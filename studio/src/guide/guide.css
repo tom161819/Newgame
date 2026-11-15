@@ -1,0 +1,23 @@
+/* Guide page (owner 15 Nov 2026). */
+.gd-main { max-width: 1000px; display: flex; flex-direction: column; gap: 18px; }
+.gd-intro p { margin: 0 0 6px; max-width: 75ch; }
+.gd-mode { color: var(--muted); font-size: 13px; }
+.gd-section h2 { font-family: var(--font-display); font-size: 19px; margin: 0 0 8px; }
+.gd-section h2 .count { color: var(--muted); font-size: 13px; font-family: var(--font-body); font-weight: 500; }
+.gd-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.gd-item { display: grid; grid-template-columns: 32px 1fr auto; gap: 8px 12px; align-items: start; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.gd-item.changed { border-color: var(--status-review); box-shadow: inset 3px 0 0 var(--status-review); }
+.gd-num { font-weight: 700; color: var(--muted); padding-top: 6px; text-align: center; }
+.gd-fields { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.gd-fields .meta { color: var(--muted); font-size: 12px; }
+.gd-fields label { display: grid; grid-template-columns: 34px 1fr; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); }
+.gd-fields input, .gd-fields textarea, .gd-add input, .gd-add select, .gd-gap input { font: inherit; width: 100%; box-sizing: border-box; }
+.gd-fields textarea { min-height: 40px; resize: vertical; }
+.gd-actions { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.gd-actions .button { padding: 2px 8px; }
+.gd-add { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.gd-add input { flex: 1 1 240px; }
+.gd-add select { width: auto; }
+.gd-gap { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; font-size: 14px; }
+.gd-gap input { width: 90px; }
+@media (max-width: 600px) { .gd-item { grid-template-columns: 24px 1fr; } .gd-actions { grid-column: 1 / -1; justify-content: flex-start; } }

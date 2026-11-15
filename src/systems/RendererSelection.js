@@ -1,7 +1,7 @@
-// Renderer choice for the current page load. Canvas stays the default because it
-// performs well without GPU acceleration; WebGL is opt-in through ?renderer=.
+// Renderer choice for the current page load. Owner 15 Nov 2026: WebGL is the default (Canvas when the browser has
+// no WebGL); Canvas stays a choice in Settings or through ?renderer=canvas.
 export const RENDERER_PREFERENCES=Object.freeze(['canvas','webgl','auto']);
-export const DEFAULT_RENDERER_PREFERENCE='canvas';
+export const DEFAULT_RENDERER_PREFERENCE='webgl';
 const SOFTWARE_RENDERERS=/swiftshader|llvmpipe|softpipe|software|basic render driver/i;
 
 export function parseRendererPreference(search=''){
@@ -37,11 +37,11 @@ export function chooseRenderer(preference,probe){
     const result=probe(true);
     return result.available&&result.hardware?{type:'webgl',preference,reason:'',gpu:result.renderer}:{type:'canvas',preference,reason:`${result.reason||'No hardware-accelerated WebGL is available.'} Using Canvas.`,gpu:null};
   }
-  return {type:'canvas',preference:DEFAULT_RENDERER_PREFERENCE,reason:'',gpu:null};
+  return {type:'canvas',preference:'canvas',reason:'',gpu:null};
 }
 
 export function rendererLabel(choice){
   const name=choice.type==='webgl'?'WebGL':'Canvas';
-  const mode=choice.preference==='canvas'?'default':choice.preference==='auto'?'auto':'requested';
+  const mode=choice.preference===DEFAULT_RENDERER_PREFERENCE?'default':choice.preference==='auto'?'auto':'requested';
   return `${name} (${mode})${choice.reason?` · ${choice.reason}`:''}`;
 }

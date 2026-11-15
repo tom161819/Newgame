@@ -22,6 +22,6 @@ export default defineConfig({
     // 15 Nov 2026: 24 KB – the 48 season oaks took the build to 561 files.
     assetsInlineLimit: 24576,
     chunkSizeWarningLimit: 2500,
-    rollupOptions: { input: { index: `${studio}index.html`, 'phaser-demo': `${studio}phaser-demo.html`, 'path-lab': `${studio}path-lab.html`, buildings: `${studio}buildings.html`, 'ui-lab': `${studio}ui-lab.html`, 'world-lab': `${studio}world-lab.html`, 'fire-lab': `${studio}fire-lab.html`, 'light-lab': `${studio}light-lab.html` } },
+    rollupOptions: { input: { index: `${studio}index.html`, 'phaser-demo': `${studio}phaser-demo.html`, 'path-lab': `${studio}path-lab.html`, buildings: `${studio}buildings.html`, guide: `${studio}guide.html`, 'ui-lab': `${studio}ui-lab.html`, 'world-lab': `${studio}world-lab.html`, 'fire-lab': `${studio}fire-lab.html`, 'light-lab': `${studio}light-lab.html` } },
   },
 });

@@ -1,6 +1,8 @@
 import { t } from '../i18n/index.js';
 import { element } from './objectLabels.js';
 import { gettingStartedProgress } from '../systems/GettingStarted.js';
+import { guideText } from '../data/guide.js';
+import { language } from '../i18n/index.js';
 
 // Owner request 7 Nov 2026: Getting started, a checklist of the first buildings. A step ticks itself when its building is
 // completed. Owner 9 Nov 2026 ("začínáme úkoly → přesuň doprava pod tenhle panel, udělej na to nové zvláštní okno,
@@ -18,7 +20,8 @@ export class GettingStartedPanel {
     // The summary toggles the <details>; the choice is kept per browser.
     this.dialog.addEventListener('toggle',()=>{writeHelpCollapsed(!this.dialog.open,this.storage);this.place();},options);
     for(const e of ['pointerdown','mousedown','mouseup','wheel'])this.dialog.addEventListener(e,ev=>ev.stopPropagation(),options);
-    this.list.addEventListener('click',event=>{const id=event.target.closest('[data-help-building]')?.dataset.helpBuilding;if(id)this.showBuilding(id);},options);
+    // Owner 15 Nov 2026: a task opens the place where it is done (the build menu, Population → job, the king).
+    this.list.addEventListener('click',event=>{const id=event.target.closest('[data-help-step]')?.dataset.helpStep;if(id)this.showTask(id);},options);
     this.refresh=()=>this.update();scene.events?.on('buildings:changed',this.refresh);
     // Docked just under the top bar, whose height changes with its rows and the "More" details.
     this.place=()=>{const bar=document.querySelector('.inventory'),view=this.dialog.offsetParent;if(!bar||!view)return;
@@ -26,10 +29,17 @@ export class GettingStartedPanel {
       if(this.dialog.style.top!==`${top}px`)this.dialog.style.top=`${top}px`;};
     if(typeof ResizeObserver!=='undefined'){this.observer=new ResizeObserver(()=>this.place());const bar=document.querySelector('.inventory');if(bar)this.observer.observe(bar);}
     window.addEventListener('resize',this.place,options);
+    // Jobs, the selected king and found water are not building events: the list is checked once a second too.
+    this.timer=setInterval(()=>this.update(),1000);
     this.dialog.hidden=false;this.update();this.place();
   }
-  progress(){return gettingStartedProgress(this.scene.buildings);}
-  update(){const progress=this.progress();this.render(progress);return progress;}
+  progress(){
+    const s=this.scene,flags=s.guideFlags??={};
+    if(s.unitSelection?.king)flags.king=true;
+    const progress=gettingStartedProgress(s);if(progress.steps.some(step=>step.kind==='water'&&step.done))flags.water=true;return progress;
+  }
+  // Owner 15 Nov 2026: when every task is done the panel goes away for the rest of the game.
+  update(){const progress=this.progress();const key=JSON.stringify(progress.steps.map(s=>s.done))+language();if(key!==this.lastKey||progress.allDone!==this.lastAllDone){this.lastKey=key;this.render(progress);}this.lastAllDone=progress.allDone;this.dialog.hidden=progress.allDone;return progress;}
   render(progress=this.progress()){
     this.summary.textContent=progress.allDone?t('help.allSet'):t('help.progress',{done:progress.doneCount,total:progress.total});
     this.summary.classList.toggle('help-all-set',progress.allDone);
@@ -38,9 +48,9 @@ export class GettingStartedPanel {
     this.list.replaceChildren(...progress.steps.map((step,index)=>{
       const item=element('li',`help-step${step.done?' done':''}${step.id===progress.current?' current':''}`);item.dataset.helpStep=step.id;
       if(step.id===progress.current)item.setAttribute('aria-current','step');
-      const button=element('button','help-step-button');button.type='button';button.dataset.helpBuilding=step.buildingId;
+      const button=element('button','help-step-button');button.type='button';if(step.buildingId)button.dataset.helpBuilding=step.buildingId;
       const mark=element('span','help-step-mark',step.done?'✓':String(index+1));mark.setAttribute('aria-hidden','true');
-      const text=element('span','help-step-text');text.append(element('strong','',t(`help.step.${step.id}`)),element('small','',t(`help.step.${step.id}.why`)));
+      const text=element('span','help-step-text');text.append(element('strong','',guideText(step.title,language())??t(`help.step.${step.id}`)),element('small','',guideText(step.why,language())??t(`help.step.${step.id}.why`)));
       const state=element('span','help-step-state',t(step.done?'help.done':'help.todo'));
       button.append(mark,text,state);item.append(button);return item;
     }));
@@ -56,6 +66,12 @@ export class GettingStartedPanel {
     bar.selectCategory(definition.buildingCategory??'all');if(bar.panel.hidden)bar.toggle();
     const choice=document.getElementById(`${id}-choice`);choice?.scrollIntoView?.({block:'nearest',inline:'center'});choice?.focus({preventScroll:true});
   }
-  relabel(){this.update();}
-  destroy(){this.controller.abort();this.observer?.disconnect();this.scene.events?.off('buildings:changed',this.refresh);this.dialog.hidden=true;}
+  showTask(id){
+    const s=this.scene,step=this.progress().steps.find(x=>x.id===id);if(!step)return;
+    if(step.kind==='job'){s.populationSidebar?.setOpen(true);return;}
+    if(step.kind==='king'||step.kind==='water'){s.worldCamera?.selectKing?.();s.worldCamera?.locate?.(s.character??{});return;}
+    if(step.buildingId)this.showBuilding(step.buildingId);
+  }
+  relabel(){this.lastKey=null;this.update();}
+  destroy(){clearInterval(this.timer);this.controller.abort();this.observer?.disconnect();this.scene.events?.off('buildings:changed',this.refresh);this.dialog.hidden=true;}
 }

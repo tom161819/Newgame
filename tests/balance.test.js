@@ -2,7 +2,7 @@
 // developer Balance multipliers (src/data/devBalance.js) behind the hidden Dev mode.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { TUTORIAL_STEPS } from '../src/data/tutorial.js';
+import { GETTING_STARTED_STEPS } from '../src/data/gettingStarted.js';
 import { FORESTRY } from '../src/data/naturalResources.js';
 import { FISHING } from '../src/data/fishing.js';
 import { FARMING_RULES } from '../src/data/farming.js';
@@ -20,8 +20,10 @@ import { DevBalancePanel } from '../src/ui/DevBalancePanel.js';
 
 const memory=()=>{const m=new Map();return {getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),map:m};};
 
-test('m-drevo-start: the Lumberjack Hut comes right after the Granary, before the Hunting Lodge',()=>{
-  const ids=TUTORIAL_STEPS.map(s=>s.id);assert.equal(ids.indexOf('lumberjack_hut'),ids.indexOf('granary')+1);assert.ok(ids.indexOf('lumberjack_hut')<ids.indexOf('hunting_lodge'));
+// Owner 15 Nov 2026: the Getting started order is his (Granary, Builder, Hunting Lodge, Lumberjack Hut, …); wood still
+// comes early – the Lumberjack Hut is among the first four tasks.
+test('m-drevo-start: the Lumberjack Hut is among the first Getting started tasks',()=>{
+  const ids=GETTING_STARTED_STEPS.map(s=>s.id);assert.ok(ids.indexOf('lumberjack_hut')>=0&&ids.indexOf('lumberjack_hut')<=3);assert.ok(ids.indexOf('granary')<ids.indexOf('lumberjack_hut'));
 });
 test('m-drevo-start: chopping is 1.5× faster from data (the wood per tree and the hut pile stay)',()=>{
   for(const [id,wood]of [['oak_tree',6],['pine_tree',5]]){const tree=objectRegistry.require(id).tree;assert.equal(tree.wood,wood);assert.equal(tree.chopDuration,FORESTRY.trees[id].chopDuration);

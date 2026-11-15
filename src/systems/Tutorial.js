@@ -34,6 +34,8 @@ export function tutorialProgress(scene,{seen=new Set(),skipped=new Set()}={}){
       case 'built':return step.buildingIds.every(id=>built.has(id));
       case 'stone':return marked||step.buildingIds.some(id=>types.has(id));
       case 'speed':return seen.has(step.id)||(scene.gameSpeed??1)>1;
+      // Owner 15 Nov 2026 start guide: the Wiki was opened / the arrow was acknowledged (this session).
+      case 'wiki':case 'ack':return seen.has(step.id);
       default:return false;
     }
   };

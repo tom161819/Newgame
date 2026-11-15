@@ -98,11 +98,11 @@ test('other world settings (no river, dense forest, many rocks) keep the guarant
 });
 
 test('tutorial: the Stone step names the grey deposit near the castle; with the Quarry chosen the arrow points at it',async()=>{
-  const { TutorialGuide }=await import('../src/ui/TutorialGuide.js'),{ TUTORIAL_STEPS }=await import('../src/data/tutorial.js'),{ gridToWorld }=await import('../src/game/isometric.js');
+  const { TutorialGuide }=await import('../src/ui/TutorialGuide.js'),{ gridToWorld }=await import('../src/game/isometric.js');
   const en=(await import('../src/i18n/en.js')).default,cs=(await import('../src/i18n/cs.js')).default;
   assert.match(en['tutorial.step.stone'],/Quarry on the grey deposit near the castle/);assert.match(cs['tutorial.step.stone'],/kamenolom na šedém ložisku kousek od hradu/);
   assert.ok(en['tutorial.step.stoneQuarry']&&cs['tutorial.step.stoneQuarry']);
-  const {s,result}=newWorld(7,undefined,{trees:false}),step=TUTORIAL_STEPS.find(t=>t.id==='stone'),guide=Object.create(TutorialGuide.prototype);
+  const {s,result}=newWorld(7,undefined,{trees:false}),step={id:'stone',check:'stone',target:'#mark-rocks',buildingIds:['quarry']}/* the stone arrow logic stays in TutorialGuide (owner 15 Nov 2026: no longer a guide step) */,guide=Object.create(TutorialGuide.prototype);
   Object.assign(guide,{scene:s,doc:{querySelector:()=>null,getElementById:()=>null}});
   s.buildMode=true;s.selectedBuilding=s.objectRegistry.require('quarry');
   const target=guide.target(step),nearest=guide.quarryDeposit(),p=gridToWorld(nearest.x+1,nearest.y+1);

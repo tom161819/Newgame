@@ -6,11 +6,17 @@ import { TUTORIAL_KING_MS } from '../data/tutorial.js';
 import { TipQueue } from './tipQueue.js';
 import { DAY_DURATION } from '../systems/GameTimeSystem.js';
 import { foodDays } from '../data/foodOutlook.js';
+import { GUIDE,guideText } from '../data/guide.js';
+import { TIP_GAP_SECONDS } from '../data/tips.js';
+import { language } from '../i18n/index.js';
 
 // E3 tutorial (plan m-e3-tutorial-sipka): a bubble with one sentence and an arrow at the place to click. The map is never
 // blocked. "Show me" opens the right panel or menu, "Skip" moves on, × ends the tutorial (Settings can bring it back).
 const KEY='newgame.tutorial',SPEED_KEY='newgame.tutorial.speedSeen';
 const TIPS_KEY='newgame.tips',SEEN_KEY='newgame.tipsSeen';
+// Owner 15 Nov 2026: the start guide (Wiki arrow, Getting started arrow) is shown once per browser.
+const INTRO_KEY='newgame.guide.intro';
+export const introDone=(storage=globalThis.localStorage)=>{try{return storage?.getItem(INTRO_KEY)==='done';}catch{return false;}};
 export const tipsEnabled=(storage=globalThis.localStorage)=>{try{return storage?.getItem(TIPS_KEY)!=='off';}catch{return true;}};
 export const tutorialEnabled=(storage=globalThis.localStorage)=>{try{return storage?.getItem(KEY)!=='off';}catch{return true;}};
 export function setTutorialEnabled(on,storage=globalThis.localStorage){try{storage?.setItem(KEY,on?'on':'off');}catch{/* session only */}}
@@ -83,8 +89,8 @@ export class TutorialGuide {
   button(cls,action){const b=this.doc.createElement('button');b.type='button';b.className=cls;b.addEventListener('click',action,{signal:this.controller.signal});return b;}
   progress(){if(rememberSpeed(this.scene,this.seen))try{localStorage.setItem(SPEED_KEY,'1');}catch{/* session */}return tutorialProgress(this.scene,{seen:this.seen,skipped:this.skipped});}
   // A new game from the setup starts it; a loaded game resumes it while it is switched on and not finished.
-  start(){if(!tutorialEnabled())return false;this.active=true;this.startedAt=performance.now();this.update(true);return true;}
-  resume(){if(tutorialEnabled()&&!this.progress().allDone){this.active=true;this.startedAt=performance.now();this.update(true);}}
+  start(){if(!tutorialEnabled()||introDone())return false;this.active=true;this.startedAt=performance.now();this.update(true);return true;}
+  resume(){if(tutorialEnabled()&&!introDone()&&!this.progress().allDone){this.active=true;this.startedAt=performance.now();this.update(true);}}
   end(){if(this.tip){this.closeTip();try{localStorage.setItem(TIPS_KEY,'off');}catch{/* session */}if(this.tipSetting)this.tipSetting.checked=false;return;}this.active=false;setTutorialEnabled(false);if(this.setting)this.setting.checked=false;this.hide();}
   hide(){this.bubble.hidden=true;this.arrow.hidden=true;}
   next(){if(this.tip){this.closeTip();return;}const p=this.progress();if(p.current){this.seen.add(p.current.id);if(p.current.id==='speed')try{localStorage.setItem(SPEED_KEY,'1');}catch{/* session */}}this.update(true);}
@@ -93,6 +99,7 @@ export class TutorialGuide {
   showMe(){
     if(this.tip){const wiki=this.tip.wiki;this.closeTip();if(wiki&&this.scene.wikiPanel)this.scene.wikiPanel.open(wiki);else this.scene.gettingStarted?.show();return;}
     const s=this.scene,step=this.progress().current;if(!step)return;
+    if(step.id==='wiki'){s.wikiPanel?.open();this.seen.add('wiki');this.update(true);return;}
     if(step.check==='job'){s.populationSidebar?.setOpen(true);return;}
     if(step.id==='speed'){s.speedControls?.setSpeed(2);this.next();return;}
     if(step.id==='stone'){if(s.rockMiningTool&&!s.rockMiningTool.enabled)s.rockMiningTool.activate(false);else this.doc.querySelector('#mark-rocks')?.focus();this.update(true);return;}
@@ -116,6 +123,8 @@ export class TutorialGuide {
     // m-kamenolom-u-hradu: with the Quarry chosen in the build menu, the arrow points down at the free Stone Deposit
     // nearest to the Castle (every new world has one 8–16 tiles out).
     if(step.id==='stone'&&s.buildMode&&s.selectedBuilding?.id==='quarry'){const d=this.quarryDeposit();if(d){const c=depositCentre(d),p=gridToWorld(c.x,c.y);return {world:{x:p.x,y:p.y-30},from:'above',placing:true,quarry:true};}}
+    // Owner 15 Nov 2026 start guide: the Getting started arrow stays beside the panel, never over its tasks.
+    if(step.check==='ack'&&step.target)return {el:q(step.target),avoid:[q('#help-dialog')]};
     if(step.target)return {el:q(step.target)};
     const id=this.pendingBuilding(step);if(!id)return {};
     if(s.buildMode&&s.selectedBuilding?.id===id)return {placing:true};
@@ -149,17 +158,21 @@ export class TutorialGuide {
   update(force=false){
     if(!this.active){this.updateTips();return;}const now=performance.now();if(!force&&now-this.lastCheck<150)return;this.lastCheck=now;
     if(this.scene.gameOver||!tutorialEnabled()){this.hide();return;}
+    if(this.scene.wikiPanel?.isOpen)this.seen.add('wiki');
     const p=this.progress();
     if(p.current?.id==='king'&&now-(this.startedAt??now)>=TUTORIAL_KING_MS)this.seen.add('king');
     if(this.currentId&&p.current?.id!==this.currentId&&!this.skipped.has(this.currentId))this.flashDone();
-    if(!p.current){this.active=false;this.hide();this.scene.eventFeed?.push?.('tutorial-done',t('tutorial.finished'),{important:true});this.currentId=null;return;}
+    if(!p.current){try{localStorage.setItem(INTRO_KEY,'done');}catch{/* session */}this.lastTipClosed=this.gameNow();this.active=false;this.hide();this.currentId=null;return;}
     this.currentId=p.current.id;
     const target=this.target(p.current);
     const key=target.quarry?'tutorial.step.stoneQuarry':target.placing?'tutorial.place':target.from==='above'&&p.current.id==='stone'?'tutorial.step.stoneMark':`tutorial.step.${p.current.id}`;
-    this.text.textContent=t(key,{name:this.scene.objectRegistry?.get(this.pendingBuilding(p.current)??'')?.name??'',plots:FARM_PLOT_CAPACITY});
+    const intro=GUIDE.intro.find(step=>step.id===p.current.id);
+    this.arrow.classList.toggle('big',!!intro);
+    this.text.textContent=guideText(intro?.text,language())??t(key,{name:this.scene.objectRegistry?.get(this.pendingBuilding(p.current)??'')?.name??'',plots:FARM_PLOT_CAPACITY});
     this.count.textContent=t('tutorial.count',{step:p.doneCount+1,total:p.total});
     this.showButton.textContent=t('tutorial.show');this.skipButton.textContent=t('tutorial.skip');this.nextButton.textContent=t('tutorial.next');this.closeButton.title=this.closeButton.ariaLabel=t('tutorial.close');
-    this.nextButton.hidden=!p.current.optional&&!['king','speed'].includes(p.current.id);this.showButton.hidden=p.current.id==='king'||!!target.placing;
+    this.nextButton.hidden=!p.current.optional&&!['king','speed'].includes(p.current.id)&&p.current.check!=='ack';this.showButton.hidden=p.current.id==='king'||p.current.check==='ack'||!!target.placing;
+    if(p.current.check==='ack')this.nextButton.textContent=t('tips.gotIt');
     this.bubble.hidden=false;this.place(target);
   }
   place(target){
@@ -205,8 +218,16 @@ export class TutorialGuide {
   }
   flashDone(){this.done.hidden=false;this.done.classList.remove('pop');void this.done.offsetWidth;this.done.classList.add('pop');clearTimeout(this.doneTimer);this.doneTimer=setTimeout(()=>{this.done.hidden=true;},900);}
   // ---- Tips (plan m-e3-tipy) ----
+  // Owner 15 Nov 2026: a 'sequence' tip comes after the start guide, when the earlier ones are seen and TIP_GAP_SECONDS
+  // of play (game time) have passed since the last tip was closed.
+  sequenceHolds(id){
+    if(!introDone())return false;const list=this.tips.tips.filter(tip=>tip.kind==='sequence'),i=list.findIndex(tip=>tip.id===id);
+    if(i<0||list.slice(0,i).some(tip=>!this.tips.seen.has(tip.id)))return false;
+    this.lastTipClosed??=this.gameNow();return this.gameNow()-this.lastTipClosed>=TIP_GAP_SECONDS*1000;
+  }
   tipHolds(id){
     const s=this.scene;
+    if(this.tips.byId(id)?.kind==='sequence')return this.sequenceHolds(id);
     switch(id){
       case 'night':return !!s.dayNight?.isNight?.();
       case 'food':return foodDays(s.foodSystem)<3;
@@ -235,9 +256,9 @@ export class TutorialGuide {
     const tip=this.tips.next(id=>this.tipHolds(id),this.gameNow());if(tip)this.showTip(tip);
   }
   showTip(tip){
-    this.text.textContent=t(`tips.${tip.id}`);this.count.textContent=t('tips.label');
+    this.text.textContent=guideText(tip.text,language())??t(`tips.${tip.id}`);this.count.textContent=t('tips.label');
     this.showButton.hidden=false;this.showButton.textContent=t('tips.more');this.nextButton.hidden=false;this.nextButton.textContent=t('tips.gotIt');this.skipButton.hidden=true;this.closeButton.title=this.closeButton.ariaLabel=t('tips.off');
-    this.bubble.classList.add('is-tip');this.bubble.hidden=false;this.hovered=false;this.placeTip();
+    this.arrow.classList.remove('big');this.bubble.classList.add('is-tip');this.bubble.hidden=false;this.hovered=false;this.placeTip();
   }
   placeTip(){
     const tip=this.tip,s=this.scene;if(!tip)return;
@@ -245,11 +266,11 @@ export class TutorialGuide {
     else this.place(tip.target?{el:this.doc.querySelector(tip.target)}:{});
   }
   // "Got it" marks the tip seen; × switches tips off; "More" opens the help (the checklist and its answers).
-  closeTip(seen=true){if(!this.tip)return;this.tips.close(seen);if(seen)this.saveSeen();this.bubble.classList.remove('is-tip');this.hide();}
+  closeTip(seen=true){if(!this.tip)return;this.lastTipClosed=this.gameNow();this.tips.close(seen);if(seen)this.saveSeen();this.bubble.classList.remove('is-tip');this.hide();}
   // Folded into the Notices bar: seen (it does not pop up again), listed there until opened or closed.
-  parkTip(){if(!this.tips.park(this.gameNow()))return;this.saveSeen();this.bubble.classList.remove('is-tip');this.hide();this.scene.noticesPanel?.render?.();}
+  parkTip(){if(!this.tips.park(this.gameNow()))return;this.lastTipClosed=this.gameNow();this.saveSeen();this.bubble.classList.remove('is-tip');this.hide();this.scene.noticesPanel?.render?.();}
   // The tips folded into the Notices bar, as notice rows (NoticesPanel).
-  parkedTips(){return this.tips.parkedList().map(({id,at})=>({key:`tip:${id}`,tip:id,reason:'tip',category:'tip',severity:'info',entityId:null,lastNotified:at,text:t(`tips.${id}`)}));}
+  parkedTips(){return this.tips.parkedList().map(({id,at})=>({key:`tip:${id}`,tip:id,reason:'tip',category:'tip',severity:'info',entityId:null,lastNotified:at,text:guideText(this.tips.byId(id)?.text,language())??t(`tips.${id}`)}));}
   // A parked tip clicked in the Notices bar opens again (not while the tutorial runs: it uses the same bubble).
   reopenTip(id){if(this.active||!this.tips.reopen(id,this.gameNow()))return false;this.saveSeen();this.showTip(this.tip);this.scene.noticesPanel?.render?.();return true;}
   dropTip(id){if(this.tips.drop(id))this.scene.noticesPanel?.render?.();}

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Asset Studio · Guide and tips</title>
+    <meta name="claude:viewport-fit-sides" content="cover" />
+    <link rel="icon" href="data:," />
+    <meta name="description" content="The game's start guide, Getting started tasks and tips: edit texts and order, then send them to Claude." />
+  </head>
+  <body class="guide-page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><strong>Guide and tips</strong><span class="brand-sub" id="gd-version">From the game's code</span></div></div>
+      <nav class="views" aria-label="Studio views"><a href="./index.html#assets">Assets</a><a href="./index.html#style-guide">Style guide</a><a href="./buildings.html">Buildings in game</a><a href="./guide.html" aria-current="page">Guide</a><a href="./ui-lab.html">UI Lab</a><a href="./world-lab.html">World Lab</a><a href="./fire-lab.html">Fire Lab</a><a href="./light-lab.html">Light Lab</a><a href="./phaser-demo.html">Phaser demo</a><a href="./path-lab.html">Path Lab</a></nav>
+      <div class="review-status">
+        <span id="gd-summary" class="review-summary" aria-live="polite"></span>
+        <button id="gd-reset" type="button" class="button">Back to the game's version</button>
+        <button id="gd-submit" type="button" class="button primary">Send to Claude</button>
+      </div>
+    </header>
+    <p id="studio-alert" class="studio-alert" role="alert" hidden></p>
+    <main id="gd-main" class="workspace gd-main" tabindex="-1">
+      <div class="gd-intro">
+        <p>Edit the texts (Czech; English is optional – Claude translates what is missing), change the order with ↑ ↓, add or remove tasks and tips. Changes save by themselves and everyone with this page sees them. When you are done press <strong>Send to Claude</strong> and write <strong>„převzít průvodce“</strong> in the chat.</p>
+        <p id="gd-mode" class="gd-mode"></p>
+      </div>
+      <section class="gd-section"><h2>1 · Start arrows <span class="count">shown once at the start of the first game</span></h2><ol id="gd-intro" class="gd-list"></ol></section>
+      <section class="gd-section"><h2>2 · Getting started tasks <span class="count">the panel goes away when all are done</span></h2><ol id="gd-tasks" class="gd-list"></ol>
+        <div class="gd-add"><select id="gd-task-kind"><option value="build">Build a building</option><option value="job">Give a resident a job</option><option value="king">Select the king</option><option value="water">Find water</option></select><select id="gd-task-building"></select><select id="gd-task-job" hidden></select><button id="gd-add-task" type="button" class="button">Add task</button></div>
+      </section>
+      <section class="gd-section"><h2>3 · Tips <span class="count">“In order” tips come one after another after the start arrows; “When it happens” tips come with their situation</span></h2>
+        <label class="gd-gap">Pause between “in order” tips <input id="gd-gap" type="number" min="10" max="3600" step="5" /> seconds of play</label>
+        <ol id="gd-tips" class="gd-list"></ol>
+        <div class="gd-add"><input id="gd-new-tip" type="text" placeholder="New tip in Czech, e.g. Kolečkem myši přibližuješ mapu." /><button id="gd-add-tip" type="button" class="button">Add tip</button></div>
+      </section>
+    </main>
+    <script type="module" src="./src/guide/main.js"></script>
+  </body>
+</html>

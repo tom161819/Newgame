@@ -15,29 +15,30 @@ function fakeDocument({gpu='NVIDIA GeForce',software=false,missing=false}={}){
 }
 const probeWith=doc=>requireHardware=>probeWebGL(doc,{requireHardware});
 
-test('renderer preference comes only from a valid ?renderer value and defaults to Canvas',()=>{
-  assert.equal(parseRendererPreference(''),'canvas');
+// Owner 15 Nov 2026: WebGL is the default.
+test('renderer preference comes only from a valid ?renderer value and defaults to WebGL',()=>{
+  assert.equal(parseRendererPreference(''),'webgl');
   assert.equal(parseRendererPreference('?renderer=webgl'),'webgl');
   assert.equal(parseRendererPreference('?renderer=AUTO'),'auto');
   assert.equal(parseRendererPreference('?renderer=canvas&changelog=0.2.0'),'canvas');
-  assert.equal(parseRendererPreference('?renderer=vulkan'),'canvas');
-  assert.equal(parseRendererPreference('?renderer='),'canvas');
+  assert.equal(parseRendererPreference('?renderer=vulkan'),'webgl');
+  assert.equal(parseRendererPreference('?renderer='),'webgl');
 });
 
-test('default Canvas never creates a WebGL probe context',()=>{
+test('chosen Canvas never creates a WebGL probe context',()=>{
   const doc=fakeDocument();
   assert.deepEqual(chooseRenderer('canvas',probeWith(doc)),{type:'canvas',preference:'canvas',reason:'',gpu:null});
   assert.equal(doc.calls.length,0);
-  assert.equal(rendererLabel(chooseRenderer('canvas',probeWith(doc))),'Canvas (default)');
+  assert.equal(rendererLabel(chooseRenderer('canvas',probeWith(doc))),'Canvas (requested)');
 });
 
 test('requested WebGL is used when available, including a reported software rasteriser',()=>{
   const gpu=chooseRenderer('webgl',probeWith(fakeDocument()));
-  assert.equal(gpu.type,'webgl');assert.equal(gpu.gpu,'NVIDIA GeForce');assert.equal(rendererLabel(gpu),'WebGL (requested)');
+  assert.equal(gpu.type,'webgl');assert.equal(gpu.gpu,'NVIDIA GeForce');assert.equal(rendererLabel(gpu),'WebGL (default)');
   const software=chooseRenderer('webgl',probeWith(fakeDocument({software:true})));
   assert.equal(software.type,'webgl');assert.match(software.reason,/software rasteriser/);
   const missing=chooseRenderer('webgl',probeWith(fakeDocument({missing:true})));
-  assert.equal(missing.type,'canvas');assert.match(rendererLabel(missing),/^Canvas \(requested\) · WebGL is not available\. Using Canvas\.$/);
+  assert.equal(missing.type,'canvas');assert.match(rendererLabel(missing),/^Canvas \(default\) · WebGL is not available\. Using Canvas\.$/);
 });
 
 test('auto selects WebGL only with hardware acceleration and otherwise falls back to Canvas',()=>{

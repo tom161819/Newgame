@@ -17,8 +17,8 @@ initCompactHud();initCompactHints();
 // UI Lab look and layout (owner's design from the Studio by default), before the main menu shows.
 applyUiStyle();
 
-// Canvas stays the default: shared terrain textures and simple shapes are fast
-// even without a GPU. ?renderer=webgl or ?renderer=auto opts into WebGL for testing.
+// Canvas was the default until 0.138: shared terrain textures and simple shapes are fast
+// even without a GPU. Owner 15 Nov 2026: WebGL is now the default; ?renderer=canvas or Settings picks Canvas.
 // Settings → Renderer remembers the choice in this browser (an artifact page cannot take ?renderer= in its address).
 let savedRenderer=null;try{savedRenderer=localStorage.getItem('newgame.renderer');}catch{/* default */}
 const rendererPreference=new URLSearchParams(window.location.search).has('renderer')?parseRendererPreference(window.location.search):parseRendererPreference(`?renderer=${savedRenderer??''}`);

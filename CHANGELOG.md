@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.138.5] - 2026-11-15
+<!-- version: {"title":"Start guide, tips and WebGL","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- The step-by-step tutorial is gone. A new game starts with a big arrow at the Wiki (information about the game and its mechanics), then one at the Getting started panel; after that tips come one by one (full screen with Alt+Enter, K selects the king, Shift builds several buildings in a row, game speed), each a while after the last.
+- Getting started has new tasks: Granary, a Builder, a Hunting Lodge, a Lumberjack Hut, a Material Yard, select the king and explore, find water, a Fisherman's Hut. Clicking a task opens the place where it is done (the build menu, the Population list, the king). The panel goes away when every task is done.
+- The game starts with WebGL by default (Canvas when the browser has no WebGL; Settings can still pick Canvas).
+
 ## [0.138.4] - 2026-11-15
 <!-- version: {"title":"Statistics switched on","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

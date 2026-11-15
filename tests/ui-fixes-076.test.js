@@ -6,7 +6,7 @@ import { deathLine } from '../src/ui/EventFeed.js';
 import { noticeText } from '../src/ui/noticeText.js';
 import { initCompactHud } from '../src/ui/CompactHud.js';
 import { t,setLanguage,pluralCategory,pluralForm } from '../src/i18n/index.js';
-import { TUTORIAL_STEPS } from '../src/data/tutorial.js';
+import { GUIDE } from '../src/data/guide.js';
 import CS_NAMES from '../src/data/names.cs.js';
 import { stumpMessageShown } from '../src/systems/NaturalResourcesSystem.js';
 import { workerScene } from './helpers/workerScene.js';
@@ -133,12 +133,12 @@ test('Czech origins take "z" or "ze" before a hard cluster (point 11)',()=>{
   assert.ok(CS_NAMES.origins.includes('z Hrnčíř'),'Hrnčíře (genitive plural) is right');
 });
 
-test('a Speed step once done stays done after slowing down (point 9)',()=>{
-  const scene={buildings:[],gameSpeed:3,workerSystem:{liveSubjects:()=>[]}},seen=new Set(),speed=()=>tutorialProgress(scene,{seen}).steps.find(s=>s.id==='speed').done;
-  assert.ok(TUTORIAL_STEPS.some(s=>s.id==='speed'));assert.equal(speed(),true);
-  assert.equal(rememberSpeed(scene,seen),true);assert.equal(rememberSpeed(scene,seen),false,'remembered once');
-  scene.gameSpeed=1;assert.equal(speed(),true,'still done at ×1');
-  const fresh={...scene,gameSpeed:1};assert.equal(rememberSpeed(fresh,new Set()),false);assert.equal(tutorialProgress(fresh).steps.find(s=>s.id==='speed').done,false);
+test('point 9: the speed-up is remembered once (the speed step became a start-guide tip)',()=>{
+  // Owner 15 Nov 2026: speed is now a sequence tip of the start guide; the remembered speed-up still works.
+  const scene={buildings:[],gameSpeed:3,workerSystem:{liveSubjects:()=>[]}},seen=new Set();
+  assert.ok(GUIDE.tips.some(t=>t.id==='speed'&&t.kind==='sequence'));
+  assert.equal(rememberSpeed(scene,seen),true);assert.equal(rememberSpeed(scene,seen),false,'remembered once');assert.ok(seen.has('speed'));
+  const fresh={...scene,gameSpeed:1};assert.equal(rememberSpeed(fresh,new Set()),false);
 });
 
 test('the King\'s felled wood is carried by Haulers; the stump line only for the King (point 10)',()=>{

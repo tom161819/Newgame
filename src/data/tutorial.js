@@ -5,28 +5,13 @@
 // the first food, then four optional food-chain steps (info + arrow, "Next" or building it moves on), the Miner after
 // marking a rock. Optional steps are also done once the world has passed them (a later mandatory step is done), so a
 // loaded game never falls back to them. The mandatory path is paid by the New Game start (NEW_GAME_DEFAULTS, test).
-export const TUTORIAL_STEPS=Object.freeze([
-  {id:'king',check:'seen',target:'king'},
-  {id:'builder',check:'job',job:'builder'},
-  {id:'hauler',check:'job',job:'hauler'},
-  // m-tutorial-v3 (owner point 75): the Granary stays right after the Hauler. Only the player's own Granary ends it – the
-  // Castle and the Starter Stockpile never count (the step checks the building type `granary`).
-  {id:'granary',check:'planned',buildingIds:['granary']},
-  // m-drevo-start (playtest 0.76.0 #2): the Lumberjack Hut right after the Granary, so wood comes in from day 1.
-  {id:'lumberjack_hut',check:'planned',buildingIds:['lumberjack_hut']},
-  {id:'hunting_lodge',check:'planned',buildingIds:['hunting_lodge']},
-  {id:'fisherman',check:'planned',optional:true,buildingIds:['fisherman_hut']},
-  {id:'farm',check:'planned',optional:true,buildingIds:['farmhouse']},
-  {id:'mill',check:'planned',optional:true,buildingIds:['mill']},
-  {id:'bakery',check:'planned',optional:true,buildingIds:['bakery']},
-  {id:'stone',check:'stone',target:'#mark-rocks',buildingIds:['quarry']},
-  {id:'miner',check:'job',job:'miner'},
-  // m-tutorial-v3 (owner point 76): every build step ends with the placed blueprint; the House no longer waits to be finished.
-  {id:'house',check:'planned',buildingIds:['house']},
-  {id:'storage',check:'planned',buildingIds:['material_yard','builder_workshop']},
-  {id:'speed',check:'speed',target:'#speed-controls [data-speed="2"]'},
-].map(step=>Object.freeze(step)));
+// Owner 15 Nov 2026 ("zruš tutoriál"): the step-by-step tutorial is replaced by a short start guide – an arrow at the
+// Wiki, then one at the Getting started panel – whose steps and texts come from src/data/guide.js (Asset Studio, Guide).
+// The step machinery above stays: 'wiki' ends when the Wiki opens, 'ack' with the "Got it" button.
+import { GUIDE } from './guide.js';
+export const TUTORIAL_STEPS=Object.freeze(GUIDE.intro.map(step=>Object.freeze({id:step.id,check:step.check,target:step.target})));
 // The buildings the mandatory steps ask for: the New Game start must pay all of them (tests/tutorial.test.js).
-export const TUTORIAL_PATH_BUILDINGS=Object.freeze(['granary','hunting_lodge','lumberjack_hut','house','material_yard','builder_workshop']);
+// Owner 15 Nov 2026: the buildings of the Getting started tasks.
+export const TUTORIAL_PATH_BUILDINGS=Object.freeze(GUIDE.tasks.filter(task=>task.kind==='build').map(task=>task.building));
 // The king step ends by itself after this many real milliseconds (or "Next").
 export const TUTORIAL_KING_MS=6000;
