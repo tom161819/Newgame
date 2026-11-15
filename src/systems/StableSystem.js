@@ -1,4 +1,4 @@
-import { buildingDefinition } from '../game/buildings.js';
+import { buildingDepth, buildingDefinition } from '../game/buildings.js';
 import { STABLE_RULES } from '../data/stables.js';
 import { t } from '../i18n/index.js';
 import { buildingIsComplete,towerNeighbors } from '../game/buildings.js';
@@ -58,11 +58,14 @@ export class StableSystem {
   // Owner 14 Nov 2026: the 6 × 8 Stables have the stable along the back edge and an open paddock in front of it;
   // Stables of an older save (5 × 5) keep their spots.
   paddock(b,index){const spots=buildingDefinition(b).height>=8?[[0,5],[2,6],[4,6],[5,4]]:[[3,1],[3,3],[1,3],[4,2]],[dx,dy]=spots[index%spots.length];return {x:b.x+dx+.5,y:b.y+dy+.5};}
+  // Point 55 (owner 15 Nov 2026): a stabled horse stands inside the Stables' footprint, so it is drawn just above the
+  // Stables' picture (else the picture covered it and the paddock looked empty).
+  depthFor(animal){const h=this.horses.get(animal.id);if(h?.state!=='stabled')return null;const b=this.stable(h.stableId);return b?buildingDepth(b)+.4+(animal.position?.y??0)*.001:null;}
   place(id){
     const h=this.horses.get(id),b=h&&this.stable(h.stableId),a=this.horse(id);if(!b||!a)return;
     if(h.state==='ridden')return;const index=this.inPaddock(b.id).findIndex(([hid])=>hid===id),p=this.paddock(b,index);
     const tile={x:Math.floor(p.x),y:Math.floor(p.y)},point=tileCenter(tile);a.path=[];a.nextTile=null;a.walking=false;a.position={x:p.x,y:p.y};a.tile=tile;
-    a.view?.setPosition?.(point.x,point.y)?.setDepth?.(point.y+(a.definition.depth?.offset??0));
+    a.view?.setPosition?.(point.x,point.y)?.setDepth?.(this.depthFor(a)??point.y+(a.definition.depth?.offset??0));
   }
   // Stablehand: pick a wild horse in sight, walk to it, tame it, lead it home. Returns true while working.
   updateWorker(worker,delta){

@@ -8,3 +8,6 @@ export function transportLabel(scene,actor){
   const pickup=['foodPickup','stockPickup','withdraw'].includes(task.kind),drop=task.sourceDropId&&scene.dropSystem.drops.get(task.sourceDropId),source=drop?t('transport.ground',{x:drop.tile.x,y:drop.tile.y}):storageName(scene,task.sourceId),destination=task.kind==='withdraw'?t('transport.kingCargo'):storageName(scene,task.destinationId);
   return `${t(pickup?'transport.collecting':'transport.delivering',{count:task.amount,resource:scene.objectRegistry.require(task.resource).name})} · ${pickup?`${source} → `:''}${destination}`;
 }
+
+// Point 57 (owner 15 Nov 2026): how a Hauler carries now – by hand, with a Wheelbarrow or a Horse Wagon.
+export function haulerCarry(scene,worker){const v=scene.vehicles?.held?.(worker)??scene.vehicles?.reservedBy?.(worker);return t(v?.type==='horse_wagon'?'haul.carry.wagon':v?.type==='wheelbarrow'?'haul.carry.wheelbarrow':'haul.carry.hand');}

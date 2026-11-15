@@ -64,7 +64,7 @@ const GROUND_STEP = 6, PATH_PLANT_REACH = 48, PATH_PARTIAL_SHARE = 0.4;
 const TILE_BLEED = .8;
 
 // Season tints as RGBA, for blending between seasons during a transition.
-const SEASON_TINT={Spring:[95,145,65,.08],Summer:[185,159,70,.09],Autumn:[158,105,45,.17],Winter:[232,237,220,.83]};
+const SEASON_TINT={Spring:[150,215,100,.16],Summer:[196,188,80,.13],Autumn:[205,128,48,.28],Winter:[232,237,220,.83]};
 function mixTint(from,to,t){const a=SEASON_TINT[from],b=SEASON_TINT[to];if(!a||!b)return null;const c=a.map((v,i)=>v+(b[i]-v)*t);return`rgba(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])},${c[3].toFixed(3)})`;}
 
 const WINTER_VEIL=[0,2.2,1.9,1.3,1]; // light tracks fade most under snow
@@ -835,7 +835,7 @@ export class TerrainRenderer {
           else drawRef(grassSeason?seasonal(season):entry.key);
           if(zoned)this.blendZones(context,x,y,point.x-left-32,point.y-origin.y-16,season);
           if(this.wear)paths.push({x,y,polygon,filter:context.filter,veil:mix?(mix.from==='Winter'?1-mix.amount:0)*.45+(season==='Winter'?mix.amount:0)*.45:season==='Winter'?.45:0});
-          const tint=(mix&&mixTint(mix.from,season,mix.amount))??{Spring:'rgba(95,145,65,.08)',Summer:'rgba(185,159,70,.09)',Autumn:'rgba(158,105,45,.17)',Winter:'rgba(232,237,220,.83)'}[season];
+          const tint=(mix&&mixTint(mix.from,season,mix.amount))??{Spring:'rgba(150,215,100,.16)',Summer:'rgba(196,188,80,.13)',Autumn:'rgba(205,128,48,.28)',Winter:'rgba(232,237,220,.83)'}[season];
           if(tint&&!grassSeason){context.globalCompositeOperation='source-atop';context.fillStyle=tint;polygon(TILE_BLEED);context.fill();}
           const zoneTint=season==='Winter'||zoned?null:this.zoneTint(x,y);if(zoneTint){context.globalCompositeOperation='source-atop';context.fillStyle=zoneTint;polygon(TILE_BLEED);context.fill();}
           context.globalCompositeOperation='source-over';

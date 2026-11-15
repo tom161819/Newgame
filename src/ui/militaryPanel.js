@@ -19,7 +19,7 @@ export function militaryBlockedText(scene,reason,type){
 export function militaryRank(scene,worker){const unit=scene.military?.unit(worker);return unit?t(`unit.type.${unit.type}`):t('military.recruit');}
 export function militarySignature(scene,building){const m=scene.military;return m?JSON.stringify([[...m.units],[...m.orders.values()].filter(o=>o.barracksId===building.id),scene.inventory.count('gold'),['sword','bow','armor'].map(id=>m.available(id)),UNIT_TYPE_IDS.map(type=>m.supplyBlocker(type))]):'';}
 export function renderMilitary(scene,building,root,employees){
-  const m=scene.military;root.hidden=!m||building.type!=='barracks';if(root.hidden)return;
+  const m=scene.military;root.hidden=!m||building.type!=='barracks';if(root.hidden){if(root._autoHire?.parentElement&&root._autoHire.parentElement!==root)root._autoHire.remove();return;}
   const cards=UNIT_TYPE_IDS.map(type=>{
     const spec=UNIT_TYPES[type],kit=unitKit(type),kits=Math.min(...Object.entries(kit).map(([id,n])=>Math.floor(m.available(id)/n))),card=element('li','unit-type-card');card.dataset.unitType=type;
     card.append(element('strong','',t(`unit.type.${type}`)),element('span','',t('military.kit',{list:itemList(scene,kit)})),element('span','',t('military.cost',{gold:spec.goldCost,seconds:spec.trainingTime/1000,level:spec.requiredCombatLevel})),
@@ -49,7 +49,9 @@ export function renderMilitary(scene,building,root,employees){
     range.addEventListener('input',()=>{const b=hire._building;if(!b)return;b.autoHire=Number(range.value);text.textContent=t('military.autoHire',{count:b.autoHire,capacity:Number(range.max)});scene.employment?.request?.();});
     hire.append(text,range);root._autoHire=hire;}
   {const range=hire.querySelector('input'),text=hire.querySelector('.barracks-auto-hire-text'),value=barracksAutoHire(building,capacity);hire._building=building;range.max=String(capacity);if(document.activeElement!==range)range.value=String(value);text.textContent=t('military.autoHire',{count:value,capacity});}
-  root.replaceChildren(element('h3','',t('military.title')),places,hire,cardList,element('h4','',t('military.recruits',{count:recruits.length})),soldiers,element('h4','',t('military.units',{count:trained.length})),units);
+  // Point 58 (owner 15 Nov 2026): the automatic hiring slider sits at the very top of the Barracks window.
+  {const heading=root.parentElement?.querySelector?.('.dialog-heading');if(heading){if(hire.previousElementSibling!==heading)heading.after(hire);}else if(hire.parentElement!==root)root.prepend(hire);}
+  root.replaceChildren(...(hire.parentElement===root?[hire]:[]),element('h3','',t('military.title')),places,cardList,element('h4','',t('military.recruits',{count:recruits.length})),soldiers,element('h4','',t('military.units',{count:trained.length})),units);
 }
 export function handleMilitaryClick(scene,button){
   const m=scene.military;if(!m)return false;

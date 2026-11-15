@@ -24,7 +24,7 @@ export class AnimalController {
     }
     this.availableWorkMs=advanceMovement(this,delta);
     const p=gridToWorld(this.position.x,this.position.y);
-    this.view.setPosition(p.x,p.y).setDepth(p.y+(this.definition.depth?.offset??0));
+    this.view.setPosition(p.x,p.y).setDepth(this.scene.stables?.depthFor?.(this)??p.y+(this.definition.depth?.offset??0));
     this.view.animate?.(delta,this.walking,this.direction);
   }
 }

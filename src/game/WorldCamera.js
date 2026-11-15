@@ -4,6 +4,7 @@ import { buildingDefinition } from './buildings.js';
 import { MIN_ZOOM,MAX_ZOOM,DEFAULT_ZOOM,ZOOM_RESPONSE_MS,clampZoom } from '../data/camera.js';
 export { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 
+const EDGE_SCROLL_PX=4;
 export class WorldCamera {
   constructor(scene, target) {
     this.scene = scene;
@@ -33,6 +34,7 @@ export class WorldCamera {
     };
     this.recenter = () => this.follow();
     scene.input.on('wheel', this.wheel);
+    this.edgeMove=e=>{this.edge={x:e.clientX,y:e.clientY};};this.edgeLeave=()=>{this.edge=null;};globalThis.addEventListener?.('mousemove',this.edgeMove);globalThis.document?.addEventListener?.('mouseleave',this.edgeLeave);globalThis.addEventListener?.('blur',this.edgeLeave);
     scene.input.keyboard.on('keydown-SPACE', this.recenter);
     // Owner 15 Nov 2026: K selects the King (then the right button sends him).
     this.selectKing=()=>{const s=this.scene,el=globalThis.document?.activeElement;if(el&&/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))return;if(s.gameOver||!s.character?.isAlive||!s.unitSelection)return;s.unitSelection.set([s.character]);s.setStatus?.(t('status.kingSelected'));};
@@ -84,6 +86,9 @@ export class WorldCamera {
     const k = this.keys, camera = this.camera;
     let dx = Number(k.D.isDown || k.RIGHT.isDown) - Number(k.A.isDown || k.LEFT.isDown);
     let dy = Number(k.S.isDown || k.DOWN.isDown) - Number(k.W.isDown || k.UP.isDown);
+    // Point 54 (owner 15 Nov 2026): the pointer at the edge of the window moves the view that way.
+    {const m=this.edge;if(m&&!dx&&!dy&&globalThis.document?.hasFocus?.()&&!globalThis.document.querySelector('dialog[open]')){const W=globalThis.innerWidth,H=globalThis.innerHeight,E=EDGE_SCROLL_PX;
+      dx=Number(m.x>=W-E)-Number(m.x<=E-1);dy=Number(m.y>=H-E)-Number(m.y<=E-1);}}
     let x = camera.scrollX + camera.width / 2, y = camera.scrollY + camera.height / 2;
     if (dx || dy) {
       if (this.following) document.querySelector('#camera-mode').textContent = t('hud.cameraManual');
@@ -107,6 +112,7 @@ export class WorldCamera {
   destroy() {
     this.resizeObserver.disconnect();
     this.scene.input.off('wheel', this.wheel);
+    globalThis.removeEventListener?.('mousemove',this.edgeMove);globalThis.document?.removeEventListener?.('mouseleave',this.edgeLeave);globalThis.removeEventListener?.('blur',this.edgeLeave);
     this.scene.input.keyboard.off('keydown-SPACE', this.recenter);this.scene.input.keyboard.off('keydown-K', this.selectKing);
     document.querySelector('#follow-king').removeEventListener('click', this.recenter);
   }

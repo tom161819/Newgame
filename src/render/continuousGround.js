@@ -70,7 +70,8 @@ for (const kind of [...OBJECT_KINDS, ...WATER_KINDS]) GROUND_DEFAULTS_ALPHA[`${k
 export const GROUND_DEFAULTS = Object.freeze({ ...GROUND_DEFAULTS_BASE, ...GROUND_DEFAULTS_ALPHA });
 const hex = c => [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)];
 // Season shift of the grass colour: [multiply r, g, b] then mix towards a tint.
-const SEASON = { spring: { mul: [0.95, 1.06, 0.92], tint: [150, 196, 90], mix: 0.08 }, summer: { mul: [1, 1, 1], tint: [0, 0, 0], mix: 0 }, autumn: { mul: [1.12, 0.92, 0.78], tint: [168, 132, 62], mix: 0.22 }, winter: { mul: [0.9, 0.9, 0.95], tint: [236, 240, 246], mix: 0.72 } };
+// Point 53 (owner 15 Nov 2026): the seasons differ more – spring light green, summer green-yellow, autumn towards orange.
+const SEASON = { spring: { mul: [0.92, 1.12, 0.9], tint: [158, 220, 104], mix: 0.2 }, summer: { mul: [1.05, 1.02, 0.86], tint: [198, 190, 84], mix: 0.13 }, autumn: { mul: [1.2, 0.9, 0.7], tint: [208, 130, 50], mix: 0.34 }, winter: { mul: [0.9, 0.9, 0.95], tint: [236, 240, 246], mix: 0.72 } };
 
 // The year as one continuous value 0–1 (0 = midwinter, 0.25 spring, 0.5 summer, 0.75 autumn).
 const SEASON_KEYS = ['winter', 'spring', 'summer', 'autumn'];

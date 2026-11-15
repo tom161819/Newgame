@@ -147,6 +147,8 @@ function placeRocks(terrain,ground,random,o,stony,desertDistance){
     const x=2+Math.floor(random()*(COLUMNS-6)),y=2+Math.floor(random()*(ROWS-6)),dd=desertDistance[index(x,y)],weight=.2+.8*Math.max(stony(x,y),dd>0&&dd<W.rocks.desertRim?.9:0);
     if(random()>weight)continue;
     const w=widths[placed%widths.length],tiles=[];for(let dy=0;dy<2;dy++)for(let dx=0;dx<w;dx++)tiles.push({x:x+dx,y:y+dy});
+    // Point 56 (owner 15 Nov 2026): no rock obstacles close to the start and only a few a little further (no extra random draw: a hash of the place decides).
+    {const d=Math.hypot(x+w/2-PLAYER_START.x,y+1-PLAYER_START.y),near=W.rocks.nearStart;if(d<near.none||d<near.thin&&((Math.imul(x,73856093)^Math.imul(y,19349663))>>>0)%100>=Math.round((d-near.none)/(near.thin-near.none)*near.share*100))continue;}
     if(tiles.some(t=>!inside(t.x,t.y)||Math.abs(t.x-PLAYER_START.x)<5&&Math.abs(t.y-PLAYER_START.y)<5||![GROUND.GRASS,GROUND.DESERT,GROUND.SHORE_ROCKS].includes(ground[t.y][t.x])))continue;
     // Generator 4: a placement on open ground only is one rock obstacle (2 × 2) or ridge (4 × 2).
     const group=tiles.every(t=>terrain[t.y][t.x]===0)?rockGroupFor(x,y,w,2):null;if(group)groups.push(group);

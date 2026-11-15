@@ -5,6 +5,18 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.130.0] - 2026-11-15
+<!-- version: {"title":"Points 53-58","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- The pointer at the edge of the window moves the view that way.
+- A Hauler shows how he carries now – by hand, with a Wheelbarrow or a Horse Wagon – in his window and in the Population list.
+### Changed
+- The seasons differ more on the ground: spring light green, summer green-yellow, autumn towards orange.
+- New games have no rock obstacles close to the start and only a few a little further.
+- The automatic hiring slider of the Barracks is at the very top of its window.
+### Fixed
+- Tamed horses standing in the paddock of the Stables were hidden under the Stables' picture.
+
 ## [0.129.3] - 2026-11-15
 <!-- version: {"title":"K selects the King","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added
