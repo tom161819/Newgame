@@ -19,7 +19,7 @@ export const START_GARRISON=Object.freeze([Object.freeze({type:'soldier',count:2
 export const UNIT_TYPE_IDS=Object.freeze(Object.keys(UNIT_TYPES));
 // A Knight rides a tamed horse from the Stables: it is reserved for the training and kept by the Knight.
 export const KNIGHT_SPEED=1.5;
-export const MILITARY_RULES=Object.freeze({guardRadius:12,retarget:600,kitCapacityPerOrder:2});
+export const MILITARY_RULES=Object.freeze({guardRadius:12,retarget:600,kitCapacityPerOrder:2,followRadius:10,spreadRadius:6,crowd:3,engageRadius:5});
 // The items one unit type needs, as {itemId: count}.
 export function unitKit(type){const kit={};for(const id of Object.values(UNIT_TYPES[type].equipment))kit[id]=(kit[id]??0)+1;return kit;}
 

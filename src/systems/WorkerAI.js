@@ -56,6 +56,11 @@ export class WorkerAI {
     if(this.scene.naturalResources?.miningWork.rocks.eligible(worker)||this.scene.naturalResources?.miningWork.rocks.borrow(worker)){this.scene.naturalResources.miningWork.rocks.update(worker,delta);worker.update(delta);return;}
     const job=JOBS[worker.profession];
     const workplace=this.scene.workplaceSystem;
+    // Combat test 16 Nov 2026: a garrison soldier (a unit with no Barracks seat – the starting garrison, a scouting party)
+    // has no workplace but still follows military orders: attack, scouting, the caravan, defending.
+    if(worker.profession==='soldier'&&!worker.assignedWorkplaceId&&this.scene.military?.unit?.(worker)){
+      if(!this.scene.military.updateSoldier(worker,delta)){if(this.scene.combat.attacks.has(worker)){worker.path=[];worker.workState='Working';worker.workMessage='Defending self';}else{worker.workState='Waiting';worker.workMessage='On guard';}}
+      worker.update(delta);return;}
     if((job.requiresWorkplace||workplace?.requiresWorkplace(worker.profession))&&!worker.assignedWorkplaceId){worker.workState='Waiting';worker.workMessage='Waiting for workplace';worker.update(delta);return;}
     if(worker.assignedWorkplaceId&&workplace){
       if(!workplace.building(worker)){workplace.remove(worker);worker.update(delta);return;}

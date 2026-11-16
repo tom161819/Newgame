@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.142.4] - 2026-11-16
+<!-- version: {"title":"Combat: garrison soldiers obey, soldiers fight on","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Fixed
+- Garrison soldiers (the starting garrison and a scouting party – soldiers without a Barracks seat) now follow orders: they attack an enemy you right-click, walk with a scouting party or the caravan and defend. Before they only stood "Waiting for workplace" and fought back only when hit themselves.
+### Improved
+- Soldiers keep fighting after their target falls: each takes the next enemy near him instead of standing idle, a melee soldier picks a free enemy when three are already on his, and an enemy coming within 5 tiles is fought without an order.
+- Health bars of enemies (wolves, bandits, rats) are red, our people's green, so a fight is easy to read.
+
 ## [0.142.3] - 2026-11-16
 <!-- version: {"title":"Party soldiers stay soldiers, groups keep together","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Fixed

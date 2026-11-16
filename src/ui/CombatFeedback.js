@@ -21,9 +21,10 @@ export class CombatFeedback {
     const text=t('hud.hp',{hp,max:king.maxHP});if(output.textContent!==text)output.textContent=text;
     const progress=document.querySelector('#king-health-bar');progress.max=king.maxHP;progress.value=king.currentHP;
     // m-kral-vyber (point 52): the King has a health bar over his head too – when hurt, fighting or selected.
+    const targets=new Set(s.combat.attacks.values());
     for(const animal of [king,...s.animalSystem.animals.values(),...(s.workerSystem?.liveWorkers()??[])]){
       const view=animal===king?s.player:animal.view;
-      const fighting=s.combat.attacks.has(animal)||[...s.combat.attacks.values()].includes(animal);
+      const fighting=s.combat.attacks.has(animal)||targets.has(animal);
       const visible=animal.isAlive&&!animal.mounted&&view.visible&&(animal.currentHP<animal.maxHP-1e-9||fighting||animal===king&&!!s.unitSelection?.king);
       let bar=this.bars.get(animal.id);
       if(!visible){bar?.setVisible(false);continue;}
@@ -31,8 +32,10 @@ export class CombatFeedback {
       const offset=animal.definition.visual?.healthBarOffset??(30*(animal.definition.visual?.bodyScale??1)+14);
       bar.clear().setPosition(view.x,view.y-offset).setDepth(view.depth+.5).setVisible(true);
       bar.fillStyle(0x231f18,.9);bar.fillRect(-18,-2,36,7);
-      bar.fillStyle(0x743c30);bar.fillRect(-17,-1,34,5);
-      bar.fillStyle(0x85aa64);bar.fillRect(-17,-1,34*animal.currentHP/animal.maxHP,5);
+      bar.fillStyle(0x4a3a30);bar.fillRect(-17,-1,34,5);
+      // Combat test 16 Nov 2026: enemies (wolves, bandits, rats) have a red bar, our people a green one.
+      const enemy=animal.type==='wolf'||!!animal.definition?.gameplay?.hostile;
+      bar.fillStyle(enemy?0xd8503a:0x85aa64);bar.fillRect(-17,-1,34*animal.currentHP/animal.maxHP,5);
     }
   }
   remove(id){this.bars.get(id)?.destroy();this.bars.delete(id);}
