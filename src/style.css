@@ -1317,5 +1317,9 @@ html .tutorial-arrow.big:not(.offscreen) { width:84px; height:54px; }
 .sandbox-row { display:flex; flex-wrap:wrap; gap:4px; align-items:center; margin-bottom:4px; }
 .sandbox-row button { padding:4px 8px; font-size:.8rem; } .sandbox-row button.on { border-color:#e3c57a; background:#4a4524; color:#fff2c4; }
 .sandbox-foes { border-color:#a8463a !important; } .sandbox-hint { margin:6px 0 0; font-size:.78rem; opacity:.85; }
-body.in-sandbox #kingdom-bar, body.in-sandbox #royal-goals, body.in-sandbox #getting-started-panel { display:none !important; }
+body.in-sandbox #kingdom-bar, body.in-sandbox #royal-goals, body.in-sandbox #getting-started-panel, body.in-sandbox #notices-panel { display:none !important; }
 body.sandbox-tool canvas { cursor:crosshair !important; }
+/* Owner 16 Nov 2026: chosen units by kind */
+.unit-kinds { display:inline-flex; flex-wrap:wrap; gap:4px; margin:0 6px; } .unit-kinds[hidden] { display:none; }
+.unit-kind { display:inline-flex; align-items:center; gap:3px; padding:2px 7px !important; min-height:0; border-radius:12px; font-size:.85rem; }
+.unit-kind-icon { font-size:1rem; line-height:1; } .unit-kind b { font-variant-numeric:tabular-nums; }

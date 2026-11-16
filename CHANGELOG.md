@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.3] - 2026-11-16
+<!-- version: {"title":"Unit kinds in the bar, marching in lanes","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- The bar of chosen units shows each kind with an icon and a count (🛡️ Soldiers, 🏹 Archers, ⚔️ Swordsmen, 🐎 Knights, 👑 the King, workers by their job); a click on a kind keeps only that kind chosen.
+### Improved
+- A group of three or more marches in lanes beside each other along one route instead of one long file: each keeps his place in the formation on the way. 30 soldiers now walk as a block about 12 × 10 tiles instead of a file 27 tiles long.
+
 ## [0.143.2] - 2026-11-16
 <!-- version: {"title":"Groups walk together","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Improved

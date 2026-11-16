@@ -6,8 +6,10 @@ import { haulPriorityFromValue,haulPriorityValue,setHaulPriority } from '../syst
 import { tileCenter } from '../game/isometric.js';
 import { blockingDialog } from './dockedPanels.js';
 import { setSquad,squadMembers } from './armySquads.js';
+import { JOBS } from '../data/jobs.js';
 
 const DOUBLE_CLICK_MS=400;
+const KIND_ICONS=Object.freeze({king:'👑','soldier:soldier':'🛡️','soldier:swordsman':'⚔️','soldier:archer':'🏹','soldier:knight':'🐎','soldier:recruit':'🪖',hauler:'📦',builder:'🔨',woodcutter:'🪓',miner:'⛏️',hunter:'🦌',fisher:'🎣',farmer:'🌾',idle:'💤'});
 export const isEnemy=animal=>animal?.type==='wolf'||!!animal?.definition?.gameplay?.hostile;
 const ATTACK_CURSOR=`url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g stroke="#1b1a14" stroke-width="1.2" stroke-linejoin="round"><path d="M4 3l3 0 14 14-3 3L4 6z" fill="#dfe3e6"/><path d="M28 3l-3 0-14 14 3 3L28 6z" fill="#c9ced2"/><path d="M15 21l5-5 3 3-5 5z" fill="#b8892f"/><path d="M17 21l-5-5-3 3 5 5z" fill="#b8892f"/><path d="M21 22l3-3 5 6-3 3z" fill="#6b4a2a"/><path d="M11 22l-3-3-5 6 3 3z" fill="#6b4a2a"/></g></svg>')}") 16 16, crosshair`;
 // Screen-space drag rectangle; selected rings and order markers are projected
@@ -17,6 +19,8 @@ export class UnitSelection {
     this.scene=scene;this.ids=new Set();this.graphics=scene.add.graphics().setDepth(1000000);this.overlay=scene.add.graphics().setDepth(1000001);
     this.panel=document.createElement('div');this.panel.id='unit-command-bar';this.panel.className='unit-command-bar';this.panel.hidden=true;this.panel.setAttribute('role','group');
     this.label=document.createElement('span');this.panel.append(this.label);this.buttons={};
+    // Owner 16 Nov 2026: what is chosen, by kind – an icon and a count for each kind (a click keeps only that kind).
+    this.kinds=document.createElement('span');this.kinds.className='unit-kinds';this.panel.append(this.kinds);
     for(const action of ['hold','resume','inspect','clear']){const button=document.createElement('button');button.type='button';button.dataset.unitCommand=action;button.addEventListener('click',()=>this.act(action));this.panel.append(button);this.buttons[action]=button;}
     // m-nosic-priorita: with several Haulers chosen, one choice of what they carry first sets it for all of them.
     this.haul=document.createElement('select');this.haul.id='unit-haul-priority';this.haul.hidden=true;this.panel.append(this.haul);
@@ -44,6 +48,16 @@ export class UnitSelection {
     const now=globalThis.performance?.now?.()??Date.now(),again=this.lastGroup===id&&now-(this.lastGroupAt??0)<450;this.lastGroup=id;this.lastGroupAt=now;
     this.set(members);if(again){const c=members.reduce((a,w)=>({x:a.x+w.tile.x/members.length,y:a.y+w.tile.y/members.length}),{x:0,y:0});s.worldCamera?.lookAt?.({x:Math.round(c.x),y:Math.round(c.y)});}
     s.setStatus?.(t('army.groupChosen',{number:id,count:members.length}));
+  }
+  kindIcon(kind){return KIND_ICONS[kind]??KIND_ICONS[kind.split(':')[0]]??'👤';}
+  kindName(kind){if(kind==='king')return t('command.king');const [p,type]=kind.split(':');if(p==='soldier')return type==='recruit'?t('unit.recruit'):t(`unit.type.${type}`);return JOBS[p]?.name??p;}
+  drawKinds(workers){
+    const counts=new Map();if(this.king)counts.set('king',1);for(const w of workers){const k=this.kindOf(w);counts.set(k,(counts.get(k)??0)+1);}
+    const order=[...counts].sort((a,b)=>(a[0]==='king'?-1:b[0]==='king'?1:0)||(a[0].startsWith('soldier')===b[0].startsWith('soldier')?b[1]-a[1]:a[0].startsWith('soldier')?-1:1));
+    this.kinds.replaceChildren(...order.map(([kind,n])=>{const b=document.createElement('button');b.type='button';b.className='unit-kind';b.dataset.kind=kind;b.title=`${this.kindName(kind)}: ${n}`;
+      const i=document.createElement('span');i.className='unit-kind-icon';i.textContent=this.kindIcon(kind);const c=document.createElement('b');c.textContent=String(n);b.append(i,c);
+      b.addEventListener('click',()=>{if(kind==='king')this.set([this.scene.character]);else this.set(this.workers().filter(w=>this.kindOf(w)===kind));});return b;}));
+    this.kinds.hidden=counts.size===0;
   }
   kindOf(w){return w.profession==='soldier'?`soldier:${this.scene.military?.unit?.(w)?.type??'recruit'}`:w.profession;}
   workers(){return [...this.ids].map(id=>this.scene.workerSystem.workers.get(id)).filter(w=>this.scene.workerSystem.commands.selectable(w));}
@@ -119,7 +133,7 @@ export class UnitSelection {
     const signature=JSON.stringify([this.king,workers.map(w=>w.id+':'+w.profession+':'+haulPriorityValue(w.haulPriority)+':'+(w.stance??'')),s.gameOver,s.gameTime.paused,language(),detail]);
     if(!this.panel.hidden&&signature===this.signature){const now=globalThis.performance?.now?.()??0;if(now-(this.placedAt??0)>700){this.placedAt=now;this.placeAboveBar();}}
     if(signature!==this.signature){
-      this.signature=signature;this.panel.hidden=!count||!!s.gameOver||detail||(this.king&&!workers.length&&!!s.unitPanel?.dialog.open);this.panel.setAttribute('aria-label',t('command.title'));this.label.textContent=t('command.selected',{count});
+      this.signature=signature;this.panel.hidden=!count||!!s.gameOver||detail||(this.king&&!workers.length&&!!s.unitPanel?.dialog.open);this.panel.setAttribute('aria-label',t('command.title'));this.label.textContent=t('command.selected',{count});this.drawKinds(workers);
       for(const [action,button]of Object.entries(this.buttons))button.textContent=t(`command.${action}`);
       this.buttons.inspect.disabled=workers.length!==1;
       {const soldiers=workers.filter(w=>w.profession==='soldier');this.stance.hidden=!soldiers.length;if(soldiers.length){const now=new Set(soldiers.map(w=>w.stance??'aggressive'));

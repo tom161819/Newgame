@@ -3,6 +3,7 @@ import { knownMap } from '../game/knownMap.js';
 import { tileKey } from '../game/stones.js';
 import { t } from '../i18n/index.js';
 
+const LANE_STEP=4,LANE_MAX=5,LANE_SPREAD=1.6;
 export const workingCommand=()=>({state:'Working',goal:null});
 export const commanded=worker=>worker.commandState?.state==='MovingToHold'||worker.commandState?.state==='Holding';
 
@@ -49,6 +50,8 @@ export class UnitCommands {
     const spread=Math.max(1,...selected.map(w=>Math.max(Math.abs(w.tile.x-mid.x),Math.abs(w.tile.y-mid.y)))),squeeze=Math.min(1,2/spread);
     const dir=(()=>{const dx=target.x-mid.x,dy=target.y-mid.y,n=Math.hypot(dx,dy);return n?{x:dx/n,y:dy/n}:{x:0,y:0};})();
     const pace=Math.min(...selected.map(w=>(w.speed??1)*(w.speedFactor??1)));
+    // The leader route: from the walkable tile nearest the group's middle to the click.
+    let lead=null;if(selected.length>2){const m={x:Math.round(mid.x),y:Math.round(mid.y)},from=selected.map(w=>w.tile).sort((a,b)=>Math.hypot(a.x-m.x,a.y-m.y)-Math.hypot(b.x-m.x,b.y-m.y))[0];lead=findPathToAny(base,from,[target])?.path??null;if(lead&&lead.length<8)lead=null;}
     for(const worker of selected){
       const nav=this.navigation(worker,base,selectedIds),start=worker.nextTile??worker.tile;
       // Combat 16 Nov 2026: archers stay two tiles behind the group, armoured melee one tile ahead of it.
@@ -59,10 +62,23 @@ export class UnitCommands {
       for(const slot of order){if(used.has(tileKey(slot))||nav[slot.y][slot.x]!==0)continue;route=findPathToAny(nav,start,[slot]);if(route){goal=slot;break;}}
       worker.groupPace=selected.length>1&&worker.speed>0?Math.min(1,pace/((worker.speed??1)*(worker.speedFactor??1))):1;
       if(!route)continue;
+      // Owner 16 Nov 2026: not one long file – a group marches in lanes beside each other along one leader route,
+      // each lane shifted by the soldier's place in the formation (its slot's offset from the click).
+      if(lead&&selected.length>2){const lanes=this.laneRoute(nav,start,lead,{x:goal.x-target.x,y:goal.y-target.y},goal);if(lanes)route=lanes;}
       this.interrupt(worker);worker.commandState={state:'MovingToHold',goal:{...goal}};worker.path=route.path;worker.workState='MovingToHold';used.add(tileKey(goal));accepted++;
     }
     return accepted;
   }
+  // Waypoints every few tiles of the leader route shifted by the lane offset (snapped to a walkable tile), joined by
+  // short searches. null when a piece cannot be found (the plain route is used then).
+  laneRoute(nav,start,lead,offset,goal){
+    const lane={x:Math.max(-LANE_MAX,Math.min(LANE_MAX,Math.round(offset.x*LANE_SPREAD))),y:Math.max(-LANE_MAX,Math.min(LANE_MAX,Math.round(offset.y*LANE_SPREAD)))},points=[];
+    for(let i=LANE_STEP;i<lead.length-LANE_STEP;i+=LANE_STEP){const p={x:lead[i].x+lane.x,y:lead[i].y+lane.y},q=this.nearestOpen(nav,p);if(q)points.push(q);}
+    points.push(goal);const path=[];let at=start;
+    for(const point of points){if(point.x===at.x&&point.y===at.y)continue;const piece=findPathToAny(nav,at,[point]);if(!piece)return null;path.push(...piece.path);at=point;if(path.length>lead.length*2+40)return null;}
+    return path.length?{path}:null;
+  }
+  nearestOpen(nav,p){for(let r=0;r<=2;r++)for(let y=p.y-r;y<=p.y+r;y++)for(let x=p.x-r;x<=p.x+r;x++)if(Math.max(Math.abs(x-p.x),Math.abs(y-p.y))===r&&nav[y]?.[x]===0)return {x,y};return null;}
   canStep(worker,tile){
     // Only the next physical step consults reality: hidden obstacles cannot
     // affect acceptance or the planned formation at command time.

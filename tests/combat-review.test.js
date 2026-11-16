@@ -48,3 +48,12 @@ test('owner 16 Nov 2026: a unit on an order passes through our walking people; s
   const ordered=ws.navigationMap(me);assert.equal(ordered[2][2],0,'walking resident does not block');assert.equal(ordered[1][1],0,'a resident holding a spot does not block');assert.equal(ordered[4][4],1,'a standing resident blocks');
   const plain=ws.navigationMap(worker);assert.equal(plain[2][2],1,'without an order everyone blocks as before');
 });
+test('owner 16 Nov 2026: a group marches in lanes beside each other, not in one file',async()=>{
+  const { UnitCommands } = await import('../src/systems/UnitCommands.js');
+  const nav=Array.from({length:30},()=>Array(30).fill(0)),lead=Array.from({length:20},(_,i)=>({x:5+i,y:10}));
+  const c=Object.create(UnitCommands.prototype);
+  const left=c.laneRoute(nav,{x:4,y:8},lead,{x:0,y:-2},{x:24,y:8}),right=c.laneRoute(nav,{x:4,y:12},lead,{x:0,y:2},{x:24,y:12});
+  assert.ok(left&&right);const mean=r=>r.path.reduce((n,p)=>n+p.y,0)/r.path.length;
+  assert.ok(mean(right)-mean(left)>=4,'the lanes stay apart');assert.deepEqual(left.path.at(-1),{x:24,y:8});
+  const walled=nav.map(r=>[...r]);for(let y=0;y<30;y++)walled[y][15]=1;assert.equal(c.laneRoute(walled,{x:4,y:8},lead,{x:0,y:-2},{x:24,y:8}),null,'no way: the plain route is used');
+});
