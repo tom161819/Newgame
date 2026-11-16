@@ -7,6 +7,7 @@ import { tileCenter } from '../game/isometric.js';
 import { blockingDialog } from './dockedPanels.js';
 import { setSquad,squadMembers } from './armySquads.js';
 
+const DOUBLE_CLICK_MS=400;
 export const isEnemy=animal=>animal?.type==='wolf'||!!animal?.definition?.gameplay?.hostile;
 const ATTACK_CURSOR=`url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g stroke="#1b1a14" stroke-width="1.2" stroke-linejoin="round"><path d="M4 3l3 0 14 14-3 3L4 6z" fill="#dfe3e6"/><path d="M28 3l-3 0-14 14 3 3L28 6z" fill="#c9ced2"/><path d="M15 21l5-5 3 3-5 5z" fill="#b8892f"/><path d="M17 21l-5-5-3 3 5 5z" fill="#b8892f"/><path d="M21 22l3-3 5 6-3 3z" fill="#6b4a2a"/><path d="M11 22l-3-3-5 6 3 3z" fill="#6b4a2a"/></g></svg>')}") 16 16, crosshair`;
 // Screen-space drag rectangle; selected rings and order markers are projected
@@ -44,6 +45,7 @@ export class UnitSelection {
     this.set(members);if(again){const c=members.reduce((a,w)=>({x:a.x+w.tile.x/members.length,y:a.y+w.tile.y/members.length}),{x:0,y:0});s.worldCamera?.lookAt?.({x:Math.round(c.x),y:Math.round(c.y)});}
     s.setStatus?.(t('army.groupChosen',{number:id,count:members.length}));
   }
+  kindOf(w){return w.profession==='soldier'?`soldier:${this.scene.military?.unit?.(w)?.type??'recruit'}`:w.profession;}
   workers(){return [...this.ids].map(id=>this.scene.workerSystem.workers.get(id)).filter(w=>this.scene.workerSystem.commands.selectable(w));}
   // m-kral-vyber (point 52): the King is selected like the others (click or drag) and ordered with the right button.
   set(workers){this.king=workers.includes(this.scene.character)&&this.scene.character.isAlive&&!this.scene.character.away;this.ids=new Set(workers.filter(w=>this.scene.workerSystem.commands.selectable(w)).map(w=>w.id));this.draw();}
@@ -84,7 +86,12 @@ export class UnitSelection {
       // #120: one click on an own villager opens his detail at once; a click on another villager switches it.
       const onKing=s.player?.visible!==false&&s.fog?.isVisibleObject?.(s.character)!==false&&this.onKing(pointer.worldX,pointer.worldY)&&!(hit?.kind==='human'&&hit.depth>s.player.depth);
       if(onKing){this.set([s.character]);s.unitPanel?.open(s.character);}
-      else if(hit?.kind==='human'&&s.workerSystem.commands.selectable(hit.object)){this.set([hit.object]);s.unitPanel?.open(hit.object);}
+      else if(hit?.kind==='human'&&s.workerSystem.commands.selectable(hit.object)){
+        // Owner 16 Nov 2026: a double click chooses every unit of the same kind on screen (soldiers by unit type).
+        const now=globalThis.performance?.now?.()??Date.now(),same=this.lastClick&&now-this.lastClick.at<DOUBLE_CLICK_MS&&this.lastClick.id===hit.object.id;this.lastClick={at:now,id:hit.object.id};
+        if(same){const kind=this.kindOf(hit.object),view=s.cameras.main.worldView,all=s.workerSystem.liveSubjects().filter(w=>!w.away&&s.workerSystem.commands.selectable(w)&&this.kindOf(w)===kind&&view.contains(w.view.x,w.view.y));
+          this.set(all);if(s.unitPanel?.dialog?.open)s.unitPanel.close();s.setStatus?.(t('command.sameKind',{count:all.length}));}
+        else{this.set([hit.object]);s.unitPanel?.open(hit.object);}}
       else{this.clear();if(s.unitPanel?.dialog.open&&s.unitPanel.unit?.id!=null&&s.workerSystem.workers.get(s.unitPanel.unit.id)===s.unitPanel.unit)s.unitPanel.close();s.handleClick(pointer,true);}
     }
     this.dragging=false;this.draw();return true;

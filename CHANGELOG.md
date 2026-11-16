@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.1] - 2026-11-16
+<!-- version: {"title":"Double click chooses the same units","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- A double click on a unit chooses every unit of the same kind in the current view: soldiers of the same type (all Archers, all Swordsmen…), other residents of the same job.
+
 ## [0.143.0] - 2026-11-16
 <!-- version: {"title":"Test map","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added
