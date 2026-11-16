@@ -38,3 +38,13 @@ test('war 16 Nov 2026: an attack order spreads the soldiers over the whole enemy
   assert.equal(per.size,3,'every enemy of the group gets fighters');assert.ok([...per.values()].every(n=>n<=3),'at most three melee fighters each');
   assert.ok(soldiers.every(w=>w.attackArea&&w.attackRadius>=12));
 });
+test('owner 16 Nov 2026: a unit on an order passes through our walking people; standing ones still block',async()=>{
+  const { WorkerSystem } = await import('../src/systems/WorkerSystem.js');
+  const map=Array.from({length:6},()=>Array(6).fill(0));
+  const unit=(id,tile,extra={})=>({id,isAlive:true,tile,path:[],nextTile:null,reservedTiles(){return [this.tile];},...extra});
+  const walker=unit('w',{x:2,y:2},{path:[{x:3,y:2}]}),stander=unit('s',{x:4,y:4}),holder=unit('h',{x:1,y:1},{commandState:{state:'Holding'}}),me=unit('me',{x:0,y:0},{commandState:{state:'MovingToHold'}}),worker=unit('k',{x:5,y:5});
+  const ws=Object.create(WorkerSystem.prototype);ws.workers=new Map([walker,stander,holder,me,worker].map(u=>[u.id,u]));
+  ws.scene={map,workplaceSystem:{},character:{isAlive:false},animalSystem:{animals:new Map()},stables:null,combat:{attacks:new Map()}};ws.liveWorkers=()=>[...ws.workers.values()];
+  const ordered=ws.navigationMap(me);assert.equal(ordered[2][2],0,'walking resident does not block');assert.equal(ordered[1][1],0,'a resident holding a spot does not block');assert.equal(ordered[4][4],1,'a standing resident blocks');
+  const plain=ws.navigationMap(worker);assert.equal(plain[2][2],1,'without an order everyone blocks as before');
+});

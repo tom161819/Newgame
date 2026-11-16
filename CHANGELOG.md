@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.2] - 2026-11-16
+<!-- version: {"title":"Groups walk together","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Improved
+- A group sent somewhere walks together: residents on an order (and soldiers marching or fighting) pass through our people who are walking or holding a spot, so nobody stands waiting for the ones in front. Only people standing at work still block the way. 30 soldiers now arrive about 10 game seconds sooner and nobody stops on the way.
+
 ## [0.143.1] - 2026-11-16
 <!-- version: {"title":"Double click chooses the same units","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added

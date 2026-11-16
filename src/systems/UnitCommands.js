@@ -77,7 +77,7 @@ export class UnitCommands {
       if(tileKey(worker.tile)===tileKey(command.goal)){command.state='Holding';worker.workState='Holding';}
       else if(!worker.commandWait){
         // Bound replans when a newly discovered wall or another unit blocks us.
-        if((worker.commandRetry??0)>=3){this.hold(worker);this.scene.setStatus(t('command.blocked'));}
+        if((worker.commandRetry??0)>=5){this.hold(worker);this.scene.setStatus(t('command.blocked'));}
         else{worker.commandRetry=(worker.commandRetry??0)+1;worker.commandWait=1000;const route=findPathToAny(this.navigation(worker),worker.tile,[command.goal]);if(route)worker.path=route.path;}
       }
     }

@@ -39,8 +39,11 @@ export class WorkerSystem {
   navigationMap(worker){
     if(!this.scene.workplaceSystem)return this.scene.map;
     const map=[...this.scene.map],rows=new Set(),units=[this.scene.character,...this.scene.animalSystem.animals.values(),...this.liveWorkers()];
+    // Owner 16 Nov 2026: a group sent somewhere walks together – a resident on an order (or a soldier on the march or
+    // in a fight) passes through our people who are walking themselves or holding a spot on an order; only the others who stand block him.
+    const soft=worker?.commandState?.state==='MovingToHold'||worker?.profession==='soldier'&&(!!worker.huntWolfId||this.scene.combat?.attacks?.has(worker)||worker.scoutZone!=null),walking=u=>u.isSubject!==false&&this.workers.get(u.id)===u&&(!!u.nextTile||u.path?.length>0||u.commandState?.state==='Holding'&&soft);
     // A horse harnessed to a Horse Wagon travels with the wagon and its driver; it never blocks a tile (S12).
-    for(const unit of units)if(unit!==worker&&unit.isAlive&&!unit.mounted&&(!unit.state||unit.state==='ground')&&this.scene.stables?.horses.get(unit.id)?.state!=='harnessed'&&!this.scene.stables?.led(unit))for(const tile of unit.reservedTiles()){
+    for(const unit of units)if(unit!==worker&&unit.isAlive&&!unit.mounted&&!(soft&&walking(unit))&&(!unit.state||unit.state==='ground')&&this.scene.stables?.horses.get(unit.id)?.state!=='harnessed'&&!this.scene.stables?.led(unit))for(const tile of unit.reservedTiles()){
       if(!map[tile.y]||map[tile.y][tile.x]===undefined)continue;
       if(!rows.has(tile.y)){rows.add(tile.y);map[tile.y]=[...map[tile.y]];}map[tile.y][tile.x]=1;
     }
