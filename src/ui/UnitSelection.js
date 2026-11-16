@@ -5,6 +5,7 @@ import { HAUL_PRIORITIES,HAULABLE_RESOURCES } from '../data/logistics.js';
 import { haulPriorityFromValue,haulPriorityValue,setHaulPriority } from '../systems/haulPriority.js';
 import { tileCenter } from '../game/isometric.js';
 import { blockingDialog } from './dockedPanels.js';
+import { setSquad,squadMembers } from './armySquads.js';
 
 export const isEnemy=animal=>animal?.type==='wolf'||!!animal?.definition?.gameplay?.hostile;
 const ATTACK_CURSOR=`url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g stroke="#1b1a14" stroke-width="1.2" stroke-linejoin="round"><path d="M4 3l3 0 14 14-3 3L4 6z" fill="#dfe3e6"/><path d="M28 3l-3 0-14 14 3 3L28 6z" fill="#c9ced2"/><path d="M15 21l5-5 3 3-5 5z" fill="#b8892f"/><path d="M17 21l-5-5-3 3 5 5z" fill="#b8892f"/><path d="M21 22l3-3 5 6-3 3z" fill="#6b4a2a"/><path d="M11 22l-3-3-5 6 3 3z" fill="#6b4a2a"/></g></svg>')}") 16 16, crosshair`;
@@ -19,8 +20,29 @@ export class UnitSelection {
     // m-nosic-priorita: with several Haulers chosen, one choice of what they carry first sets it for all of them.
     this.haul=document.createElement('select');this.haul.id='unit-haul-priority';this.haul.hidden=true;this.panel.append(this.haul);
     this.haul.addEventListener('change',()=>{const p=haulPriorityFromValue(this.haul.value);for(const w of this.workers())if(w.profession==='hauler')setHaulPriority(w,p);this.signature=null;this.draw();});
+    // Combat 16 Nov 2026: the stance of the chosen soldiers (aggressive, defensive, hold).
+    this.stance=document.createElement('span');this.stance.className='unit-stance';this.stance.hidden=true;this.stanceButtons={};
+    for(const id of ['aggressive','defensive','hold']){const b=document.createElement('button');b.type='button';b.dataset.stance=id;b.addEventListener('click',()=>{for(const w of this.workers())if(w.profession==='soldier'){if(id==='aggressive')delete w.stance;else w.stance=id;if(id==='hold'){w.path=[];delete w.huntWolfId;}}this.signature=null;this.draw();});this.stance.append(b);this.stanceButtons[id]=b;}
+    this.panel.append(this.stance);
+    // Combat 16 Nov 2026: groups on the number keys – Shift + 1–9 makes the chosen soldiers group N, 1–9 chooses it
+    // (twice quickly: the camera goes to it). Ctrl + number belongs to the browser (tabs). Without such a group the keys
+    // 1–3 keep setting the speed.
+    this.keys=new AbortController();
+    globalThis.addEventListener?.('keydown',event=>this.groupKey(event),{capture:true,signal:this.keys.signal});
     document.querySelector('#game')?.append(this.panel);
     if(!this.panel.isConnected)scene.game.canvas.parentElement.append(this.panel);
+  }
+  groupKey(event){
+    const n=/^Digit([1-9])$/.exec(event.code)?.[1];if(!n||event.ctrlKey||event.metaKey||event.altKey||event.repeat)return;
+    if(document.querySelector('dialog[open]')||/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName??''))return;
+    const s=this.scene,id=Number(n);if(s.gameOver||s.buildMode)return;
+    if(event.shiftKey){const chosen=this.workers().filter(w=>w.profession==='soldier');if(!chosen.length)return;event.preventDefault();event.stopImmediatePropagation();
+      setSquad(s,chosen,id);s.setStatus?.(t('army.groupSaved',{number:id,count:chosen.length}));this.signature=null;this.draw();return;}
+    const members=squadMembers(s,id).filter(w=>w.isAlive&&!w.away);if(!members.length)return;
+    event.preventDefault();event.stopImmediatePropagation();
+    const now=globalThis.performance?.now?.()??Date.now(),again=this.lastGroup===id&&now-(this.lastGroupAt??0)<450;this.lastGroup=id;this.lastGroupAt=now;
+    this.set(members);if(again){const c=members.reduce((a,w)=>({x:a.x+w.tile.x/members.length,y:a.y+w.tile.y/members.length}),{x:0,y:0});s.worldCamera?.lookAt?.({x:Math.round(c.x),y:Math.round(c.y)});}
+    s.setStatus?.(t('army.groupChosen',{number:id,count:members.length}));
   }
   workers(){return [...this.ids].map(id=>this.scene.workerSystem.workers.get(id)).filter(w=>this.scene.workerSystem.commands.selectable(w));}
   // m-kral-vyber (point 52): the King is selected like the others (click or drag) and ordered with the right button.
@@ -39,7 +61,7 @@ export class UnitSelection {
         // m-vojaci-na-hradby: a right click on a finished Stone Wall, Tower or Gate posts the selected soldiers on it.
         // m-vojaci-utok (point 39): a right click on an enemy (a wolf now, other enemies later) sends the selected soldiers at it.
         {const enemy=this.enemyAt(pointer),fighters=this.workers().filter(w=>w.profession==='soldier');
-          if(enemy&&fighters.length){for(const w of fighters){s.workerSystem.commands.resume(w);s.military?.wallPatrol?.set(w,false);w.huntWolfId=enemy.id;w.militaryRetarget=0;}s.setStatus(t('army.attack',{count:fighters.length,name:enemy.definition.name}));if(this.king)s.kingOrder(pointer);this.draw();return true;}}
+          if(enemy&&fighters.length){for(const w of fighters){s.workerSystem.commands.resume(w);s.military?.wallPatrol?.set(w,false);w.huntWolfId=enemy.id;w.attackArea={x:enemy.position.x,y:enemy.position.y};w.militaryRetarget=0;}s.setStatus(t('army.attack',{count:fighters.length,name:enemy.definition.name}));if(this.king)s.kingOrder(pointer);this.draw();return true;}}
         const tile=s.pointerTile(pointer),target=tile&&s.buildings.find(b=>buildingIsComplete(b)&&(isWall(b)||['tower','gate','wall_gate'].includes(b.type))&&b.tiles?.some(tl=>tl.x===tile.x&&tl.y===tile.y)),soldiers=this.workers().filter(w=>w.profession==='soldier');
         if(target&&soldiers.length){const posted=s.military?.wallPatrol?.post(soldiers,target)??0;if(posted){s.setStatus(t('army.posted',{count:posted,name:buildingDefinition(target).name}));this.draw();return true;}s.setStatus(t('army.postNoWay'));return true;}
         if(this.ids.size){const count=s.workerSystem.commands.move(this.workers(),s.pointerTile(pointer));s.setStatus(t(count?'command.moving':'command.noRoute',{count}));}
@@ -87,12 +109,14 @@ export class UnitSelection {
     // The open detail of the one selected villager already carries his commands.
     const detail=workers.length===1&&!!s.unitPanel?.dialog.open&&s.unitPanel.unit===workers[0];
     const count=workers.length+(this.king?1:0);if(this.king&&(!s.character.isAlive||s.character.away))this.king=false;
-    const signature=JSON.stringify([this.king,workers.map(w=>w.id+':'+w.profession+':'+haulPriorityValue(w.haulPriority)),s.gameOver,s.gameTime.paused,language(),detail]);
+    const signature=JSON.stringify([this.king,workers.map(w=>w.id+':'+w.profession+':'+haulPriorityValue(w.haulPriority)+':'+(w.stance??'')),s.gameOver,s.gameTime.paused,language(),detail]);
     if(!this.panel.hidden&&signature===this.signature){const now=globalThis.performance?.now?.()??0;if(now-(this.placedAt??0)>700){this.placedAt=now;this.placeAboveBar();}}
     if(signature!==this.signature){
       this.signature=signature;this.panel.hidden=!count||!!s.gameOver||detail||(this.king&&!workers.length&&!!s.unitPanel?.dialog.open);this.panel.setAttribute('aria-label',t('command.title'));this.label.textContent=t('command.selected',{count});
       for(const [action,button]of Object.entries(this.buttons))button.textContent=t(`command.${action}`);
-      this.buttons.inspect.disabled=workers.length!==1;if(!this.panel.hidden)this.placeAboveBar();
+      this.buttons.inspect.disabled=workers.length!==1;
+      {const soldiers=workers.filter(w=>w.profession==='soldier');this.stance.hidden=!soldiers.length;if(soldiers.length){const now=new Set(soldiers.map(w=>w.stance??'aggressive'));
+        for(const [id,b] of Object.entries(this.stanceButtons)){b.textContent=t(`army.stance.${id}`);b.title=t(`army.stance.${id}Tip`);b.classList.toggle('on',now.size===1&&now.has(id));}}}if(!this.panel.hidden)this.placeAboveBar();
       const haulers=workers.filter(w=>w.profession==='hauler');this.haul.hidden=haulers.length<2;
       if(!this.haul.hidden){const option=(v,text)=>{const o=document.createElement('option');o.value=v;o.textContent=text;return o;};
         this.haul.setAttribute('aria-label',t('haul.priority'));this.haul.replaceChildren(option('',t('haul.priority')+'…'),...HAUL_PRIORITIES.filter(k=>k!=='resource').map(k=>option(k,t(`haul.priority.${k}`))),...HAULABLE_RESOURCES.map(r=>option(`resource:${r}`,t('haul.priority.only',{resource:s.objectRegistry.get(r)?.name??r}))));
@@ -108,5 +132,5 @@ export class UnitSelection {
     // pointer at every zoom (a scroll-free overlay is still zoomed around the screen middle).
     if(this.anchor&&this.dragging&&this.current){const cam=s.cameras.main,a=cam.getWorldPoint(this.anchor.x,this.anchor.y),b=cam.getWorldPoint(this.current.x,this.current.y);this.overlay.lineStyle(1/(cam.zoom||1),0xffd768,1).fillStyle(0xffd768,.12).fillRect(a.x,a.y,b.x-a.x,b.y-a.y).strokeRect(a.x,a.y,b.x-a.x,b.y-a.y);}
   }
-  destroy(){this.graphics.destroy();this.overlay.destroy();this.panel.remove();}
+  destroy(){this.keys?.abort();this.graphics.destroy();this.overlay.destroy();this.panel.remove();}
 }

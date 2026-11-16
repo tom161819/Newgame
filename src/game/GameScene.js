@@ -316,7 +316,7 @@ export class GameScene extends Phaser.Scene {
     this.combatFeedback=new CombatFeedback(this);
     this.combat.on('attack',(attacker,target)=>{if(this.animalSystem.animals.has(target.id))this.animalSystem.onAttacked(target,attacker);});
     this.combat.on('attack',(attacker,target)=>{if(this.workerSystem?.workers.has(target.id)&&target.profession==='soldier'&&target.isAlive)this.combat.startAttack(target,attacker);});
-    this.combat.on('damage',(unit,amount,attacker)=>{this.combatFeedback.hit(unit);this.skillSystem.creditDamage(attacker,unit,amount);});
+    this.combat.on('damage',(unit,amount,attacker)=>{this.combatFeedback.hit(unit);this.combatFeedback.damaged(unit,amount);this.skillSystem.creditDamage(attacker,unit,amount);});
     this.combat.on('death',(unit,killer)=>this.onUnitDeath(unit,killer));
     this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
     // Day and night N1: a third of the sight outside light at night (one light list per fog update).

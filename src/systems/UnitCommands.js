@@ -47,10 +47,13 @@ export class UnitCommands {
     // to two tiles), and they all walk at the pace of the slowest.
     const mid={x:selected.reduce((n,w)=>n+w.tile.x,0)/Math.max(1,selected.length),y:selected.reduce((n,w)=>n+w.tile.y,0)/Math.max(1,selected.length)};
     const spread=Math.max(1,...selected.map(w=>Math.max(Math.abs(w.tile.x-mid.x),Math.abs(w.tile.y-mid.y)))),squeeze=Math.min(1,2/spread);
+    const dir=(()=>{const dx=target.x-mid.x,dy=target.y-mid.y,n=Math.hypot(dx,dy);return n?{x:dx/n,y:dy/n}:{x:0,y:0};})();
     const pace=Math.min(...selected.map(w=>(w.speed??1)*(w.speedFactor??1)));
     for(const worker of selected){
       const nav=this.navigation(worker,base,selectedIds),start=worker.nextTile??worker.tile;
-      const want={x:target.x+(worker.tile.x-mid.x)*squeeze,y:target.y+(worker.tile.y-mid.y)*squeeze};
+      // Combat 16 Nov 2026: archers stay two tiles behind the group, armoured melee one tile ahead of it.
+      const along=worker.attackRange>1?-2:(worker.armor??0)>0?1:0;
+      const want={x:target.x+(worker.tile.x-mid.x)*squeeze+dir.x*along,y:target.y+(worker.tile.y-mid.y)*squeeze+dir.y*along};
       const order=selected.length>1?[...slots].sort((a,b)=>Math.hypot(a.x-want.x,a.y-want.y)-Math.hypot(b.x-want.x,b.y-want.y)):slots;
       let route,goal;
       for(const slot of order){if(used.has(tileKey(slot))||nav[slot.y][slot.x]!==0)continue;route=findPathToAny(nav,start,[slot]);if(route){goal=slot;break;}}

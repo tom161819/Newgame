@@ -5,6 +5,19 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.142.5] - 2026-11-16
+<!-- version: {"title":"Combat: stances, groups, battle bar, damage numbers","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- Soldier stances in the bar of chosen units: Attack (default – they fight enemies within 5 tiles, chase them and take the next one), Defend (only enemies within 3 tiles, no long chase) and Hold position (they do not move; archers shoot what they reach). The stance is saved.
+- Groups on the number keys: Shift + 1–9 makes the chosen soldiers group 1–9, the number key chooses the group, pressed twice it moves the camera to it. (Ctrl + number belongs to the browser.) Without such a group the keys 1–3 still set the speed.
+- A battle bar at the top while a fight goes on (ours standing / taking part, enemies standing / taking part) and a report in the event feed when it ends (won, lost, who fell).
+- Damage numbers over the hit units and visible arrows of archers.
+- A badly hurt soldier (below a quarter of his health) falls back behind his comrades until he has healed to half (not when holding position).
+### Improved
+- Melee fighters spread around their enemy instead of standing on each other; archers shoot the nearest enemy in reach and step back when an enemy gets right next to them; when a group is sent somewhere, archers keep two tiles behind and armoured soldiers one tile ahead.
+- After an attack order the soldiers fight on against the rest of the enemies around the place they were sent to, and soldiers help a comrade attacked near them.
+- Enemies have a red ring under their feet; bandits wear charcoal with a green sash instead of red, so they no longer look like our soldiers.
+
 ## [0.142.4] - 2026-11-16
 <!-- version: {"title":"Combat: garrison soldiers obey, soldiers fight on","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Fixed

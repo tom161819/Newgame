@@ -19,3 +19,8 @@ export function makeSquad(scene,workers){
 }
 export function dissolveSquad(scene,id){let n=0;for(const w of soldiers(scene))if(w.squad===id){delete w.squad;n++;}return n;}
 export const squadMembers=(scene,id)=>soldiers(scene).filter(w=>w.squad===id);
+// Combat 16 Nov 2026: group N on the number keys – exactly these soldiers (one is enough); others leave group N.
+export function setSquad(scene,workers,id){
+  const chosen=[...new Set(workers)].filter(w=>w?.isAlive&&w.profession==='soldier');if(!chosen.length||!Number.isInteger(id)||id<1||id>SQUAD_MAX)return 0;
+  for(const w of soldiers(scene))if(w.squad===id&&!chosen.includes(w))delete w.squad;for(const w of chosen)w.squad=id;return chosen.length;
+}

@@ -1,3 +1,4 @@
+import { freeAround } from '../game/combatSpacing.js';
 import { WildlifeClearance,keepsWildlifeClearance } from './WildlifeClearance.js';
 import { AnimalController } from '../game/AnimalController.js';
 import { generateResourcePositions } from '../game/stones.js';
@@ -60,7 +61,7 @@ export class AnimalSystem {
             if(length&&!animal.nextTile)animal.direction={x:dx/length,y:dy/length};
           }else{
             combat.stopAttack(animal);animal.retaliationRepath-=delta;
-            if(animal.retaliationRepath<=0){animal.retaliationRepath=350;animal.moveTo(adjacentTiles(target,this.scene.map));}
+            if(animal.retaliationRepath<=0){animal.retaliationRepath=350;animal.moveTo(animal.definition.gameplay.guardRadius?freeAround(this.scene,target,animal):adjacentTiles(target,this.scene.map));}
           }
           animal.update(delta);continue;
         }

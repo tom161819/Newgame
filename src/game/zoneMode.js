@@ -31,7 +31,7 @@ export function zoneWorldCode(homeCode,zoneId,type,{dungeon=false}={}){
 // The party as it goes from map to map: soldiers by id (from the home state at first, then from the last map).
 function homeRecords(home,ids){
   const workers=new Map((home.workers??[]).map(w=>[w.id,w])),units=new Map((home.military?.units??[]).map(u=>[u.workerId,u])),out={};
-  for(const id of ids){const r=workers.get(id),u=units.get(id);if(!r)continue;out[id]={name:r.name,identity:r.identity??null,type:u?.type??'militia',equipment:u?.equipment?{...u.equipment}:null,currentHP:r.currentHP,maxHP:r.maxHP,experience:r.experience?structuredClone(r.experience):null};}
+  for(const id of ids){const r=workers.get(id),u=units.get(id);if(!r)continue;out[id]={name:r.name,identity:r.identity??null,type:u?.type??'militia',equipment:u?.equipment?{...u.equipment}:null,currentHP:r.currentHP,maxHP:r.maxHP,experience:r.experience?structuredClone(r.experience):null,stance:r.stance??null};}
   return out;
 }
 function zoneSettings(home,zone,{dungeon=false}={}){
@@ -50,7 +50,7 @@ export function zoneStart(home){
 export function collectParty(scene){
   const z=scene.zone;
   for(const w of z.soldiers){const r=z.records[w.id];if(!r)continue;if(!w.isAlive){delete z.records[w.id];if(!z.fallen.includes(w.id))z.fallen.push(w.id);continue;}
-    r.currentHP=Math.max(1,Math.round(w.currentHP));r.maxHP=w.maxHP;if(w.experience)r.experience=structuredClone(w.experience);}
+    r.currentHP=Math.max(1,Math.round(w.currentHP));r.maxHP=w.maxHP;if(w.experience)r.experience=structuredClone(w.experience);r.stance=w.stance??null;}
   if(z.king&&Number.isFinite(scene.character?.currentHP))z.kingHP=Math.max(1,Math.round(scene.character.currentHP));
   const gold=Math.floor(scene.inventory?.count?.('gold')??0);if(gold>0)z.loot.gold+=gold;
   if(z.feature?.kind==='bandits'&&z.guards?.length&&z.guards.every(a=>!a.isAlive))z.cleared=true;
@@ -83,7 +83,7 @@ export function setupZone(scene){
     // The unit stays a garrison soldier (no Barracks here), or MilitarySystem would dismiss him to Unemployed.
     const unit=scene.military.units.get(id);if(unit){unit.garrison=true;if(r.equipment){unit.equipment={...r.equipment};scene.military.apply?.(w);}}
     if(Number.isFinite(r.maxHP))w.maxHP=r.maxHP;if(Number.isFinite(r.currentHP))w.currentHP=Math.min(w.maxHP,Math.max(1,r.currentHP));
-    if(r.experience)w.experience=structuredClone(r.experience);
+    if(r.experience)w.experience=structuredClone(r.experience);if(r.stance)w.stance=r.stance;
     z.soldiers.push(w);
   }
   ws.updateUI?.();
@@ -143,7 +143,7 @@ function chestTakenByKing(scene){const g=Math.floor(scene.inventory?.count?.('go
 // The home state with the party on its way back: their health and experience, the loot and what the land remembers.
 export function homeAfterZone(scene){
   const z=collectParty(scene),home=structuredClone(z.home),fallen=new Set(z.fallen);
-  for(const r of home.workers??[]){const rec=z.records[r.id];if(!rec)continue;r.currentHP=rec.currentHP;if(rec.experience)r.experience=structuredClone(rec.experience);}
+  for(const r of home.workers??[]){const rec=z.records[r.id];if(!rec)continue;r.currentHP=rec.currentHP;if(rec.experience)r.experience=structuredClone(rec.experience);if(rec.stance)r.stance=rec.stance;else delete r.stance;}
   const p=home.scouting.party,place=home.scouting.zones[p.zone];
   if(place){if(z.taken.length)place.taken=[...new Set(z.taken)].sort();if(z.cleared)place.cleared=true;}
   // The fallen die at home right after loading (the game's own death: records, wages, homes); here they leave the party.

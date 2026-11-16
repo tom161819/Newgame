@@ -7,7 +7,8 @@ import { buildingIsComplete } from '../game/buildings.js';
 import { recalculateStats } from './UnitStats.js';
 import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
 import { inAttackRange } from './CombatSystem.js';
-import { MILITARY_RULES,PATROL } from '../data/military.js';
+import { MILITARY_RULES,PATROL,STANCES } from '../data/military.js';
+import { freeAround,awayFrom } from '../game/combatSpacing.js';
 
 // C08: Soldiers employed in a Barracks are trained into units. Training is paid in Gold, needs the unit's real items
 // (Haulers carry them from an Armory to the Barracks kit store) and game time at the Barracks. A trained unit wears
@@ -112,11 +113,11 @@ export class MilitarySystem {
     this.scene.updateInventory?.();return true;
   }
   // A threat: a living animal fighting one of our people (a resident or the king) near this unit's Barracks, in sight.
-  nearestEnemy(worker,radius,ok=()=>true){let best=null,d=radius;for(const a of this.scene.animalSystem?.animals.values()??[]){if(!a.isAlive||a.active===false||!(a.type==='wolf'||a.definition?.gameplay?.hostile)||!ok(a))continue;if(this.scene.fog&&!this.scene.fog.isVisibleObject(a))continue;const e=Math.hypot(a.position.x-worker.position.x,a.position.y-worker.position.y);if(e<=d){d=e;best=a;}}return best;}
+  nearestEnemy(worker,radius,ok=()=>true){let best=null,d=radius;if(!(radius>0))return null;for(const a of this.scene.animalSystem?.animals.values()??[]){if(!a.isAlive||a.active===false||!(a.type==='wolf'||a.definition?.gameplay?.hostile)||!ok(a))continue;if(this.scene.fog&&!this.scene.fog.isVisibleObject(a))continue;const e=Math.hypot(a.position.x-worker.position.x,a.position.y-worker.position.y);if(e<=d){d=e;best=a;}}return best;}
   attackers(target){let n=0;for(const [a,t] of this.scene.combat?.attacks??[])if(t===target&&a.isAlive)n++;return n;}
   threat(worker){
     // m-mapa-kraje: in a scouted land the party guards itself – a soldier helps whoever of it is attacked near him.
-    const home=this.barracks(worker.assignedWorkplaceId)??(this.scene.zone?{x:worker.position.x,y:worker.position.y}:this.unit(worker)?.garrison?this.scene.buildings.find(b=>b.type==='castle')??null:null);if(!home)return null;let best=null,bestDistance=Infinity;
+    const home=this.barracks(worker.assignedWorkplaceId)??(this.unit(worker)?.garrison||this.scene.zone?{x:worker.position.x,y:worker.position.y}:null);if(!home)return null;let best=null,bestDistance=Infinity;
     for(const animal of this.scene.animalSystem?.animals.values()??[]){
       const victim=animal.retaliationTarget;if(!animal.isAlive||!victim?.isAlive||!(victim===this.scene.character||this.scene.workerSystem.workers.has(victim.id)&&victim.isSubject!==false))continue;
       if(this.scene.fog&&!this.scene.fog.isVisibleObject(animal))continue;
@@ -140,21 +141,46 @@ export class MilitarySystem {
       if(this.wallPatrol.update(worker,delta))return true;}
     // kasarna-branci: Recruits defend near their Barracks too, with their basic stats.
     if(!(unit||this.isRecruit(worker))||worker.commandState?.state==='Holding')return false;
+    // Combat 16 Nov 2026: stances – aggressive (default: chases and fights on), defensive (fights near itself only),
+    // hold (does not move; fights only what is in reach).
+    const stance=STANCES[worker.stance]??STANCES.aggressive,tile=worker.position;
+    // A badly hurt soldier steps back from the fight until he has healed to half (not when told to hold).
+    if(worker.retreating||stance.retreat&&worker.currentHP<worker.maxHP*MILITARY_RULES.retreatBelow&&(combat.attacks.get(worker)||this.nearestEnemy(worker,3))){
+      const danger=this.nearestEnemy(worker,MILITARY_RULES.retreatSafe);
+      if(worker.currentHP>=worker.maxHP*MILITARY_RULES.retreatUntil||!danger){if(worker.retreating){worker.retreating=false;worker.path=[];}}
+      else{if(!worker.retreating){worker.retreating=true;this.scene.eventFeed?.push?.(`retreat:${worker.id}:${Math.floor((this.scene.gameTime?.totalElapsed??0)/30000)}`,t('army.retreats',{name:worker.name??''}),{});}
+        combat.stopAttack(worker);delete worker.huntWolfId;worker.workState='Retreating';worker.workMessage='Falling back';
+        if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=800;
+          // Back to the healthy comrades (behind them, away from the enemy), else simply away.
+          const friend=this.scene.workerSystem.liveWorkers().filter(w=>w!==worker&&w.profession==='soldier'&&!w.retreating&&!w.away&&w.currentHP>=w.maxHP*.5).sort((a,b)=>Math.hypot(a.position.x-worker.position.x,a.position.y-worker.position.y)-Math.hypot(b.position.x-worker.position.x,b.position.y-worker.position.y))[0];
+          const to=friend&&Math.hypot(friend.position.x-worker.position.x,friend.position.y-worker.position.y)<15?awayFrom(this.scene,friend.tile,danger.tile,2):awayFrom(this.scene,worker.tile,danger.tile,6);if(to.length)worker.moveTo(to);}return true;}
+    }
     // m-vlk-zustava: "Hunt the wolf" sends a soldier after a lurking wolf anywhere on the map until it is dead or gone.
     let hunted=null;if(worker.huntWolfId){hunted=this.scene.animalSystem?.animals?.get?.(worker.huntWolfId)??[...(this.scene.animalSystem?.animals?.values?.()??[])].find(a=>a.id===worker.huntWolfId);if(!hunted?.isAlive||hunted.active===false){delete worker.huntWolfId;hunted=null;
       // Combat test 16 Nov 2026: the attacked group fights on – the next enemy near him, not standing idle.
-      const next=this.nearestEnemy(worker,MILITARY_RULES.followRadius);if(next){worker.huntWolfId=next.id;hunted=next;}}}
+      // …and with an attack order, the rest of the enemies around the place he was sent to.
+      const next=this.nearestEnemy(worker,stance.follow)??(worker.attackArea&&!stance.hold?this.nearestEnemy({position:worker.attackArea},MILITARY_RULES.orderRadius):null);if(next){worker.huntWolfId=next.id;hunted=next;}else delete worker.attackArea;}}
+    const ranged=worker.attackRange>1;
+    // Archers shoot the nearest enemy they can reach rather than walking to a far one.
+    if(ranged&&!stance.hold){const inReach=this.nearestEnemy(worker,worker.attackRange,a=>inAttackRange(worker,a,this.scene.map)&&combat.canTarget(worker,a));if(inReach&&(!hunted||!inAttackRange(worker,hunted,this.scene.map)))hunted=inReach;}
     // Spread out: a melee soldier whose enemy already has enough fighters around it takes a free one close by.
-    if(hunted&&worker.attackRange<=1&&!combat.attacks.get(worker)&&this.attackers(hunted)>=MILITARY_RULES.crowd){const other=this.nearestEnemy(worker,MILITARY_RULES.spreadRadius,a=>a!==hunted&&this.attackers(a)<MILITARY_RULES.crowd);if(other){worker.huntWolfId=other.id;hunted=other;}}
+    if(hunted&&!ranged&&!combat.attacks.get(worker)&&this.attackers(hunted)>=MILITARY_RULES.crowd){const other=this.nearestEnemy(worker,MILITARY_RULES.spreadRadius,a=>a!==hunted&&this.attackers(a)<MILITARY_RULES.crowd);if(other){worker.huntWolfId=other.id;hunted=other;}}
     // An enemy coming close is fought without an order.
-    if(!hunted&&!combat.attacks.get(worker)){const near=this.nearestEnemy(worker,MILITARY_RULES.engageRadius);if(near)hunted=near;}
-    const target=combat.attacks.get(worker)?.isAlive&&combat.attacks.get(worker).definition?combat.attacks.get(worker):this.threat(worker)??hunted;if(!target)return false;
+    if(!hunted&&!combat.attacks.get(worker)){const near=this.nearestEnemy(worker,stance.hold?worker.attackRange+.5:stance.engage);if(near)hunted=near;}
+    const current=combat.attacks.get(worker)?.isAlive&&combat.attacks.get(worker).definition?combat.attacks.get(worker):null;
+    const target=current??(stance.hold?hunted:this.threat(worker)??hunted);if(!target)return false;
     worker.workState='Working';worker.workMessage='Defending the kingdom';
-    const ranged=worker.attackRange>1,ready=!worker.nextTile&&(ranged?inAttackRange(worker,target,this.scene.map)&&combat.canTarget(worker,target):canInteractAdjacent(this.scene.map,worker,target));
+    // Archers keep their distance: an enemy right next to one makes him step back (unless he holds).
+    if(ranged&&!stance.hold&&!worker.nextTile&&(worker.kiteWait??0)<=0){const close=this.nearestEnemy(worker,1.6);if(close&&this.attackers(close)>0){worker.kiteWait=2500;combat.stopAttack(worker);const to=awayFrom(this.scene,worker.tile,close.tile,3);if(to.length){worker.moveTo(to);return true;}}}
+    worker.kiteWait=Math.max(0,(worker.kiteWait??0)-delta);
+    const ready=!worker.nextTile&&(ranged?inAttackRange(worker,target,this.scene.map)&&combat.canTarget(worker,target):canInteractAdjacent(this.scene.map,worker,target));
     if(ready){worker.path=[];combat.startAttack(worker,target);const dx=target.position.x-worker.position.x,dy=target.position.y-worker.position.y,n=Math.hypot(dx,dy);if(n)worker.direction={x:dx/n,y:dy/n};return true;}
     if(!ranged)combat.stopAttack(worker);
+    if(stance.hold){worker.path=[];return true;}
+    // A defensive soldier does not chase far from where the fight found him.
+    if(stance.leash&&Math.hypot(target.position.x-tile.x,target.position.y-tile.y)>stance.leash){combat.stopAttack(worker);delete worker.huntWolfId;return false;}
     worker.militaryRetarget=(worker.militaryRetarget??0)-delta;
-    if(worker.militaryRetarget<=0){worker.militaryRetarget=MILITARY_RULES.retarget;worker.moveTo(adjacentTiles(target,this.scene.map));}
+    if(worker.militaryRetarget<=0){worker.militaryRetarget=MILITARY_RULES.retarget;worker.moveTo(ranged?adjacentTiles(target,this.scene.map):freeAround(this.scene,target,worker));}
     return true;
   }
   // kasarna-branci: the wage table entry for this resident (a Recruit is paid as `recruit`, a trained unit as `soldier`).
