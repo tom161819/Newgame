@@ -14,9 +14,9 @@ const hash=text=>{let h=2166136261;for(const c of String(text)){h^=c.charCodeAt(
 const level=key=>WORLD_SETTINGS.findIndex(s=>s.key===key);
 // What the land is like, by what the party found there.
 export const ZONE_LOOK=Object.freeze({
-  forest:Object.freeze({levels:{forest:9,rocks:3,bushes:7,rivers:0,lakes:1},deposits:{stone_deposit:.5,iron_deposit:.5}}),
-  iron:Object.freeze({levels:{forest:3,rocks:8,rivers:0,lakes:0},deposits:{stone_deposit:1,iron_deposit:4}}),
-  stone:Object.freeze({levels:{forest:3,rocks:9,rivers:0,lakes:0},deposits:{stone_deposit:4,iron_deposit:.5}}),
+  forest:Object.freeze({levels:{forest:9,rocks:3,bushes:7,rivers:0,lakes:1},trees:4,clusters:5,deposits:{stone_deposit:.5,iron_deposit:.5}}),
+  iron:Object.freeze({levels:{forest:3,rocks:8,rivers:0,lakes:0},trees:.6,deposits:{stone_deposit:1,iron_deposit:4}}),
+  stone:Object.freeze({levels:{forest:3,rocks:9,rivers:0,lakes:0},trees:.6,deposits:{stone_deposit:4,iron_deposit:.5}}),
 });
 export function zoneWorldCode(homeCode,zoneId,type){
   const levels=defaultWorldLevels();for(const [key,value] of Object.entries(ZONE_LOOK[type]?.levels??{}))levels[level(key)]=value;
@@ -27,7 +27,7 @@ export function zoneStart(home){
   const party=home?.scouting?.party,found=party&&home.scouting.zones?.[party.zone];
   if(!party||party.phase!=='there'||!found)return null;
   const settings={...home.gameSettings,worldCode:zoneWorldCode(home.gameSettings?.worldCode,party.zone,found.type),mapSize:100,startingGold:0,startingGarrison:false};
-  return {settings,zone:{home,id:party.zone,type:found.type,ids:[...party.ids]}};
+  return {settings,zone:{home,id:party.zone,type:found.type,ids:[...party.ids],king:!!party.king,wagon:!!party.wagonId,cargo:structuredClone(party.cargo??{})}};
 }
 // Called at the end of GameScene.create for a zone game.
 export function setupZone(scene){
@@ -48,17 +48,20 @@ export function setupZone(scene){
     z.soldiers.push(w);
   }
   ws.updateUI?.();
-  // The King stays home: here he is out of sight in a corner and out of every fight.
-  const corner=free.length?{x:map[0].length-1-back.x,y:map.length-1-back.y}:{x:0,y:0},c=scene.character;
-  c.tile={...corner};c.position={x:corner.x+.5,y:corner.y+.5};c.nextTile=null;c.path=[];scene.player?.setVisible?.(false);
-  if(scene.player?.setPosition){const p=tileCenter(corner);scene.player.setPosition(p.x,p.y);}
-  scene.worldCamera?.lookAt?.(z.soldiers[0]?.tile??back);
+  // Owner 16 Nov 2026: the King is here only when he went with the party; otherwise he is not on this map at all.
+  const c=scene.character;
+  if(z.king){const k=free[z.ids.length]??back;c.tile={...k};c.position={x:k.x+.5,y:k.y+.5};c.nextTile=null;c.path=[];c.away=false;const p=tileCenter(k);scene.player?.setPosition?.(p.x,p.y);scene.worldCamera?.follow?.();}
+  else{c.away=true;c.path=[];c.nextTile=null;scene.player?.setVisible?.(false);scene.worldCamera?.lookAt?.(z.soldiers[0]?.tile??back);}
+  // The Horse Wagon with its load stands by the party (no horse work here yet: it only carries the goods).
+  if(z.wagon){const g=free.find((t,i)=>i>z.ids.length&&scene.vehicles?.free(t))??back;z.wagonVehicle=scene.vehicles?.create('horse_wagon',g)??null;}
+  // No wolves wait at the spot where the party comes in.
+  for(const a of [...(scene.animalSystem?.animals.values()??[])])if(a.type==='wolf'&&Math.hypot(a.tile.x-back.x,a.tile.y-back.y)<30)scene.animalSystem.remove(a);
   // Home-only guides are not shown here.
   scene.tutorial?.destroy?.();scene.tutorial=null;if(scene.gettingStarted){scene.gettingStarted.show=()=>{};scene.gettingStarted.update=()=>{};if(scene.gettingStarted.dialog)scene.gettingStarted.dialog.hidden=true;}
   scene.scouting.zones=structuredClone(home.scouting.zones);scene.scouting.party=structuredClone(home.scouting.party);
   document.body.classList.add('in-zone');
   const banner=document.createElement('div');banner.id='zone-banner';banner.className='zone-banner';
-  const type=scoutTypeById(z.type),label=document.createElement('span');label.textContent=t('zone.banner',{zone:t(`scouting.zone.${z.id}`),found:`${type?.icon??''} ${t(`scouting.type.${z.type}`)}`,count:z.soldiers.length});
+  const type=scoutTypeById(z.type),label=document.createElement('span'),goods=Object.entries(z.cargo??{}).map(([id,n])=>`${n} ${scene.objectRegistry.get(id)?.name??id}`).join(', ');label.textContent=t('zone.banner',{zone:t(`scouting.zone.${z.id}`),found:`${type?.icon??''} ${t(`scouting.type.${z.type}`)}`,count:z.soldiers.length+(z.king?1:0)})+(z.wagon?` ${t('zone.wagon',{goods:goods||t('zone.wagonEmpty')})}`:'');
   const go=document.createElement('button');go.type='button';go.id='zone-home';go.textContent=t('zone.sendHome');go.addEventListener('click',()=>scene.game.registry.get('application')?.leaveZone());
   banner.append(label,go);document.body.append(banner);z.banner=banner;
   scene.events.once('shutdown',()=>{banner.remove();document.body.classList.remove('in-zone');});
@@ -67,7 +70,7 @@ export function setupZone(scene){
 // Checked every frame in a zone game: when the whole party has fallen, the zone ends.
 export function updateZone(scene){
   const z=scene.zone;if(!z||z.leaving)return;
-  if(z.soldiers.length&&z.soldiers.every(w=>!w.isAlive)){z.leaving=true;scene.eventFeed?.push?.('zone-lost',t('zone.lost'),{important:true});setTimeout(()=>scene.game.registry.get('application')?.leaveZone(),2500);}
+  if(!z.king&&z.soldiers.length&&z.soldiers.every(w=>!w.isAlive)){z.leaving=true;scene.eventFeed?.push?.('zone-lost',t('zone.lost'),{important:true});setTimeout(()=>scene.game.registry.get('application')?.leaveZone(),2500);}
 }
 // The home state with the party on its way back: their health and experience from the zone; the fallen are gone.
 export function homeAfterZone(scene){
@@ -77,7 +80,8 @@ export function homeAfterZone(scene){
   const p=home.scouting.party;
   // The fallen die at home right after loading (the game's own death: records, wages, homes); here they leave the party.
   if(fallen.size)p.ids=p.ids.filter(id=>!fallen.has(id));
-  if(!p.ids.length)home.scouting.party=null;
+  if(p.king&&home.player&&Number.isFinite(scene.character?.currentHP))home.player.currentHP=Math.max(1,Math.round(scene.character.currentHP));
+  if(!p.ids.length&&!p.king)home.scouting.party=null;
   else Object.assign(p,{phase:'returning',at:home.time.totalElapsed+SCOUTING.travelDays*home.gameSettings.dayLengthSeconds*1000});
   return {home,fallen:[...fallen]};
 }

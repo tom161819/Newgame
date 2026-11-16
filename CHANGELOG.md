@@ -5,6 +5,16 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.142.1] - 2026-11-16
+<!-- version: {"title":"Party: the King, a Horse Wagon, a dense forest","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- The King can go with the scouting party (a tick in the World window). He walks to the map edge with the soldiers and is away from the kingdom until the party comes back; in the land he is with the party and you lead him there too. If he falls, the game ends. Without the King he is not on the land's map at all.
+- A free Horse Wagon can go with the party, loaded with goods from the stores (up to the wagon's load). In the land it stands by the party; what is in it comes back to the stores when the party returns home.
+### Changed
+- A Dense forest land now really is a dense forest: about five times as many trees as a home map, spread over the whole land.
+### Fixed
+- No wolves wait where the party enters a land, and the King no longer appears alone on the far side of a land he did not go to. The party enters the land on the side facing home.
+
 ## [0.142.0] - 2026-11-16
 <!-- version: {"title":"Playing a zone with the scouting party","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added

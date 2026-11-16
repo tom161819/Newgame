@@ -24,7 +24,7 @@ export class UnitSelection {
   }
   workers(){return [...this.ids].map(id=>this.scene.workerSystem.workers.get(id)).filter(w=>this.scene.workerSystem.commands.selectable(w));}
   // m-kral-vyber (point 52): the King is selected like the others (click or drag) and ordered with the right button.
-  set(workers){this.king=workers.includes(this.scene.character)&&this.scene.character.isAlive;this.ids=new Set(workers.filter(w=>this.scene.workerSystem.commands.selectable(w)).map(w=>w.id));this.draw();}
+  set(workers){this.king=workers.includes(this.scene.character)&&this.scene.character.isAlive&&!this.scene.character.away;this.ids=new Set(workers.filter(w=>this.scene.workerSystem.commands.selectable(w)).map(w=>w.id));this.draw();}
   clear(){this.ids.clear();this.king=false;this.anchor=null;this.draw();}
   act(action){
     const workers=this.workers(),s=this.scene;if(action==='clear'){this.clear();return;}
@@ -86,7 +86,7 @@ export class UnitSelection {
     const s=this.scene,workers=this.workers();this.ids=new Set(workers.map(w=>w.id));this.graphics.clear();this.overlay.clear();
     // The open detail of the one selected villager already carries his commands.
     const detail=workers.length===1&&!!s.unitPanel?.dialog.open&&s.unitPanel.unit===workers[0];
-    const count=workers.length+(this.king?1:0);if(this.king&&!s.character.isAlive)this.king=false;
+    const count=workers.length+(this.king?1:0);if(this.king&&(!s.character.isAlive||s.character.away))this.king=false;
     const signature=JSON.stringify([this.king,workers.map(w=>w.id+':'+w.profession+':'+haulPriorityValue(w.haulPriority)),s.gameOver,s.gameTime.paused,language(),detail]);
     if(!this.panel.hidden&&signature===this.signature){const now=globalThis.performance?.now?.()??0;if(now-(this.placedAt??0)>700){this.placedAt=now;this.placeAboveBar();}}
     if(signature!==this.signature){

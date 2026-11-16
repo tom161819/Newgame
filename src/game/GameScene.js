@@ -1,4 +1,4 @@
-import { setupZone,updateZone } from './zoneMode.js';
+import { setupZone,updateZone,ZONE_LOOK } from './zoneMode.js';
 import { WorldPanel } from '../ui/WorldPanel.js';
 import { ScoutingSystem } from '../systems/ScoutingSystem.js';
 import { castleRules } from '../data/castle.js';
@@ -283,7 +283,7 @@ export class GameScene extends Phaser.Scene {
     if(!this.loadState&&!this.zone){createStartingCastle(this);createStartingStockpile(this);}
     this.skillSystem.initialize(this.character);
     this.equipment=new EquipmentSystem(this.character,this.objectRegistry,this.inventory,()=>{this.equipmentPanel?.refresh();this.combatFeedback?.refresh();});
-    this.combat=new CombatSystem({map:this.map,damageScale:unit=>this.heating?.combatFactor?.(unit)??1,canFight:unit=>unit.isAlive&&!(this.zone&&unit===this.character)&&!unit.mounted&&(unit!==this.character||unit.state===PLAYER_STATE.GROUND),regenerationRate:unit=>this.regeneration.rateFor(unit),canTarget:(attacker,target)=>attacker.attackRange<=1||!this.workerSystem?.workers.has(attacker.id)||!this.fog||this.fog.isVisibleObject(target)});
+    this.combat=new CombatSystem({map:this.map,damageScale:unit=>this.heating?.combatFactor?.(unit)??1,canFight:unit=>unit.isAlive&&!(unit===this.character&&this.character.away)&&!unit.mounted&&(unit!==this.character||unit.state===PLAYER_STATE.GROUND),regenerationRate:unit=>this.regeneration.rateFor(unit),canTarget:(attacker,target)=>attacker.attackRange<=1||!this.workerSystem?.workers.has(attacker.id)||!this.fog||this.fog.isVisibleObject(target)});
     this.skillSystem.attachCombat(this.combat);
     this.resourceSpawners=[];
     for(const definition of this.objectRegistry.byCategory('resource').filter(d=>d.spawn)){
@@ -361,7 +361,7 @@ export class GameScene extends Phaser.Scene {
     this.setStatus(t('status.idle'));
     this.worldCamera=new WorldCamera(this,this.player);this.staffingIndicators=new MissingWorkersIndicators(this);
     this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState){const weights=this.worldWeights,at=(grid,t)=>grid[t.y*this.groundGrid[0].length+t.x]??0,F=WORLD_GENERATION.fairStart;
-      this.naturalResources.generate(this.worldRandom('trees'),Math.round(WORLD_FORESTRY.initialTrees*settingsFromLevels(this.worldLevels).forest*mapArea()),{weight:weights?t=>at(weights.forest,t):null,start:settingsFromLevels(this.worldLevels).forest>=.5?{center:PLAYER_START,radius:F.radius,trees:F.trees}:null});
+      this.naturalResources.generate(this.worldRandom('trees'),Math.round(WORLD_FORESTRY.initialTrees*settingsFromLevels(this.worldLevels).forest*mapArea()*(this.zone?ZONE_LOOK[this.zone.type]?.trees??1:1)),{clusters:Math.round(WORLD_FORESTRY.clusters*(this.zone?ZONE_LOOK[this.zone.type]?.clusters??1:1)),weight:weights?(this.zone?.type==='forest'?t=>.45+.55*at(weights.forest,t):t=>at(weights.forest,t)):null,start:settingsFromLevels(this.worldLevels).forest>=.5?{center:PLAYER_START,radius:F.radius,trees:F.trees}:null});
       this.naturalResources.mining.generate(this.worldRandom('minerals'),weights?t=>.25+.75*at(weights.stone,t):null);
       // m-kamenolom-u-hradu: a Quarry deposit 8–16 tiles from the Castle in every world (generator 3).
       if(!this.zone)this.naturalResources.mining.ensureStartQuarry(this.worldRandom('start-quarry'));
@@ -956,7 +956,7 @@ export class GameScene extends Phaser.Scene {
       if(fading){const key=`building:${building.id}`;if(buildingIsComplete(building)&&this.mapMemory?.objects.has(key)){const target=edgeLight(this.fog,building,buildingDefinition(building));lit=fadeStep(visual.sightLit??target,target,frame);}visual.sightLit=lit;if(lit<1&&lit>0)fades.set(key,lit);else fades.delete(key);}
       const shown=(seen||lit>0)&&visual.inView(view);visual.setVisible(shown);
       if(shown&&buildingIsComplete(building))applyFootprint(visual,footprintShown({selected:selectedIds.has(building.id),buildMode:!!this.buildMode}));}
-    this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
+    this.player.setVisible(!this.character.away&&this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
     this.combatFeedback?.refresh();
     this.experienceFeedback?.refreshVisibility();this.unitPanel?.refresh();
     this.rockMiningTool?.refresh();this.populationSidebar?.update();this.unitSelection?.draw();this.minimap?.update();this.eventFeed?.update();this.kingdomHappiness?.update();

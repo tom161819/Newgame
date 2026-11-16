@@ -46,11 +46,11 @@ export class NaturalResourcesSystem {
   }
   // World v2: `weight(tile)` 0–1 (generator 2's forest weights) puts forests where the landscape wants them;
   // `start` {radius, trees} adds a grove near the castle when the start would have too few trees (fair start).
-  generate(random=Math.random,count=FORESTRY.initialTrees,{weight=null,start:fair=null}={}){
+  generate(random=Math.random,count=FORESTRY.initialTrees,{weight=null,start:fair=null,clusters=FORESTRY.clusters}={}){
     const s=this.scene,start=s.character.tile,reserved=this.reserved(),possible=reachableTiles(s.map,[start]).filter(t=>t.x>1&&t.y>1&&t.x<COLUMNS-2&&t.y<ROWS-2&&Math.hypot(t.x-start.x,t.y-start.y)>FORESTRY.protectedRadius&&!reserved.has(tileKey(t))&&!s.resourceOccupancy.has(tileKey(t)));
     if(!possible.length)return 0;
     // m-velikost-mapy: the route check answers from a local test first (the same answers as two flood fills per tree).
-    const origins=this.origins(),mask=reachableMask(s.map,origins),width=s.map[0].length,keeps=tile=>{const quick=blockKeepsReach(s.map,[tile],mask,origins),ok=quick===null?this.preservesRoutes(tile):quick;if(ok)mask[tile.y*width+tile.x]=0;return ok;};const reachable=new Set(possible.map(tileKey)),pick=()=>{for(let i=0;i<60;i++){const t=possible[Math.floor(random()*possible.length)];if(!weight||random()<weight(t))return t;}return possible[Math.floor(random()*possible.length)];},centers=Array.from({length:FORESTRY.clusters},pick);let added=0;
+    const origins=this.origins(),mask=reachableMask(s.map,origins),width=s.map[0].length,keeps=tile=>{const quick=blockKeepsReach(s.map,[tile],mask,origins),ok=quick===null?this.preservesRoutes(tile):quick;if(ok)mask[tile.y*width+tile.x]=0;return ok;};const reachable=new Set(possible.map(tileKey)),pick=()=>{for(let i=0;i<60;i++){const t=possible[Math.floor(random()*possible.length)];if(!weight||random()<weight(t))return t;}return possible[Math.floor(random()*possible.length)];},centers=Array.from({length:clusters},pick);let added=0;
     for(let attempt=0;attempt<count*80&&added<count;attempt++){
       const center=centers[attempt%centers.length],radius=Math.sqrt(random())*(5+random()*5),angle=random()*Math.PI*2,tile={x:Math.round(center.x+Math.cos(angle)*radius),y:Math.round(center.y+Math.sin(angle)*radius)},key=tileKey(tile);
       if(!reachable.has(key)||weight&&random()>Math.max(.15,weight(tile))||s.map[tile.y]?.[tile.x]!==0||!isFertileGround(s.groundGrid?.[tile.y]?.[tile.x])||tile.x<2||tile.y<2||tile.x>COLUMNS-3||tile.y>ROWS-3||reserved.has(key)||s.resourceOccupancy.has(key)||Math.hypot(tile.x-start.x,tile.y-start.y)<=FORESTRY.protectedRadius)continue;

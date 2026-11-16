@@ -609,7 +609,7 @@ function validateAtSize(input,registry){
   part='kingSkills';if(s.kingSkills!==undefined)check(validKingSkillState(s.kingSkills,s.royalGoals?.done??[]));
   // m-noc-zrychleni (82): the night speed-up tip shown (optional, only `true`).
   if(s.nightSpeedTip!==undefined)check(validNightSpeedTipState(s.nightSpeedTip));
-  /* m-mapa-kraje: scouting the zones around the map, optional */part='scouting';check(validScouting(s.scouting,{workerIds:new Set((s.workers??[]).map(w=>w.id))}));
+  /* m-mapa-kraje: scouting the zones around the map, optional */part='scouting';check(validScouting(s.scouting,{workerIds:new Set((s.workers??[]).map(w=>w.id)),vehicleIds:new Set((s.vehicles?.vehicles??[]).filter(x=>x.type==='horse_wagon').map(x=>x.id)),registry}));
   // m-91 Dev tool: known keys only, numbers on the 0.05 grid within ×0.25–×4, at least one key.
   if(s.devBalance!==undefined)check(validDevBalanceState(s.devBalance));
   // m-hlasky-jednou (79): closed notices – [memory key, game time of the close], unique, never in the future.

@@ -44,13 +44,23 @@ export class WorldPanel {
       else{
         d.append(this.el('p','world-hint',t('scouting.pickSoldiers',{zone:t(`scouting.zone.${this.selected}`),hours:Math.round(SCOUTING.travelDays*24)})));
         const list=this.el('div','world-soldiers');
+        // Owner 16 Nov 2026: the King may go along (otherwise he is not on the zone's map).
+        if(s.kingFree()){const l=this.el('label','world-king');const c=this.doc.createElement('input');c.type='checkbox';c.checked=!!this.withKing;c.addEventListener('change',()=>{this.withKing=c.checked;this.render();});l.append(c,` 👑 ${t('scouting.withKing')}`);list.append(l);}
         if(!soldiers.length)list.append(this.el('p','',t('scouting.noSoldiers')));
         for(const w of soldiers){const l=this.el('label');const c=this.doc.createElement('input');c.type='checkbox';c.checked=this.picked.has(w.id);c.addEventListener('change',()=>{c.checked?this.picked.add(w.id):this.picked.delete(w.id);this.render();});l.append(c,` ${w.name??w.id}`);list.append(l);}
         if(soldiers.length){const all=this.el('button','',t('scouting.all'));all.type='button';all.addEventListener('click',()=>{this.picked=new Set(soldiers.map(w=>w.id));this.render();});list.append(all);}
         d.append(list);
-        const send=this.el('button','world-send',t('scouting.send'));send.type='button';send.disabled=!this.picked.size;
-        send.addEventListener('click',()=>{const r=s.send(this.selected,[...this.picked]);if(r.error){this.error=r.error;}else{this.error=null;this.picked=new Set();}this.render();});d.append(send);
-        if(this.picked.size)d.append(this.el('p','world-warn',t('scouting.safetyWarn')));
+        // A Horse Wagon with goods from the stores (up to its load).
+        const cart=s.freeWagon(),wagon=this.el('div','world-wagon');
+        if(!cart)wagon.append(this.el('p','world-hint',t('scouting.noWagonHere')));
+        else{const l=this.el('label');const c=this.doc.createElement('input');c.type='checkbox';c.checked=!!this.withWagon;c.addEventListener('change',()=>{this.withWagon=c.checked;this.render();});l.append(c,` 🐴 ${t('scouting.withWagon')}`);wagon.append(l);
+          if(this.withWagon){this.cargo??={};const load=s.load(this.cargo);wagon.append(this.el('p','world-hint',t('scouting.wagonLoad',{load:Math.round(load),max:s.capacity()})));
+            const grid=this.el('div','world-goods');for(const g of s.goods()){const row=this.el('label');const n=this.doc.createElement('input');n.type='number';n.min='0';n.max=String(g.available);n.step='1';n.value=String(this.cargo[g.resource]??0);n.addEventListener('change',()=>{const v=Math.max(0,Math.min(g.available,Math.floor(Number(n.value)||0)));if(v)this.cargo[g.resource]=v;else delete this.cargo[g.resource];this.render();});row.append(`${g.name} (${g.available}) `,n);grid.append(row);}
+            wagon.append(grid);if(load>s.capacity())wagon.append(this.el('p','world-error',t('scouting.heavy')));}}
+        d.append(wagon);
+        const send=this.el('button','world-send',t('scouting.send'));send.type='button';send.disabled=!this.picked.size&&!this.withKing;
+        send.addEventListener('click',()=>{const r=s.send(this.selected,[...this.picked],{king:!!this.withKing,wagon:!!this.withWagon,cargo:this.withWagon?this.cargo:{}});if(r.error){this.error=r.error;}else{this.error=null;this.picked=new Set();this.withKing=false;this.withWagon=false;this.cargo={};}this.render();});d.append(send);
+        if(this.picked.size)d.append(this.el('p','world-warn',t('scouting.safetyWarn')));if(this.withKing)d.append(this.el('p','world-warn',t('scouting.kingWarn')));
       }
     }
     if(this.error)d.append(this.el('p','world-error',this.error));

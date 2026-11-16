@@ -55,3 +55,15 @@ test('zone play: the zone world, the start and the way home',async()=>{
   assert.deepEqual(back.fallen,['s1']);assert.deepEqual(back.home.scouting.party.ids,['s0']);assert.equal(back.home.scouting.party.phase,'returning');
   assert.equal(back.home.scouting.party.at,5000+300000);assert.equal(back.home.workers[0].currentHP,33);assert.equal(home.scouting.party.phase,'there','the kept home state is not changed');
 });
+test('owner 16 Nov 2026: the King and a loaded Horse Wagon may go with the party (save check)',()=>{
+  const ids=new Set(['s0']),vehicleIds=new Set(['vehicle-1']),registry={get:id=>({bread:{category:'resource'},wood:{category:'resource'}})[id]};
+  const party=extra=>({zones:{},party:{zone:'n',ids:['s0'],phase:'there',since:0,at:5,...extra}});
+  assert.ok(validScouting(party({king:true}),{workerIds:ids,vehicleIds,registry}));
+  assert.ok(validScouting({zones:{},party:{zone:'n',ids:[],phase:'away',since:0,at:5,king:true}},{workerIds:ids,vehicleIds,registry}),'the King alone');
+  assert.ok(!validScouting({zones:{},party:{zone:'n',ids:[],phase:'away',since:0,at:5}},{workerIds:ids,vehicleIds,registry}),'nobody');
+  assert.ok(!validScouting(party({king:false}),{workerIds:ids,vehicleIds,registry}));
+  assert.ok(validScouting(party({wagonId:'vehicle-1',cargo:{bread:10}}),{workerIds:ids,vehicleIds,registry}));
+  assert.ok(!validScouting(party({wagonId:'vehicle-2',cargo:{}}),{workerIds:ids,vehicleIds,registry}),'unknown wagon');
+  assert.ok(!validScouting(party({wagonId:'vehicle-1',cargo:{gold_bar:1}}),{workerIds:ids,vehicleIds,registry}),'unknown goods');
+  assert.ok(!validScouting(party({cargo:{bread:1}}),{workerIds:ids,vehicleIds,registry}),'goods without a wagon');
+});

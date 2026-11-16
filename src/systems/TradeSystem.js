@@ -116,7 +116,7 @@ export class TradeSystem {
   reservedGold(){return this.openOrders().filter(o=>o.side==='buy').reduce((n,o)=>n+(o.quantity-o.delivered)*o.price,0);}
   pendingSaleGold(){return this.openOrders().filter(o=>o.side==='sell').reduce((n,o)=>n+(o.quantity-o.delivered)*o.price,0);}
   // Vehicles a merchant would buy now: parked ones (not in use or reserved), each with its price.
-  vehiclesForSale(){const v=this.scene.vehicles;if(!v)return [];return [...v.vehicles.values()].filter(x=>x.state==='parked'&&vehicleSalePrice(x.type)).map(x=>({id:x.id,type:x.type,price:vehicleSalePrice(x.type)}));}
+  vehiclesForSale(){const v=this.scene.vehicles;if(!v)return [];return [...v.vehicles.values()].filter(x=>x.state==='parked'&&!this.scene.scouting?.holds?.(x)&&vehicleSalePrice(x.type)).map(x=>({id:x.id,type:x.type,price:vehicleSalePrice(x.type)}));}
   // The merchant takes the vehicle (and a wagon's horse) at once and pays from his Gold.
   sellVehicle(id){
     const c=this.caravan,v=this.scene.vehicles?.vehicles.get(id);if(!c||c.phase!=='trading')return {ok:false,error:'noCaravan'};

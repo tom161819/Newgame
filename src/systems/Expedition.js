@@ -9,7 +9,7 @@ export const wagonLoad=()=>LOGISTICS_RULES.loadUnits*(VEHICLES.horse_wagon?.mult
 export class Expedition {
   constructor(trade){this.trade=trade;this.state=null;}
   get scene(){return this.trade.scene;}
-  freeWagon(){const v=this.scene.vehicles;if(!v)return null;return [...v.vehicles.values()].find(x=>x.type==='horse_wagon'&&x.state==='parked'&&v.usable(x))??null;}
+  freeWagon(){const v=this.scene.vehicles;if(!v)return null;return [...v.vehicles.values()].find(x=>x.type==='horse_wagon'&&x.state==='parked'&&v.usable(x)&&!this.scene.scouting?.holds?.(x))??null;}
   // Why the button is grey (null = it may be sent).
   blocker(){if(this.state)return 'away';if(!this.freeWagon())return 'wagon';return null;}
   escorts(){const m=this.scene.military;return this.scene.workerSystem.liveWorkers().filter(w=>w.profession==='soldier'&&!w.away&&w.scoutZone==null&&!w.restPhase&&!this.scene.combat?.attacks?.get?.(w));}
