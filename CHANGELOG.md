@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.5] - 2026-11-16
+<!-- version: {"title":"3D soldiers with animations","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Changed
+- Soldiers wear the owner's new 3D figures: the Knight, the Archer, the Swordsman and the Recruit with a spear, each in all eight directions (the Knight shows once Knights can be trained).
+### Added
+- Soldiers are animated: they walk with a real stride, strike in battle (a sword swing, a spear thrust, an archer drawing the bow) and fall when they die, lying a moment before they fade.
+
 ## [0.143.4] - 2026-11-16
 <!-- version: {"title":"Subtler selection ring","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Improved

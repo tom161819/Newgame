@@ -1,3 +1,4 @@
+import { SOLDIER_ANIM_LOOKS } from '../soldierAnimArt.js';
 // Building art approved by the developer in Asset Studio (art/approvals.json).
 // Values come from each export's metadata: origin = baseOrigin (the game anchors
 // buildings at the footprint's front corner), visualHeight and gameLights.
@@ -124,6 +125,9 @@ export const WALK_COLUMNS=Object.freeze(['idle','stride-a','stride-b']);
 export const WALK_CYCLE=Object.freeze([0,1,0,2]);
 // The walk-sheet frame for a facing and the time spent walking (ms); standing is the idle column.
 export function walkFrame(k,walkedMs,fps,moving){return k*WALK_COLUMNS.length+(moving?WALK_CYCLE[Math.floor(walkedMs*fps/1000)%WALK_CYCLE.length]:0);}
+// m-vojaci-3d: the frame of an animated soldier sheet: attacking, walking or standing.
+export function soldierFrame(anim,k,{walkedMs=0,walkFps=10,moving=false,attackMs=0,attacking=false}={}){
+  const col=attacking?anim.attack[Math.floor(attackMs*anim.attackFps/1000)%anim.attack.length]:moving?anim.walk[Math.floor(walkedMs*walkFps/1000)%anim.walk.length]:anim.idle;return k*anim.columns+col;}
 export const walkKey=look=>`villager-walk:${look}`;
 // A look whose walk sheet has loaded walks frame by frame; without one (missing or failed file) it keeps the facing image.
 export function hasWalk(scene,look){return !!APPROVED_VILLAGER_ART[look]?.walk&&!!scene?.textures?.exists?.(walkKey(look));}
@@ -148,7 +152,9 @@ export const MILITARY_LOOKS=Object.freeze({soldier:Object.freeze({male:['militar
   archer:Object.freeze({male:['military-archer-hood','military-archer-royal'],female:['military-archer-woman']}),
   swordsman:Object.freeze({male:['military-swordsman-kite','military-swordsman-greatsword'],female:['military-swordsman-woman']}),
   knight:Object.freeze({male:['military-knight-blue','military-knight-red'],female:['military-knight-woman']})});
-export function militaryLook(type,sex,id=''){const list=MILITARY_LOOKS[type]?.[sex];if(!list)return null;let h=0;for(const c of String(id))h=(h*31+c.charCodeAt(0))>>>0;return list[h%list.length];}
+// m-vojaci-3d (owner 16 Nov 2026): the four ranks wear the owner's rigged 3D soldiers, rendered with walk, attack and
+// fall animations (SOLDIER_ANIM_ART); the earlier painted looks stay only as data for the Studio.
+export function militaryLook(type,sex,id=''){if(SOLDIER_ANIM_LOOKS[type])return SOLDIER_ANIM_LOOKS[type];const list=MILITARY_LOOKS[type]?.[sex];if(!list)return null;let h=0;for(const c of String(id))h=(h*31+c.charCodeAt(0))>>>0;return list[h%list.length];}
 export function villagerSex(name=''){const first=String(name).split(' ')[0];return FEMALE_NAMES.has(first)||/a$/i.test(first)?'female':'male';}
 
 export function withApprovedArt(definition){

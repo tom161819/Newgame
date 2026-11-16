@@ -2,10 +2,11 @@ import Phaser from 'phaser';
 import { directionName,DIRECTION_POSES } from './directions.js';
 import { CargoBundleView } from './CargoBundleView.js';
 import { HUMAN_APPEARANCE as COLORS } from '../data/humanAppearance.js';
-import { APPROVED_VILLAGER_ART,PROFESSION_LOOKS,FACING_INDEX,villagerSex,walkFrame,walkKey,militaryLook } from '../data/objects/approvedArt.js';
+import { APPROVED_VILLAGER_ART,PROFESSION_LOOKS,FACING_INDEX,villagerSex,walkFrame,walkKey,militaryLook,soldierFrame } from '../data/objects/approvedArt.js';
 import { FISHER_WALK_ART,FISHER_LOOKS } from '../data/fisherWalkArt.js';
 // Approved looks with only a walk sheet (the Fisher): the walk sheet carries all eight directions.
-const villagerArt=look=>APPROVED_VILLAGER_ART[look]??FISHER_WALK_ART[look]??null;
+import { SOLDIER_ANIM_ART } from '../data/soldierAnimArt.js';
+const villagerArt=look=>APPROVED_VILLAGER_ART[look]??SOLDIER_ANIM_ART[look]??FISHER_WALK_ART[look]??null;
 const professionLooks=profession=>PROFESSION_LOOKS[profession]??(profession==='fisher'?FISHER_LOOKS:null);
 const hasWalk=(scene,look)=>!!villagerArt(look)?.walk&&!!scene?.textures?.exists?.(walkKey(look));
 import { assetURL } from '../systems/AssetManager.js';
@@ -58,6 +59,8 @@ export class HumanView extends Phaser.GameObjects.Container {
     for(const part of [this.shadow,this.leftLeg,this.rightLeg,this.body,...this.arms])part.setVisible(!on);
     if(!on){this.art.setVisible(false);return;}
     const art=villagerArt(this.look);this.tool.setVisible(false);this.weapon.setVisible(false);
+    if(art.anim&&hasWalk(this.scene,this.look)){const frame=soldierFrame(art.anim,k,{walkedMs:this.walked??0,walkFps:art.walk.fps,moving:!!this.isWalking,attackMs:this.attackMs??0,attacking:!!this.attacking}),key=walkKey(this.look);
+      if(this.artFrame!==`${key}:${frame}`){this.artFrame=`${key}:${frame}`;this.art.setTexture(key,frame).setOrigin(art.walk.origin.x,art.walk.origin.y);}this.art.setVisible(true);return;}
     if(hasWalk(this.scene,this.look)){const frame=walkFrame(k,this.walked??0,art.walk.fps,!!this.isWalking),key=walkKey(this.look);
       if(this.artFrame!==`${key}:${frame}`){this.artFrame=`${key}:${frame}`;this.art.setTexture(key,frame).setOrigin(art.walk.origin.x,art.walk.origin.y);}this.art.setVisible(true);return;}
     const origin=art.origins[k];this.artFrame=null;
@@ -84,6 +87,8 @@ export class HumanView extends Phaser.GameObjects.Container {
       else{this.art.y=moving?-Math.abs(Math.sin(this.phase))*1.6:0;this.art.rotation=moving?Math.sin(this.phase)*.035:0;}}
   }
   setAttackPose(delta,active,direction){
+    const animArt=this.art.visible?villagerArt(this.look)?.anim:null;
+    if(animArt){this.weapon.setVisible(false);this.attacking=!!active;if(active){const face=directionName(direction);if(face)this.facing=face;this.attackMs=(this.attackMs??0)+delta;}else this.attackMs=0;this.art.rotation=0;this.applyArt();return;}
     if(this.art.visible){this.weapon.setVisible(false);if(active){this.attackPhase=(this.attackPhase??0)+delta*.011;this.art.rotation=Math.sin(this.attackPhase)*.12;}return;}
     this.weapon.setVisible(active);if(!active)return;const face=directionName(direction);if(face&&face!==this.facing){this.facing=face;this.paint();}
     this.attackPhase=(this.attackPhase??0)+delta*.011;const pose=DIRECTION_POSES[this.facing],swing=Math.sin(this.attackPhase)*7;
@@ -119,6 +124,20 @@ export class HumanView extends Phaser.GameObjects.Container {
     const view=this.scene.cameras?.main?.worldView,onScreen=!view||this.x>view.x-80&&this.x<view.right+80&&this.y>view.y-80&&this.y<view.bottom+120;
     if(this.visible&&onScreen){const frame=fishingFrame(art,this.fishFacing??0,state.column);if(this.fishFrame!==frame||this.fishArt.texture.key!==key){this.fishFrame=frame;this.fishArt.setTexture(key,frame).setOrigin(art.origin.x,art.origin.y);}this.fishArt.setVisible(true);}
     return true;
+  }
+  // m-vojaci-3d: an animated soldier falls where he died (the fall frames, then he lies a moment and fades); the view
+  // itself is destroyed by the caller right after.
+  playDeath(){
+    const art=this.look&&this.lookReady?villagerArt(this.look):null,scene=this.scene;if(!art?.anim||!this.art.visible||!scene?.add)return null;
+    const k=FACING_INDEX[this.facing]??0,key=walkKey(this.look),frames=art.anim.die.map(c=>k*art.anim.columns+c);
+    const body=scene.add.image(this.x,this.y,key,frames[0]).setOrigin(art.walk.origin.x,art.walk.origin.y).setDepth(this.depth);
+    // One timer drives the fall (dieFps), the rest on the ground (1.8 s) and the fade (1.2 s).
+    const fall=frames.length*1000/art.anim.dieFps,end=fall+3000;let t=0;
+    const step=scene.time?.addEvent?.({delay:50,loop:true,callback:()=>{t+=50;if(!body.active){step.remove();return;}
+      body.setFrame(frames[Math.min(frames.length-1,Math.floor(t*art.anim.dieFps/1000))]);if(t>fall+1800)body.setAlpha(Math.max(0,1-(t-fall-1800)/1200));
+      if(t>=end){step.remove();body.destroy();}}});
+    if(!step)body.destroy();
+    return body;
   }
   setCargo(cargo){this.cargoBundle.update(cargo);}
   // #58 C2: a small red "!" over a striking or leaving resident.
