@@ -1,4 +1,4 @@
-import { zoneStart,homeAfterZone,buryFallen } from '../game/zoneMode.js';
+import { zoneStart,homeAfterZone,buryFallen,nextMap } from '../game/zoneMode.js';
 import { recordSaveFailure } from '../systems/saveFailure.js';
 import { saveRecordStatus } from './SaveLoadMenu.js';
 import { SaveGameManager } from '../systems/SaveGameManager.js';
@@ -101,6 +101,9 @@ export class GameApplication {
     const start=zoneStart(home);if(!start){this.notify(t('zone.notThere'));return false;}
     this.start(null,start.settings,start.zone);return true;
   }
+  // m-mapa-kraje: into an abandoned mine (its inside is a map of its own) and back out to the land.
+  enterMine(){const scene=this.scene;if(!scene?.zone||scene.zone.dungeon)return false;const next=nextMap(scene,{dungeon:true});this.start(null,next.settings,next.zone);return true;}
+  leaveMine(){const scene=this.scene;if(!scene?.zone?.dungeon)return false;const next=nextMap(scene,{dungeon:false});this.start(null,next.settings,next.zone);return true;}
   // Back home: the saved home state with the party on its way back.
   leaveZone(){
     const scene=this.scene;if(!scene?.zone)return false;const {home,fallen}=homeAfterZone(scene);let state,checked=true;

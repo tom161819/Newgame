@@ -54,6 +54,7 @@ export default {
   'object.pitch_kiln.name':"Smolárna",'object.pitch_kiln.description':"Smolař pálí ze 2 dřev 1 smůlu a z 1 dřeva a 1 smůly dělá 3 pochodně. Nejdřív udržuje 20 pochodní ve skladech.",
   'object.torch_post.name':"Sloup s pochodní",'object.torch_post.description':"Železný sloup s pochodní. V noci osvětlí 5 políček kolem; spálí 1 pochodeň za noc.",
   'object.campfire.name':"Táborák",'object.campfire.description':"Oheň z klestí nasbíraného na místě. Hoří jednu noc; vlci se jeho světlu vyhnou.",
+  'object.bandit.name':"Loupežník",'object.bandit.description':"Loupežník, který hlídá kořist svého tábora. Napadne každého, kdo se přiblíží.",'object.cave_rat.name':"Obří krysa",'object.cave_rat.description':"Obří krysa z opuštěného dolu. Kousne každého, kdo se přiblíží.",
   'object.wolf.name':"Vlk",'object.wolf.description':"Šedý vlk, který v noci loví ve smečce. Ohni se vyhne. Zanechá 2 maso.",
   'object.burnt_ruins.name':"Ohořelé trosky",'object.burnt_ruins.description':"Zbytky budovy, která vyhořela.",
   'object.iron.name':'Železo','object.iron.description':'Hotové železo vytavené ze 3 železných rud a 3 dřev ve slévárně. Ukládá se ve skladech materiálu; liší se od surové rudy. Z železa se kovají meče, zbroj a kování vozíků.',

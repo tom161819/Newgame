@@ -14,6 +14,11 @@ export const SCOUTING=Object.freeze({
     {id:'forest',icon:'🌲',weight:3},
     {id:'iron',icon:'⛏',weight:2},
     {id:'stone',icon:'🪨',weight:2},
+    // Owner 16 Nov 2026: a bandit camp (bandits guard their loot), crumbling ruins with a treasure, an abandoned mine
+    // (its entrance leads into a dungeon).
+    {id:'bandits',icon:'🏕',weight:2},
+    {id:'ruins',icon:'🏚',weight:2},
+    {id:'mine',icon:'🕳',weight:2},
   ].map(z=>Object.freeze(z))),
 });
 const hash=text=>{let h=2166136261;for(const c of String(text)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)>>>0;}return h>>>0;};

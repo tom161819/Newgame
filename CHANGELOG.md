@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.142.2] - 2026-11-16
+<!-- version: {"title":"Bandit camp, ruins and an abandoned mine","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- New lands a scouting party can find: a Bandit camp, Crumbling ruins and an Abandoned mine.
+- Bandit camp: bandits guard a chest of gold in the middle of a clearing and attack anyone who comes close. Beat them and take the chest; a beaten camp stays empty.
+- Crumbling ruins: broken stone walls with a treasure chest inside.
+- Abandoned mine: a rock hill with an entrance. Walk the party to the entrance and press "Enter the mine": the map switches to the inside – dark tunnels and rooms with giant rats, iron and stone deposits and treasure chests in the farthest rooms. "Leave the mine" brings the party back out to the entrance.
+- A party member who steps next to a chest takes its gold. The loot is shown in the bar at the top and goes into the treasury when the party gets home. A chest once taken stays empty next time.
+
 ## [0.142.1] - 2026-11-16
 <!-- version: {"title":"Party: the King, a Horse Wagon, a dense forest","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added

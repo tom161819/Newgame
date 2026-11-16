@@ -9,7 +9,7 @@ import { animalInitialCount } from './GameSettings.js';
 export class AnimalSystem {
   constructor(scene,random=Math.random){this.scene=scene;this.random=random;this.animals=new Map();this.nextId=1;this.clearance=new WildlifeClearance(scene);}
   spawn(start){
-    const definitions=this.scene.objectRegistry.byCategory('animal');this.clearance.refresh();
+    const definitions=this.scene.objectRegistry.byCategory('animal').filter(d=>!d.gameplay.zoneOnly);this.clearance.refresh();
     const positions=generateResourcePositions(this.scene.map,start,this.scene.map.length*this.scene.map[0].length,this.random,this.scene.resourceOccupancy);
     const safe=positions.filter(tile=>this.clearance.isClear(tile)),used=new Set();
     for(const definition of definitions)for(let i=0;i<animalInitialCount(definition,this.scene.gameSettings);i++){
@@ -30,6 +30,10 @@ export class AnimalSystem {
     animal.retaliationTarget=attacker;animal.path=[];animal.retaliationRepath=0;
     this.scene.combat.startAttack(animal,attacker);
   }
+  guardTarget(animal){
+    const s=this.scene,r=animal.definition.gameplay.guardRadius,c=s.character,units=[...(s.workerSystem?.liveWorkers()??[]).filter(w=>w.isAlive&&!w.away),...(c?.isAlive&&!c.away?[c]:[])];
+    let best=null,d=r;for(const u of units){const e=Math.hypot(u.position.x-animal.position.x,u.position.y-animal.position.y);if(e<=d){d=e;best=u;}}return best;
+  }
   stopRetaliation(animal){
     if(animal.retaliationTarget){animal.path=[];animal.wanderWait=1500;}
     animal.retaliationTarget=null;
@@ -43,6 +47,8 @@ export class AnimalSystem {
       if(animal.mounted||this.scene.stables?.holds(animal))continue;
       // N3: wolves are led by the night threat system (hunting, keeping out of light, leaving at dawn).
       if(animal.definition.gameplay.nightPredator&&this.scene.nightThreats?.leadsWolf?.(animal,delta)){animal.update(delta);continue;}
+      // m-mapa-kraje: bandits and mine rats attack a party member who comes close.
+      if(animal.definition.gameplay.guardRadius&&!animal.retaliationTarget){const foe=this.guardTarget(animal);if(foe)this.onAttacked(animal,foe);}
       const target=animal.retaliationTarget;
       if(target){
         if(!target.isAlive){this.stopRetaliation(animal);}

@@ -93,6 +93,8 @@ export class ScoutingSystem {
   home(){
     const goals=this.edgeGoals(this.party.zone),at=goals[0]??this.scene.workerSystem?.origin?.()??{x:50,y:50};
     if(this.party.king){const c=this.scene.character,g=goals[goals.length-1]??at;c.tile={...g};c.position={x:g.x+.5,y:g.y+.5};c.path=[];c.nextTile=null;this.setKingAway(false);this.scene.worldCamera?.lookAt?.(g);}
+    // Gold the party brought from the land (chests, a bandit camp).
+    if(this.party.loot?.gold>0){this.scene.inventory.add('gold',this.party.loot.gold,{source:'Scouting party',id:`scouting-loot:${this.party.since}`});this.scene.eventFeed?.push?.(`scouting-loot:${this.party.since}`,t('scouting.loot',{gold:this.party.loot.gold}),{important:true});}
     if(this.party.wagonId){const v=this.scene.vehicles?.vehicles.get(this.party.wagonId),g=goals[1]??at;if(v&&this.scene.vehicles.free(g)){v.x=g.x;v.y=g.y;}this.returnCargo(this.party.cargo,g);}
     for(const [i,w] of this.partyWorkers().entries()){const g=goals[i%Math.max(1,goals.length)]??at;w.away=false;delete w.scoutZone;w.tile={...g};w.position={x:g.x+.5,y:g.y+.5};w.path=[];w.nextTile=null;w.view?.setVisible?.(true);}
     this.scene.eventFeed?.push?.(`scouting-home:${this.party.since}`,t('scouting.home',{zone:t(`scouting.zone.${this.party.zone}`)}),{important:true});
@@ -108,9 +110,11 @@ export class ScoutingSystem {
 export function validScouting(v,{workerIds,vehicleIds=new Set(),registry=null}){
   if(v===undefined)return true;if(!v||typeof v!=='object'||Array.isArray(v)||Object.keys(v).sort().join()!=='party,zones')return false;
   if(!v.zones||typeof v.zones!=='object'||Array.isArray(v.zones))return false;
-  for(const [id,z] of Object.entries(v.zones))if(!zoneById(id)||!z||!scoutTypeById(z.type)||!Number.isSafeInteger(z.day)||Object.keys(z).sort().join()!=='day,type')return false;
+  for(const [id,z] of Object.entries(v.zones))if(!zoneById(id)||!z||!scoutTypeById(z.type)||!Number.isSafeInteger(z.day)||!Object.keys(z).every(k=>['day','type','taken','cleared'].includes(k))
+    ||z.taken!==undefined&&!(Array.isArray(z.taken)&&z.taken.length&&z.taken.length<=8&&new Set(z.taken).size===z.taken.length&&z.taken.every(k=>/^(zone|mine)-\d$/.test(k)))||z.cleared!==undefined&&z.cleared!==true)return false;
   const p=v.party;if(p===null)return true;
   return !!p&&typeof p==='object'&&!!zoneById(p.zone)&&Array.isArray(p.ids)&&(p.ids.length>0||p.king===true)&&(p.king===undefined||p.king===true)
     &&(p.wagonId===undefined?p.cargo===undefined:vehicleIds.has(p.wagonId)&&!!p.cargo&&typeof p.cargo==='object'&&!Array.isArray(p.cargo)&&Object.entries(p.cargo).every(([id,q])=>(registry?registry.get(id)?.category==='resource':/^[a-z_]{1,40}$/.test(id))&&Number.isSafeInteger(q)&&q>0))&&p.ids.every(id=>workerIds.has(id))&&new Set(p.ids).size===p.ids.length&&['leaving','away','there','returning'].includes(p.phase)&&Number.isFinite(p.since)&&(p.phase==='leaving'?p.at===undefined:Number.isFinite(p.at))
-    &&Object.keys(p).every(k=>['zone','ids','phase','since','at','king','wagonId','cargo'].includes(k));
+    &&(p.loot===undefined||!!p.loot&&Object.keys(p.loot).join()==='gold'&&Number.isSafeInteger(p.loot.gold)&&p.loot.gold>0)
+    &&Object.keys(p).every(k=>['zone','ids','phase','since','at','king','wagonId','cargo','loot'].includes(k));
 }

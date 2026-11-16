@@ -7,7 +7,7 @@ export class WildlifeRespawnSystem {
   constructor(scene,animals,random=Math.random){Object.assign(this,{scene,animals,random});this.elapsed=0;}
   get interval(){return WILDLIFE_INTERVALS[this.scene.gameSettings.wildlifeRespawn];}
   spawnOne(){
-    const definitions=this.scene.objectRegistry.byCategory('animal').filter(d=>d.gameplay.huntable&&!d.gameplay.nightPredator),target=wildlifeTarget(this.scene.gameSettings);
+    const definitions=this.scene.objectRegistry.byCategory('animal').filter(d=>d.gameplay.huntable&&!d.gameplay.nightPredator&&!d.gameplay.zoneOnly),target=wildlifeTarget(this.scene.gameSettings);
     const counts=new Map(definitions.map(d=>[d.id,0]));for(const animal of this.animals.animals.values())if(animal.isAlive&&counts.has(animal.type))counts.set(animal.type,counts.get(animal.type)+1);
     if([...counts.values()].reduce((a,b)=>a+b,0)>=target*definitions.length)return false;
     const missing=Math.max(...definitions.map(d=>target-counts.get(d.id))),choices=definitions.filter(d=>target-counts.get(d.id)===missing),definition=choices[Math.floor(this.random()*choices.length)];

@@ -1,4 +1,6 @@
-import { setupZone,updateZone,ZONE_LOOK } from './zoneMode.js';
+import { BanditView } from './BanditView.js';
+import { shapeZoneWorld } from './zoneFeatures.js';
+import { setupZone,updateZone,zoneLook } from './zoneMode.js';
 import { WorldPanel } from '../ui/WorldPanel.js';
 import { ScoutingSystem } from '../systems/ScoutingSystem.js';
 import { castleRules } from '../data/castle.js';
@@ -228,6 +230,7 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('fortification',(_definition,context)=>new FortificationView(this,context.building,context.preview));
     this.assets.registerRenderer('chest',(_definition,context)=>new ChestView(this,context.x,context.y));
     this.assets.registerRenderer('human',(definition,context)=>new HumanView(this,context.x,context.y,definition));
+    this.assets.registerRenderer('bandit',(definition,context)=>new BanditView(this,context.x,context.y,definition));
     this.assets.registerRenderer('workplace',(_definition,context)=>new WorkplaceView(this,context.building,context.preview));
     this.assets.registerRenderer('food_building',(_definition,context)=>new WorkplaceView(this,context.building,context.preview));
     this.assets.registerRenderer('crop',(_definition,context)=>new CropPlotView(this,context.building,context.preview));
@@ -244,6 +247,8 @@ export class GameScene extends Phaser.Scene {
     this.worldLevels=worldCode?.levels??defaultWorldLevels();this.worldSeed=worldCode?.seed??0;this.worldRandom=worldCode?worldStreams(worldCode.seed):()=>Math.random;
     const world=this.loadState?{terrain:this.loadState.terrain.map(row=>[...row]),ground:this.loadState.ground?importGround(this.loadState.ground):emptyGround(),bushes:importBushes(this.loadState.bushes??[]),
       zones:this.loadState.grassZones?importZones(this.loadState.grassZones):emptyZones(),reeds:importReeds(this.loadState.reeds),natureGroups:importNatureGroups(this.loadState.natureGroups)}:generateWorld(Math.random,{levels:this.worldLevels,streams:this.worldRandom});
+    // m-mapa-kraje: a bandit camp, ruins, a mine, or the mine's inside (zoneFeatures.js) before the world is drawn.
+    this.zoneFeature=this.zone?shapeZoneWorld(world,this.zone,this.worldRandom('zone-feature')):null;
     this.terrainGrid=world.terrain;this.groundGrid=world.ground;
     // m-teren-vyska: the hills of this world, from its ground and seed (not saved; the same after every load).
     // Part 2: the ground and everything on it is drawn lifted by the height, unless localStorage newgame.terrainLift is
@@ -259,7 +264,7 @@ export class GameScene extends Phaser.Scene {
     this.map=mapFromWorld(this.terrainGrid,this.groundGrid);
     this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
     this.inventory=new Inventory();if(!this.loadState)this.inventory.add('gold',this.gameSettings.startingGold);
-    this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);if(this.zone)this.gameTime.importState(this.zone.home.time);this.regeneration=new RegenerationSystem();
+    this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);if(this.zone)this.gameTime.importState(this.zone.time??this.zone.home.time);this.regeneration=new RegenerationSystem();
     this.seasons=new SeasonSystem(this.gameTime,{enabled:this.gameSettings.seasonsEnabled,initialWeather:this.loadState?(this.loadState.seasons?.weather??'Sunny'):undefined});this.terrain.setSeason(this.seasons.season);for(const b of this.buildings??[])if((b.type==='village_green'||definitionFor(b,this.objectRegistry,true)?.decoration))this.towerViews.get(b.id)?.setSeason?.(this.seasons.season);
     this.dayNight=new DayNightSystem(this);this.lightFuel=new LightFuelSystem(this);this.nightThreats=new NightThreatSystem(this);this.heating=new HeatingSystem(this);
     this.nightThreats.onChange(()=>{for(const b of this.buildings??[])if(b.type==='campfire')(this.towerViews.get(b.id)?.inner??this.towerViews.get(b.id))?.refresh?.();});
@@ -306,7 +311,7 @@ export class GameScene extends Phaser.Scene {
     this.spawner=this.resourceSpawners.find(s=>s.definition.id==='stone');
     this.dropSystem=new DropSystem(this);
     this.foodStorage=new FoodStorageSystem(this,{physicalMaterials:true});this.kingLogistics=new KingLogisticsSystem(this);if(!this.loadState&&!this.zone)depositStartingResources(this);
-    this.animalSystem=new AnimalSystem(this);if(!this.loadState){this.animalSystem.random=this.worldRandom('animals');this.animalSystem.spawn(PLAYER_START);this.animalSystem.random=Math.random;}
+    this.animalSystem=new AnimalSystem(this);if(!this.loadState&&!this.zone?.dungeon){this.animalSystem.random=this.worldRandom('animals');this.animalSystem.spawn(PLAYER_START);this.animalSystem.random=Math.random;}
     this.huntingSystem=new HuntingSystem(this);
     this.combatFeedback=new CombatFeedback(this);
     this.combat.on('attack',(attacker,target)=>{if(this.animalSystem.animals.has(target.id))this.animalSystem.onAttacked(target,attacker);});
@@ -348,7 +353,7 @@ export class GameScene extends Phaser.Scene {
     this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);this.farmConnections=new FarmConnections(this);
     this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);this.demolitionUI=new DemolitionUI(this);this.populationSidebar=new PopulationSidebar(this);this.noticesPanel=new NoticesPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
-    this.treasurePanel=new TreasurePanel(this);if(!this.loadState){this.treasureSystem.random=this.worldRandom('treasures');this.treasureSystem.spawn(PLAYER_START);this.treasureSystem.random=Math.random;}
+    this.treasurePanel=new TreasurePanel(this);if(!this.loadState&&!this.zone){this.treasureSystem.random=this.worldRandom('treasures');this.treasureSystem.spawn(PLAYER_START);this.treasureSystem.random=Math.random;}
     this.wildlifeRespawn=new WildlifeRespawnSystem(this,this.animalSystem);
     this.policy=new PolicySystem(this);
     this.production=new ProductionSystem(this.gameTime,this.inventory,()=>this.buildings,(day,totals)=>this.onDailyIncome(day,totals));
@@ -361,7 +366,7 @@ export class GameScene extends Phaser.Scene {
     this.setStatus(t('status.idle'));
     this.worldCamera=new WorldCamera(this,this.player);this.staffingIndicators=new MissingWorkersIndicators(this);
     this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState){const weights=this.worldWeights,at=(grid,t)=>grid[t.y*this.groundGrid[0].length+t.x]??0,F=WORLD_GENERATION.fairStart;
-      this.naturalResources.generate(this.worldRandom('trees'),Math.round(WORLD_FORESTRY.initialTrees*settingsFromLevels(this.worldLevels).forest*mapArea()*(this.zone?ZONE_LOOK[this.zone.type]?.trees??1:1)),{clusters:Math.round(WORLD_FORESTRY.clusters*(this.zone?ZONE_LOOK[this.zone.type]?.clusters??1:1)),weight:weights?(this.zone?.type==='forest'?t=>.45+.55*at(weights.forest,t):t=>at(weights.forest,t)):null,start:settingsFromLevels(this.worldLevels).forest>=.5?{center:PLAYER_START,radius:F.radius,trees:F.trees}:null});
+      this.naturalResources.generate(this.worldRandom('trees'),Math.round(WORLD_FORESTRY.initialTrees*settingsFromLevels(this.worldLevels).forest*mapArea()*(this.zone?zoneLook(this.zone)?.trees??1:1)),{clusters:Math.round(WORLD_FORESTRY.clusters*(this.zone?zoneLook(this.zone)?.clusters??1:1)),weight:weights?(this.zone?.type==='forest'?t=>.45+.55*at(weights.forest,t):t=>at(weights.forest,t)):null,start:settingsFromLevels(this.worldLevels).forest>=.5?{center:PLAYER_START,radius:F.radius,trees:F.trees}:null});
       this.naturalResources.mining.generate(this.worldRandom('minerals'),weights?t=>.25+.75*at(weights.stone,t):null);
       // m-kamenolom-u-hradu: a Quarry deposit 8–16 tiles from the Castle in every world (generator 3).
       if(!this.zone)this.naturalResources.mining.ensureStartQuarry(this.worldRandom('start-quarry'));

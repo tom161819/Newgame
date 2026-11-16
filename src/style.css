@@ -1304,3 +1304,4 @@ html .tutorial-arrow.big:not(.offscreen) { width:84px; height:54px; }
 .world-actions { display:flex; gap:8px; justify-content:center; margin:6px 0; }
 .in-zone #buildings-tab, .in-zone #buildings-panel, .in-zone #royal-goals, .in-zone #notices-panel, .in-zone #kingdom-bar { display:none !important; }
 .world-wagon { margin:6px 0; } .world-goods { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px 10px; text-align:right; font-size:12px; max-height:150px; overflow:auto; } .world-goods input { width:56px; }
+.zone-actions { display:flex; gap:8px; } .zone-banner button:disabled { opacity:.5; }
