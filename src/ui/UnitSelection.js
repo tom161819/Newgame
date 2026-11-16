@@ -144,10 +144,11 @@ export class UnitSelection {
         const values=new Set(haulers.map(w=>haulPriorityValue(w.haulPriority)));this.haul.value=values.size===1?[...values][0]:'';}this.buttons.hold.disabled=this.buttons.resume.disabled=!!s.gameTime.paused;
     }
     const zoom=s.cameras.main.zoom;
-    if(this.king&&s.player)this.graphics.lineStyle(2/zoom,0xffd768,1).strokeEllipse(s.player.x,s.player.y,34,16);
+    // Owner 16 Nov 2026: the ring was too strong; a thin, half-transparent ring at the feet is enough.
+    if(this.king&&s.player)this.graphics.lineStyle(1.25/zoom,0xffd768,.6).strokeEllipse(s.player.x,s.player.y,28,12);
     for(const w of workers){
-      this.graphics.lineStyle(2/zoom,0xffd768,1).strokeEllipse(w.view.x,w.view.y,30,14);
-      const goal=w.commandState?.goal;if(goal){const p=tileCenter(goal);this.graphics.lineStyle(2/zoom,0xffd768,.8).strokeEllipse(p.x,p.y,20,10);}
+      this.graphics.lineStyle(1.25/zoom,0xffd768,.55).strokeEllipse(w.view.x,w.view.y,24,10);
+      const goal=w.commandState?.goal;if(goal){const p=tileCenter(goal);this.graphics.lineStyle(1/zoom,0xffd768,.35).strokeEllipse(p.x,p.y,16,8);}
     }
     // Owner 16 Nov 2026: drawn in the world from the same camera points the selection uses, so the box stays under the
     // pointer at every zoom (a scroll-free overlay is still zoomed around the screen middle).

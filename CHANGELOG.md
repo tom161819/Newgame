@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.4] - 2026-11-16
+<!-- version: {"title":"Subtler selection ring","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Improved
+- The ring under chosen units is thinner, smaller and half transparent, so it no longer covers the units; the ring at their goal is fainter too.
+
 ## [0.143.3] - 2026-11-16
 <!-- version: {"title":"Unit kinds in the bar, marching in lanes","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added
