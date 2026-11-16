@@ -80,7 +80,8 @@ export function setupZone(scene){
   for(const [i,[id,r]] of Object.entries(z.records).entries()){
     const tile=free[i]??free[0]??back,w=ws.create(tile,{id,name:r.name,identity:r.identity??null,randomize:false});
     if(!scene.military.enlist(w,r.type??'militia')){w.destroy?.();continue;}
-    const unit=scene.military.units.get(id);if(unit&&r.equipment){unit.equipment={...r.equipment};delete unit.garrison;scene.military.apply?.(w);}
+    // The unit stays a garrison soldier (no Barracks here), or MilitarySystem would dismiss him to Unemployed.
+    const unit=scene.military.units.get(id);if(unit){unit.garrison=true;if(r.equipment){unit.equipment={...r.equipment};scene.military.apply?.(w);}}
     if(Number.isFinite(r.maxHP))w.maxHP=r.maxHP;if(Number.isFinite(r.currentHP))w.currentHP=Math.min(w.maxHP,Math.max(1,r.currentHP));
     if(r.experience)w.experience=structuredClone(r.experience);
     z.soldiers.push(w);

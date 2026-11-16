@@ -113,7 +113,8 @@ export class MilitarySystem {
   }
   // A threat: a living animal fighting one of our people (a resident or the king) near this unit's Barracks, in sight.
   threat(worker){
-    const home=this.barracks(worker.assignedWorkplaceId);if(!home)return null;let best=null,bestDistance=Infinity;
+    // m-mapa-kraje: in a scouted land the party guards itself – a soldier helps whoever of it is attacked near him.
+    const home=this.barracks(worker.assignedWorkplaceId)??(this.scene.zone?{x:worker.position.x,y:worker.position.y}:null);if(!home)return null;let best=null,bestDistance=Infinity;
     for(const animal of this.scene.animalSystem?.animals.values()??[]){
       const victim=animal.retaliationTarget;if(!animal.isAlive||!victim?.isAlive||!(victim===this.scene.character||this.scene.workerSystem.workers.has(victim.id)&&victim.isSubject!==false))continue;
       if(this.scene.fog&&!this.scene.fog.isVisibleObject(animal))continue;

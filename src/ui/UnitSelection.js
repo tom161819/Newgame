@@ -12,7 +12,7 @@ const ATTACK_CURSOR=`url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="h
 // from world positions each frame, so pan/zoom never change who was selected.
 export class UnitSelection {
   constructor(scene){
-    this.scene=scene;this.ids=new Set();this.graphics=scene.add.graphics().setDepth(1000000);this.overlay=scene.add.graphics().setScrollFactor(0).setDepth(1000001);
+    this.scene=scene;this.ids=new Set();this.graphics=scene.add.graphics().setDepth(1000000);this.overlay=scene.add.graphics().setDepth(1000001);
     this.panel=document.createElement('div');this.panel.id='unit-command-bar';this.panel.className='unit-command-bar';this.panel.hidden=true;this.panel.setAttribute('role','group');
     this.label=document.createElement('span');this.panel.append(this.label);this.buttons={};
     for(const action of ['hold','resume','inspect','clear']){const button=document.createElement('button');button.type='button';button.dataset.unitCommand=action;button.addEventListener('click',()=>this.act(action));this.panel.append(button);this.buttons[action]=button;}
@@ -104,7 +104,9 @@ export class UnitSelection {
       this.graphics.lineStyle(2/zoom,0xffd768,1).strokeEllipse(w.view.x,w.view.y,30,14);
       const goal=w.commandState?.goal;if(goal){const p=tileCenter(goal);this.graphics.lineStyle(2/zoom,0xffd768,.8).strokeEllipse(p.x,p.y,20,10);}
     }
-    if(this.anchor&&this.dragging&&this.current){const a=this.anchor,b=this.current;this.overlay.lineStyle(1,0xffd768,1).fillStyle(0xffd768,.12).fillRect(a.x,a.y,b.x-a.x,b.y-a.y).strokeRect(a.x,a.y,b.x-a.x,b.y-a.y);}
+    // Owner 16 Nov 2026: drawn in the world from the same camera points the selection uses, so the box stays under the
+    // pointer at every zoom (a scroll-free overlay is still zoomed around the screen middle).
+    if(this.anchor&&this.dragging&&this.current){const cam=s.cameras.main,a=cam.getWorldPoint(this.anchor.x,this.anchor.y),b=cam.getWorldPoint(this.current.x,this.current.y);this.overlay.lineStyle(1/(cam.zoom||1),0xffd768,1).fillStyle(0xffd768,.12).fillRect(a.x,a.y,b.x-a.x,b.y-a.y).strokeRect(a.x,a.y,b.x-a.x,b.y-a.y);}
   }
   destroy(){this.graphics.destroy();this.overlay.destroy();this.panel.remove();}
 }

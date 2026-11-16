@@ -43,10 +43,18 @@ export class UnitCommands {
       if(Math.max(Math.abs(x-target.x),Math.abs(y-target.y))===r&&base[y][x]===0&&!used.has(`${x},${y}`))slots.push({x,y});
     }
     let accepted=0;
+    // Owner 16 Nov 2026: a group keeps together – each keeps his place in the group (offsets from its middle, squeezed
+    // to two tiles), and they all walk at the pace of the slowest.
+    const mid={x:selected.reduce((n,w)=>n+w.tile.x,0)/Math.max(1,selected.length),y:selected.reduce((n,w)=>n+w.tile.y,0)/Math.max(1,selected.length)};
+    const spread=Math.max(1,...selected.map(w=>Math.max(Math.abs(w.tile.x-mid.x),Math.abs(w.tile.y-mid.y)))),squeeze=Math.min(1,2/spread);
+    const pace=Math.min(...selected.map(w=>(w.speed??1)*(w.speedFactor??1)));
     for(const worker of selected){
       const nav=this.navigation(worker,base,selectedIds),start=worker.nextTile??worker.tile;
+      const want={x:target.x+(worker.tile.x-mid.x)*squeeze,y:target.y+(worker.tile.y-mid.y)*squeeze};
+      const order=selected.length>1?[...slots].sort((a,b)=>Math.hypot(a.x-want.x,a.y-want.y)-Math.hypot(b.x-want.x,b.y-want.y)):slots;
       let route,goal;
-      for(const slot of slots){if(used.has(tileKey(slot))||nav[slot.y][slot.x]!==0)continue;route=findPathToAny(nav,start,[slot]);if(route){goal=slot;break;}}
+      for(const slot of order){if(used.has(tileKey(slot))||nav[slot.y][slot.x]!==0)continue;route=findPathToAny(nav,start,[slot]);if(route){goal=slot;break;}}
+      worker.groupPace=selected.length>1&&worker.speed>0?Math.min(1,pace/((worker.speed??1)*(worker.speedFactor??1))):1;
       if(!route)continue;
       this.interrupt(worker);worker.commandState={state:'MovingToHold',goal:{...goal}};worker.path=route.path;worker.workState='MovingToHold';used.add(tileKey(goal));accepted++;
     }

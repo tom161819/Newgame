@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.142.3] - 2026-11-16
+<!-- version: {"title":"Party soldiers stay soldiers, groups keep together","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Fixed
+- Soldiers of a scouting party stay soldiers in the land (they were turned into Unemployed and lost their gear there, because the land has no Barracks).
+- The selection box drawn while dragging the mouse stays exactly under the pointer at every zoom.
+- Soldiers can be sent at bandits and giant rats with a right click, and soldiers of a party help a party member who is attacked near them.
+### Improved
+- A selected group sent somewhere keeps together: everyone keeps his place in the group and they walk at the pace of the slowest.
+
 ## [0.142.2] - 2026-11-16
 <!-- version: {"title":"Bandit camp, ruins and an abandoned mine","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added

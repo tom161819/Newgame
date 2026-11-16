@@ -46,7 +46,7 @@ animals.push({
   description:'A bandit guarding the loot of his camp. Attacks anyone who comes close.',
   renderMode:'procedural',renderer:'bandit',origin:{x:.5,y:.92},visualHeight:48,
   visual:{hitArea:{x:-13,y:-44,width:26,height:39},healthBarOffset:48},depth:{offset:.1},
-  gameplay:{movementSpeed:2.4,initialCount:0,behavior:'wander',huntable:true,meatDrop:0,wanderRadius:2,guardRadius:7,zoneOnly:true},
+  gameplay:{movementSpeed:2.4,initialCount:0,behavior:'wander',huntable:true,meatDrop:0,wanderRadius:2,guardRadius:7,zoneOnly:true,hostile:true},
   stats:{maxHP:70,attackDPS:7,armor:1,attackRange:1},
   animations:{mode:'procedural',states:['idle','walk'],directions:['N','NE','E','SE','S','SW','W','NW']},
 });
@@ -56,7 +56,7 @@ animals.push({
   description:'A giant rat of an abandoned mine. Bites anyone who comes close.',
   renderMode:'procedural',renderer:'animal',origin:{x:.5,y:.85},visualHeight:30,
   visual:{bodyColor:0x4a4038,bodyScale:.55,hitArea:{x:-16,y:-28,width:32,height:30}},depth:{offset:.1},
-  gameplay:{movementSpeed:1.8,initialCount:0,behavior:'wander',huntable:true,meatDrop:0,wanderRadius:2,guardRadius:6,zoneOnly:true},
+  gameplay:{movementSpeed:1.8,initialCount:0,behavior:'wander',huntable:true,meatDrop:0,wanderRadius:2,guardRadius:6,zoneOnly:true,hostile:true},
   stats:{maxHP:30,attackDPS:5,armor:0,attackRange:1},
   animations:{mode:'procedural',states:['idle','walk'],directions:['N','NE','E','SE','S','SW','W','NW']},
 });
