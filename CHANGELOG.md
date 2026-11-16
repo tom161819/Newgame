@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.141.1] - 2026-11-16
+<!-- version: {"title":"Unit command bar above the build bar","type":"fix","reconstructed":false,"saveVersion":64} -->
+### Fixed
+- The command bar of a selected unit (the King's Hold Here, Resume, Deselect…) is no longer hidden behind the build bar at the bottom of the screen: it sits above the build bar and the status line.
+
 ## [0.141.0] - 2026-11-15
 <!-- version: {"title":"Scouting the surroundings and the garrison","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added

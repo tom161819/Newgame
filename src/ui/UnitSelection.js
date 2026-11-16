@@ -74,6 +74,13 @@ export class UnitSelection {
   // The pointer turns into crossed swords over an enemy while soldiers are selected.
   hover(pointer){const s=this.scene,canvas=s.game.canvas;if(s.buildMode||s.rockMiningTool?.enabled)return;const attack=this.ids.size>0&&this.workers().some(w=>w.profession==='soldier')&&!!this.enemyAt(pointer);
     if(attack!==this.attackCursor){this.attackCursor=attack;canvas.style.cursor=attack?ATTACK_CURSOR:'';}}
+  // Owner 16 Nov 2026: the bar sits above the build bar at the bottom of the screen, never behind it.
+  placeAboveBar(doc=globalThis.document){
+    const host=this.panel.offsetParent;if(!host||!doc?.querySelectorAll)return;const h=host.getBoundingClientRect();
+    // The build bar and the status line above it, when they sit in the lower half of the screen.
+    const tops=[...doc.querySelectorAll('.buildings-bar,.status-row')].map(e=>e.getBoundingClientRect()).filter(r=>r.height&&r.top>h.top+h.height/2).map(r=>r.top);
+    this.panel.style.bottom=tops.length?`${Math.max(16,Math.round(h.bottom-Math.min(...tops)+8))}px`:'';
+  }
   cancelDrag(){this.anchor=null;this.dragging=false;this.overlay.clear();}
   draw(){
     const s=this.scene,workers=this.workers();this.ids=new Set(workers.map(w=>w.id));this.graphics.clear();this.overlay.clear();
@@ -81,10 +88,11 @@ export class UnitSelection {
     const detail=workers.length===1&&!!s.unitPanel?.dialog.open&&s.unitPanel.unit===workers[0];
     const count=workers.length+(this.king?1:0);if(this.king&&!s.character.isAlive)this.king=false;
     const signature=JSON.stringify([this.king,workers.map(w=>w.id+':'+w.profession+':'+haulPriorityValue(w.haulPriority)),s.gameOver,s.gameTime.paused,language(),detail]);
+    if(!this.panel.hidden&&signature===this.signature){const now=globalThis.performance?.now?.()??0;if(now-(this.placedAt??0)>700){this.placedAt=now;this.placeAboveBar();}}
     if(signature!==this.signature){
       this.signature=signature;this.panel.hidden=!count||!!s.gameOver||detail||(this.king&&!workers.length&&!!s.unitPanel?.dialog.open);this.panel.setAttribute('aria-label',t('command.title'));this.label.textContent=t('command.selected',{count});
       for(const [action,button]of Object.entries(this.buttons))button.textContent=t(`command.${action}`);
-      this.buttons.inspect.disabled=workers.length!==1;
+      this.buttons.inspect.disabled=workers.length!==1;if(!this.panel.hidden)this.placeAboveBar();
       const haulers=workers.filter(w=>w.profession==='hauler');this.haul.hidden=haulers.length<2;
       if(!this.haul.hidden){const option=(v,text)=>{const o=document.createElement('option');o.value=v;o.textContent=text;return o;};
         this.haul.setAttribute('aria-label',t('haul.priority'));this.haul.replaceChildren(option('',t('haul.priority')+'…'),...HAUL_PRIORITIES.filter(k=>k!=='resource').map(k=>option(k,t(`haul.priority.${k}`))),...HAULABLE_RESOURCES.map(r=>option(`resource:${r}`,t('haul.priority.only',{resource:s.objectRegistry.get(r)?.name??r}))));
