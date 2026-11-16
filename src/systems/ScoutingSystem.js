@@ -49,10 +49,13 @@ export class ScoutingSystem {
     if(p.phase==='away'&&now>=p.at){
       const type=zoneType(this.worldCode(),p.zone);this.zones[p.zone]={type,day:s.gameTime.day};
       s.eventFeed?.push?.(`scouting-found:${p.since}`,t('scouting.found',{zone:t(`scouting.zone.${p.zone}`),found:`${scoutTypeById(type)?.icon??''} ${t(`scouting.type.${type}`)}`}),{important:true});
-      Object.assign(p,{phase:'returning',at:now+SCOUTING.travelDays*day});this.changed();return;
+      // Owner 16 Nov 2026: the party stays there until it is sent home (or you switch to it and play the zone).
+      Object.assign(p,{phase:'there',at:now});this.changed();return;
     }
     if(p.phase==='returning'&&now>=p.at)this.home();
   }
+  // Send the party that is in a zone back home (half a day on the road).
+  sendHome(){const p=this.party;if(p?.phase!=='there')return false;Object.assign(p,{phase:'returning',at:this.scene.gameTime.totalElapsed+SCOUTING.travelDays*this.scene.gameTime.dayDuration});this.scene.eventFeed?.push?.(`scouting-back:${p.since}`,t('scouting.sentHome'),{});this.changed();return true;}
   home(){
     const goals=this.edgeGoals(this.party.zone),at=goals[0]??this.scene.workerSystem?.origin?.()??{x:50,y:50};
     for(const [i,w] of this.partyWorkers().entries()){const g=goals[i%Math.max(1,goals.length)]??at;w.away=false;delete w.scoutZone;w.tile={...g};w.position={x:g.x+.5,y:g.y+.5};w.path=[];w.nextTile=null;w.view?.setVisible?.(true);}
@@ -70,6 +73,6 @@ export function validScouting(v,{workerIds}){
   if(!v.zones||typeof v.zones!=='object'||Array.isArray(v.zones))return false;
   for(const [id,z] of Object.entries(v.zones))if(!zoneById(id)||!z||!scoutTypeById(z.type)||!Number.isSafeInteger(z.day)||Object.keys(z).sort().join()!=='day,type')return false;
   const p=v.party;if(p===null)return true;
-  return !!p&&typeof p==='object'&&!!zoneById(p.zone)&&Array.isArray(p.ids)&&p.ids.length>0&&p.ids.every(id=>workerIds.has(id))&&new Set(p.ids).size===p.ids.length&&['leaving','away','returning'].includes(p.phase)&&Number.isFinite(p.since)&&(p.phase==='leaving'?p.at===undefined:Number.isFinite(p.at))
+  return !!p&&typeof p==='object'&&!!zoneById(p.zone)&&Array.isArray(p.ids)&&p.ids.length>0&&p.ids.every(id=>workerIds.has(id))&&new Set(p.ids).size===p.ids.length&&['leaving','away','there','returning'].includes(p.phase)&&Number.isFinite(p.since)&&(p.phase==='leaving'?p.at===undefined:Number.isFinite(p.at))
     &&Object.keys(p).every(k=>['zone','ids','phase','since','at'].includes(k));
 }

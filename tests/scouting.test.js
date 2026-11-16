@@ -28,7 +28,7 @@ test('a party leaves, finds the zone, comes back',()=>{
   const a=workers.get('s0');assert.ok(s.updateSoldier(a));assert.ok(a.goal.length);
   scene.gameTime.totalElapsed=SCOUTING.leaveHours*1000+1;s.update();assert.equal(s.party.phase,'away');assert.ok(a.away);
   const saved=JSON.parse(JSON.stringify(s.exportState()));assert.ok(validScouting(saved,{workerIds:new Set(workers.keys())}));
-  scene.gameTime.totalElapsed=s.party.at;s.update();assert.equal(s.party.phase,'returning');assert.equal(s.zones.e.type,zoneType('ABC','e'));assert.ok(feed.some(t=>t.includes('Východ')||t.includes('East')));
+  scene.gameTime.totalElapsed=s.party.at;s.update();assert.equal(s.party.phase,'there');assert.ok(validScouting(JSON.parse(JSON.stringify(s.exportState())),{workerIds:new Set(workers.keys())}));scene.gameTime.totalElapsed+=50000;s.update();assert.equal(s.party.phase,'there','it waits');assert.ok(s.sendHome());assert.equal(s.party.phase,'returning');assert.equal(s.zones.e.type,zoneType('ABC','e'));assert.ok(feed.some(t=>t.includes('Východ')||t.includes('East')));
   scene.gameTime.totalElapsed=s.party.at;s.update();assert.equal(s.party,null);assert.ok(!a.away);assert.equal(a.scoutZone,undefined);assert.ok(a.tile.x>=95||a.tile.y<=4);
 });
 test('scouting save validation',()=>{
@@ -40,4 +40,18 @@ test('scouting save validation',()=>{
 test('garrison: one soldier per 5 residents for the full bonus',()=>{
   const p=(r,s,away=0)=>[...Array(r).fill({profession:'builder'}),...Array(s).fill({profession:'soldier'}),...Array(away).fill({profession:'soldier',away:true})];
   assert.equal(garrisonRatio(p(10,2)).ratio,1);assert.equal(garrisonRatio(p(10,1)).ratio,.5);assert.equal(garrisonRatio(p(10,0,2)).ratio,0);assert.equal(garrisonRatio(p(0,0)).ratio,1);
+});
+test('zone play: the zone world, the start and the way home',async()=>{
+  const { zoneWorldCode,zoneStart,homeAfterZone,ZONE_LOOK } = await import('../src/game/zoneMode.js');
+  const { decodeWorldCode,WORLD_SETTINGS } = await import('../src/data/worldCode.js');
+  const code=zoneWorldCode('MKW5-155515555555-ABC','e','forest');assert.equal(code,zoneWorldCode('MKW5-155515555555-ABC','e','forest'),'the same zone, the same world');
+  assert.notEqual(code,zoneWorldCode('MKW5-155515555555-ABC','w','forest'));
+  assert.equal(decodeWorldCode(code).levels[WORLD_SETTINGS.findIndex(s=>s.key==='forest')],ZONE_LOOK.forest.levels.forest);
+  const home={gameSettings:{worldCode:'MKW5-155515555555-ABC',dayLengthSeconds:600,mapSize:150},time:{totalElapsed:5000},workers:[{id:'s0',currentHP:50},{id:'s1',currentHP:50}],
+    scouting:{zones:{e:{type:'iron',day:2}},party:{zone:'e',ids:['s0','s1'],phase:'away',since:0,at:9}}};
+  assert.equal(zoneStart(home),null,'not there yet');home.scouting.party.phase='there';
+  const start=zoneStart(home);assert.equal(start.settings.mapSize,100);assert.deepEqual(start.zone.ids,['s0','s1']);assert.equal(start.zone.type,'iron');
+  const back=homeAfterZone({zone:{home,soldiers:[{id:'s0',isAlive:true,currentHP:33},{id:'s1',isAlive:false,currentHP:0}]}});
+  assert.deepEqual(back.fallen,['s1']);assert.deepEqual(back.home.scouting.party.ids,['s0']);assert.equal(back.home.scouting.party.phase,'returning');
+  assert.equal(back.home.scouting.party.at,5000+300000);assert.equal(back.home.workers[0].currentHP,33);assert.equal(home.scouting.party.phase,'there','the kept home state is not changed');
 });

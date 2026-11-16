@@ -1,3 +1,4 @@
+import { setupZone,updateZone } from './zoneMode.js';
 import { WorldPanel } from '../ui/WorldPanel.js';
 import { ScoutingSystem } from '../systems/ScoutingSystem.js';
 import { castleRules } from '../data/castle.js';
@@ -192,7 +193,7 @@ import { bindSoundSetting } from '../ui/sound.js';
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
   // m-velikost-mapy: the map size is set before anything is built; a loaded game takes it from its saved terrain.
-  init({state=null,settings}={}){this.loadState=state;const size=Array.isArray(state?.terrain)?state.terrain.length:null;
+  init({state=null,settings,zone=null}={}){this.loadState=state;this.zone=zone;const size=Array.isArray(state?.terrain)?state.terrain.length:null;
     this.gameSettings=gameSettings({...(state?.gameSettings??settings??{}),...(size?{mapSize:size}:{})});setMapSize(this.gameSettings.mapSize);}
 
   preload() {
@@ -258,7 +259,7 @@ export class GameScene extends Phaser.Scene {
     this.map=mapFromWorld(this.terrainGrid,this.groundGrid);
     this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
     this.inventory=new Inventory();if(!this.loadState)this.inventory.add('gold',this.gameSettings.startingGold);
-    this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);this.regeneration=new RegenerationSystem();
+    this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);if(this.zone)this.gameTime.importState(this.zone.home.time);this.regeneration=new RegenerationSystem();
     this.seasons=new SeasonSystem(this.gameTime,{enabled:this.gameSettings.seasonsEnabled,initialWeather:this.loadState?(this.loadState.seasons?.weather??'Sunny'):undefined});this.terrain.setSeason(this.seasons.season);for(const b of this.buildings??[])if((b.type==='village_green'||definitionFor(b,this.objectRegistry,true)?.decoration))this.towerViews.get(b.id)?.setSeason?.(this.seasons.season);
     this.dayNight=new DayNightSystem(this);this.lightFuel=new LightFuelSystem(this);this.nightThreats=new NightThreatSystem(this);this.heating=new HeatingSystem(this);
     this.nightThreats.onChange(()=>{for(const b of this.buildings??[])if(b.type==='campfire')(this.towerViews.get(b.id)?.inner??this.towerViews.get(b.id))?.refresh?.();});
@@ -279,10 +280,10 @@ export class GameScene extends Phaser.Scene {
     const position=tileCenter(PLAYER_START);
     this.player=this.assets.createView('king',position);
     this.character=new PlayerController(this,this.player,PLAYER_START);
-    if(!this.loadState){createStartingCastle(this);createStartingStockpile(this);}
+    if(!this.loadState&&!this.zone){createStartingCastle(this);createStartingStockpile(this);}
     this.skillSystem.initialize(this.character);
     this.equipment=new EquipmentSystem(this.character,this.objectRegistry,this.inventory,()=>{this.equipmentPanel?.refresh();this.combatFeedback?.refresh();});
-    this.combat=new CombatSystem({map:this.map,damageScale:unit=>this.heating?.combatFactor?.(unit)??1,canFight:unit=>unit.isAlive&&!unit.mounted&&(unit!==this.character||unit.state===PLAYER_STATE.GROUND),regenerationRate:unit=>this.regeneration.rateFor(unit),canTarget:(attacker,target)=>attacker.attackRange<=1||!this.workerSystem?.workers.has(attacker.id)||!this.fog||this.fog.isVisibleObject(target)});
+    this.combat=new CombatSystem({map:this.map,damageScale:unit=>this.heating?.combatFactor?.(unit)??1,canFight:unit=>unit.isAlive&&!(this.zone&&unit===this.character)&&!unit.mounted&&(unit!==this.character||unit.state===PLAYER_STATE.GROUND),regenerationRate:unit=>this.regeneration.rateFor(unit),canTarget:(attacker,target)=>attacker.attackRange<=1||!this.workerSystem?.workers.has(attacker.id)||!this.fog||this.fog.isVisibleObject(target)});
     this.skillSystem.attachCombat(this.combat);
     this.resourceSpawners=[];
     for(const definition of this.objectRegistry.byCategory('resource').filter(d=>d.spawn)){
@@ -304,7 +305,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.spawner=this.resourceSpawners.find(s=>s.definition.id==='stone');
     this.dropSystem=new DropSystem(this);
-    this.foodStorage=new FoodStorageSystem(this,{physicalMaterials:true});this.kingLogistics=new KingLogisticsSystem(this);if(!this.loadState)depositStartingResources(this);
+    this.foodStorage=new FoodStorageSystem(this,{physicalMaterials:true});this.kingLogistics=new KingLogisticsSystem(this);if(!this.loadState&&!this.zone)depositStartingResources(this);
     this.animalSystem=new AnimalSystem(this);if(!this.loadState){this.animalSystem.random=this.worldRandom('animals');this.animalSystem.spawn(PLAYER_START);this.animalSystem.random=Math.random;}
     this.huntingSystem=new HuntingSystem(this);
     this.combatFeedback=new CombatFeedback(this);
@@ -331,7 +332,7 @@ export class GameScene extends Phaser.Scene {
     this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,unlocks:this.buildingUnlocks,freeOffer:definition=>freeOffer(this,definition),onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
     this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onWorkplaceApply:()=>{this.workplaceSystem.reconcileDefinitions();if(this.selectedBuilding)this.selectedBuilding=this.objectRegistry.require(this.selectedBuilding.id);},onCostApply:()=>{if(this.selectedBuilding)this.selectedBuilding=this.objectRegistry.require(this.selectedBuilding.id);this.updateInventory();},onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
     this.equipmentPanel=new EquipmentPanel(this);
-    this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=t('hud.population',{count,maximum});}});if(!this.loadState)this.workerSystem.spawnInitial(this.worldRandom('villagers'));this.builderWorkshops=new BuilderWorkshopSystem(this);this.fishing=new FishingSystem(this);
+    this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=t('hud.population',{count,maximum});}});if(!this.loadState&&!this.zone)this.workerSystem.spawnInitial(this.worldRandom('villagers'));this.builderWorkshops=new BuilderWorkshopSystem(this);this.fishing=new FishingSystem(this);
     // Every living subject is a moving sight source (diameter 15); leaving, dying or emigrating removes it.
     // Point 42 (owner 14 Nov 2026): a newcomer on his way from the map edge reveals nothing until he reaches the Castle.
     // m-hrad-urovne: from level 2 the Castle sees around itself (its tower), without the King climbing it.
@@ -343,7 +344,7 @@ export class GameScene extends Phaser.Scene {
       onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);if(this.mapMemory?.objects.delete(`building:${site.id}`))this.mapMemory.revision++;this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.siteCancelled'));}});
     this.demolition=new DemolitionSystem(this,{complete:(building,refund)=>{const done=finishDemolition(this,building,refund);if(done)completeRelocation(this,building);return done;}});this.repairs=new RepairSystem(this);
     this.constructionUI=new ConstructionUI(this);
-    this.foodProduction=new FoodProductionSystem(this);this.military=new MilitarySystem(this);if(!this.loadState&&this.gameSettings.startingGarrison)this.military.enlistStartingGarrison(this.worldRandom('villagers'));this.vehicles=new VehicleSystem(this);this.stables=new StableSystem(this);this.needs=new NeedsSystem(this);this.kingdomHappiness=new KingdomHappinessIndicator(this);this.vehicleViews=new VehicleViews(this);this.caravans=new CaravanSystem(this);this.trade=new TradeSystem(this);this.scouting=new ScoutingSystem(this);this.caravanViews=new CaravanViews(this);this.employment=new EmploymentSystem(this,{enabled:this.gameSettings.autoEmployment});this.diagnostics=new ProductionDiagnostics(this);this.employmentPanel=new EmploymentPanel(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.kingCargoControl=new KingCargoControl(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
+    this.foodProduction=new FoodProductionSystem(this);this.military=new MilitarySystem(this);if(!this.loadState&&!this.zone&&this.gameSettings.startingGarrison)this.military.enlistStartingGarrison(this.worldRandom('villagers'));this.vehicles=new VehicleSystem(this);this.stables=new StableSystem(this);this.needs=new NeedsSystem(this);this.kingdomHappiness=new KingdomHappinessIndicator(this);this.vehicleViews=new VehicleViews(this);this.caravans=new CaravanSystem(this);this.trade=new TradeSystem(this);this.scouting=new ScoutingSystem(this);this.caravanViews=new CaravanViews(this);this.employment=new EmploymentSystem(this,{enabled:this.gameSettings.autoEmployment});this.diagnostics=new ProductionDiagnostics(this);this.employmentPanel=new EmploymentPanel(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.kingCargoControl=new KingCargoControl(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
     this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);this.farmConnections=new FarmConnections(this);
     this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);this.demolitionUI=new DemolitionUI(this);this.populationSidebar=new PopulationSidebar(this);this.noticesPanel=new NoticesPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
@@ -363,9 +364,9 @@ export class GameScene extends Phaser.Scene {
       this.naturalResources.generate(this.worldRandom('trees'),Math.round(WORLD_FORESTRY.initialTrees*settingsFromLevels(this.worldLevels).forest*mapArea()),{weight:weights?t=>at(weights.forest,t):null,start:settingsFromLevels(this.worldLevels).forest>=.5?{center:PLAYER_START,radius:F.radius,trees:F.trees}:null});
       this.naturalResources.mining.generate(this.worldRandom('minerals'),weights?t=>.25+.75*at(weights.stone,t):null);
       // m-kamenolom-u-hradu: a Quarry deposit 8–16 tiles from the Castle in every world (generator 3).
-      this.naturalResources.mining.ensureStartQuarry(this.worldRandom('start-quarry'));
+      if(!this.zone)this.naturalResources.mining.ensureStartQuarry(this.worldRandom('start-quarry'));
       // m-zelezny-dul-misto: a free Iron Mine spot beside the nearest Iron Deposit (generator 5).
-      this.naturalResources.mining.ensureIronMine(this.worldRandom('start-iron-mine'));
+      if(!this.zone)this.naturalResources.mining.ensureIronMine(this.worldRandom('start-iron-mine'));
       // m-duby: lone oaks and the grand oaks of the starting world (after everything else, so the rest stays as it was).
       if(settingsFromLevels(this.worldLevels).forest>0)this.naturalResources.generateOaks();}
     // velke-prirodni-objekty: a group with a tree, deposit or building on a tile is single bushes or rocks again.
@@ -373,7 +374,7 @@ export class GameScene extends Phaser.Scene {
     // World v2: a fingerprint of the starting world as generated (terrain, water, bushes, every placed resource, animals,
     // chests), so tests and the Studio can check that a world code always gives the same world.
     // Owner 15 Nov 2026 (62): the King starts in front of the Castle, on a tile left free by the whole generation.
-    if(!this.loadState)placeKingInFront(this);
+    if(!this.loadState&&!this.zone)placeKingInFront(this);
     this.startWorldFingerprint=this.loadState?null:this.worldFingerprint();
     this.resourceLedger=new ResourceTransactionLedger(this);if(this.loadState)this.resourceLedger.suspend();this.inventoryBar.setLedger(this.resourceLedger);
     const onBackground=()=>{this.background?.hide();this.visibilityPaused=true;this.tweens.pauseAll();this.setGalleryInput(false);};
@@ -433,6 +434,7 @@ export class GameScene extends Phaser.Scene {
       this.game.canvas.style.cursor='';
     });
     if(this.loadState){loadGameState(this,this.loadState);this.loadState=null;this.nightControls?.syncThreats();}
+    if(this.zone)setupZone(this);
     this.game.registry.get('application')?.onGameReady(this);
   }
 
@@ -910,7 +912,7 @@ export class GameScene extends Phaser.Scene {
     if(this.gameOver)return null;
     this.constructionSystem.update(delta);this.demolition.update(delta);this.repairs.update(delta);
     this.farmingSystem.update(delta);
-    this.foodProduction.update(delta);this.military.update(delta);this.vehicles.update();this.stables.update(delta);this.caravans.update(delta);this.trade.update();this.scouting.update();this.caravanViews.update();this.vehicleViews.update();this.employment.update();this.diagnostics.update();
+    this.foodProduction.update(delta);this.military.update(delta);this.vehicles.update();this.stables.update(delta);this.caravans.update(delta);this.trade.update();this.scouting.update();if(this.zone)updateZone(this);this.caravanViews.update();this.vehicleViews.update();this.employment.update();this.diagnostics.update();
     this.regeneration.update(delta,[this.character,...this.animalSystem.animals.values(),...this.workerSystem.liveWorkers()],covered);
     this.combatFeedback.update(activeDelta);this.foodSystem.update(activeDelta);
     this.experienceFeedback.update(activeDelta);

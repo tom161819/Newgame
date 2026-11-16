@@ -31,7 +31,13 @@ export class WorldPanel {
     d.append(grid);
     if(party){
       const left=party.at!=null?Math.max(0,(party.at-this.scene.gameTime.totalElapsed)/this.scene.gameTime.dayDuration*24):null;
-      d.append(this.el('p','world-status',t('scouting.status',{zone:t(`scouting.zone.${party.zone}`),count:party.ids.length,phase:t(`scouting.phase.${party.phase}`)})+(left!=null?` · ${t('scouting.hoursLeft',{hours:Math.ceil(left)})}`:'')));
+      d.append(this.el('p','world-status',t('scouting.status',{zone:t(`scouting.zone.${party.zone}`),count:party.ids.length,phase:t(`scouting.phase.${party.phase}`)})+(left!=null&&party.phase!=='there'?` · ${t('scouting.hoursLeft',{hours:Math.ceil(left)})}`:'')));
+      // Owner 16 Nov 2026: a party that has arrived can be played (the map switches to its zone) or sent home.
+      if(party.phase==='there'){const row=this.el('div','world-actions'),app=this.scene.game?.registry?.get?.('application');
+        if(!this.scene.zone){const play=this.el('button','world-play',t('scouting.play'));play.type='button';play.addEventListener('click',()=>{this.close();app?.enterZone();});row.append(play);
+          const back=this.el('button','world-back',t('scouting.sendHome'));back.type='button';back.addEventListener('click',()=>this.scene.scouting.sendHome());row.append(back);}
+        else{const back=this.el('button','world-back',t('zone.sendHome'));back.type='button';back.addEventListener('click',()=>{this.close();app?.leaveZone();});row.append(back);}
+        d.append(row);}
     }else if(!block){
       const soldiers=s.soldiers();
       if(!this.selected)d.append(this.el('p','world-hint',t('scouting.pickZone')));

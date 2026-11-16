@@ -1,3 +1,4 @@
+import { ZONE_LOOK } from '../game/zoneMode.js';
 import { COLUMNS,ROWS,mapArea } from '../game/config.js';
 import { byArea } from './GameSettings.js';
 import { MINERAL_DEPOSITS,START_QUARRY,START_IRON_MINE,resourceBlocks,depositFamily } from '../data/minerals.js';
@@ -17,7 +18,7 @@ export class MineralSystem {
   // World v2: `weight(anchor)` 0–1 makes deposits more likely in stony country (generator 2's stone weights).
   generate(random=Math.random,weight=null){
     const s=this.scene,protectedTiles=this.natural.reserved(),start=s.character.tile;let added=0;const origins=this.natural.origins(),mask=reachableMask(s.map,origins);
-    for(const [type,rule]of Object.entries(MINERAL_DEPOSITS))for(let count=0,attempt=0,want=byArea(rule.count);count<want&&attempt<5000*mapArea();attempt++){
+    for(const [type,rule]of Object.entries(MINERAL_DEPOSITS))for(let count=0,attempt=0,want=Math.round(byArea(rule.count)*(s.zone?ZONE_LOOK[s.zone.type]?.deposits?.[rule.family??type]??1:1));count<want&&attempt<5000*mapArea();attempt++){
       const anchor={x:2+Math.floor(random()*(COLUMNS-5)),y:2+Math.floor(random()*(ROWS-5))},definition=s.objectRegistry.require(type),tiles=buildingTiles(anchor,definition);
       if(Math.hypot(anchor.x-start.x,anchor.y-start.y)<=9||weight&&random()>weight(anchor)||!tiles.every(t=>s.map[t.y]?.[t.x]===0&&!s.isFordTile?.(t)&&!s.resourceOccupancy.has(tileKey(t))&&!protectedTiles.has(tileKey(t))))continue;
       // m-velikost-mapy: a local test first, the two flood fills only when it cannot tell.

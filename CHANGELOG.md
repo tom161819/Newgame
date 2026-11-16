@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.142.0] - 2026-11-16
+<!-- version: {"title":"Playing a zone with the scouting party","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- Play with the scouting party: a party that has reached its land now waits there. In the World window you can send it home, or press "Switch to the party" – the map switches to that land (dense forest, iron or stone deposits, always the same for the same world) and you lead the soldiers there: select them, move them, fight the animals. "Send the party home" in the bar at the top brings you back; the party then walks home for half a day. Soldiers who fall in the land are lost.
+- While you are in the land, home waits (its time stands still), and saving saves home with the party in the land. What you change in the land is not kept yet.
+
 ## [0.141.1] - 2026-11-16
 <!-- version: {"title":"Unit command bar above the build bar","type":"fix","reconstructed":false,"saveVersion":64} -->
 ### Fixed
