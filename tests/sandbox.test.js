@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+globalThis.document??={querySelector:()=>null};
+const { SANDBOX_UNITS,SANDBOX_COUNTS,tilesAround,sandboxSettings } = await import('../src/game/sandboxMode.js');
+const { objectRegistry } = await import('../src/systems/ObjectRegistry.js');
+const { UNIT_TYPES } = await import('../src/data/military.js');
+test('owner 16 Nov 2026: the Test map offers our units, enemies and animals that exist',()=>{
+  for(const u of SANDBOX_UNITS){if(u.unit)assert.ok(UNIT_TYPES[u.unit],u.unit);else assert.equal(objectRegistry.get(u.id)?.category,'animal',u.id);}
+  assert.ok(SANDBOX_UNITS.some(u=>u.group==='foes'&&u.id==='raider'));assert.deepEqual(SANDBOX_COUNTS,[1,5,10,25,50]);
+  const s=sandboxSettings();assert.equal(s.fogOfWar,false);assert.equal(s.startingCastle,true);assert.equal(s.nightWolves,false);
+});
+test('Test map: units are put on free tiles around the click',()=>{
+  const map=Array.from({length:30},()=>Array(30).fill(0));map[10][11]=1;
+  const scene={map,resourceOccupancy:new Map([['9,10','stone']]),workerSystem:{liveWorkers:()=>[{tile:{x:10,y:9}}]},animalSystem:{animals:new Map()}};
+  const tiles=tilesAround(scene,{x:10,y:10},12),keys=tiles.map(t=>`${t.x},${t.y}`);
+  assert.equal(tiles.length,12);assert.equal(new Set(keys).size,12);assert.ok(!keys.includes('11,10')&&!keys.includes('9,10')&&!keys.includes('10,9'));assert.equal(keys[0],'10,10');
+});

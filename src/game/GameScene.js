@@ -1,6 +1,7 @@
 import { BanditView,RaiderView } from './BanditView.js';
 import { shapeZoneWorld } from './zoneFeatures.js';
 import { setupZone,updateZone,zoneLook } from './zoneMode.js';
+import { setupSandbox,placeSandboxBuilding } from './sandboxMode.js';
 import { WorldPanel } from '../ui/WorldPanel.js';
 import { ScoutingSystem } from '../systems/ScoutingSystem.js';
 import { castleRules } from '../data/castle.js';
@@ -195,7 +196,7 @@ import { bindSoundSetting } from '../ui/sound.js';
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
   // m-velikost-mapy: the map size is set before anything is built; a loaded game takes it from its saved terrain.
-  init({state=null,settings,zone=null}={}){this.loadState=state;this.zone=zone;const size=Array.isArray(state?.terrain)?state.terrain.length:null;
+  init({state=null,settings,zone=null,sandbox=false}={}){this.loadState=state;this.zone=zone;this.sandbox=!!sandbox&&!state&&!zone;const size=Array.isArray(state?.terrain)?state.terrain.length:null;
     this.gameSettings=gameSettings({...(state?.gameSettings??settings??{}),...(size?{mapSize:size}:{})});setMapSize(this.gameSettings.mapSize);}
 
   preload() {
@@ -338,7 +339,7 @@ export class GameScene extends Phaser.Scene {
     this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,unlocks:this.buildingUnlocks,freeOffer:definition=>freeOffer(this,definition),onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
     this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onWorkplaceApply:()=>{this.workplaceSystem.reconcileDefinitions();if(this.selectedBuilding)this.selectedBuilding=this.objectRegistry.require(this.selectedBuilding.id);},onCostApply:()=>{if(this.selectedBuilding)this.selectedBuilding=this.objectRegistry.require(this.selectedBuilding.id);this.updateInventory();},onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
     this.equipmentPanel=new EquipmentPanel(this);
-    this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=t('hud.population',{count,maximum});}});if(!this.loadState&&!this.zone)this.workerSystem.spawnInitial(this.worldRandom('villagers'));this.builderWorkshops=new BuilderWorkshopSystem(this);this.fishing=new FishingSystem(this);
+    this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=t('hud.population',{count,maximum});}});if(!this.loadState&&!this.zone&&!this.sandbox)this.workerSystem.spawnInitial(this.worldRandom('villagers'));this.builderWorkshops=new BuilderWorkshopSystem(this);this.fishing=new FishingSystem(this);
     // Every living subject is a moving sight source (diameter 15); leaving, dying or emigrating removes it.
     // Point 42 (owner 14 Nov 2026): a newcomer on his way from the map edge reveals nothing until he reaches the Castle.
     // m-hrad-urovne: from level 2 the Castle sees around itself (its tower), without the King climbing it.
@@ -350,7 +351,7 @@ export class GameScene extends Phaser.Scene {
       onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);if(this.mapMemory?.objects.delete(`building:${site.id}`))this.mapMemory.revision++;this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.siteCancelled'));}});
     this.demolition=new DemolitionSystem(this,{complete:(building,refund)=>{const done=finishDemolition(this,building,refund);if(done)completeRelocation(this,building);return done;}});this.repairs=new RepairSystem(this);
     this.constructionUI=new ConstructionUI(this);
-    this.foodProduction=new FoodProductionSystem(this);this.military=new MilitarySystem(this);if(!this.loadState&&!this.zone&&this.gameSettings.startingGarrison)this.military.enlistStartingGarrison(this.worldRandom('villagers'));this.vehicles=new VehicleSystem(this);this.stables=new StableSystem(this);this.needs=new NeedsSystem(this);this.kingdomHappiness=new KingdomHappinessIndicator(this);this.vehicleViews=new VehicleViews(this);this.caravans=new CaravanSystem(this);this.trade=new TradeSystem(this);this.scouting=new ScoutingSystem(this);this.caravanViews=new CaravanViews(this);this.employment=new EmploymentSystem(this,{enabled:this.gameSettings.autoEmployment});this.diagnostics=new ProductionDiagnostics(this);this.employmentPanel=new EmploymentPanel(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.kingCargoControl=new KingCargoControl(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
+    this.foodProduction=new FoodProductionSystem(this);this.military=new MilitarySystem(this);if(!this.loadState&&!this.zone&&!this.sandbox&&this.gameSettings.startingGarrison)this.military.enlistStartingGarrison(this.worldRandom('villagers'));this.vehicles=new VehicleSystem(this);this.stables=new StableSystem(this);this.needs=new NeedsSystem(this);this.kingdomHappiness=new KingdomHappinessIndicator(this);this.vehicleViews=new VehicleViews(this);this.caravans=new CaravanSystem(this);this.trade=new TradeSystem(this);this.scouting=new ScoutingSystem(this);this.caravanViews=new CaravanViews(this);this.employment=new EmploymentSystem(this,{enabled:this.gameSettings.autoEmployment});this.diagnostics=new ProductionDiagnostics(this);this.employmentPanel=new EmploymentPanel(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.kingCargoControl=new KingCargoControl(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
     this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);this.farmConnections=new FarmConnections(this);
     this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);this.demolitionUI=new DemolitionUI(this);this.populationSidebar=new PopulationSidebar(this);this.noticesPanel=new NoticesPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
@@ -408,7 +409,7 @@ export class GameScene extends Phaser.Scene {
     // Army panel (the Army panel only when no soldier is chosen in it – then the right click sends them, as on the map).
     const sidePanels=()=>[this.settingsPanel,this.populationSidebar,this.buildingBar?.dismissable,this.armyPanel?.dismissable];
     installPanelDismiss(document,{panels:sidePanels,scene:this,signal:this.controls.signal});
-    this.input.on('pointerdown',pointer=>{if(pointer.rightButtonDown()&&closeOpenPanels(document,{panels:sidePanels()}))return;if(this.rockMiningTool.down(pointer))return;if(!this.unitSelection.down(pointer))this.handleClick(pointer);});
+    this.input.on('pointerdown',pointer=>{if(pointer.rightButtonDown()&&closeOpenPanels(document,{panels:sidePanels()}))return;if(this.sandboxPanel?.down(pointer))return;if(this.rockMiningTool.down(pointer))return;if(!this.unitSelection.down(pointer))this.handleClick(pointer);});
     this.input.on('pointerup',pointer=>{if(this.rockMiningTool.up(pointer))return;if(this.unitSelection.up(pointer))return;if(this.pavementTool?.anchor&&this.pavementTool.active()&&pointer.leftButtonReleased()){this.pavementTool.confirm(this.pointerTile(pointer));return;}if(this.dragAnchor&&pointer.leftButtonReleased())this.confirmWallLine(pointer);});
     this.input.on('pointerupoutside',()=>{this.rockMiningTool.cancelDrag();this.unitSelection.cancelDrag();this.clearWallPreviews();});
     this.input.on('pointermove',pointer=>{this.rockMiningTool.move(pointer);this.unitSelection.move(pointer);this.updateHover(pointer);if(this.buildMode&&!this.assetGallery.isOpen){if(!this.dragAnchor)this.wallLastLine=null;this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
@@ -441,6 +442,7 @@ export class GameScene extends Phaser.Scene {
     });
     if(this.loadState){loadGameState(this,this.loadState);this.loadState=null;this.nightControls?.syncThreats();}
     if(this.zone)setupZone(this);
+    if(this.sandbox)setupSandbox(this);
     this.game.registry.get('application')?.onGameReady(this);
   }
 
@@ -538,6 +540,8 @@ export class GameScene extends Phaser.Scene {
       if(known){this.previewKey=null;this.updateBuildingPreview();this.setStatus(known);return;}
       // m-staveni-zdi-studna (59): a Gate or Tower over Stone Wall segments replaces them; a Gate keeps the axis it was placed with.
       const fields=['wall_gate','gate'].includes(this.selectedBuilding.id)?{gateAxis:gateAxis(wallIndex(this.buildings,true),{...goal,definition:this.selectedBuilding,gateAxis:this.gateAxis})}:this.selectedBuilding.id==='tower'&&this.towerFacing?{facing:this.towerFacing}:null;
+      // Test map (owner 16 Nov 2026): every building is free and stands finished at once.
+      if(this.sandbox&&placeSandboxBuilding(this,goal,fields,pointer))return;
       const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.placementReserved(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding,reserveMaterials:true,provisional,fields,replaceWalls:(walls,building)=>replaceWalls(this,walls,building)});
       if(result.error){this.previewKey=null;this.updateBuildingPreview();this.setStatus(mineSpotError(this,goal,this.selectedBuilding,result.error));}
       else{
@@ -882,7 +886,7 @@ export class GameScene extends Phaser.Scene {
     delta=this.activeFramePending?0:Number.isFinite(raw)?Math.max(0,raw):Math.max(0,delta);
     this.activeFramePending=false;
     // Autosave counts only these active, visible, unpaused milliseconds.
-    this.registry.get('application')?.autosave?.update(delta);
+    if(!this.sandbox)this.registry.get('application')?.autosave?.update(delta);
     // První snímek po Load/Resume pouze obnoví obraz. Nulový čas nesmí
     // změnit uloženou animaci, rozpracovanou AI ani příkazy jednotek.
     if(!delta){this.refreshVisibility();return;}

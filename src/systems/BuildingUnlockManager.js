@@ -32,7 +32,7 @@ export class BuildingUnlockManager {
     scene.events?.on('buildings:changed',this.changed);this.unsubscribe=scene.objectRegistry.subscribe(this.changed);this.refresh();
   }
   refresh(){this.index=worldIndex(this.scene.buildings);for(const listener of this.listeners)listener();}
-  status(definition,{live=false}={}){return live?buildingUnlockStatus(definition,this.scene.buildings,this.scene.objectRegistry):evaluate(definition,this.index,this.scene.objectRegistry);}
+  status(definition,{live=false}={}){if(this.scene.sandbox&&!definition.maxCount)return {unlocked:true,missing:[],description:''};return live?buildingUnlockStatus(definition,this.scene.buildings,this.scene.objectRegistry):evaluate(definition,this.index,this.scene.objectRegistry);}
   subscribe(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   destroy(){this.scene.events?.off('buildings:changed',this.changed);this.unsubscribe();this.listeners.clear();}
 }

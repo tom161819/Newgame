@@ -83,6 +83,7 @@ export class WorkerSystem {
     this.updateUI();
   }
   onNewDay(day){
+    if(this.scene.sandbox)return; // Test map: nobody settles.
     if(day<=this.lastMigrationDay)return;this.lastMigrationDay=day;
     // m-start-v2: a full settlement says so once per capacity (the line comes back after new Houses fill up too).
     const capacity=this.capacity();if(this.liveSubjects().length>=capacity&&this.scene.eventFeed?.push)this.scene.eventFeed.push(`population-full:${capacity}`,t('feed.populationFull',{capacity}));

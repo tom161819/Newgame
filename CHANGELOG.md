@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.0] - 2026-11-16
+<!-- version: {"title":"Test map","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- Test map in the main menu (under the World Editor): a new world with the Castle and nobody else, for trying battles and buildings. Every building is free and stands finished at once (no materials, no builders), there is no fog and no night threat, nobody settles or leaves, the King stays out of it and nothing is saved.
+- The Test panel on the left: put our Soldiers, Archers and Swordsmen, enemies (Raiders, Bandits, Giant Rats, Wolves) and animals on the map with a click, 1–50 at a time; remove one unit, clear enemies, ours or everything; "Ours attack" sends all our soldiers at the nearest enemy group. Soldiers are commanded as in the game.
+
 ## [0.142.6] - 2026-11-16
 <!-- version: {"title":"War groundwork: group attack, Raider, test battle","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added

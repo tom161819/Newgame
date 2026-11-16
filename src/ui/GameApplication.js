@@ -1,3 +1,4 @@
+import { sandboxSettings } from '../game/sandboxMode.js';
 import { zoneStart,homeAfterZone,buryFallen,nextMap } from '../game/zoneMode.js';
 import { recordSaveFailure } from '../systems/saveFailure.js';
 import { saveRecordStatus } from './SaveLoadMenu.js';
@@ -51,6 +52,8 @@ export class GameApplication {
         else this.start(null,gameSettings({...NEW_GAME_DEFAULTS,worldCode:code}));},
       onBack:world=>{if(this.editorFrom==='setup'){this.setup.world={levels:[...world.levels],seed:world.seed};this.setup.writeCode();this.setup.root.hidden=false;document.querySelector('#setup-open-editor')?.focus();}else this.showMainMenu();}});
     document.querySelector('#main-world-editor')?.addEventListener('click',()=>{this.editorFrom='main';this.main.hidden=true;this.worldEditor.open();});
+    // Owner 16 Nov 2026: the Test map – a sandbox to try battles and buildings (sandboxMode.js).
+    document.querySelector('#main-test-map')?.addEventListener('click',()=>this.startTestMap());
     document.querySelector('#setup-open-editor')?.addEventListener('click',()=>{this.editorFrom='setup';this.setup.root.hidden=true;this.worldEditor.open(this.setup.world);});
     document.querySelector('#main-load-game').addEventListener('click',()=>this.openSaves('load'));
     // E2 (report 0.48.0): Continue loads the newest compatible save straight away.
@@ -76,7 +79,7 @@ export class GameApplication {
   }
   async latestSave(){try{return (await this.saves.list()).find(r=>saveRecordStatus(r).compatible&&r.state)??null;}catch{return null;}}
   async refreshContinue(){const button=document.querySelector('#continue-game');if(!button)return;const record=await this.latestSave();button.hidden=!record;if(record)button.title=t('menu.continueTitle',{name:record.name||t('saves.unnamed')});}
-  showMainMenu(){this.refreshContinue();this.scene=null;this.main.hidden=false;document.body.classList.remove('in-game');document.querySelector('main').inert=true;document.querySelector('#new-game').disabled=false;document.querySelector('#main-load-game').disabled=false;const editorButton=document.querySelector('#main-world-editor');if(editorButton)editorButton.disabled=false;this.worldEditor?.close();document.querySelector('#new-game').focus();
+  showMainMenu(){this.refreshContinue();this.scene=null;this.main.hidden=false;document.body.classList.remove('in-game');document.querySelector('main').inert=true;document.querySelector('#new-game').disabled=false;document.querySelector('#main-load-game').disabled=false;const editorButton=document.querySelector('#main-world-editor');if(editorButton)editorButton.disabled=false;const testButton=document.querySelector('#main-test-map');if(testButton)testButton.disabled=false;this.worldEditor?.close();document.querySelector('#new-game').focus();
     if(this.pendingSetup){this.pendingSetup=false;this.main.hidden=true;this.setup.open();}}
   // Opens Game Setup from anywhere. A running game is stopped first; nothing is saved or deleted.
   openNewGameSetup(){
@@ -85,7 +88,7 @@ export class GameApplication {
     this.main.hidden=true;this.setup.open();
   }
   // Getting started opens once for a New Game started from the setup (onStart); loads and scripted restarts never open it.
-  start(state=null,settings,zone=null){
+  start(state=null,settings,zone=null,sandbox=false){
     // The ground look: a loaded game keeps the one in its save; a new game takes this browser's World Editor look.
     setGroundOverride(state?state.groundLook??null:zone?zone.home.groundLook??null:activeGroundLook(this.storage));
     this.archive.close(false);
@@ -93,8 +96,9 @@ export class GameApplication {
     this.setup.close();
     this.pauseDialog.close();this.main.hidden=true;document.body.classList.add('in-game');document.querySelector('main').inert=false;
     this.startedFromSave=!!state||!!zone;
-    this.game.scene.stop('MainMenu');this.game.scene.stop('Game');this.scene=null;this.game.scene.start('Game',{state,settings,zone});
+    this.game.scene.stop('MainMenu');this.game.scene.stop('Game');this.scene=null;this.game.scene.start('Game',{state,settings,zone,sandbox});
   }
+  startTestMap(){this.pendingGettingStarted=false;this.start(null,sandboxSettings(),null,true);}
   // m-mapa-kraje (owner 16 Nov 2026): switch to the scouting party – home is kept as a saved state, the zone map starts.
   enterZone(){
     if(!this.scene||this.scene.zone)return false;let home;try{home=this.snapshot();}catch(error){this.notify(error.message);return false;}
@@ -129,6 +133,7 @@ export class GameApplication {
   snapshot(){if(!this.scene||this.scene.gameOver)throw new Error(t('app.startFirst'));
     // m-mapa-kraje: in a zone, saving keeps home (with the party in the zone); the zone itself is not kept yet.
     if(this.scene.zone)return validateGameState(structuredClone(this.scene.zone.home));
+    if(this.scene.sandbox)throw new Error(t('sandbox.noSave'));
     // m-ulozeni-brod: a state that fails the check is a bug in the running game, not a damaged save – say so and keep playing.
     // m-ukladani-chyba: a passing state (someone mid-step) gets up to 3 more tries, each after one short simulation step.
     let error;for(let attempt=0;attempt<4;attempt++){

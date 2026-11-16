@@ -46,7 +46,7 @@ export class NeedsSystem {
   // #58 C2, at the end of each day: count whole days of low Happiness; start strikes and emigration.
   closeDay(){
     // m-mapa-kraje: a scouting party in a zone does not strike or emigrate (it has no home there).
-    if(this.scene.zone)return;
+    if(this.scene.zone||this.scene.sandbox)return;
     let changed=false;const homes=this.homes();
     for(const worker of this.residents()){
       const r=this.record(worker),h=this.status(worker,homes).happiness;
