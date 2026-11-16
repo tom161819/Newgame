@@ -19,7 +19,7 @@ export const START_GARRISON=Object.freeze([Object.freeze({type:'soldier',count:2
 export const UNIT_TYPE_IDS=Object.freeze(Object.keys(UNIT_TYPES));
 // A Knight rides a tamed horse from the Stables: it is reserved for the training and kept by the Knight.
 export const KNIGHT_SPEED=1.5;
-export const MILITARY_RULES=Object.freeze({guardRadius:12,retarget:600,kitCapacityPerOrder:2,followRadius:10,spreadRadius:6,crowd:3,engageRadius:5,retreatBelow:.25,retreatUntil:.5,retreatSafe:8,orderRadius:12});
+export const MILITARY_RULES=Object.freeze({guardRadius:12,retarget:600,kitCapacityPerOrder:2,followRadius:10,spreadRadius:6,crowd:3,engageRadius:5,retreatBelow:.25,retreatUntil:.5,retreatSafe:8,orderRadius:12,groupLink:5});
 // Combat 16 Nov 2026: soldier stances (worker.stance, saved; aggressive when missing). engage = fights an enemy this
 // near without an order; follow = takes the next enemy this near after his target falls; leash = gives up a chase this
 // far from himself; hold = never moves to fight; retreat = steps back when badly hurt.

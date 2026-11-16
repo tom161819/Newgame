@@ -25,3 +25,16 @@ test('combat 16 Nov 2026: number-key groups (one soldier is enough; others leave
   assert.equal(setSquad(scene,[c,cook],3),1);assert.deepEqual(squadMembers(scene,3).map(x=>x.id),['c']);assert.equal(a.squad,undefined);
   assert.equal(setSquad(scene,[a],0),0);
 });
+test('war 16 Nov 2026: an attack order spreads the soldiers over the whole enemy group',async()=>{
+  const { MilitarySystem } = await import('../src/systems/MilitarySystem.js');
+  const foe=(id,x,y)=>({id,isAlive:true,active:true,type:'raider',definition:{gameplay:{hostile:true}},position:{x,y}});
+  const foes=[foe('a',10,10),foe('b',12,10),foe('c',14,10),foe('far',60,60)];
+  const scene={animalSystem:{animals:new Map(foes.map(f=>[f.id,f]))},combat:{attacks:new Map()}};
+  const m=Object.create(MilitarySystem.prototype);m.scene=scene;
+  assert.deepEqual(m.enemyGroup(foes[0]).map(f=>f.id).sort(),['a','b','c'],'linked enemies, not the far one');
+  const soldiers=Array.from({length:9},(_,i)=>({id:`s${i}`,attackRange:1,position:{x:5+i,y:14}}));
+  assert.equal(m.orderAttack(soldiers,foes[0]),3);
+  const per=new Map();for(const w of soldiers)per.set(w.huntWolfId,(per.get(w.huntWolfId)??0)+1);
+  assert.equal(per.size,3,'every enemy of the group gets fighters');assert.ok([...per.values()].every(n=>n<=3),'at most three melee fighters each');
+  assert.ok(soldiers.every(w=>w.attackArea&&w.attackRadius>=12));
+});

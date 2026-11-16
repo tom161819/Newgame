@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.142.6] - 2026-11-16
+<!-- version: {"title":"War groundwork: group attack, Raider, test battle","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- Dev tool: "Test battle 100 v 100" puts 100 of our soldiers (Soldiers, Archers, Swordsmen; group 9) against 100 Raiders on open ground away from the Castle, gives the attack order and turns on the FPS meter; "Clear the test battle" removes whoever is left.
+- A new enemy: the Raider, a soldier of an enemy army (steel-blue tabard, helmet; for wars and sieges later – for now only in the test battle).
+### Improved
+- An attack order on one enemy is an attack on his whole group: every soldier gets his own enemy (at most three melee fighters on one), so a large army fights along the whole front instead of crowding one enemy, and it clears the whole group before it stops.
+- Large battles: damage numbers only on screen and at most 40 at a time; no event-feed line for every soldier who falls back.
+### Fixed
+- The battle bar counted some of our soldiers as enemies.
+
 ## [0.142.5] - 2026-11-16
 <!-- version: {"title":"Combat: stances, groups, battle bar, damage numbers","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added

@@ -114,6 +114,25 @@ export class MilitarySystem {
   }
   // A threat: a living animal fighting one of our people (a resident or the king) near this unit's Barracks, in sight.
   nearestEnemy(worker,radius,ok=()=>true){let best=null,d=radius;if(!(radius>0))return null;for(const a of this.scene.animalSystem?.animals.values()??[]){if(!a.isAlive||a.active===false||!(a.type==='wolf'||a.definition?.gameplay?.hostile)||!ok(a))continue;if(this.scene.fog&&!this.scene.fog.isVisibleObject(a))continue;const e=Math.hypot(a.position.x-worker.position.x,a.position.y-worker.position.y);if(e<=d){d=e;best=a;}}return best;}
+  // War (owner 16 Nov 2026): an attack order on one enemy is an attack on its whole group – the enemies linked to it
+  // within `groupLink` tiles. Every soldier gets his own enemy (the nearest one with fewer than `crowd` melee fighters;
+  // archers may share), and the group's middle and size are the area the soldiers clear before they stop.
+  enemyGroup(enemy){
+    const all=[...(this.scene.animalSystem?.animals.values()??[])].filter(a=>a.isAlive&&a.active!==false&&(a.type==='wolf'||a.definition?.gameplay?.hostile)),group=[enemy],seen=new Set([enemy]);
+    for(let i=0;i<group.length&&group.length<400;i++)for(const a of all)if(!seen.has(a)&&Math.hypot(a.position.x-group[i].position.x,a.position.y-group[i].position.y)<=MILITARY_RULES.groupLink){seen.add(a);group.push(a);}
+    return group;
+  }
+  orderAttack(soldiers,enemy){
+    const group=this.enemyGroup(enemy),mid={x:group.reduce((n,a)=>n+a.position.x,0)/group.length,y:group.reduce((n,a)=>n+a.position.y,0)/group.length};
+    const radius=Math.max(MILITARY_RULES.orderRadius,...group.map(a=>Math.hypot(a.position.x-mid.x,a.position.y-mid.y)+6)),load=new Map();
+    const order=[...soldiers].sort((a,b)=>Math.hypot(a.position.x-mid.x,a.position.y-mid.y)-Math.hypot(b.position.x-mid.x,b.position.y-mid.y));
+    for(const w of order){
+      let best=null,score=Infinity;for(const a of group){const n=load.get(a)??0;if(w.attackRange<=1&&n>=MILITARY_RULES.crowd)continue;const d=Math.hypot(a.position.x-w.position.x,a.position.y-w.position.y)+n*3+(a===enemy?-1:0);if(d<score){score=d;best=a;}}
+      best??=enemy;load.set(best,(load.get(best)??0)+(w.attackRange<=1?1:0));
+      w.huntWolfId=best.id;w.attackArea={x:mid.x,y:mid.y};w.attackRadius=Math.round(radius);w.militaryRetarget=0;
+    }
+    return group.length;
+  }
   attackers(target){let n=0;for(const [a,t] of this.scene.combat?.attacks??[])if(t===target&&a.isAlive)n++;return n;}
   threat(worker){
     // m-mapa-kraje: in a scouted land the party guards itself – a soldier helps whoever of it is attacked near him.
@@ -148,7 +167,7 @@ export class MilitarySystem {
     if(worker.retreating||stance.retreat&&worker.currentHP<worker.maxHP*MILITARY_RULES.retreatBelow&&(combat.attacks.get(worker)||this.nearestEnemy(worker,3))){
       const danger=this.nearestEnemy(worker,MILITARY_RULES.retreatSafe);
       if(worker.currentHP>=worker.maxHP*MILITARY_RULES.retreatUntil||!danger){if(worker.retreating){worker.retreating=false;worker.path=[];}}
-      else{if(!worker.retreating){worker.retreating=true;this.scene.eventFeed?.push?.(`retreat:${worker.id}:${Math.floor((this.scene.gameTime?.totalElapsed??0)/30000)}`,t('army.retreats',{name:worker.name??''}),{});}
+      else{worker.retreating=true;
         combat.stopAttack(worker);delete worker.huntWolfId;worker.workState='Retreating';worker.workMessage='Falling back';
         if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=800;
           // Back to the healthy comrades (behind them, away from the enemy), else simply away.
@@ -159,7 +178,7 @@ export class MilitarySystem {
     let hunted=null;if(worker.huntWolfId){hunted=this.scene.animalSystem?.animals?.get?.(worker.huntWolfId)??[...(this.scene.animalSystem?.animals?.values?.()??[])].find(a=>a.id===worker.huntWolfId);if(!hunted?.isAlive||hunted.active===false){delete worker.huntWolfId;hunted=null;
       // Combat test 16 Nov 2026: the attacked group fights on – the next enemy near him, not standing idle.
       // …and with an attack order, the rest of the enemies around the place he was sent to.
-      const next=this.nearestEnemy(worker,stance.follow)??(worker.attackArea&&!stance.hold?this.nearestEnemy({position:worker.attackArea},MILITARY_RULES.orderRadius):null);if(next){worker.huntWolfId=next.id;hunted=next;}else delete worker.attackArea;}}
+      const next=(this.nearestEnemy(worker,stance.follow,a=>this.attackers(a)<MILITARY_RULES.crowd)??this.nearestEnemy(worker,stance.follow))??(worker.attackArea&&!stance.hold?this.nearestEnemy({position:worker.attackArea},worker.attackRadius??MILITARY_RULES.orderRadius,a=>this.attackers(a)<MILITARY_RULES.crowd)??this.nearestEnemy({position:worker.attackArea},worker.attackRadius??MILITARY_RULES.orderRadius):null);if(next){worker.huntWolfId=next.id;hunted=next;}else{delete worker.attackArea;delete worker.attackRadius;}}}
     const ranged=worker.attackRange>1;
     // Archers shoot the nearest enemy they can reach rather than walking to a far one.
     if(ranged&&!stance.hold){const inReach=this.nearestEnemy(worker,worker.attackRange,a=>inAttackRange(worker,a,this.scene.map)&&combat.canTarget(worker,a));if(inReach&&(!hunted||!inAttackRange(worker,hunted,this.scene.map)))hunted=inReach;}

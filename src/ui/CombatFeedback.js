@@ -13,8 +13,10 @@ export class CombatFeedback {
     const s=this.scene;if(!s.add?.text)return;
     for(const [unit,d] of this.damage){d.wait-=delta;if(d.wait>0)continue;if(d.sum<1){if(!unit.isAlive)this.damage.delete(unit);continue;}
       const view=unit===s.character?s.player:unit.view;const shown=view?.visible&&(!s.fog?.enabled||s.fog.isVisibleObject?.(unit)!==false);
-      if(shown){const enemy=isEnemyUnit(unit),y=view.y-(unit.definition?.visual?.healthBarOffset??40)-10,text=s.add.text(view.x+(Math.random()*10-5),y,`-${Math.round(d.sum)}`,{fontSize:'12px',fontStyle:'bold',color:enemy?'#ffe07a':'#ff7b6b',stroke:'#1b140e',strokeThickness:3}).setOrigin(.5).setDepth(view.depth+2);
-        s.tweens?.add?.({targets:text,y:y-22,alpha:0,duration:800,onComplete:()=>text.destroy()});}
+      // Big battles: numbers only on screen and at most 40 at a time.
+      const cam=s.cameras?.main?.worldView,onScreen=!cam||cam.contains?.(view?.x??0,view?.y??0)!==false;
+      if(shown&&onScreen&&(this.floating??0)<40){this.floating=(this.floating??0)+1;const enemy=isEnemyUnit(unit),y=view.y-(unit.definition?.visual?.healthBarOffset??40)-10,text=s.add.text(view.x+(Math.random()*10-5),y,`-${Math.round(d.sum)}`,{fontSize:'12px',fontStyle:'bold',color:enemy?'#ffe07a':'#ff7b6b',stroke:'#1b140e',strokeThickness:3}).setOrigin(.5).setDepth(view.depth+2);
+        s.tweens?.add?.({targets:text,y:y-22,alpha:0,duration:800,onComplete:()=>{text.destroy();this.floating--;}});}
       d.sum=0;d.wait=550;if(!unit.isAlive)this.damage.delete(unit);}
   }
   // Arrows: an archer who is shooting sends a visible arrow about once a second.
@@ -29,7 +31,7 @@ export class CombatFeedback {
   // A summary of the fight going on: who took part, who still stands, and a report when it is over.
   trackBattle(delta){
     const s=this.scene,ours=new Set(),foes=new Set();
-    for(const [a,b] of s.combat.attacks){const ea=isEnemyUnit(a),eb=isEnemyUnit(b);if(ea===eb)continue;(ea?foes:ours).add(ea?a:b);(ea?ours:foes).add(ea?b:a);}
+    for(const [a,b] of s.combat.attacks){const ea=isEnemyUnit(a),eb=isEnemyUnit(b);if(ea===eb||!a?.isAlive&&!b?.isAlive)continue;foes.add(ea?a:b);ours.add(ea?b:a);}
     let battle=this.battle;
     if(ours.size&&foes.size){if(!battle)battle=this.battle={ours:new Set(),foes:new Set(),quiet:0,start:s.gameTime?.totalElapsed??0};for(const u of ours)battle.ours.add(u);for(const u of foes)battle.foes.add(u);battle.quiet=0;}
     else if(battle){battle.quiet+=delta;if(battle.quiet>=BATTLE_QUIET){this.endBattle(battle);this.battle=battle=null;}}

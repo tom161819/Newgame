@@ -60,3 +60,16 @@ animals.push({
   stats:{maxHP:30,attackDPS:5,armor:0,attackRange:1},
   animations:{mode:'procedural',states:['idle','walk'],directions:['N','NE','E','SE','S','SW','W','NW']},
 });
+
+// War (owner 16 Nov 2026: wars, attacks of other armies, sieges): a soldier of an enemy army. Not in the world yet –
+// the Dev tool's test battle uses it; armies of other castles come later.
+animals.push({
+  id:'raider',name:'Raider',category:'animal',sprite:'/assets/characters/peasant/peasant.svg',
+  width:1,height:1,walkable:false,collectible:false,buildable:false,cost:{},interactions:['hunt'],
+  description:'A soldier of an enemy army. Attacks anyone of the kingdom who comes close.',
+  renderMode:'procedural',renderer:'raider',origin:{x:.5,y:.92},visualHeight:48,
+  visual:{hitArea:{x:-13,y:-44,width:26,height:39},healthBarOffset:48},depth:{offset:.1},
+  gameplay:{movementSpeed:2.6,initialCount:0,behavior:'wander',huntable:true,meatDrop:0,wanderRadius:2,guardRadius:9,zoneOnly:true,hostile:true},
+  stats:{maxHP:80,attackDPS:9,armor:5,attackRange:1},
+  animations:{mode:'procedural',states:['idle','walk'],directions:['N','NE','E','SE','S','SW','W','NW']},
+});

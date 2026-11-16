@@ -55,6 +55,7 @@ export default {
   'object.torch_post.name':"Torch Post",'object.torch_post.description':"An iron post with a torch. Lights 5 tiles around it at night; burns 1 Torch a night.",
   'object.campfire.name':"Campfire",'object.campfire.description':"A fire of brushwood gathered on the spot. Burns one night; wolves keep away from its light.",
   'object.bandit.name':"Bandit",'object.bandit.description':"A bandit guarding the loot of his camp. Attacks anyone who comes close.",'object.cave_rat.name':"Giant Rat",'object.cave_rat.description':"A giant rat of an abandoned mine. Bites anyone who comes close.",
+  'object.raider.name':"Raider",'object.raider.description':"A soldier of an enemy army. Attacks anyone of the kingdom who comes close.",
   'object.wolf.name':"Wolf",'object.wolf.description':"A grey wolf that hunts in packs at night. Keeps away from fire. Leaves 2 meat.",
   'object.burnt_ruins.name':"Burnt Ruins",'object.burnt_ruins.description':"The charred remains of a building that burnt down.",
   'object.iron.name':'Iron','object.iron.description':'Finished iron smelted from 3 Iron Ore and 3 Wood in a Smelter. Stored in Material Yards; distinct from raw ore. Swords, armour and cart fittings are forged from it.',

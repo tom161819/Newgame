@@ -3,6 +3,7 @@ import { t,onLanguageChange } from '../i18n/index.js';
 import { DEV_MAIN_KEYS,DEV_ADVANCED_KEYS,DEV_FOREST_KEYS,DEV_LOOK_KEYS,devRange,DEV_QUICK,loadDevBalance,devMode,setDevMode,setDevFactor,resetDevBalance,devBalanceValues,devBalanceJSON,devBalanceChanged,devTooltipDelay,setDevTooltipDelay,onDevBalanceChange } from '../data/devBalance.js';
 import { BUILDING_TOOLTIP } from '../data/buildingTooltip.js';
 import { FrameProfiler,PROFILER_RULES } from '../systems/FrameProfiler.js';
+import { startDevBattle,clearDevBattle } from '../systems/devBattle.js';
 import { arrivalForecast,economyOverview,forestOverview,addDevGold,addDevResources,advanceDevDay,summonDevCaravan,addDevResident } from '../systems/DevTools.js';
 
 // m-91-asset-library-dev (owner point 88): the Dev tool. An icon right under the Settings icon opens a pop-up menu
@@ -10,7 +11,7 @@ import { arrivalForecast,economyOverview,forestOverview,addDevGold,addDevResourc
 // an economy overview, quick actions, the building tooltip delay and the frame profiler (F8). "Show Dev tool" in
 // Settings hides the icon (alpha default ON; replaces the 0.78 hidden 5-click unlock). Built here, no index.html markup.
 const el=(doc,tag,props={},children=[])=>{const e=doc.createElement(tag);Object.assign(e,props);for(const c of children)e.append(c);return e;};
-export const DEV_ACTIONS=Object.freeze(['gold','resources','day','caravan','resident','saveDump']);
+export const DEV_ACTIONS=Object.freeze(['gold','resources','day','caravan','resident','saveDump','battle','battleClear']);
 export class DevBalancePanel {
   constructor(scene,{storage,document:doc=globalThis.document}={}){
     this.scene=scene;this.doc=doc;this.controller=new AbortController();loadDevBalance(storage);
@@ -98,6 +99,8 @@ export class DevBalancePanel {
     else if(id==='caravan')message=summonDevCaravan(s)?t('dev.action.caravanDone'):t('dev.action.noCaravan');
     else if(id==='saveDump')message=downloadSaveFailure()?t('dev.action.saveDumpDone'):t('dev.action.noSaveDump');
     else if(id==='resident')message=addDevResident(s)?t('dev.action.residentDone'):t('dev.action.noBed');
+    else if(id==='battle'){const r=startDevBattle(s,100);message=r?t('dev.battle.started',r):t('dev.battle.noRoom');}
+    else if(id==='battleClear')message=t('dev.battle.cleared',{count:clearDevBattle(s)});
     this.status.textContent=message;this.renderLive();return message;
   }
   setProfiling(on){

@@ -1,4 +1,4 @@
-import { BanditView } from './BanditView.js';
+import { BanditView,RaiderView } from './BanditView.js';
 import { shapeZoneWorld } from './zoneFeatures.js';
 import { setupZone,updateZone,zoneLook } from './zoneMode.js';
 import { WorldPanel } from '../ui/WorldPanel.js';
@@ -231,6 +231,7 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('chest',(_definition,context)=>new ChestView(this,context.x,context.y));
     this.assets.registerRenderer('human',(definition,context)=>new HumanView(this,context.x,context.y,definition));
     this.assets.registerRenderer('bandit',(definition,context)=>new BanditView(this,context.x,context.y,definition));
+    this.assets.registerRenderer('raider',(definition,context)=>new RaiderView(this,context.x,context.y,definition));
     this.assets.registerRenderer('workplace',(_definition,context)=>new WorkplaceView(this,context.building,context.preview));
     this.assets.registerRenderer('food_building',(_definition,context)=>new WorkplaceView(this,context.building,context.preview));
     this.assets.registerRenderer('crop',(_definition,context)=>new CropPlotView(this,context.building,context.preview));
