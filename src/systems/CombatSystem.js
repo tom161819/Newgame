@@ -6,15 +6,19 @@ export { clampArmor,createCombatStats } from './UnitStats.js';
 // p70: a unit with a reach of 2 (the Halberdier) is still a melee fighter; shooting starts above that.
 export const isRanged=unit=>unit.attackRange>2;
 
+// m-hlidka-hradby / owner 17 Nov 2026: an archer up on a wall, Tower or Gate shoots 2 tiles further and over the
+// walls and buildings below him (no line of sight needed from the height).
+export const WALL_ARCHER_RANGE=2;
+const reach=attacker=>attacker.attackRange+(attacker.onWall&&attacker.attackRange>2?WALL_ARCHER_RANGE:0);
 export function inAttackRange(attacker,target,map=null) {
   const dx=Math.abs(attacker.position.x-target.position.x),dy=Math.abs(attacker.position.y-target.position.y);
-  if(Math.max(dx,dy)>attacker.attackRange+1e-8)return false;
+  if(Math.max(dx,dy)>reach(attacker)+1e-8)return false;
   const a={x:Math.floor(attacker.position.x),y:Math.floor(attacker.position.y)},b={x:Math.floor(target.position.x),y:Math.floor(target.position.y)};
   if(map&&attacker.attackRange<=1&&a.x!==b.x&&a.y!==b.y){
     return isWalkable(map,a.x,b.y)&&isWalkable(map,b.x,a.y);
   }
   // Ranged attacks need a clear line between the two tiles.
-  return attacker.attackRange<=1||!map||hasLineOfSight(map,a,b);
+  return attacker.attackRange<=1||!map||!!attacker.onWall||hasLineOfSight(map,a,b);
 }
 
 // Integruje DPS po časových úsecích až k nejbližší smrti. Odvetný útok tak

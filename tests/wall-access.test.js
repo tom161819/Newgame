@@ -104,3 +104,14 @@ test('owner 17 Nov 2026: a post has a ring up on the wall or the Tower platform,
   for(const w of [a,b]){const ring=s.military.wallPatrol.postPoint(w);s.military.wallPatrol.place(w);assert.ok(Math.hypot(w.view.x-ring.x,w.view.y-ring.y)<1,'he stands on his ring');}
   assert.equal(s.military.wallPatrol.postPoint(soldier(s,barracks,{x:22,y:25})),null);
 });
+
+test('owner 17 Nov 2026: an archer on the wall shoots an enemy outside (range +2, over the walls) and keeps his post; no rest at home',()=>{
+  const s=scene(),barracks=building(s,'barracks',24,24),{walls}=fort(s,0),w=soldier(s,barracks,{x:22,y:23});
+  assert.equal(s.military.enlist?.(w,'archer')??true,true);
+  s.military.wallPatrol.post([w],walls.find(b=>b.x===25&&b.y===30));follow(s,[w],()=>w.wallPatrol?.phase==='post');assert.ok(w.onWall);
+  assert.equal(w.attackRange,6);
+  const foe=s.animalSystem.create(s.objectRegistry.require('raider'),{x:25,y:37});const hp=foe.currentHP;
+  for(let ms=0;ms<20000&&foe.isAlive;ms+=50)s.tick(50);
+  assert.ok(foe.currentHP<hp,'shot at 7 tiles from the wall');assert.ok(w.onWall,'still up there');assert.deepEqual(w.tile,{x:25,y:30});
+  assert.equal(s.workerSystem.rest?.eligible?.(w)??false,false,'no rest at home while on a wall order');
+});

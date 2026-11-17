@@ -4,11 +4,12 @@ import { tileKey } from '../game/stones.js';
 import { tileCenter,gridToWorld } from '../game/isometric.js';
 import { elevatedIndex,elevatedRoute,entrances,planAscent,planDescent,platformTiles,platformCenter } from '../game/wallNetwork.js';
 import { t } from '../i18n/index.js';
+import { WALL_ARCHER_RANGE } from './CombatSystem.js';
 
 // m-hlidka-hradby (owner, 12 Nov): "Patrol – walls". A soldier climbs to the wall walk at a wall touching a Tower or a
 // Gate, walks the finished walls from stop to stop (walls beside Towers and Gates) and waits 5–15 s at each, looking
 // out (+3 sight; an Archer +2 range). Several soldiers spread over the stops. Only soldiers walk on walls.
-export const WALL_PATROL=Object.freeze({pause:Object.freeze([5000,15000]),sight:3,archerRange:2,retry:2000});
+export const WALL_PATROL=Object.freeze({pause:Object.freeze([5000,15000]),sight:3,archerRange:WALL_ARCHER_RANGE,retry:2000});
 
 // Where the men stand on a platform, in tiles from its middle.
 export const PLATFORM_SLOTS=Object.freeze([{x:0,y:0},{x:-.32,y:.32},{x:.32,y:-.32},{x:.3,y:.3}]);

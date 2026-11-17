@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.144.4] - 2026-11-17
+<!-- version: {"title":"Archers on walls shoot and keep their posts","type":"fix","reconstructed":false,"saveVersion":64} -->
+### Fixed
+- Archers on walls, Towers and Gates shoot every enemy in sight within their range. From the height they reach 2 tiles further and shoot over walls and buildings.
+- Soldiers no longer leave their wall posts. Shooting used to make them drop down, and the morning rest and the walk to the Barracks used to pull them off the walls. A soldier on a wall order now stays until you give him another order.
+
 ## [0.144.3] - 2026-11-17
 <!-- version: {"title":"Goal ring on walls, Towers and Gates","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Improved

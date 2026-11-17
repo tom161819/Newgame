@@ -6,7 +6,7 @@ import { MILITARY_ITEMS } from '../data/militaryEquipment.js';
 import { buildingIsComplete } from '../game/buildings.js';
 import { recalculateStats } from './UnitStats.js';
 import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
-import { inAttackRange,isRanged } from './CombatSystem.js';
+import { inAttackRange,isRanged,WALL_ARCHER_RANGE } from './CombatSystem.js';
 import { MILITARY_RULES,PATROL,STANCES } from '../data/military.js';
 import { freeAround,awayFrom } from '../game/combatSpacing.js';
 
@@ -157,7 +157,13 @@ export class MilitarySystem {
     if(worker.expeditionGather!=null){const m=this.scene.buildings.find(b=>b.id===worker.expeditionGather);if(m){worker.workState='Traveling to Target';worker.workMessage=t('expedition.gathering');
       if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0&&Math.max(Math.abs(worker.tile.x-(m.x+1)),Math.abs(worker.tile.y-(m.y+1)))>4){worker.aiCooldown=1500;worker.moveTo(towerNeighbors(m));}return true;}delete worker.expeditionGather;}
     // m-hlidka-hradby: on the wall walk (or on the way up) the patrol leads; an Archer on a wall shoots threats in range.
-    if(worker.wallPatrol){this.wallPatrol??=new WallPatrol(this.scene);if(worker.onWall&&isRanged(worker)){const target=this.threat(worker);if(target&&inAttackRange(worker,target,this.scene.map)){worker.path=[];combat.startAttack(worker,target);return true;}}
+    // Owner 17 Nov 2026 ("archers on Towers, walls and Gates do not shoot and leave their posts"): an archer up there
+    // shoots any enemy in sight within his range (+2 from the height) and keeps his post – the post's own update runs
+    // every frame (a missed one counted as leaving); he never steps down to chase.
+    if(worker.wallPatrol){this.wallPatrol??=new WallPatrol(this.scene);
+      if(worker.onWall&&!worker.wallDescent&&isRanged(worker)){const map=this.scene.map,current=combat.attacks.get(worker),fits=a=>a?.isAlive&&inAttackRange(worker,a,map)&&combat.canTarget(worker,a);
+        const target=fits(current)?current:this.nearestEnemy(worker,worker.attackRange+WALL_ARCHER_RANGE+1,fits);
+        if(target){combat.startAttack(worker,target);if(!worker.nextTile&&!worker.path.length){const dx=target.position.x-worker.position.x,dy=target.position.y-worker.position.y,n=Math.hypot(dx,dy);if(n)worker.direction={x:dx/n,y:dy/n};}}else if(current)combat.stopAttack(worker);}
       if(this.wallPatrol.update(worker,delta))return true;}
     // kasarna-branci: Recruits defend near their Barracks too, with their basic stats.
     if(!(unit||this.isRecruit(worker))||worker.commandState?.state==='Holding')return false;
