@@ -4,7 +4,7 @@ python3.11 render-soldier.py <model.blend> <out_dir> <kind> [--samples 16] [--on
 kind: sword | spear | bow (which attack clip the figure plays).
 
 Sheet layout (written as frames <dir>/<k>-<col>.png, packed by scripts/soldier-sheets.mjs):
-rows = 8 facings in FACING_INDEX order (SE, E, NE, N, NW, W, SW, S); columns = idle, walk 0-7, attack 0-5, die 0-3.
+rows = 8 facings in FACING_INDEX order (SE, E, NE, N, NW, W, SW, S); columns = idle, walk 0-7, attack 0-5, die 0-3, idle 1-5 (stand-still moves).
 The camera is the game's 2:1 projection (elevation 30 deg, azimuth 45 deg), 30 px per metre after the 3x supersample
 is reduced; the lights of the owner's file stay fixed, the figure turns under them. Poses are FK rotations of the
 shared bone names about the figure's own axes (X sideways, -Y forward, Z up).
@@ -16,6 +16,7 @@ args = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else sys.argv[1:]
 blend, out, kind = args[0], args[1], args[2]
 samples = int(args[args.index('--samples') + 1]) if '--samples' in args else 16
 only = int(args[args.index('--only') + 1]) if '--only' in args else None
+first = int(args[args.index('--from') + 1]) if '--from' in args else 0  # render only columns from this one on
 SS = 3; PPM = 30; FW, FH = 128, 136; ANCHOR = (64, 100)  # final frame and the feet point inside it
 
 bpy.ops.wm.open_mainfile(filepath=blend)
@@ -41,7 +42,7 @@ pb = arm.pose.bones
 for p in pb: p.rotation_mode = 'QUATERNION'
 X = Vector((1, 0, 0)); Z = Vector((0, 0, 1)); Y = Vector((0, 1, 0))
 
-def rest():
+def rest(*_):
   for p in pb: p.rotation_quaternion = Quaternion(); p.location = (0, 0, 0)
 
 def rot(name, deg, axis=X):
@@ -95,13 +96,23 @@ def die(i):
   rot('upper_arm.R', 30 * (i / 3), Y); rot('upper_arm.L', -30 * (i / 3), Y); rot('upper_arm.R', -20 * buckle); rot('upper_arm.L', -20 * buckle)
   arm.rotation_euler.x = math.radians(-tilt); arm.location.z = .14 * math.sin(math.radians(tilt))
 
-frames = [('idle', 0, rest)] + [('walk', i, walk) for i in range(8)] + [('attack', i, attack) for i in range(6)] + [('die', i, die) for i in range(4)]
+def fidget(i):
+  """Owner 17 Nov 2026: standing soldiers are not frozen – small stand-still moves the game picks at random."""
+  rest(); weapon = 'L' if kind == 'bow' else 'R'
+  if i == 1: rot('thigh.L', -7); rot('shin.L', 12); rot('foot.L', -4); rot('spine', 2); rot('spine', 4, Y); lift(-.012)  # weight on one leg
+  elif i == 2: rot('head', 32, Z); rot('spine', 6, Z)  # looks to one side
+  elif i == 3: rot('head', -32, Z); rot('spine', -6, Z)  # and to the other
+  elif i == 4: rot(f'upper_arm.{weapon}', -14); rot(f'forearm.{weapon}', -26)  # shifts the weapon in the hand
+  elif i == 5: rot('spine', -4); rot('head', -9); rot('upper_arm.R', -4, Y); rot('upper_arm.L', 4, Y)  # straightens his back
+
+frames = [('idle', 0, rest)] + [('walk', i, walk) for i in range(8)] + [('attack', i, attack) for i in range(6)] + [('die', i, die) for i in range(4)] + [('idle', i, fidget) for i in range(1, 6)]
 os.makedirs(out, exist_ok=True)
 for k in range(8):
   if only is not None and k != only: continue
   for col, (name, i, fn) in enumerate(frames):
+    if col < first: continue
     arm.rotation_euler = (0, 0, math.radians(45 + 45 * k)); arm.location = (0, 0, 0)
-    fn(i) if name != 'idle' else rest()
+    fn(i)
     bpy.context.view_layer.update()
     sc.render.filepath = os.path.join(out, f'{k}-{col:02d}.png')
     bpy.ops.render.render(write_still=True)

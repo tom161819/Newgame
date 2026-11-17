@@ -125,9 +125,19 @@ export const WALK_COLUMNS=Object.freeze(['idle','stride-a','stride-b']);
 export const WALK_CYCLE=Object.freeze([0,1,0,2]);
 // The walk-sheet frame for a facing and the time spent walking (ms); standing is the idle column.
 export function walkFrame(k,walkedMs,fps,moving){return k*WALK_COLUMNS.length+(moving?WALK_CYCLE[Math.floor(walkedMs*fps/1000)%WALK_CYCLE.length]:0);}
+// Owner 17 Nov 2026: a standing soldier now and then makes a small move (shifts his weight, looks aside, shifts his
+// weapon, straightens up) at his own random times, so fifty standing men do not stand frozen alike. Returns the
+// idle column; state keeps {wait, left, col} per figure.
+export function soldierIdle(anim,state,delta,random=Math.random){
+  const extra=(anim.idles??[]).filter(c=>c!==anim.idle);if(!extra.length)return anim.idle;
+  if(state.wait==null)state.wait=1500+random()*7000;
+  if(state.left>0){state.left-=delta;if(state.left>0)return state.col;state.wait=2500+random()*8000;}
+  state.wait-=delta;if(state.wait>0)return anim.idle;
+  state.col=extra[Math.floor(random()*extra.length)];state.left=900+random()*1800;return state.col;
+}
 // m-vojaci-3d: the frame of an animated soldier sheet: attacking, walking or standing.
-export function soldierFrame(anim,k,{walkedMs=0,walkFps=10,moving=false,attackMs=0,attacking=false}={}){
-  const col=attacking?anim.attack[Math.floor(attackMs*anim.attackFps/1000)%anim.attack.length]:moving?anim.walk[Math.floor(walkedMs*walkFps/1000)%anim.walk.length]:anim.idle;return k*anim.columns+col;}
+export function soldierFrame(anim,k,{walkedMs=0,walkFps=10,moving=false,attackMs=0,attacking=false,idleCol=anim.idle}={}){
+  const col=attacking?anim.attack[Math.floor(attackMs*anim.attackFps/1000)%anim.attack.length]:moving?anim.walk[Math.floor(walkedMs*walkFps/1000)%anim.walk.length]:idleCol;return k*anim.columns+col;}
 export const walkKey=look=>`villager-walk:${look}`;
 // A look whose walk sheet has loaded walks frame by frame; without one (missing or failed file) it keeps the facing image.
 export function hasWalk(scene,look){return !!APPROVED_VILLAGER_ART[look]?.walk&&!!scene?.textures?.exists?.(walkKey(look));}

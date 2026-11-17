@@ -3,7 +3,9 @@ import { isWall } from '../game/walls.js';
 import { t,language } from '../i18n/index.js';
 import { HAUL_PRIORITIES,HAULABLE_RESOURCES } from '../data/logistics.js';
 import { haulPriorityFromValue,haulPriorityValue,setHaulPriority } from '../systems/haulPriority.js';
-import { tileCenter } from '../game/isometric.js';
+import { tileCenter,worldToGrid } from '../game/isometric.js';
+import { FORMATIONS,FORMATION_ICONS,DEFAULT_FORMATION,formationTiles } from '../game/formations.js';
+import { knownMap } from '../game/knownMap.js';
 import { blockingDialog } from './dockedPanels.js';
 import { setSquad,squadMembers } from './armySquads.js';
 import { JOBS } from '../data/jobs.js';
@@ -29,6 +31,11 @@ export class UnitSelection {
     this.stance=document.createElement('span');this.stance.className='unit-stance';this.stance.hidden=true;this.stanceButtons={};
     for(const id of ['aggressive','defensive','hold']){const b=document.createElement('button');b.type='button';b.dataset.stance=id;b.addEventListener('click',()=>{for(const w of this.workers())if(w.profession==='soldier'){if(id==='aggressive')delete w.stance;else w.stance=id;if(id==='hold'){w.path=[];delete w.huntWolfId;}}this.signature=null;this.draw();});this.stance.append(b);this.stanceButtons[id]=b;}
     this.panel.append(this.stance);
+    // Owner 17 Nov 2026: the formation the chosen men take when sent somewhere (holding the right button shows it and
+    // turns it with the mouse).
+    this.formation=DEFAULT_FORMATION;this.formationBar=document.createElement('span');this.formationBar.className='unit-formation';this.formationBar.hidden=true;this.formationButtons={};
+    for(const id of FORMATIONS){const b=document.createElement('button');b.type='button';b.dataset.formation=id;b.addEventListener('click',()=>{this.formation=id;this.signature=null;this.draw();});this.formationBar.append(b);this.formationButtons[id]=b;}
+    this.panel.append(this.formationBar);this.blueprint=scene.add.graphics().setDepth(1000001);
     // Combat 16 Nov 2026: groups on the number keys – Shift + 1–9 makes the chosen soldiers group N, 1–9 chooses it
     // (twice quickly: the camera goes to it). Ctrl + number belongs to the browser (tabs). Without such a group the keys
     // 1–3 keep setting the speed.
@@ -80,15 +87,21 @@ export class UnitSelection {
           if(enemy&&fighters.length){for(const w of fighters){s.workerSystem.commands.resume(w);s.military?.wallPatrol?.set(w,false);}if(s.military?.orderAttack)s.military.orderAttack(fighters,enemy);else for(const w of fighters){w.huntWolfId=enemy.id;w.militaryRetarget=0;}s.setStatus(t('army.attack',{count:fighters.length,name:enemy.definition.name}));if(this.king)s.kingOrder(pointer);this.draw();return true;}}
         const tile=s.pointerTile(pointer),target=tile&&s.buildings.find(b=>buildingIsComplete(b)&&(isWall(b)||['tower','gate','wall_gate'].includes(b.type))&&b.tiles?.some(tl=>tl.x===tile.x&&tl.y===tile.y)),soldiers=this.workers().filter(w=>w.profession==='soldier');
         if(target&&soldiers.length){const posted=s.military?.wallPatrol?.post(soldiers,target)??0;if(posted){s.setStatus(t('army.posted',{count:posted,name:buildingDefinition(target).name}));this.draw();return true;}s.setStatus(t('army.postNoWay'));return true;}
-        if(this.ids.size){const count=s.workerSystem.commands.move(this.workers(),s.pointerTile(pointer));s.setStatus(t(count?'command.moving':'command.noRoute',{count}));}
+        // Owner 17 Nov 2026: the order is given when the button goes up; while it is held the blueprint shows the places
+        // and dragging turns it.
+        if(this.ids.size){const tile=s.pointerTile(pointer);pointer.updateWorldPoint(s.cameras.main);this.order={tile,x:pointer.x,y:pointer.y,world:{x:pointer.worldX,y:pointer.worldY},facing:null};this.drawOrder();}
         if(this.king)s.kingOrder(pointer);return true;}
       return false;
     }
     if(!pointer.leftButtonDown())return false;
     this.anchor={x:pointer.x,y:pointer.y};this.dragging=false;return true;
   }
-  move(pointer){this.hover(pointer);if(!this.anchor)return;this.current={x:pointer.x,y:pointer.y};if(Math.hypot(pointer.x-this.anchor.x,pointer.y-this.anchor.y)>6)this.dragging=true;this.draw();}
+  move(pointer){this.hover(pointer);
+    if(this.order){if(!pointer.rightButtonDown()){this.giveOrder();}else if(Math.hypot(pointer.x-this.order.x,pointer.y-this.order.y)>14){pointer.updateWorldPoint(this.scene.cameras.main);
+      const a=worldToGrid(this.order.world.x,this.order.world.y),b=worldToGrid(pointer.worldX,pointer.worldY);this.order.facing={x:b.x-a.x,y:b.y-a.y};this.drawOrder();}}
+    if(!this.anchor)return;this.current={x:pointer.x,y:pointer.y};if(Math.hypot(pointer.x-this.anchor.x,pointer.y-this.anchor.y)>6)this.dragging=true;this.draw();}
   up(pointer){
+    if(this.order&&!pointer.rightButtonDown()){this.giveOrder();return true;}
     if(!this.anchor)return false;
     const anchor=this.anchor;this.anchor=null;
     if(this.dragging){
@@ -110,6 +123,21 @@ export class UnitSelection {
     }
     this.dragging=false;this.draw();return true;
   }
+  // The facing a plain click gives: from the group's middle to the clicked tile.
+  orderFacing(){const o=this.order,w=this.workers();if(o.facing)return o.facing;if(!w.length)return {x:1,y:0};const m={x:w.reduce((n,u)=>n+u.tile.x,0)/w.length,y:w.reduce((n,u)=>n+u.tile.y,0)/w.length};return {x:o.tile.x-m.x,y:o.tile.y-m.y};}
+  giveOrder(){
+    const o=this.order,s=this.scene;this.order=null;this.blueprint.clear();if(!o?.tile||!this.ids.size)return;
+    const count=s.workerSystem.commands.move(this.workers(),o.tile,{formation:this.formation,facing:o.facing??null});s.setStatus(t(count?'command.moving':'command.noRoute',{count}));this.draw();
+  }
+  // The blueprint: a ring for each place of the formation and an arrow the way the men will face.
+  drawOrder(){
+    const o=this.order,s=this.scene,g=this.blueprint,z=s.cameras.main.zoom||1;g.clear();if(!o?.tile)return;const n=this.workers().length;
+    const base=knownMap(s),open=(x,y)=>base[y]?.[x]===0,facing=this.orderFacing();
+    const tiles=this.formation==='loose'||n<2?[o.tile]:formationTiles(this.formation,n,o.tile,facing,open);
+    for(const tile of tiles){const p=tileCenter(tile);g.fillStyle(0xffd768,.18).fillEllipse(p.x,p.y,22,11).lineStyle(1.2/z,0xffd768,.8).strokeEllipse(p.x,p.y,22,11);}
+    if(this.formation!=='loose'&&n>1){const len=Math.hypot(facing.x,facing.y)||1,c=tileCenter(o.tile),tip=tileCenter({x:o.tile.x+facing.x/len*2.2,y:o.tile.y+facing.y/len*2.2}),dx=tip.x-c.x,dy=tip.y-c.y,l=Math.hypot(dx,dy)||1,ux=dx/l,uy=dy/l;
+      g.lineStyle(2/z,0xffd768,.9).lineBetween(c.x,c.y,tip.x,tip.y).fillStyle(0xffd768,.9).fillTriangle(tip.x+ux*6,tip.y+uy*6,tip.x-uy*5,tip.y+ux*5,tip.x+uy*5,tip.y-ux*5);}
+  }
   // The King's picture as a click target (his view is a container; a little room around it helps on small zoom).
   onKing(x,y){const b=this.scene.player?.getBounds?.();return !!b&&this.scene.character.state==='ground'&&x>=b.x-6&&x<=b.x+b.width+6&&y>=b.y-24&&y<=b.y+b.height+4;}
   // An enemy under the pointer that soldiers may be sent at.
@@ -130,14 +158,15 @@ export class UnitSelection {
     // The open detail of the one selected villager already carries his commands.
     const detail=workers.length===1&&!!s.unitPanel?.dialog.open&&s.unitPanel.unit===workers[0];
     const count=workers.length+(this.king?1:0);if(this.king&&(!s.character.isAlive||s.character.away))this.king=false;
-    const signature=JSON.stringify([this.king,workers.map(w=>w.id+':'+w.profession+':'+haulPriorityValue(w.haulPriority)+':'+(w.stance??'')),s.gameOver,s.gameTime.paused,language(),detail]);
+    const signature=JSON.stringify([this.formation,this.king,workers.map(w=>w.id+':'+w.profession+':'+haulPriorityValue(w.haulPriority)+':'+(w.stance??'')),s.gameOver,s.gameTime.paused,language(),detail]);
     if(!this.panel.hidden&&signature===this.signature){const now=globalThis.performance?.now?.()??0;if(now-(this.placedAt??0)>700){this.placedAt=now;this.placeAboveBar();}}
     if(signature!==this.signature){
       this.signature=signature;this.panel.hidden=!count||!!s.gameOver||detail||(this.king&&!workers.length&&!!s.unitPanel?.dialog.open);this.panel.setAttribute('aria-label',t('command.title'));this.label.textContent=t('command.selected',{count});this.drawKinds(workers);
       for(const [action,button]of Object.entries(this.buttons))button.textContent=t(`command.${action}`);
       this.buttons.inspect.disabled=workers.length!==1;
       {const soldiers=workers.filter(w=>w.profession==='soldier');this.stance.hidden=!soldiers.length;if(soldiers.length){const now=new Set(soldiers.map(w=>w.stance??'aggressive'));
-        for(const [id,b] of Object.entries(this.stanceButtons)){b.textContent=t(`army.stance.${id}`);b.title=t(`army.stance.${id}Tip`);b.classList.toggle('on',now.size===1&&now.has(id));}}}if(!this.panel.hidden)this.placeAboveBar();
+        for(const [id,b] of Object.entries(this.stanceButtons)){b.textContent=t(`army.stance.${id}`);b.title=t(`army.stance.${id}Tip`);b.classList.toggle('on',now.size===1&&now.has(id));}}
+        this.formationBar.hidden=workers.length<2;for(const [id,b] of Object.entries(this.formationButtons)){b.textContent=FORMATION_ICONS[id];b.title=t(`army.formation.${id}`);b.setAttribute('aria-label',t(`army.formation.${id}`));b.classList.toggle('on',this.formation===id);}}if(!this.panel.hidden)this.placeAboveBar();
       const haulers=workers.filter(w=>w.profession==='hauler');this.haul.hidden=haulers.length<2;
       if(!this.haul.hidden){const option=(v,text)=>{const o=document.createElement('option');o.value=v;o.textContent=text;return o;};
         this.haul.setAttribute('aria-label',t('haul.priority'));this.haul.replaceChildren(option('',t('haul.priority')+'…'),...HAUL_PRIORITIES.filter(k=>k!=='resource').map(k=>option(k,t(`haul.priority.${k}`))),...HAULABLE_RESOURCES.map(r=>option(`resource:${r}`,t('haul.priority.only',{resource:s.objectRegistry.get(r)?.name??r}))));
@@ -154,5 +183,5 @@ export class UnitSelection {
     // pointer at every zoom (a scroll-free overlay is still zoomed around the screen middle).
     if(this.anchor&&this.dragging&&this.current){const cam=s.cameras.main,a=cam.getWorldPoint(this.anchor.x,this.anchor.y),b=cam.getWorldPoint(this.current.x,this.current.y);this.overlay.lineStyle(1/(cam.zoom||1),0xffd768,1).fillStyle(0xffd768,.12).fillRect(a.x,a.y,b.x-a.x,b.y-a.y).strokeRect(a.x,a.y,b.x-a.x,b.y-a.y);}
   }
-  destroy(){this.keys?.abort();this.graphics.destroy();this.overlay.destroy();this.panel.remove();}
+  destroy(){this.keys?.abort();this.graphics.destroy();this.overlay.destroy();this.blueprint?.destroy();this.panel.remove();}
 }

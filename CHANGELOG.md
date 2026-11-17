@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.6] - 2026-11-17
+<!-- version: {"title":"Formations, Test map lands, standing soldiers move","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- Formations: with two or more units chosen, the command bar offers loose, line (two ranks), block and wedge. Holding the right mouse button shows a blueprint of their places; moving the mouse turns it, and letting go sends the men there. Shields and armour stand in front, archers at the back, and on arrival the men face the way you turned the blueprint.
+- The Test map first asks which land to open: the home map with the Castle, a dense forest, iron or stone hills, a bandit camp (with its bandits and chest), crumbling ruins, an abandoned mine, or the inside of a mine.
+### Improved
+- Standing soldiers are no longer frozen alike: each now and then shifts his weight, looks aside, shifts his weapon or straightens his back, at his own random times.
+
 ## [0.143.5] - 2026-11-16
 <!-- version: {"title":"3D soldiers with animations","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Changed

@@ -1,7 +1,7 @@
 import { BanditView,RaiderView } from './BanditView.js';
 import { shapeZoneWorld } from './zoneFeatures.js';
 import { setupZone,updateZone,zoneLook } from './zoneMode.js';
-import { setupSandbox,placeSandboxBuilding } from './sandboxMode.js';
+import { setupSandbox,placeSandboxBuilding,sandboxLand } from './sandboxMode.js';
 import { WorldPanel } from '../ui/WorldPanel.js';
 import { ScoutingSystem } from '../systems/ScoutingSystem.js';
 import { castleRules } from '../data/castle.js';
@@ -196,7 +196,9 @@ import { bindSoundSetting } from '../ui/sound.js';
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
   // m-velikost-mapy: the map size is set before anything is built; a loaded game takes it from its saved terrain.
-  init({state=null,settings,zone=null,sandbox=false}={}){this.loadState=state;this.zone=zone;this.sandbox=!!sandbox&&!state&&!zone;const size=Array.isArray(state?.terrain)?state.terrain.length:null;
+  init({state=null,settings,zone=null,sandbox=false}={}){this.loadState=state;this.zone=zone;this.sandbox=!!sandbox&&!state&&!zone;
+    // The land the map is shaped as: the scouts' zone, or the land chosen for the Test map (null = the home map).
+    this.sandboxLand=this.sandbox?sandboxLand(sandbox===true?'home':sandbox):null;this.land=this.zone??this.sandboxLand;const size=Array.isArray(state?.terrain)?state.terrain.length:null;
     this.gameSettings=gameSettings({...(state?.gameSettings??settings??{}),...(size?{mapSize:size}:{})});setMapSize(this.gameSettings.mapSize);}
 
   preload() {
@@ -250,7 +252,7 @@ export class GameScene extends Phaser.Scene {
     const world=this.loadState?{terrain:this.loadState.terrain.map(row=>[...row]),ground:this.loadState.ground?importGround(this.loadState.ground):emptyGround(),bushes:importBushes(this.loadState.bushes??[]),
       zones:this.loadState.grassZones?importZones(this.loadState.grassZones):emptyZones(),reeds:importReeds(this.loadState.reeds),natureGroups:importNatureGroups(this.loadState.natureGroups)}:generateWorld(Math.random,{levels:this.worldLevels,streams:this.worldRandom});
     // m-mapa-kraje: a bandit camp, ruins, a mine, or the mine's inside (zoneFeatures.js) before the world is drawn.
-    this.zoneFeature=this.zone?shapeZoneWorld(world,this.zone,this.worldRandom('zone-feature')):null;
+    this.zoneFeature=this.land?shapeZoneWorld(world,this.land,this.worldRandom('zone-feature')):null;
     this.terrainGrid=world.terrain;this.groundGrid=world.ground;
     // m-teren-vyska: the hills of this world, from its ground and seed (not saved; the same after every load).
     // Part 2: the ground and everything on it is drawn lifted by the height, unless localStorage newgame.terrainLift is
@@ -287,7 +289,7 @@ export class GameScene extends Phaser.Scene {
     const position=tileCenter(PLAYER_START);
     this.player=this.assets.createView('king',position);
     this.character=new PlayerController(this,this.player,PLAYER_START);
-    if(!this.loadState&&!this.zone){createStartingCastle(this);createStartingStockpile(this);}
+    if(!this.loadState&&!this.land){createStartingCastle(this);createStartingStockpile(this);}
     this.skillSystem.initialize(this.character);
     this.equipment=new EquipmentSystem(this.character,this.objectRegistry,this.inventory,()=>{this.equipmentPanel?.refresh();this.combatFeedback?.refresh();});
     this.combat=new CombatSystem({map:this.map,damageScale:unit=>this.heating?.combatFactor?.(unit)??1,canFight:unit=>unit.isAlive&&!(unit===this.character&&this.character.away)&&!unit.mounted&&(unit!==this.character||unit.state===PLAYER_STATE.GROUND),regenerationRate:unit=>this.regeneration.rateFor(unit),canTarget:(attacker,target)=>attacker.attackRange<=1||!this.workerSystem?.workers.has(attacker.id)||!this.fog||this.fog.isVisibleObject(target)});
@@ -313,7 +315,7 @@ export class GameScene extends Phaser.Scene {
     this.spawner=this.resourceSpawners.find(s=>s.definition.id==='stone');
     this.dropSystem=new DropSystem(this);
     this.foodStorage=new FoodStorageSystem(this,{physicalMaterials:true});this.kingLogistics=new KingLogisticsSystem(this);if(!this.loadState&&!this.zone)depositStartingResources(this);
-    this.animalSystem=new AnimalSystem(this);if(!this.loadState&&!this.zone?.dungeon){this.animalSystem.random=this.worldRandom('animals');this.animalSystem.spawn(PLAYER_START);this.animalSystem.random=Math.random;}
+    this.animalSystem=new AnimalSystem(this);if(!this.loadState&&!this.land?.dungeon){this.animalSystem.random=this.worldRandom('animals');this.animalSystem.spawn(PLAYER_START);this.animalSystem.random=Math.random;}
     this.huntingSystem=new HuntingSystem(this);
     this.combatFeedback=new CombatFeedback(this);
     this.combat.on('attack',(attacker,target)=>{if(this.animalSystem.animals.has(target.id))this.animalSystem.onAttacked(target,attacker);});
@@ -368,12 +370,12 @@ export class GameScene extends Phaser.Scene {
     this.setStatus(t('status.idle'));
     this.worldCamera=new WorldCamera(this,this.player);this.staffingIndicators=new MissingWorkersIndicators(this);
     this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState){const weights=this.worldWeights,at=(grid,t)=>grid[t.y*this.groundGrid[0].length+t.x]??0,F=WORLD_GENERATION.fairStart;
-      this.naturalResources.generate(this.worldRandom('trees'),Math.round(WORLD_FORESTRY.initialTrees*settingsFromLevels(this.worldLevels).forest*mapArea()*(this.zone?zoneLook(this.zone)?.trees??1:1)),{clusters:Math.round(WORLD_FORESTRY.clusters*(this.zone?zoneLook(this.zone)?.clusters??1:1)),weight:weights?(this.zone?.type==='forest'?t=>.45+.55*at(weights.forest,t):t=>at(weights.forest,t)):null,start:settingsFromLevels(this.worldLevels).forest>=.5?{center:PLAYER_START,radius:F.radius,trees:F.trees}:null});
+      this.naturalResources.generate(this.worldRandom('trees'),Math.round(WORLD_FORESTRY.initialTrees*settingsFromLevels(this.worldLevels).forest*mapArea()*(this.land?zoneLook(this.land)?.trees??1:1)),{clusters:Math.round(WORLD_FORESTRY.clusters*(this.land?zoneLook(this.land)?.clusters??1:1)),weight:weights?(this.land?.type==='forest'?t=>.45+.55*at(weights.forest,t):t=>at(weights.forest,t)):null,start:settingsFromLevels(this.worldLevels).forest>=.5?{center:PLAYER_START,radius:F.radius,trees:F.trees}:null});
       this.naturalResources.mining.generate(this.worldRandom('minerals'),weights?t=>.25+.75*at(weights.stone,t):null);
       // m-kamenolom-u-hradu: a Quarry deposit 8–16 tiles from the Castle in every world (generator 3).
-      if(!this.zone)this.naturalResources.mining.ensureStartQuarry(this.worldRandom('start-quarry'));
+      if(!this.land)this.naturalResources.mining.ensureStartQuarry(this.worldRandom('start-quarry'));
       // m-zelezny-dul-misto: a free Iron Mine spot beside the nearest Iron Deposit (generator 5).
-      if(!this.zone)this.naturalResources.mining.ensureIronMine(this.worldRandom('start-iron-mine'));
+      if(!this.land)this.naturalResources.mining.ensureIronMine(this.worldRandom('start-iron-mine'));
       // m-duby: lone oaks and the grand oaks of the starting world (after everything else, so the rest stays as it was).
       if(settingsFromLevels(this.worldLevels).forest>0)this.naturalResources.generateOaks();}
     // velke-prirodni-objekty: a group with a tree, deposit or building on a tile is single bushes or rocks again.
@@ -381,7 +383,7 @@ export class GameScene extends Phaser.Scene {
     // World v2: a fingerprint of the starting world as generated (terrain, water, bushes, every placed resource, animals,
     // chests), so tests and the Studio can check that a world code always gives the same world.
     // Owner 15 Nov 2026 (62): the King starts in front of the Castle, on a tile left free by the whole generation.
-    if(!this.loadState&&!this.zone)placeKingInFront(this);
+    if(!this.loadState&&!this.land)placeKingInFront(this);
     this.startWorldFingerprint=this.loadState?null:this.worldFingerprint();
     this.resourceLedger=new ResourceTransactionLedger(this);if(this.loadState)this.resourceLedger.suspend();this.inventoryBar.setLedger(this.resourceLedger);
     const onBackground=()=>{this.background?.hide();this.visibilityPaused=true;this.tweens.pauseAll();this.setGalleryInput(false);};

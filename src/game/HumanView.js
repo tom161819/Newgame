@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { directionName,DIRECTION_POSES } from './directions.js';
 import { CargoBundleView } from './CargoBundleView.js';
 import { HUMAN_APPEARANCE as COLORS } from '../data/humanAppearance.js';
-import { APPROVED_VILLAGER_ART,PROFESSION_LOOKS,FACING_INDEX,villagerSex,walkFrame,walkKey,militaryLook,soldierFrame } from '../data/objects/approvedArt.js';
+import { APPROVED_VILLAGER_ART,PROFESSION_LOOKS,FACING_INDEX,villagerSex,walkFrame,walkKey,militaryLook,soldierFrame,soldierIdle } from '../data/objects/approvedArt.js';
 import { FISHER_WALK_ART,FISHER_LOOKS } from '../data/fisherWalkArt.js';
 // Approved looks with only a walk sheet (the Fisher): the walk sheet carries all eight directions.
 import { SOLDIER_ANIM_ART } from '../data/soldierAnimArt.js';
@@ -59,7 +59,7 @@ export class HumanView extends Phaser.GameObjects.Container {
     for(const part of [this.shadow,this.leftLeg,this.rightLeg,this.body,...this.arms])part.setVisible(!on);
     if(!on){this.art.setVisible(false);return;}
     const art=villagerArt(this.look);this.tool.setVisible(false);this.weapon.setVisible(false);
-    if(art.anim&&hasWalk(this.scene,this.look)){const frame=soldierFrame(art.anim,k,{walkedMs:this.walked??0,walkFps:art.walk.fps,moving:!!this.isWalking,attackMs:this.attackMs??0,attacking:!!this.attacking}),key=walkKey(this.look);
+    if(art.anim&&hasWalk(this.scene,this.look)){const frame=soldierFrame(art.anim,k,{walkedMs:this.walked??0,walkFps:art.walk.fps,moving:!!this.isWalking,attackMs:this.attackMs??0,attacking:!!this.attacking,idleCol:this.idleCol??art.anim.idle}),key=walkKey(this.look);
       if(this.artFrame!==`${key}:${frame}`){this.artFrame=`${key}:${frame}`;this.art.setTexture(key,frame).setOrigin(art.walk.origin.x,art.walk.origin.y);}this.art.setVisible(true);return;}
     if(hasWalk(this.scene,this.look)){const frame=walkFrame(k,this.walked??0,art.walk.fps,!!this.isWalking),key=walkKey(this.look);
       if(this.artFrame!==`${key}:${frame}`){this.artFrame=`${key}:${frame}`;this.art.setTexture(key,frame).setOrigin(art.walk.origin.x,art.walk.origin.y);}this.art.setVisible(true);return;}
@@ -83,7 +83,7 @@ export class HumanView extends Phaser.GameObjects.Container {
     this.updateLook();
     // Approved looks with a walk sheet step frame by frame (no bob); without one they bob and sway lightly.
     if(this.art.visible){
-      if(hasWalk(this.scene,this.look)){this.walked=moving?(this.walked??0)+delta*MOVEMENT_SPEED_SCALE:0;this.applyArt();this.art.y=0;this.art.rotation=0;}
+      if(hasWalk(this.scene,this.look)){this.walked=moving?(this.walked??0)+delta*MOVEMENT_SPEED_SCALE:0;{const anim=villagerArt(this.look)?.anim;if(anim)this.idleCol=moving||this.attacking?anim.idle:soldierIdle(anim,this.idleState??={},delta);}this.applyArt();this.art.y=0;this.art.rotation=0;}
       else{this.art.y=moving?-Math.abs(Math.sin(this.phase))*1.6:0;this.art.rotation=moving?Math.sin(this.phase)*.035:0;}}
   }
   setAttackPose(delta,active,direction){

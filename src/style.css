@@ -857,6 +857,8 @@ html[data-ui-population="left"] :is(.policy-card, .employment-panel) { right:aut
 .hud-more-camera span { color:#c7c4a4; }
 
 /* E2 (report 0.48.0): Continue first, the archive and the changelog as small links. */
+.test-map-lands { border:1px solid #9e8b51; background:#1d2a28f5; color:#e8e2cc; padding:20px 24px; border-radius:6px; max-width:420px; } .test-map-lands::backdrop { background:#0a1414b0; } .test-map-lands h2 { margin:0 0 14px; color:#e1ce97; font-size:20px; text-align:center; }
+.test-map-land-list { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; } .test-map-land-list button { padding:10px 8px; text-align:left; } .test-map-cancel { width:100%; }
 .main-menu-links { display:flex; gap:14px; justify-content:center; margin-top:4px; }
 .main-menu-links .menu-link { padding:4px 8px; font-size:13px; border-color:transparent; background:none; box-shadow:none; text-decoration:underline; color:#d8c88f; }
 .main-menu-links .menu-link:hover { background:#2b3a33; }
@@ -1307,6 +1309,7 @@ html .tutorial-arrow.big:not(.offscreen) { width:84px; height:54px; }
 .zone-actions { display:flex; gap:8px; } .zone-banner button:disabled { opacity:.5; }
 /* Combat 16 Nov 2026: stances, battle summary */
 .unit-stance { display:inline-flex; gap:4px; } .unit-stance[hidden] { display:none; } .unit-stance button.on { border-color:#e3c57a; background:#4a4524; color:#fff2c4; }
+.unit-formation { display:inline-flex; gap:3px; } .unit-formation[hidden] { display:none; } .unit-formation button { min-width:30px; font-size:16px; line-height:1; } .unit-formation button.on { border-color:#e3c57a; background:#4a4524; color:#fff2c4; }
 .battle-panel { position:fixed; z-index:39; top:132px; left:50%; transform:translateX(-50%); padding:5px 14px; border:1px solid #a8463a; border-radius:8px; background:#2a1a17ee; color:#f6dccf; font-size:.9rem; font-weight:600; box-shadow:0 3px 12px #0008; pointer-events:none; }
 .battle-panel[hidden] { display:none; }
 /* Test map (owner 16 Nov 2026) */

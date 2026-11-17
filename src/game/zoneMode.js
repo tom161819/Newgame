@@ -112,13 +112,18 @@ export function setupZone(scene){
 }
 // Chests, bandits and rats where the land's feature put them (taken chests and a beaten camp stay so).
 function populateZone(scene){
-  const z=scene.zone,f=scene.zoneFeature;z.chests=[];z.guards=[];if(!f)return;
-  for(const chest of f.chests??[]){if(z.taken.includes(chest.key))continue;const free=nearFree(scene,chest.tile);if(!free)continue;
-    const made=scene.treasureSystem?.create(free,{id:`zone-${chest.key}`,contents:{gold:chest.gold,equipment:[]},opened:false,looted:false});if(made){made.zoneKey=chest.key;z.chests.push(made);}}
-  const spawn=(type,tiles)=>{const d=scene.objectRegistry.get(type);if(!d)return;for(const tile of tiles){const at=nearFree(scene,tile);if(at)z.guards.push(scene.animalSystem.create(d,at));}};
-  if(f.kind==='bandits'&&!z.cleared)spawn('bandit',f.guards);
+  const z=scene.zone,made=populateFeature(scene,scene.zoneFeature,{taken:z.taken,cleared:z.cleared});z.chests=made.chests;z.guards=made.guards;if(made.mouth)z.mouth=made.mouth;
+}
+// The chests, guards and the mine mouth of a shaped land (also the Test map's lands, owner 17 Nov 2026).
+export function populateFeature(scene,f,{taken=[],cleared=false}={}){
+  const out={chests:[],guards:[],mouth:null};if(!f)return out;
+  for(const chest of f.chests??[]){if(taken.includes(chest.key))continue;const free=nearFree(scene,chest.tile);if(!free)continue;
+    const made=scene.treasureSystem?.create(free,{id:`zone-${chest.key}`,contents:{gold:chest.gold,equipment:[]},opened:false,looted:false});if(made){made.zoneKey=chest.key;out.chests.push(made);}}
+  const spawn=(type,tiles)=>{const d=scene.objectRegistry.get(type);if(!d)return;for(const tile of tiles){const at=nearFree(scene,tile);if(at)out.guards.push(scene.animalSystem.create(d,at));}};
+  if(f.kind==='bandits'&&!cleared)spawn('bandit',f.guards);
   if(f.kind==='dungeon')spawn('cave_rat',f.rats);
-  if(f.kind==='mine'||f.kind==='dungeon'){const p=tileCenter(f.entrance),g=scene.add.graphics().setDepth(p.y-1);g.fillStyle(0x0d0b09,.85);g.fillEllipse(p.x,p.y-4,40,20);g.lineStyle(2,0x5b4a36,.9);g.strokeEllipse(p.x,p.y-4,40,20);z.mouth=g;}
+  if(f.kind==='mine'||f.kind==='dungeon'){const p=tileCenter(f.entrance),g=scene.add.graphics().setDepth(p.y-1);g.fillStyle(0x0d0b09,.85);g.fillEllipse(p.x,p.y-4,40,20);g.lineStyle(2,0x5b4a36,.9);g.strokeEllipse(p.x,p.y-4,40,20);out.mouth=g;}
+  return out;
 }
 function nearFree(scene,tile){const map=scene.map;for(let r=0;r<=4;r++)for(let y=tile.y-r;y<=tile.y+r;y++)for(let x=tile.x-r;x<=tile.x+r;x++)if(Math.max(Math.abs(x-tile.x),Math.abs(y-tile.y))===r&&map[y]?.[x]===0&&!scene.resourceOccupancy?.has(tileKey({x,y}))&&![...(scene.animalSystem?.animals.values()??[])].some(a=>a.tile.x===x&&a.tile.y===y))return {x,y};return null;}
 function refreshBanner(scene){

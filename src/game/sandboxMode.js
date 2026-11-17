@@ -3,13 +3,19 @@ import { DEFAULT_GAME_SETTINGS,gameSettings } from '../systems/GameSettings.js';
 import { randomWorldCode } from '../data/worldCode.js';
 import { placeBuilding,buildingDefinition } from './buildings.js';
 import { replaceWalls } from './wallReplacement.js';
+import { zoneWorldCode,populateFeature } from './zoneMode.js';
 
 // Owner 16 Nov 2026: the Test map (main menu, under the World Editor) – a sandbox to try battles and buildings.
 // A fresh world with the Castle and nobody else; every building is free and stands finished at once; no fog, no night
 // threats, no King on the map, nobody settles, nobody strikes or leaves; no saving (the autosave of the real game is left alone).
 // The Test panel puts our soldiers, enemies and animals on the map with a click.
-export function sandboxSettings(){
-  return gameSettings({...DEFAULT_GAME_SETTINGS,worldCode:randomWorldCode(),fogOfWar:false,nightWolves:false,nightThieves:false,nightFires:false,startingGarrison:false,startingCastle:true});
+// Owner 17 Nov 2026: the land of the Test map – the home map with the Castle, or one of the lands the scouts find
+// (a dense forest, iron or stone hills, a bandit camp, ruins, an abandoned mine, the inside of a mine).
+export const SANDBOX_LANDS=Object.freeze(['home','forest','iron','stone','bandits','ruins','mine','dungeon']);
+export function sandboxLand(id){if(!SANDBOX_LANDS.includes(id)||id==='home')return null;return id==='dungeon'?{id:'sandbox',type:'mine',dungeon:true}:{id:'sandbox',type:id,dungeon:false};}
+export function sandboxSettings(landId='home'){
+  const land=sandboxLand(landId),seed=randomWorldCode();
+  return gameSettings({...DEFAULT_GAME_SETTINGS,worldCode:land?zoneWorldCode(seed,`sandbox-${Date.now()}`,land.type,{dungeon:land.dungeon}):seed,...(land?{mapSize:100}:{}),fogOfWar:false,nightWolves:false,nightThieves:false,nightFires:false,startingGarrison:false,startingCastle:!land});
 }
 export const SANDBOX_UNITS=Object.freeze([
   {group:'ours',id:'soldier',unit:'soldier'},{group:'ours',id:'archer',unit:'archer'},{group:'ours',id:'swordsman',unit:'swordsman'},
@@ -20,6 +26,9 @@ export const SANDBOX_COUNTS=Object.freeze([1,5,10,25,50]);
 
 export function setupSandbox(scene){
   const s=scene;s.fog?.setEnabled?.(false);s.inventory.canAfford=()=>true;
+  // A scouts' land on the Test map has its camp, chests, guards or mine mouth too.
+  if(s.sandboxLand)s.sandboxFeature=populateFeature(s,s.zoneFeature);
+  if(s.sandboxLand){const f=s.zoneFeature,size=s.map.length,p=f?.entrance??f?.center??{x:Math.round(size/2),y:Math.round(size/2)};s.worldCamera?.lookAt?.(p);}
   // The King stays out of the test (hidden, out of every fight), so a test battle cannot end the game.
   const c=s.character;if(c){c.away=true;c.path=[];c.nextTile=null;s.player?.setVisible?.(false);}
   s.tutorial?.destroy?.();s.tutorial=null;if(s.gettingStarted){s.gettingStarted.show=()=>{};s.gettingStarted.update=()=>{};if(s.gettingStarted.dialog)s.gettingStarted.dialog.hidden=true;}

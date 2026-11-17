@@ -1,4 +1,4 @@
-import { sandboxSettings } from '../game/sandboxMode.js';
+import { sandboxSettings,SANDBOX_LANDS } from '../game/sandboxMode.js';
 import { zoneStart,homeAfterZone,buryFallen,nextMap } from '../game/zoneMode.js';
 import { recordSaveFailure } from '../systems/saveFailure.js';
 import { saveRecordStatus } from './SaveLoadMenu.js';
@@ -53,7 +53,7 @@ export class GameApplication {
       onBack:world=>{if(this.editorFrom==='setup'){this.setup.world={levels:[...world.levels],seed:world.seed};this.setup.writeCode();this.setup.root.hidden=false;document.querySelector('#setup-open-editor')?.focus();}else this.showMainMenu();}});
     document.querySelector('#main-world-editor')?.addEventListener('click',()=>{this.editorFrom='main';this.main.hidden=true;this.worldEditor.open();});
     // Owner 16 Nov 2026: the Test map – a sandbox to try battles and buildings (sandboxMode.js).
-    document.querySelector('#main-test-map')?.addEventListener('click',()=>this.startTestMap());
+    document.querySelector('#main-test-map')?.addEventListener('click',()=>this.chooseTestLand());
     document.querySelector('#setup-open-editor')?.addEventListener('click',()=>{this.editorFrom='setup';this.setup.root.hidden=true;this.worldEditor.open(this.setup.world);});
     document.querySelector('#main-load-game').addEventListener('click',()=>this.openSaves('load'));
     // E2 (report 0.48.0): Continue loads the newest compatible save straight away.
@@ -98,7 +98,17 @@ export class GameApplication {
     this.startedFromSave=!!state||!!zone;
     this.game.scene.stop('MainMenu');this.game.scene.stop('Game');this.scene=null;this.game.scene.start('Game',{state,settings,zone,sandbox});
   }
-  startTestMap(){this.pendingGettingStarted=false;this.start(null,sandboxSettings(),null,true);}
+  startTestMap(land='home'){this.pendingGettingStarted=false;this.start(null,sandboxSettings(land),null,land==='home'?true:land);}
+  // Owner 17 Nov 2026: the Test map asks which land – the home map with the Castle or a land the scouts find.
+  chooseTestLand(){
+    let dialog=document.querySelector('#test-map-lands');
+    if(!dialog){dialog=document.createElement('dialog');dialog.id='test-map-lands';dialog.className='test-map-lands';document.body.append(dialog);}
+    const title=document.createElement('h2');title.textContent=t('sandbox.chooseLand');
+    const list=document.createElement('div');list.className='test-map-land-list';
+    for(const land of SANDBOX_LANDS){const b=document.createElement('button');b.type='button';b.dataset.land=land;b.textContent=t(`sandbox.land.${land}`);b.addEventListener('click',()=>{dialog.close();this.startTestMap(land);});list.append(b);}
+    const cancel=document.createElement('button');cancel.type='button';cancel.className='test-map-cancel';cancel.textContent=t('sandbox.cancel');cancel.addEventListener('click',()=>dialog.close());
+    dialog.replaceChildren(title,list,cancel);dialog.showModal?.();return dialog;
+  }
   // m-mapa-kraje (owner 16 Nov 2026): switch to the scouting party – home is kept as a saved state, the zone map starts.
   enterZone(){
     if(!this.scene||this.scene.zone)return false;let home;try{home=this.snapshot();}catch(error){this.notify(error.message);return false;}
