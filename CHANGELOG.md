@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.144.2] - 2026-11-17
+<!-- version: {"title":"Battle panel only for a real fight","type":"fix","reconstructed":false,"saveVersion":64} -->
+### Fixed
+- The battle panel no longer stays up without a fight: it counts only enemies within reach of our people and in sight. An enemy chasing someone far away, or one out in the fog, no longer counts.
+
 ## [0.144.1] - 2026-11-17
 <!-- version: {"title":"Walls, Tower doors and Gates as one network","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Changed

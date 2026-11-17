@@ -31,7 +31,10 @@ export class CombatFeedback {
   // A summary of the fight going on: who took part, who still stands, and a report when it is over.
   trackBattle(delta){
     const s=this.scene,ours=new Set(),foes=new Set();
-    for(const [a,b] of s.combat.attacks){const ea=isEnemyUnit(a),eb=isEnemyUnit(b);if(ea===eb||!a?.isAlive&&!b?.isAlive)continue;foes.add(ea?a:b);ours.add(ea?b:a);}
+    // Owner 17 Nov 2026: only a real fight counts – both alive, within reach of each other, and the enemy in sight. An
+    // enemy chasing someone it cannot reach (or one out in the dark fog) kept the panel up for good.
+    const seen=u=>!s.fog?.enabled||!s.fog.isVisibleObject||s.fog.isVisibleObject(u)!==false;
+    for(const [a,b] of s.combat.attacks){const ea=isEnemyUnit(a),eb=isEnemyUnit(b);if(ea===eb||!a?.isAlive||!b?.isAlive||!inAttackRange(a,b,s.map)||!seen(ea?a:b))continue;foes.add(ea?a:b);ours.add(ea?b:a);}
     let battle=this.battle;
     if(ours.size&&foes.size){if(!battle)battle=this.battle={ours:new Set(),foes:new Set(),quiet:0,start:s.gameTime?.totalElapsed??0};for(const u of ours)battle.ours.add(u);for(const u of foes)battle.foes.add(u);battle.quiet=0;}
     else if(battle){battle.quiet+=delta;if(battle.quiet>=BATTLE_QUIET){this.endBattle(battle);this.battle=battle=null;}}
