@@ -22,8 +22,9 @@ export class CatPanel {
     if(this.mode==='dog'&&!dog){this.close();return;}
     title.textContent=this.mode==='buyDog'?t('pets.dog.buyTitle',{price:DOGS.price}):dog.name;const lines=[];
     if(this.mode==='dog'){const h=dog.hunterId!=null?this.scene.workerSystem?.workers?.get(dog.hunterId):null;
-      lines.push(element('p','cat-state',dog.state==='stray'?(dog.tamerId?t('pets.dog.taming'):t('pets.dog.stray')):h?t('pets.dog.hunter',{hunter:h.name??''}):t('pets.dog.unassigned')));
+      lines.push(element('p','cat-state',dog.state==='party'?t('pets.withParty'):dog.state==='stray'?(dog.tamerId?t('pets.dog.taming'):t('pets.dog.stray')):h?t('pets.dog.hunter',{hunter:h.name??''}):t('pets.dog.unassigned')));
       if(dog.state!=='stray')lines.push(element('p','cat-state',dog.injuredUntil!=null?t('pets.dog.injured'):t('pets.dog.hp',{hp:Math.round(dog.hp),max:DOGS.maxHP})));}
+    if(this.mode==='dog'&&this.joinButton(dog,lines)){root.replaceChildren(...lines);return;}
     const stray=this.mode==='dog'&&dog.state==='stray';
     if(this.mode==='buyDog'||stray&&!dog.tried&&!dog.tamerId&&!dog.leaving||this.mode==='dog'&&['owned','unassigned'].includes(dog.state)){
       const hunters=d.freeHunters();lines.push(element('p','cat-help',t(stray?'pets.dog.chooseTame':this.mode==='buyDog'?'pets.dog.chooseBuy':'pets.dog.chooseReassign')));
@@ -49,7 +50,8 @@ export class CatPanel {
     const lines=[];
     if(this.mode==='cat'){
       const home=cat.buildingId!=null?d.buildingName(cat.buildingId):null;
-      lines.push(element('p','cat-state',home?t('pets.livesAt',{building:home}):cat.state==='kitten'?t('pets.kitten'):cat.leaving?t('pets.leaving'):t('pets.stray',{time:this.timeLeft(cat)})));
+      lines.push(element('p','cat-state',home?t('pets.livesAt',{building:home}):cat.state==='party'?t('pets.withParty'):cat.state==='kitten'?t('pets.kitten'):cat.leaving?t('pets.leaving'):cat.leaveAt==null?t('pets.strayStays'):t('pets.stray',{time:this.timeLeft(cat)})));
+      if(this.joinButton(cat,lines)){if(this.message)lines.push(element('p','cat-message',this.message));root.replaceChildren(...lines);return;}
     }
     if(this.mode==='buy'||!cat.leaving){
       lines.push(element('p','cat-help',t(this.mode==='buy'?'pets.chooseBuy':cat.buildingId!=null?'pets.chooseReassign':'pets.chooseTakeIn')));
@@ -63,6 +65,14 @@ export class CatPanel {
     }
     if(this.message)lines.push(element('p','cat-message',this.message));
     root.replaceChildren(...lines);
+  }
+  // Point 67: on an expedition a stray can join the party (or is already with it).
+  joinButton(animal,lines){
+    const d=this.scene.domestic;if(!this.scene.zone||!animal)return false;
+    if(animal.state==='party'){lines.push(element('p','cat-help',t('pets.partyHelp')));return true;}
+    if(animal.state!=='stray'||animal.leaving)return false;
+    const b=element('button','',t('pets.joinParty'));b.type='button';b.dataset.joinParty=animal.id;b.addEventListener('click',()=>{if(d.joinParty(animal.id)){this.scene.setStatus?.(t('pets.joined',{name:animal.name}));this.close();}});
+    lines.push(element('p','cat-help',t('pets.joinHelp')),b);return true;
   }
   timeLeft(cat){const days=Math.max(0,(cat.leaveAt-this.scene.gameTime.totalElapsed)/this.scene.gameTime.dayDuration);return Math.round(days*10)/10;}
   choose(buildingId){

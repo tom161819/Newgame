@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.15] - 2026-11-17
+<!-- version: {"title":"A cat or dog can join the expedition","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- On an expedition a stray cat or dog may roam the land (in about six of ten lands). Click it and choose "Take along with the party": it follows the soldiers to the next map and home, where it waits as a stray – without leaving – until you give it a home (a cat) or a Hunter (a dog).
+
 ## [0.143.14] - 2026-11-17
 <!-- version: {"title":"Always night in the mine, one torch per ten soldiers","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Changed

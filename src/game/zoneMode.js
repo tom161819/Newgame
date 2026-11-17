@@ -44,7 +44,7 @@ export function zoneStart(home){
   const party=home?.scouting?.party,found=party&&home.scouting.zones?.[party.zone];
   if(!party||party.phase!=='there'||!found)return null;
   const zone={home,id:party.zone,type:found.type,ids:[...party.ids],records:homeRecords(home,party.ids),fallen:[],king:!!party.king,kingHP:party.king?home.player?.currentHP??null:null,
-    wagon:!!party.wagonId,cargo:structuredClone(party.cargo??{}),loot:{gold:0},taken:[...(found.taken??[])],cleared:!!found.cleared,time:null,seasons:null,dungeon:false,from:null};
+    wagon:!!party.wagonId,cargo:structuredClone(party.cargo??{}),pets:[],strayRolled:false,loot:{gold:0},taken:[...(found.taken??[])],cleared:!!found.cleared,time:null,seasons:null,dungeon:false,from:null};
   return {settings:zoneSettings(home,zone),zone};
 }
 // The party leaves this map: health, experience and the fallen go into the records; gold picked up goes into the loot.
@@ -55,6 +55,8 @@ export function collectParty(scene){
   if(z.king&&Number.isFinite(scene.character?.currentHP))z.kingHP=Math.max(1,Math.round(scene.character.currentHP));
   const gold=Math.floor(scene.inventory?.count?.('gold')??0);if(gold>0)z.loot.gold+=gold;
   if(z.feature?.kind==='bandits'&&z.guards?.length&&z.guards.every(a=>!a.isAlive))z.cleared=true;
+  // Point 67: pets taken in go on with the party.
+  if(scene.domestic)z.pets=scene.domestic.partyPets().slice(0,4);
   z.time=scene.gameTime.exportState();z.seasons=scene.seasons?.exportState?.()??null;
   return z;
 }
@@ -92,6 +94,11 @@ export function setupZone(scene){
   const c=scene.character,n=z.soldiers.length;
   if(z.king){const k=free[n]??back;c.tile={...k};c.position={x:k.x+.5,y:k.y+.5};c.nextTile=null;c.path=[];c.away=false;if(Number.isFinite(z.kingHP))c.currentHP=Math.min(c.maxHP,Math.max(1,z.kingHP));const p=tileCenter(k);scene.player?.setPosition?.(p.x,p.y);scene.worldCamera?.follow?.();}
   else{c.away=true;c.path=[];c.nextTile=null;scene.player?.setVisible?.(false);scene.worldCamera?.lookAt?.(z.soldiers[0]?.tile??back);}
+  // Point 67: the party's pets come along; outside, now and then a stray cat or dog lives in the land (60 %).
+  for(const [i,pet] of (z.pets??[]).entries())scene.domestic?.addPartyPet(pet,free[n+2+i]??back);
+  if(!z.dungeon&&!z.strayRolled&&scene.domestic){z.strayRolled=true;if(Math.random()<.6){const kind=Math.random()<.5?'cat':'dog',spot=free.filter(t=>Math.hypot(t.x-back.x,t.y-back.y)>=8).at(-1)??free.at(-1);
+    if(spot){const d=scene.domestic,now=d.now(),fields={x:spot.x+.5,y:spot.y+.5,home:{x:spot.x+.5,y:spot.y+.5},state:'stray',leaveAt:now+3*d.day};const a=kind==='dog'?d.newDog(fields):d.newCat(fields);
+      d.feed(`pet:land:${a.id}`,t(kind==='dog'?'pets.dog.feed.landStray':'pets.feed.landStray',{name:a.name}),false,()=>(kind==='dog'?d.dogs:d.cats).get(a.id)??a);}}}
   // The Horse Wagon with its load stands by the party outside (it does not go into the mine).
   if(z.wagon&&!z.dungeon){const g=free.find((t,i)=>i>n&&scene.vehicles?.free(t))??back;z.wagonVehicle=scene.vehicles?.create('horse_wagon',g)??null;}
   // No wolves wait at the spot where the party comes in.
@@ -156,6 +163,7 @@ export function homeAfterZone(scene){
   if(fallen.size)p.ids=p.ids.filter(id=>!fallen.has(id));
   if(p.king&&home.player&&Number.isFinite(z.kingHP))home.player.currentHP=z.kingHP;
   if(z.loot.gold>0)p.loot={gold:(p.loot?.gold??0)+z.loot.gold};
+  if(z.pets?.length)p.pets=structuredClone(z.pets.slice(0,4));
   // Point 68: what the wagon still carries comes home (torches burnt on the way are gone).
   if(p.wagonId!=null&&z.cargo)p.cargo=structuredClone(z.cargo);
   if(!p.ids.length&&!p.king)home.scouting.party=null;

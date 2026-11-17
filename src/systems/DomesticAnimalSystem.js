@@ -97,7 +97,20 @@ export class DomesticAnimalSystem {
   }
   buildingName(id){const b=this.scene.buildings?.find(b=>b.id===id);return b?(this.scene.objectRegistry?.get?.(b.type)?.name??b.type):t('pets.stockpile');}
   feed(key,text,important=false,target=null){this.scene.eventFeed?.push(key,text,{important,target});}
+  // Point 67 (owner 17 Nov 2026): on an expedition the soldiers may take in a stray cat or dog; it goes with the party
+  // (around the soldiers' middle) until they are home, where it is a stray again until the player gives it a home.
+  partyCenter(){const z=this.scene.zone,men=[...(z?.soldiers??[]).filter(w=>w.isAlive&&w.position),...(z?.king&&this.scene.character?.position?[this.scene.character]:[])];if(!men.length)return null;
+    return {x:men.reduce((n,w)=>n+w.position.x,0)/men.length,y:men.reduce((n,w)=>n+w.position.y,0)/men.length};}
+  joinParty(id){const a=this.cats.get(id)??this.dogs.get(id);if(!a||!this.scene.zone||a.state!=='stray'||a.leaving)return false;
+    a.state='party';a.leaveAt=null;a.tamerId=null;a.home=null;a.target=null;const dog=id.startsWith('dog-');
+    this.feed(`pet:party:${id}`,t(dog?'pets.dog.feed.joined':'pets.feed.joined',{name:a.name}));this.changed();return true;}
+  partyPets(){return [...this.cats.values(),...this.dogs.values()].filter(a=>a.state==='party').map(a=>({kind:a.id.startsWith('dog-')?'dog':'cat',name:a.name}));}
+  addPartyPet(pet,at){const fields={name:pet.name,x:at.x+.5,y:at.y+.5,state:'party'};return pet.kind==='dog'?this.newDog(fields):this.newCat(fields);}
+  // A pet back home from the party: a stray by the arrival point that stays until it is given a home.
+  addHomeStray(pet,at){const fields={name:pet.name,x:at.x+.5,y:at.y+.5,home:{x:at.x+.5,y:at.y+.5},state:'stray',leaveAt:null};const a=pet.kind==='dog'?this.newDog(fields):this.newCat(fields);
+    this.feed(`pet:home:${a.id}`,t(pet.kind==='dog'?'pets.dog.feed.cameHome':'pets.feed.cameHome',{name:a.name}),false,()=>(pet.kind==='dog'?this.dogs:this.cats).get(a.id)??a);return a;}
   anchor(cat){
+    if(cat.state==='party'){const c=this.partyCenter();if(c)return c;}
     if(cat.buildingId!=null){const b=this.scene.buildings?.find(b=>b.id===cat.buildingId);if(b){const d=buildingDefinition(b);return {x:b.x+d.width/2,y:b.y+d.height+.6,lodge:true};}}
     if(cat.motherId!=null){const m=this.cats.get(cat.motherId);if(m)return {x:m.x,y:m.y};}
     return cat.home??{x:cat.x,y:cat.y};
@@ -198,6 +211,7 @@ export class DomesticAnimalSystem {
       if(dog.hunterId!=null){const h=workers?.get(dog.hunterId);if(!h||!h.isAlive||h.profession!=='hunter'){dog.hunterId=null;dog.state='unassigned';this.feed(`dog:free:${dog.id}:${Math.floor(now)}`,t('pets.dog.feed.unassigned',{name:dog.name}));this.changed();}}
       if(dog.injuredUntil!=null){dog.hp=Math.min(DOGS.maxHP,dog.hp+DOGS.maxHP*seconds*1000/(DOGS.healDays*this.day));if(now>=dog.injuredUntil){dog.injuredUntil=null;dog.hp=DOGS.maxHP;this.changed();}}
       if(dog.leaving){this.step(dog,dog.target,DOGS.speed*seconds);if(dog.x<0||dog.y<0||dog.x>COLUMNS||dog.y>ROWS||Math.hypot(dog.x-dog.target.x,dog.y-dog.target.y)<.2){this.dogs.delete(dog.id);this.changed();}continue;}
+      if(dog.state==='party'){const c=this.partyCenter();if(c)this.roam(dog,c,seconds);continue;}
       if(dog.state==='caravan'){const c=this.scene.caravans?.active;if(!c||this.caravanDog?.dogId!==dog.id){this.dogs.delete(dog.id);this.changed();continue;}const p=c.position??c.tile??{x:dog.x,y:dog.y};this.step(dog,{x:p.x+1.2,y:p.y+.6},DOGS.speed*seconds);continue;}
       if(dog.state==='stray'){
         if(dog.tamerId!=null){const h=workers?.get(dog.tamerId);if(!h?.isAlive||h.profession!=='hunter'||this.dogOf(h)){dog.tamerId=null;continue;}
