@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { entryTiles } from '../src/game/buildings.js';
 import { Inventory } from '../src/game/inventory.js';
 import { findPath } from '../src/game/pathfinding.js';
 import { placeTower, placementError, towerTiles, towerNeighbors, approachTower, planTowerExit } from '../src/game/buildings.js';
@@ -57,32 +58,36 @@ test('nedostatek surovin nemění svět a více věží si zachová vlastní poz
   assert.equal(world.inventory.count('stone'), 0);
 });
 
-test('vstup volí nejkratší dostupnou cestu k okraji věže', () => {
+test('owner 17 Nov 2026: a Tower is entered only at its door – the tiles in front of the side it faces', () => {
   const world = setup();
   const { tower } = placeTower({ ...world, anchor: { x: 3, y: 3 } });
-  assert.deepEqual(approachTower(world.map, { x: 0, y: 3 }, tower).destination, { x: 2, y: 3 });
-  world.map[3][2] = 1;
-  assert.deepEqual(approachTower(world.map, { x: 0, y: 3 }, tower).destination, { x: 2, y: 4 });
-  for (const tile of towerNeighbors(tower)) world.map[tile.y][tile.x] = 1;
-  assert.equal(approachTower(world.map, { x: 0, y: 3 }, tower), null);
+  assert.deepEqual(entryTiles(tower), [{ x: 3, y: 5 }, { x: 4, y: 5 }], 'facing 0: the door is on the S side (grid y+)');
+  assert.deepEqual(approachTower(world.map, { x: 0, y: 3 }, tower).destination, { x: 3, y: 5 });
+  world.map[5][3] = 1;
+  assert.deepEqual(approachTower(world.map, { x: 0, y: 3 }, tower).destination, { x: 4, y: 5 });
+  world.map[5][4] = 1;
+  assert.equal(approachTower(world.map, { x: 0, y: 3 }, tower), null, 'free sides do not help: only the door leads in');
+  assert.deepEqual(entryTiles({ ...tower, facing: 1 }), [{ x: 5, y: 3 }, { x: 5, y: 4 }]);
+  assert.deepEqual(entryTiles({ ...tower, facing: 2 }), [{ x: 3, y: 2 }, { x: 4, y: 2 }]);
+  assert.deepEqual(entryTiles({ ...tower, facing: 3 }), [{ x: 2, y: 3 }, { x: 2, y: 4 }]);
 });
 
-test('výstup hledá souseda s cestou k cíli; úplné obklíčení výstup zakáže', () => {
+test('owner 17 Nov 2026: one coming down a Tower steps out at its door; a blocked door means no way down', () => {
   const world = setup();
   const { tower } = placeTower({ ...world, anchor: { x: 3, y: 3 } });
   const order = { kind: 'move', goal: { x: 8, y: 3 } };
   const route = planTowerExit(world.map, tower, order);
-  assert.deepEqual(route.exit, { x: 5, y: 3 });
-  assert.equal(route.path.length, 3);
-  for (const tile of towerNeighbors(tower)) world.map[tile.y][tile.x] = 1;
+  assert.ok([[3, 5], [4, 5]].some(([x, y]) => route.exit.x === x && route.exit.y === y));
+  for (const tile of entryTiles(tower)) world.map[tile.y][tile.x] = 1;
   assert.equal(planTowerExit(world.map, tower, order), null);
 });
 
-test('okrajová věž poskytuje jen sousedy ležící v mapě', () => {
+test('a Tower at the map edge is entered only if its door is on the map', () => {
   const world = setup();
   const { tower } = placeTower({ ...world, anchor: { x: 8, y: 8 } });
   assert.equal(towerTiles(tower).length, 4);
-  const route = approachTower(world.map, { x: 0, y: 0 }, tower);
+  assert.equal(approachTower(world.map, { x: 0, y: 0 }, tower), null, 'facing 0: the door would be off the map');
+  const route = approachTower(world.map, { x: 0, y: 0 }, { ...tower, facing: 2 });
   assert.ok(route);
   assert.ok(route.destination.x < 10 && route.destination.y < 10);
 });

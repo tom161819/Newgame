@@ -18,6 +18,7 @@ export function campfireWood(scene,tile,range){
   return false;
 }
 export { buildingIsComplete } from './buildingState.js';
+import { buildingIsComplete } from './buildingState.js';
 
 const towerDefinition = () => objectRegistry.require('tower');
 export const TOWER_COST = towerDefinition().cost.stone;
@@ -69,6 +70,26 @@ export function towerNeighbors(building) {
   for(let dx=0;dx<width;dx++)neighbors.push({x:x+dx,y:y+height},{x:x+dx,y:y-1});
   for(let dy=0;dy<height;dy++)neighbors.push({x:x-1,y:y+dy},{x:x+width,y:y+dy});
   return neighbors;
+}
+// Owner 17 Nov 2026: a Tower is climbed only through its door; R turns it while placing (facing 0 S = grid y+, 1 E = x+,
+// 2 N = y−, 3 W = x−). A Gate is climbed from its passage; a wall walk only from a Tower or a Gate joined to it.
+export const DOOR_SIDES=Object.freeze(['S','E','N','W']);
+export const towerDoorSide=building=>DOOR_SIDES[building.facing??0]??'S';
+export function sideTiles(building,side){
+  const {x,y}=building,{width,height}=buildingDefinition(building),out=[];
+  if(side==='S'||side==='N')for(let i=0;i<width;i++)out.push({x:x+i,y:side==='S'?y+height:y-1});
+  else for(let i=0;i<height;i++)out.push({x:side==='E'?x+width:x-1,y:y+i});
+  return out;
+}
+const PLATFORMS=['tower','gate','wall_gate'];
+const touches=(a,b)=>(a.tiles??[a]).some(t=>(b.tiles??[b]).some(u=>Math.abs(t.x-u.x)+Math.abs(t.y-u.y)===1));
+// Ground tiles from which a building is climbed (and where one coming down steps off). Other buildings (the Castle)
+// from any side; a wall (with the list of buildings) from the entries of the Towers and Gates touching it.
+export function entryTiles(building,buildings=null){
+  if(building.type==='tower')return sideTiles(building,towerDoorSide(building));
+  if(building.type==='gate'||building.type==='wall_gate')return (building.tiles??[building]).map(t=>({x:t.x,y:t.y}));
+  if(buildings&&buildingDefinition(building).navigation?.walkableTop)return buildings.filter(b=>PLATFORMS.includes(b.type)&&buildingIsComplete(b)&&touches(b,building)).flatMap(b=>entryTiles(b));
+  return towerNeighbors(building);
 }
 export function towerBase(building) {
   const definition=buildingDefinition(building);
@@ -170,7 +191,7 @@ export function placeTower(options) {
   return result.error?result:{tower:result.building};
 }
 
-export function approachTower(map,start,building,options) { return findPathToAny(map,start,towerNeighbors(building),options); }
+export function approachTower(map,start,building,options) { return findPathToAny(map,start,entryTiles(building,options?.buildings),options); }
 export function planGroundOrder(map,start,order,options) {
   if(order.kind==='approachAnimal')return findPathToAny(map,start,adjacentTiles(order.animal,map),options);
   if(order.kind==='enter')return approachTower(map,start,order.tower,options);
@@ -180,7 +201,7 @@ export function planGroundOrder(map,start,order,options) {
 }
 export function planTowerExit(map,building,order,options) {
   let best=null;
-  for(const exit of towerNeighbors(building)){
+  for(const exit of entryTiles(building,options?.buildings)){
     if(!isWalkable(map,exit.x,exit.y))continue;
     const route=planGroundOrder(map,exit,order,options);
     if(route&&(!best||route.cost<best.cost))best={...route,exit};

@@ -1,3 +1,4 @@
+import { planDescent } from '../game/wallNetwork.js';
 import { findPathToAny,canStep } from '../game/pathfinding.js';
 import { knownMap } from '../game/knownMap.js';
 import { tileKey } from '../game/stones.js';
@@ -61,7 +62,9 @@ export class UnitCommands {
     const face=options.facing||places?directionName(facing):null;
     let lead=null;if(selected.length>2){const m={x:Math.round(mid.x),y:Math.round(mid.y)},from=selected.map(w=>w.tile).sort((a,b)=>Math.hypot(a.x-m.x,a.y-m.y)-Math.hypot(b.x-m.x,b.y-m.y))[0];lead=findPathToAny(base,from,[target])?.path??null;if(lead&&lead.length<8)lead=null;}
     for(const worker of selected){
-      const nav=this.navigation(worker,base,selectedIds),start=worker.nextTile??worker.tile;
+      // Owner 17 Nov 2026: a move ends a wall post; one up there walks down at the nearest way down first.
+      const wp=this.scene.military?.wallPatrol,down=worker.onWall&&wp?(worker.wallDescent?.ground??planDescent(this.scene.map,this.scene.buildings,worker.nextTile??worker.tile,undefined,target)?.ground):null;
+      const nav=this.navigation(worker,base,selectedIds),start=down??worker.nextTile??worker.tile;
       // Combat 16 Nov 2026: archers stay two tiles behind the group, armoured melee one tile ahead of it.
       const along=worker.attackRange>1?-2:(worker.armor??0)>0?1:0;
       const want={x:target.x+(worker.tile.x-mid.x)*squeeze+dir.x*along,y:target.y+(worker.tile.y-mid.y)*squeeze+dir.y*along};
@@ -73,7 +76,7 @@ export class UnitCommands {
       // Owner 16 Nov 2026: not one long file – a group marches in lanes beside each other along one leader route,
       // each lane shifted by the soldier's place in the formation (its slot's offset from the click).
       if(lead&&selected.length>2){const lanes=this.laneRoute(nav,start,lead,{x:goal.x-target.x,y:goal.y-target.y},goal);if(lanes)route=lanes;}
-      this.interrupt(worker);worker.commandState={state:'MovingToHold',goal:{x:goal.x,y:goal.y}};worker.holdFace=face;worker.path=route.path;worker.workState='MovingToHold';used.add(tileKey(goal));accepted++;
+      this.interrupt(worker);delete worker.wallPatrol;worker.commandState={state:'MovingToHold',goal:{x:goal.x,y:goal.y}};worker.holdFace=face;if(down){delete worker.wallDescent;wp.descend(worker,route.path,target);}else worker.path=route.path;worker.workState='MovingToHold';used.add(tileKey(goal));accepted++;
     }
     return accepted;
   }
@@ -97,6 +100,7 @@ export class UnitCommands {
     if(!commanded(worker))return false;
     const command=worker.commandState;
     worker.workState=command.state;worker.workMessage='';worker.commandWait=Math.max(0,(worker.commandWait??0)-delta);
+    if(worker.wallDescent){worker.update(delta);return true;}
     if(command.state==='MovingToHold'&&!worker.nextTile&&!worker.path.length){
       if(tileKey(worker.tile)===tileKey(command.goal)){command.state='Holding';worker.workState='Holding';// The facing of a formation is a look, not saved state (the save keeps goal and state only).
         if(worker.holdFace&&worker.view){const v=FACE_VECTORS[worker.holdFace];if(v)worker.direction={...v};worker.view.facing=worker.holdFace;worker.view.paint?.();worker.view.applyArt?.();}}

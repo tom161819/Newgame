@@ -8,6 +8,9 @@ export const buildings = [
     id: 'tower', name: 'Stone Tower', category: 'building', buildingCategory:'defense', sprite: '/assets/buildings/tower/watchtower-square.v1.png',
     frontSprite: '/assets/buildings/tower/watchtower-square.v1.front.png', artSource: 'art/sprites/watchtower/watchtower-square.v1.json',
     visibility: { multiplier: 2 },
+    // Owner 17 Nov 2026: the door shows the side a Tower is climbed from (facing 1: on the right face; 2 and 3: hidden).
+    // Provisional sprites cut from the approved one by the mechanics chat until the Studio has the turned views.
+    artSprites: { 'door-e': { sprite: '/assets/buildings/tower/watchtower-square.v1.door-e.png', origin: { x: 0.39634, y: 0.99107 } }, 'no-door': { sprite: '/assets/buildings/tower/watchtower-square.v1.no-door.png', origin: { x: 0.39634, y: 0.99107 } } },
     // m-staveni-zdi-studna (59): the tool stays selected after placing; a Tower may replace Stone Wall segments.
     width: 2, height: 2, walkable: false, collectible: false, buildable: true, repeatPlacement: true, replacesWall: true,
     cost: { stone: 20 }, interactions: ['enter', 'exit'], description: 'Kamenná strážní věž s horní plošinou a cimbuřím.',

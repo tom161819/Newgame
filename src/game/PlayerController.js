@@ -2,7 +2,7 @@ import { t } from '../i18n/index.js';
 import { tileCenter, isWalkable } from './map.js';
 import { gridToWorld } from './isometric.js';
 import { tileKey } from './stones.js';
-import { groundDepthAbove,planGroundOrder, planTowerExit, towerNeighbors, buildingDepth, towerTop, buildingDefinition,buildingIsComplete } from './buildings.js';
+import { groundDepthAbove,planGroundOrder, planTowerExit, towerNeighbors,entryTiles, buildingDepth, towerTop, buildingDefinition,buildingIsComplete } from './buildings.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { advanceMovement } from './movement.js';
 import { canStep } from './pathfinding.js';
@@ -76,7 +76,7 @@ export class PlayerController {
         this.scene.setStatus(t('status.onTower'));
         return false;
       }
-      const route = planTowerExit(order.explore?knownMap(this.scene):this.scene.map, this.currentTower, order,this.scene.pathWear?.routingOptions(this));
+      const route = planTowerExit(order.explore?knownMap(this.scene):this.scene.map, this.currentTower, order,this.routing());
       if (!route) {
         this.scene.setStatus(t('status.noTowerPath'));
         return false;
@@ -91,12 +91,12 @@ export class PlayerController {
     // #97: a wall is climbed only at a Gate or next to a Tower; the King walks to the nearest such stair and then along the top.
     this.pendingWall=null;
     if(order.kind==='enter'&&isWall(order.tower)&&!isWallAccess(order.tower,this.scene.buildings)){
-      const map=order.explore?knownMap(this.scene):this.scene.map,start=this.nextTile??this.tile,options=this.scene.pathWear?.routingOptions(this);let best=null;
+      const map=order.explore?knownMap(this.scene):this.scene.map,start=this.nextTile??this.tile,options=this.routing();let best=null;
       for(const access of wallAccessPoints(this.scene.buildings,order.tower)){const r=planGroundOrder(map,start,{kind:'enter',tower:access},options);if(r&&(!best||r.path.length<best.route.path.length))best={access,route:r};}
       if(!best){this.scene.setStatus(t('status.noWallAccess'));return false;}
       this.pendingWall=order.tower;order={...order,tower:best.access};
     }
-    const route = planGroundOrder(order.explore?knownMap(this.scene):this.scene.map, this.nextTile ?? this.tile, order,this.scene.pathWear?.routingOptions(this));
+    const route = planGroundOrder(order.explore?knownMap(this.scene):this.scene.map, this.nextTile ?? this.tile, order,this.routing());
     if (!route) {
       this.scene.setStatus(t('status.noPath'));
       return false;
@@ -111,9 +111,11 @@ export class PlayerController {
   }
 
   // Into the unknown the route was planned on the known map; a real obstacle met on the way is only seen when reached.
+  // Owner 17 Nov 2026: routes up and down use the Tower doors and Gate passages (entryTiles needs the buildings).
+  routing(){return {...(this.scene.pathWear?.routingOptions(this)??{}),buildings:this.scene.buildings};}
   canEnterTile(tile){return !this.order?.explore||canStep(this.scene.map,this.tile,tile);}
   replanExplore(){
-    const route=planGroundOrder(knownMap(this.scene),this.tile,this.order,this.scene.pathWear?.routingOptions(this));
+    const route=planGroundOrder(knownMap(this.scene),this.tile,this.order,this.routing());
     if(!route){this.path=[];this.order=null;this.scene.marker.setVisible(false);this.scene.setStatus(t('status.exploreBlocked'));return;}
     this.path=route.path;this.scene.showMarker(route.destination);
     if(!this.path.length)this.arrive();
@@ -125,7 +127,7 @@ export class PlayerController {
       const route=findRoofPath(this.scene.buildings,start,order.tower);
       if(route!==null){this.startRoofRoute(route,null);return true;}
     }
-    const route=planRoofExit(order.explore?knownMap(this.scene):this.scene.map,this.scene.buildings,start,order,this.scene.pathWear?.routingOptions(this));
+    const route=planRoofExit(order.explore?knownMap(this.scene):this.scene.map,this.scene.buildings,start,order,this.routing());
     if(!route){
       this.path=[];this.roofContinuation=null;this.scene.marker.setVisible(false);
       this.scene.setStatus(t('status.noWallPath'));return false;
@@ -176,7 +178,7 @@ export class PlayerController {
     if(isWall(tower)&&!isWallAccess(tower,this.scene.buildings)){this.command({kind:'enter',tower});return;}
     // Animaci nelze spustit z dálky, z obsazeného políčka ani během kroku.
     if (!buildingIsComplete(tower)||!buildingDefinition(tower).interactions.includes('enter') || this.nextTile || !isWalkable(this.scene.map, this.tile.x, this.tile.y)
-      || !towerNeighbors(tower).some(tile => tileKey(tile) === tileKey(this.tile))) return;
+      || !entryTiles(tower,this.scene.buildings).some(tile => tileKey(tile) === tileKey(this.tile))) return;
     this.currentTower = tower;
     this.setState(PLAYER_STATE.ENTERING);
     this.sprite.setDepth(buildingDepth(tower) + 0.2);

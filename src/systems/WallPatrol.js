@@ -1,8 +1,8 @@
-import { buildingIsComplete,towerTop,buildingDepth,buildingDefinition } from '../game/buildings.js';
+import { buildingIsComplete,towerTop,buildingDepth } from '../game/buildings.js';
 import { wallIndex,isWallAccess,isWall } from '../game/walls.js';
 import { tileKey } from '../game/stones.js';
 import { tileCenter,gridToWorld } from '../game/isometric.js';
-import { towerNeighbors } from '../game/buildings.js';
+import { elevatedIndex,elevatedRoute,entrances,planAscent,planDescent,platformTiles,platformCenter } from '../game/wallNetwork.js';
 import { t } from '../i18n/index.js';
 
 // m-hlidka-hradby (owner, 12 Nov): "Patrol – walls". A soldier climbs to the wall walk at a wall touching a Tower or a
@@ -38,54 +38,78 @@ export function postTiles(buildings,target,count,takenSlots=new Set()){
 export class WallPatrol {
   constructor(scene){this.scene=scene;}
   walls(){return wallIndex(this.scene.buildings);}
-  // Start or stop the order for a soldier.
+  map(worker){return this.scene.workerSystem?.navigationMap?.(worker)??this.scene.map;}
+  // Start or stop the order for a soldier. Stopping brings one up there down by walking to the nearest way down.
   set(worker,on){
-    if(on){if(worker.wallPatrol?.onWall)this.leave(worker);worker.wallPatrol={phase:'toWall',...(on.x!==undefined?{post:{x:on.x,y:on.y,...(on.tower?{tower:on.tower,...(on.slot?{slot:on.slot}:{})}:{})}}:{})};return true;}
-    if(worker.wallPatrol?.onWall)this.leave(worker);delete worker.wallPatrol;return true;
+    if(on){delete worker.wallDescent?.then;worker.wallPatrol={phase:'toWall',...(on.x!==undefined?{post:{x:on.x,y:on.y,...(on.tower?{tower:on.tower,...(on.slot?{slot:on.slot}:{})}:{})}}:{})};if(worker.onWall){worker.wallPatrol.onWall=true;if(worker.wallDescent){worker.path=[];delete worker.wallDescent;}}return true;}
+    delete worker.wallPatrol;if(worker.onWall&&!worker.wallDescent)this.descend(worker);return true;
   }
   // Sends soldiers to a wall piece, Tower or Gate; returns how many got a post.
   post(workers,target){
     const soldiers=workers.filter(w=>w.profession==='soldier'&&w.isAlive),taken=new Set((this.scene.workerSystem?.liveWorkers?.()??[]).filter(w=>!soldiers.includes(w)&&w.wallPatrol?.post?.tower===target.id).map(w=>w.wallPatrol.post.slot??0)),tiles=postTiles(this.scene.buildings,target,soldiers.length,taken);
     soldiers.slice(0,tiles.length).forEach((w,i)=>{delete w.huntWolfId;this.scene.workerSystem.commands?.resume?.(w);this.set(w,tiles[i]);});return Math.min(soldiers.length,tiles.length);
   }
-  leave(worker){const p=worker.wallPatrol,ground=p?.ground??worker.wallGround??worker.tile;delete worker.wallGround;worker.onWall=null;worker.path=[];worker.nextTile=null;worker.tile={...ground};worker.position={x:ground.x+.5,y:ground.y+.5};if(p){p.onWall=false;p.phase='toWall';}}
+  // At once on the ground (death, rest, a job): at the nearest way down, else where he climbed.
+  leave(worker){
+    const p=worker.wallPatrol,down=worker.wallDescent?.ground??(worker.onWall?planDescent(this.scene.map,this.scene.buildings,worker.nextTile??worker.tile)?.ground:null),ground=down??p?.ground??worker.wallGround??worker.tile;
+    delete worker.wallGround;delete worker.wallDescent;worker.onWall=null;worker.path=[];worker.nextTile=null;worker.tile={...ground};worker.position={x:ground.x+.5,y:ground.y+.5};if(p){p.onWall=false;p.phase='toWall';delete p.climb;}
+  }
+  // Walks to the nearest way down (Tower door, Gate passage); `then` is the ground route after it.
+  descend(worker,then=null,near=null){
+    const plan=planDescent(this.scene.map,this.scene.buildings,worker.nextTile??worker.tile,undefined,near);if(!plan){this.leave(worker);if(then)worker.path=then;return null;}
+    worker.wallDescent={ground:plan.ground,...(then?{then}:{})};const route=worker.nextTile?plan.route.slice(1):plan.route;worker.path=route;
+    if(!worker.nextTile&&!worker.path.length)this.land(worker);return plan;
+  }
+  // At the foot of the way down: steps onto the ground and goes on with the route he got meanwhile.
+  land(worker){
+    const d=worker.wallDescent;if(!d)return;const g=d.ground;delete worker.wallDescent;delete worker.wallGround;worker.onWall=null;worker.nextTile=null;worker.tile={...g};worker.position={x:g.x+.5,y:g.y+.5};worker.path=d.then??[];
+    const p=worker.wallPatrol;if(p){p.onWall=false;p.phase='toWall';delete p.climb;delete p.ground;}
+  }
+  climb(worker,way){
+    const p=worker.wallPatrol;p.onWall=true;p.ground={...worker.tile};worker.wallGround={...worker.tile};worker.onWall=way.platform;worker.path=[];worker.tile={...way.top};worker.position={x:way.top.x+.5,y:way.top.y+.5};p.phase='walk';delete p.climb;
+  }
+  // Where the order leads: the post's tiles (a platform's tiles), else the patrol stops.
+  targets(p,index){
+    const s=this.scene;
+    if(p.post?.tower){const t=s.buildings.find(b=>b.id===p.post.tower&&buildingIsComplete(b));if(!t){delete p.post;return this.targets(p,index);}return platformTiles(t);}
+    if(p.post){if(!index.has(tileKey(p.post))){delete p.post;return this.targets(p,index);}return [{x:p.post.x,y:p.post.y}];}
+    return wallStops(s.buildings).map(w=>({x:w.x,y:w.y}));
+  }
   update(worker,delta){
-    const s=this.scene,p=worker.wallPatrol,walls=this.walls(),stops=wallStops(s.buildings,walls);p.lastTick=s.gameTime?.totalElapsed??0;
-    if(p.post?.tower){
-      // On a Tower: walk to its foot, climb, stand on the platform.
-      const tower=s.buildings.find(b=>b.id===p.post.tower&&buildingIsComplete(b));if(!tower){if(p.onWall)this.leave(worker);delete p.post;return true;}
-      worker.workState='Patrolling';worker.workMessage=t('army.order.postActive');if(p.onWall)return true;
-      const goals=towerNeighbors(tower).filter(g=>s.map[g.y]?.[g.x]===0);
-      if(goals.some(g=>g.x===worker.tile.x&&g.y===worker.tile.y)&&!worker.nextTile){const d=buildingDefinition(tower);p.onWall=true;p.ground={...worker.tile};worker.wallGround={...worker.tile};worker.onWall=tower;worker.path=[];worker.tile={x:tower.x,y:tower.y};const o=PLATFORM_SLOTS[p.post.slot??0]??PLATFORM_SLOTS[0];worker.position={x:tower.x+d.width/2+o.x,y:tower.y+d.height/2+o.y};p.phase='post';return true;}
-      if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=WALL_PATROL.retry;worker.moveTo(goals);}return true;
-    }
-    if(p.post&&!walls.has(tileKey(p.post)))delete p.post;
-    if(!stops.length&&!(p.post&&walls.has(tileKey(p.post)))){if(p.onWall)this.leave(worker);worker.workState='Waiting';worker.workMessage=t('army.wallsNone');return false;}
+    const s=this.scene,p=worker.wallPatrol;p.lastTick=s.gameTime?.totalElapsed??0;
+    if(worker.wallDescent)return true;
+    const index=elevatedIndex(s.buildings),targets=this.targets(p,index);
+    if(!targets.length){if(worker.onWall)this.descend(worker);worker.workState='Waiting';worker.workMessage=t('army.wallsNone');return !!worker.onWall;}
     worker.workState='Patrolling';worker.workMessage=t(p.post?'army.order.postActive':'army.order.wallsActive');
-    if(!p.onWall){
-      // Walk to the ground beside the nearest stop, then climb.
-      // With a post: only stops joined to it over the wall walk, the nearest to the post first.
-      // Owner 15 Nov 2026 (65): a soldier sent to a wall piece may also climb at that piece itself (the King still needs a Tower or a Gate).
-      const own=p.post?walls.get(tileKey(p.post)):null,usable=p.post?[...stops.filter(st=>tileKey(st)===tileKey(p.post)||wallRoute(walls,st,p.post)),...(own&&!stops.includes(own)?[own]:[])]:stops,from=p.post??worker.tile;
-      if(p.post&&!usable.length){worker.workState='Waiting';worker.workMessage=t('army.postNoWay');return true;}
-      const near=[...usable].sort((a,b)=>Math.hypot(a.x-from.x,a.y-from.y)-Math.hypot(b.x-from.x,b.y-from.y));
-      for(const stop of near.slice(0,4)){const goals=towerNeighbors(stop).filter(g=>s.map[g.y]?.[g.x]===0);
-        if(goals.some(g=>g.x===worker.tile.x&&g.y===worker.tile.y)&&!worker.nextTile){p.onWall=true;p.ground={...worker.tile};worker.wallGround={...worker.tile};p.at={x:stop.x,y:stop.y};worker.onWall=stop;worker.path=[];worker.tile={x:stop.x,y:stop.y};worker.position={x:stop.x+.5,y:stop.y+.5};p.phase='pause';p.until=(s.gameTime?.totalElapsed??0)+WALL_PATROL.pause[0];return true;}
-        if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=WALL_PATROL.retry;if(worker.moveTo(goals))return true;}else if(worker.path.length||worker.nextTile)return true;}
-      return true;
+    if(!worker.onWall&&p.noWay){worker.workState='Waiting';worker.workMessage=t(p.post?'army.postNoWay':'army.wallsNone');}
+    if(!worker.onWall){
+      // Owner 17 Nov 2026: up only at a Tower door or in a Gate passage, the one with the shortest walk to the goal.
+      if(p.climb&&tileKey(worker.tile)===tileKey(p.climb.ground)&&!worker.nextTile){const way=entrances(s.buildings,s.map).find(e=>e.platform.id===p.climb.platform&&tileKey(e.ground)===tileKey(p.climb.ground));if(way){this.climb(worker,way);return true;}delete p.climb;}
+      if(worker.nextTile||worker.path.length)return true;
+      if((worker.aiCooldown??0)>0)return true;worker.aiCooldown=WALL_PATROL.retry;
+      const way=planAscent(this.map(worker),s.buildings,worker.tile,targets,index);
+      if(!way){delete p.climb;p.noWay=true;worker.workState='Waiting';worker.workMessage=t(p.post?'army.postNoWay':'army.wallsNone');return true;}
+      delete p.noWay;p.climb={platform:way.platform.id,ground:{...way.ground}};
+      if(tileKey(worker.tile)===tileKey(way.ground)){this.climb(worker,way);return true;}
+      if(!worker.moveTo([way.ground]))delete p.climb;return true;
     }
-    worker.onWall=walls.get(tileKey(worker.nextTile??worker.tile))??worker.onWall;
+    worker.onWall=index.get(tileKey(worker.nextTile??worker.tile))??worker.onWall;
     if(worker.nextTile||worker.path.length)return true;
     const now=s.gameTime?.totalElapsed??0;
-    if(p.post){if(tileKey(worker.tile)===tileKey(p.post)){p.phase='post';return true;}const route=wallRoute(walls,worker.tile,p.post);if(route){p.target={x:p.post.x,y:p.post.y};worker.path=route;p.phase='walk';}else this.leave(worker);return true;}
+    if(p.post){
+      if(targets.some(g=>tileKey(g)===tileKey(worker.tile))){
+        if(p.post.tower&&p.phase!=='post'){const tower=s.buildings.find(b=>b.id===p.post.tower),c=platformCenter(tower),o=PLATFORM_SLOTS[p.post.slot??0]??PLATFORM_SLOTS[0];worker.onWall=tower;worker.position={x:c.x+o.x,y:c.y+o.y};}
+        p.phase='post';return true;}
+      const route=elevatedRoute(index,worker.tile,targets);if(route){p.target={x:p.post.x,y:p.post.y};worker.path=route;p.phase='walk';}else this.descend(worker);return true;
+    }
     if(p.phase==='pause'&&now<p.until)return true;
     // Next stop: the one fewest other wall soldiers head for, then the farthest along the walk (spread out).
     const others=s.workerSystem.liveWorkers().filter(w=>w!==worker&&w.wallPatrol?.target).map(w=>tileKey(w.wallPatrol.target));
-    const here=worker.tile,options=stops.filter(st=>tileKey(st)!==tileKey(here)).map(st=>({st,route:wallRoute(walls,here,st)})).filter(o=>o.route);
+    const here=worker.tile,options=targets.filter(st=>tileKey(st)!==tileKey(here)).map(st=>({st,route:elevatedRoute(index,here,[st])})).filter(o=>o.route);
     if(!options.length){p.phase='pause';p.until=now+WALL_PATROL.pause[1];return true;}
     options.sort((a,b)=>others.filter(k=>k===tileKey(a.st)).length-others.filter(k=>k===tileKey(b.st)).length||b.route.length-a.route.length);
     const pick=options[Math.floor((s.nightThreats?.random??Math.random)()*Math.min(2,options.length))]??options[0];
-    p.target={x:pick.st.x,y:pick.st.y};worker.path=pick.route;p.phase='walk';
+    p.target={x:pick.st.x,y:pick.st.y};worker.path=pick.route;
     const [a,b]=WALL_PATROL.pause;p.until=now+pick.route.length*700+a+Math.random()*(b-a);p.phase='pause';return true;
   }
   // Where a soldier on a wall is drawn: on top of the wall under him.

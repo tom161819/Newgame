@@ -21,7 +21,10 @@ export class WorkerController extends AnimalController {
   get fullName(){return this.identity?fullName(this.identity,language()):this.fixedName;}
   // (42): a resident sleeping inside his House or the Castle neither blocks a tile nor shows.
   reservedTiles(){return this.isAlive&&this.sleepingIn==null?super.reservedTiles():[];}
-  moveTo(goals){const route=findPathToAny(this.scene.workerSystem?.navigationMap(this)??this.scene.map,this.nextTile??this.tile,goals,this.scene.pathWear?.routingOptions(this));this.path=route?.path??[];return !!route;}
+  moveTo(goals){
+    // Owner 17 Nov 2026: one walking down from the walls plans from the foot of his way down and goes on after it.
+    if(this.wallDescent){const route=findPathToAny(this.scene.workerSystem?.navigationMap(this)??this.scene.map,this.wallDescent.ground,goals,this.scene.pathWear?.routingOptions(this));this.wallDescent.then=route?.path??[];return !!route;}
+    const route=findPathToAny(this.scene.workerSystem?.navigationMap(this)??this.scene.map,this.nextTile??this.tile,goals,this.scene.pathWear?.routingOptions(this));this.path=route?.path??[];return !!route;}
   canEnterTile(tile){
     /* Point 45: a resident standing under a new blueprint may always step off it. */if(this.steppingAside!=null){const site=this.scene.buildings?.find(b=>b.id===this.steppingAside),inside=t=>!!site?.tiles?.some(p=>p.x===t.x&&p.y===t.y);if(site&&inside(this.tile)&&!this.scene.buildings.some(b=>b!==site&&b.tiles?.some(p=>p.x===tile.x&&p.y===tile.y)))return true;if(!site||!inside(this.tile))this.steppingAside=null;}
     if(this.onWall)return true;/* m-hlidka-hradby: on the wall walk the route is already a chain of joined walls */
@@ -35,8 +38,8 @@ export class WorkerController extends AnimalController {
   stop(){this.path=[];}
   update(delta){
     // Anything else taking over (rest at night, a new job, death) brings him down from the wall first.
-    if(this.onWall&&(!this.isAlive||!this.wallPatrol||(this.scene.gameTime?.totalElapsed??0)-(this.wallPatrol.lastTick??0)>1500))this.scene.military?.wallPatrol?.leave(this);
-    if(this.onWall&&this.isAlive){this.availableWorkMs=0;advanceMovement(this,delta);this.scene.military?.wallPatrol?.place(this);this.view.animate?.(delta,this.walking,this.direction);return;}
+    if(this.onWall&&(!this.isAlive||!this.wallDescent&&(!this.wallPatrol||(this.scene.gameTime?.totalElapsed??0)-(this.wallPatrol.lastTick??0)>1500)))this.scene.military?.wallPatrol?.leave(this);
+    if(this.onWall&&this.isAlive){this.availableWorkMs=0;advanceMovement(this,delta);if(this.wallDescent&&!this.nextTile&&!this.path.length)this.scene.military?.wallPatrol?.land(this);if(this.onWall){this.scene.military?.wallPatrol?.place(this);this.view.animate?.(delta,this.walking,this.direction);return;}}
     super.update(delta);this.view.setWorkPose?.(delta,this.profession==='farmer'&&this.workState==='Working'&&!this.walking);this.view.setSeated?.(!!this.seated&&!this.walking);
     if(this.profession==='fisher'||this.fishingView)this.fishingView=!!this.view.setFishing?.(delta,fishingInfo(this,this.scene));}
 }

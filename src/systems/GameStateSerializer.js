@@ -69,7 +69,7 @@ const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
 export function serializeActor(unit){
   // m-hlidka-hradby: a soldier on the wall walk is saved on the ground where he climbed up (he climbs again after loading).
-  const ground=unit.onWall&&unit.wallPatrol?.ground;if(ground)unit={...unit,tile:{...ground},position:{x:ground.x+.5,y:ground.y+.5},nextTile:null,path:[]};
+  const ground=unit.onWall&&(unit.wallDescent?.ground??unit.wallPatrol?.ground);if(ground)unit={...unit,tile:{...ground},position:{x:ground.x+.5,y:ground.y+.5},nextTile:null,path:[]};
   return {...Object.fromEntries(actorFields.filter(k=>unit[k]!==undefined).map(k=>[k,unit[k]])),
     ...(unit.experience?{experience:copy(unit.experience)}:{}),
     ...(unit.skills?{skills:copy(unit.skills),activitySkill:unit.activitySkill??null}:{}),
@@ -185,7 +185,7 @@ export function validateGameState(input,registry=objectRegistry){
 }
 function validateAtSize(input,registry){
   // m-ukladani-chyba: which part of the save failed, so the message (and a bug report) can say where.
-  let part='header';const fail=()=>{const error=new Error(`${t('saves.corrupt')} [${part}]`);error.savePart=part;throw error;};
+  let part='header',where='';const fail=()=>{const error=new Error(`${t('saves.corrupt')} [${part}${where?`: ${where}`:''}]`);error.savePart=where?`${part}: ${where}`:part;throw error;};
   const check=value=>{if(!value)fail();};
   const number=(n,min=0,max=Number.MAX_SAFE_INTEGER)=>check(Number.isFinite(n)&&n>=min&&n<=max);
   const integer=(n,min=0,max=Number.MAX_SAFE_INTEGER)=>{number(n,min,max);check(Number.isInteger(n));};
@@ -312,7 +312,8 @@ function validateAtSize(input,registry){
   repairTransportInstructions(s,registry,check);
   part='nature';const natural=s.naturalResources;check(natural&&Object.keys(natural).every(key=>['nextId','nextDepositId','growthClock','ageClock','refreshElapsed','kingTask','rockMining'].includes(key)));integer(natural.nextId,1);integer(natural.nextDepositId,1);number(natural.ageClock,0,s.time.totalElapsed/dayDuration+1e-6);number(natural.growthClock,0,natural.ageClock*1.25*devRange('forestGrowth').max+1e-6);/* m-drevorubci-stromy: Dev forest growth up to ×4 */number(natural.refreshElapsed,0,FORESTRY.refreshInterval);check(natural.refreshElapsed<FORESTRY.refreshInterval);
   const resourceTiles=new Set(),treeIds=new Map(),depositIds=new Map();
-  for(const r of s.resources){const d=definition(r.type,'resource');tile(r.tile);
+  // Owner 17 Nov 2026: a failed nature check names the object (type and tile), so a report says which one.
+  for(const r of s.resources){where=`${r.type} ${r.tile?.x},${r.tile?.y}`;const d=definition(r.type,'resource');tile(r.tile);
     if(d.tree){const n=r.natural;check(n&&n.kind==='tree'&&Object.keys(n).every(key=>['id','kind','stage','ageDays','growthDays','cycle','workDone','growthCheckpoint','ageCheckpoint','rot','grand'].includes(key)));/* m-duby: optional `grand: true` only on a grown oak (it stands on 2 × 2) */check(n.grand===undefined||n.grand===true&&r.type==='oak_tree'&&n.stage===3);if(n.rot!==undefined)number(n.rot,0,FORESTRY.stumpRotDays);const id=String(n.id).match(/^tree-([1-9]\d*)$/);check(id&&Number(id[1])<natural.nextId&&!treeIds.has(n.id));treeIds.set(n.id,r);integer(n.stage,0,3);integer(n.cycle,0);number(n.ageDays);number(n.growthDays,0,n.stage===3?0:FORESTRY.stageDays[n.stage]);number(n.workDone,0,n.stage===3?Math.max(d.tree.chopDuration*(s.devBalance?.chopTime??1),FORESTRY.legacyChopDuration):0);/* m-drevorubci-stromy: the save's chopping time */number(n.growthCheckpoint,0,natural.growthClock+1e-8);number(n.ageCheckpoint,0,natural.ageClock+1e-8);}
     else if(d.deposit){const n=r.natural;check(n&&n.kind==='deposit'&&Object.keys(n).every(key=>['id','kind','remaining','max','boundBuildingId'].includes(key)));const id=String(n.id).match(/^deposit-([1-9]\d*)$/);check(id&&Number(id[1])<natural.nextDepositId&&!depositIds.has(n.id));depositIds.set(n.id,r);/* m-loziska-kamene-2x: a stone deposit from before the change (max under the new minimum) gets twice its stone, once */if(d.deposit.resource==='stone'&&Number.isInteger(n.max)&&n.max<d.deposit.min&&n.max*2>=d.deposit.min&&Number.isInteger(n.remaining)){n.max*=2;n.remaining*=2;}integer(n.max,d.deposit.min,d.deposit.max);integer(n.remaining,0,n.max);check(n.boundBuildingId==null||bIds.has(n.boundBuildingId));}
     else check(r.natural===undefined);
@@ -321,7 +322,7 @@ function validateAtSize(input,registry){
     // Rock edges may sit under a neighbouring Quarry; unique reciprocal primary bindings are checked below.
     const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`,overlap=s.buildings.find(b=>!b.unverified&&x>=b.x&&x<b.x+bdef(b).width&&y>=b.y&&y<b.y+bdef(b).height),allowedOverlap=d.tree&&(r.natural.stage===0||!!overlap&&clearsObstacles(bdef(overlap))&&!buildingIsComplete(overlap))||depositFamily(r.type)==='stone_deposit'&&overlap?.type==='quarry'&&overlap.quarryMode==='finite'||depositFamily(r.type)==='iron_deposit'&&overlap?.type==='iron_mine'&&overlap.miningMode!=='adjacent';check(open(x,y)&&(!occupied.has(key)||allowedOverlap)&&!resourceTiles.has(key));resourceTiles.add(key);if(d.deposit||d.tree&&r.natural.stage===3)solid.add(key);
   }}
-  const boundDeposits=new Set();for(const b of s.buildings){
+  where='';const boundDeposits=new Set();for(const b of s.buildings){where=`${b.type} ${b.x},${b.y}`;
     if(b.type==='quarry'){check(['finite','legacy','unbound'].includes(b.quarryMode));if(b.quarryMode==='legacy')check(buildingIsComplete(b)&&b.depositId===undefined);if(b.quarryMode==='unbound')check(b.depositId===undefined);}
     // m-vytezeny-dul-ctverecky (64): optional `depleted: true` only on a finished mine whose bound deposit is empty.
     check(b.size===undefined||!!definition(b.type).legacyFootprint&&b.size===definition(b.type).width);
@@ -332,7 +333,7 @@ function validateAtSize(input,registry){
       if(b.type==='iron_mine'&&b.miningMode===undefined&&!over)b.miningMode='adjacent';check(b.miningMode===undefined||b.type==='iron_mine'&&b.miningMode==='adjacent'&&!over);
       if(spec.overlap&&b.miningMode!=='adjacent')check(over);else{const dx=Math.max(0,b.x-r.tile.x-rd.width+1,r.tile.x-b.x-bd.width+1),dy=Math.max(0,b.y-r.tile.y-rd.height+1,r.tile.y-b.y-bd.height+1);check(Math.hypot(dx,dy)<=spec.range);}}
   }
-  for(const r of depositIds.values())if(r.natural.boundBuildingId!=null)check(boundDeposits.has(r.natural.id));
+  where='';for(const r of depositIds.values()){where=`${r.type} ${r.tile.x},${r.tile.y}`;if(r.natural.boundBuildingId!=null)check(boundDeposits.has(r.natural.id));}where='';
   if(natural.kingTask!=null){const task=natural.kingTask,r=treeIds.get(task.treeId);check(r&&r.natural.stage===3&&!s.player.horseId&&typeof task.arrived==='boolean'&&Object.keys(task).every(key=>['treeId','goal','arrived'].includes(key)));tile(task.goal);check(Math.abs(task.goal.x-r.tile.x)+Math.abs(task.goal.y-r.tile.y)===1);}
   part='chests';for(const c of s.chests){check(typeof c.id==='string');occupy(c.tile);solid.add(`${c.tile.x},${c.tile.y}`);check(!resourceTiles.has(`${c.tile.x},${c.tile.y}`));
     check(typeof c.opened==='boolean'&&typeof c.opening==='boolean'&&typeof c.looted==='boolean'&&(!c.looted||c.opened));

@@ -78,7 +78,7 @@ import '../ui/resourceLedger.css';
 import { Inventory } from './inventory.js';
 import { drawStone, generateResourcePositions, resourceTiles, tileKey, ResourceSpawner } from './stones.js';
 import { rebuildRuin } from './ruinRebuild.js';
-import { levelDefinition, placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors, buildingDefinition,buildingDepth,buildingIsComplete, definitionFor } from './buildings.js';
+import { levelDefinition, placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors,entryTiles,sideTiles,DOOR_SIDES, buildingDefinition,buildingDepth,buildingIsComplete, definitionFor } from './buildings.js';
 import { edgeLight,fadeStep } from './sightFade.js';
 import { footprintShown,applyFootprint,selectedBuildingIds } from './footprintHighlight.js';
 import { TowerView } from './TowerView.js';
@@ -111,6 +111,7 @@ import { devProduction } from '../data/devBalance.js';
 import { DevBalancePanel } from '../ui/DevBalancePanel.js';
 import { installPanelDismiss,closeOpenPanels } from '../ui/PanelDismiss.js';
 import { FortificationView } from './FortificationView.js';
+import { TowerDoors } from './TowerDoors.js';
 import { wallLine,wallLinePlan,placeWallLine,wallIndex,connectionsFor,connectedWalls,isWall,gateAxis,turnGate } from './walls.js';
 import { replaceWalls } from './wallReplacement.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
@@ -426,9 +427,10 @@ export class GameScene extends Phaser.Scene {
     this.input.on('gameout',()=>{/* Only a map building's tooltip: Phaser handles the queued canvas "out" after the HUD gauge's pointerenter, which would cancel its preview (map now under the HUD to the window edge, 9 Nov 2026). */if(this.storePreview?.key?.startsWith?.('building:'))this.storePreview.hide();this.rockMiningTool.cancelDrag();this.unitSelection.cancelDrag();this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;this.clearWallPreviews();document.querySelector('#object-tooltip').hidden=true;});
     // #97: a Gate opens across its wall: in a wall running east–west the opening faces the other way (mirrored sprite).
     // m-staveni-zdi-studna (59): the axis comes from the wall run, else from the Gate's stored gateAxis (gateAxis in walls.js).
-    this.orientGates=()=>{const index=wallIndex(this.buildings,true);for(const b of this.buildings)if(b.type==='wall_gate'||b.type==='gate'){/* Point 48 (owner 14 Nov 2026): the axis chosen with the blueprint stays; walls built later never turn a Gate. A Gate of an older save takes its axis once. */b.gateAxis??=gateAxis(index,b);this.flipGateView(this.towerViews.get(b.id),b,b.gateAxis==='x');}else if(b.type==='tower'&&b.facing)this.flipGateView(this.towerViews.get(b.id),b,b.facing%2===1);};
+    this.orientGates=()=>{const index=wallIndex(this.buildings,true);for(const b of this.buildings)if(b.type==='wall_gate'||b.type==='gate'){/* Point 48 (owner 14 Nov 2026): the axis chosen with the blueprint stays; walls built later never turn a Gate. A Gate of an older save takes its axis once. */b.gateAxis??=gateAxis(index,b);this.flipGateView(this.towerViews.get(b.id),b,b.gateAxis==='x');}else if(b.type==='tower')this.faceTowerView(this.towerViews.get(b.id),b.facing??0);this.towerDoors?.refresh();};
+    this.towerDoors=new TowerDoors(this);
     this.events.on('buildings:changed',this.orientGates);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{this.events.off('buildings:changed',this.orientGates);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{this.events.off('buildings:changed',this.orientGates);this.towerDoors?.destroy();
       this.rockMiningTool.destroy();this.unitSelection.destroy();this.minimap?.destroy();this.worldPanel?.destroy();this.eventFeed?.destroy();this.millSails?.destroy();this.kingCargoControl.destroy();this.kingLogistics.destroy();this.lightSources.destroy();
       this.memoryRenderer.destroy();
       setRelief(null);
@@ -511,8 +513,8 @@ export class GameScene extends Phaser.Scene {
   resourceOrigins() {
     const c=this.character;
     if(c.exitTile)return [c.exitTile];
-    if(c.currentTower&&isWall(c.currentTower))return connectedWalls(this.buildings,c.currentTower).flatMap(towerNeighbors);
-    return c.currentTower?towerNeighbors(c.currentTower):[c.nextTile??c.tile];
+    if(c.currentTower&&isWall(c.currentTower))return connectedWalls(this.buildings,c.currentTower).flatMap(w=>entryTiles(w,this.buildings));
+    return c.currentTower?entryTiles(c.currentTower,this.buildings):[c.nextTile??c.tile];
   }
   resourceCount(id) { let count=0;for(const view of this.resources.values())if(view.getData('objectId')===id)count++;return count; }
   addResource(definition,tile,natural=null) {
@@ -671,6 +673,17 @@ export class GameScene extends Phaser.Scene {
     if(!preview&&['wall_gate','gate','tower'].includes(definition.id))this.time?.delayedCall?.(0,()=>this.orientGates?.());
     return !preview&&!buildingIsComplete(building)?new ConstructionView(this,building,view):view;
   }
+  // Owner 17 Nov 2026: a Tower shows its door on the side it faces (0 S: the approved sprite; 1 E: the door on the right
+  // face; 2 N and 3 W: on a hidden face, so no door shows). Provisional sprites cut from the approved one.
+  faceTowerView(view,facing){
+    const sprite=view?.back?.sprite??view?.view?.back?.sprite;if(!sprite)return;const layer=[null,'art-door-e','art-no-door','art-no-door'][facing]??null,key=layer&&this.assets?.hasTexture('tower',layer)?this.assets.key('tower',layer):this.assets?.textureKey?.('tower');
+    if(key&&sprite.texture?.key!==key)sprite.setTexture(key);const o=this.objectRegistry.require('tower').origin;sprite.setFlipX(false);sprite.setOrigin(o.x,o.y);
+  }
+  // The tiles in front of the door of the Tower being placed: the only way up from the ground.
+  markTowerDoor(anchor,definition,facing){
+    const g=this.preview?.footprint;if(!g?.fillPoints)return;const tiles=sideTiles({...anchor,definition},DOOR_SIDES[facing]??'S');
+    g.fillStyle(0xf2cf63,.55);g.lineStyle(2,0xffe49a,1);for(const tile of tiles){const poly=tilePolygon(tile);g.fillPoints(poly,true);g.strokePoints(poly,true);}
+  }
   flipGateView(view,building,flip){
     const sprite=view?.back?.sprite??view?.view?.back?.sprite;if(!sprite)return;const o=building.definition?.origin??{x:.38372,y:.84348};sprite.setFlipX(flip);sprite.setOrigin(flip?1-o.x:o.x,o.y);
   }
@@ -744,7 +757,7 @@ export class GameScene extends Phaser.Scene {
     const facing=definition.id==='tower'?(this.towerFacing??0):null,key=`${tileKey(anchor)}:${provisional}:${error}:${gate}:${facing}`;
     if(key!==this.previewKey){
       this.preview.paint({x:anchor.x,y:anchor.y,type:definition.id,definition,tiles:buildingTiles(anchor,definition)},error?0xf27777:provisional?0xe3c46b:0x71dba6);
-      let water='',hint='';if(gate){this.flipGateView(this.preview,{definition},gate==='x');hint=` · ${t('build.rotateHint')}`;}else if(facing!=null){this.flipGateView(this.preview,{definition},facing%2===1);hint=` · ${t('build.rotateHint')}`;}
+      let water='',hint='';if(gate){this.flipGateView(this.preview,{definition},gate==='x');hint=` · ${t('build.rotateHint')}`;}else if(facing!=null){this.faceTowerView(this.preview,facing);this.markTowerDoor(anchor,definition,facing);hint=` · ${t('build.towerDoorHint',{side:t(`build.side.${DOOR_SIDES[facing]}`)})}`;}
       this.previewKey=key;if(!error&&definition.fishing&&this.fishing){const distance=this.fishing.previewDistance(anchor,definition);water=` · ${distance?t('fishing.previewWater',{distance}):t('fishing.previewNoWater')}`;}
       this.setStatus((error??t(provisional?'status.provisionalPlace':'status.validPlace',{name:definition.name,cost:formatCost(definition.cost,this.objectRegistry)})+water)+hint);
     }
@@ -779,12 +792,13 @@ export class GameScene extends Phaser.Scene {
   }
   confirmWallLine(pointer){
     if(!this.buildMode||this.selectedBuilding.construction?.mode!=='line'||!this.dragAnchor)return;
-    const tiles=wallLine(this.dragAnchor,this.pointerTile(pointer)),options=this.wallOptions(tiles);
+    // Test map: a wall line is free and stands finished at once, like every other building there.
+    const tiles=wallLine(this.dragAnchor,this.pointerTile(pointer)),options=this.sandbox?{...this.wallOptions(tiles),inventory:{pay:()=>true,canAfford:()=>true,storage:null},reserveMaterials:false}:this.wallOptions(tiles);
     const result=placeWallLine(options);
     this.dragAnchor=null;
     if(result.error){this.wallLastLine=tiles;this.previewTracking=false;this.previewKey=null;this.updateBuildingPreview();return;}
-    for(const building of result.buildings){this.constructionSystem.plan(building);this.towerViews.set(building.id,this.createBuildingView(this.selectedBuilding,building));if(building.unverified)this.rememberBlueprint(building);}
-    this.refreshWallConnections();this.updateInventory();
+    for(const building of result.buildings){if(!this.sandbox)this.constructionSystem.plan(building);this.towerViews.set(building.id,this.createBuildingView(this.selectedBuilding,building));if(building.unverified)this.rememberBlueprint(building);}
+    this.refreshWallConnections();this.updateInventory();if(this.sandbox)this.events.emit('buildings:changed');
     const message=t('status.wallBlueprints',{count:result.buildings.length,cost:formatCost(result.cost,this.objectRegistry)});
     // m-staveni-zdi-studna (59): the wall tool stays selected for the next line (Esc, right click or another building ends it).
     if(this.selectedBuilding.repeatPlacement){this.clearWallPreviews();this.previewAnchor=this.pointerTile(pointer);this.previewTracking=true;this.previewKey=null;this.updateBuildingPreview();this.updateBuildingUI();this.setStatus(message);}

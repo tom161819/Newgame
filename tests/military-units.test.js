@@ -10,6 +10,7 @@ import { hasLineOfSight } from '../src/game/lineOfSight.js';
 import { inAttackRange } from '../src/systems/CombatSystem.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
+import { t } from '../src/i18n/index.js';
 globalThis.document??={querySelector:()=>({textContent:''})};
 
 const scene=(starter=true)=>{const s=workerScene(undefined,{construction:true,foodProduction:true,logistics:true,ledger:true,starter});s.workerSystem.unsubscribe();return s;};
@@ -224,7 +225,7 @@ test('m-vojaci-na-hradby: soldiers sent to a wall piece or a Tower climb up and 
 });
 // Owner 15 Nov 2026 (65): soldiers get onto walls, Gates and Towers – a Gate has a platform like a Tower, and a soldier
 // sent to a wall piece climbs at that piece even when no Tower or Gate touches the wall.
-test('owner 65: soldiers stand on a Gate and climb a wall without a Tower or Gate',async()=>{
+test('owner 65 / 17 Nov 2026: soldiers stand on a Gate; a wall with no Tower or Gate cannot be climbed',async()=>{
   const { postTiles }=await import('../src/systems/WallPatrol.js');
   const {s,barracks}=kingdom();
   const add=(type,x,y)=>{const d=s.objectRegistry.require(type),tiles=[];for(let j=0;j<d.height;j++)for(let i=0;i<d.width;i++)tiles.push({x:x+i,y:y+j});const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,x,y,tiles};s.buildings.push(b);for(const t of tiles)s.map[t.y][t.x]=d.walkable?0:1;s.towerViews.set(b.id,s.createBuildingView(d,b));return b;};
@@ -234,5 +235,5 @@ test('owner 65: soldiers stand on a Gate and climb a wall without a Tower or Gat
   const a=soldier(s,barracks,{x:60,y:66},3),b=soldier(s,barracks,{x:61,y:66},3);
   assert.equal(s.military.wallPatrol.post([a],gate),1);assert.equal(s.military.wallPatrol.post([b],lone[1]),1);
   for(let i=0;i<6000;i++){s.tick(50);if(a.onWall&&b.wallPatrol?.phase==='post')break;}
-  assert.equal(a.onWall,gate,'on the Gate');assert.equal(`${b.tile.x},${b.tile.y}`,'65,70','on the lone wall piece');
+  assert.equal(a.onWall,gate,'on the Gate');assert.equal(b.onWall??null,null,'a lone wall has no way up');assert.equal(b.workMessage,t('army.postNoWay'));
 });

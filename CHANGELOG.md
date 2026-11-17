@@ -5,6 +5,18 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.144.1] - 2026-11-17
+<!-- version: {"title":"Walls, Tower doors and Gates as one network","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Changed
+- Walls, Towers and Gates form one network. Soldiers get onto the walls only through a Tower door or inside a Gate passage, never straight from the ground. From there they walk along the walls, onto joined Towers and Gates, and from Tower to Tower.
+- A Tower is entered only through its door. R turns the Tower while placing, and the gold tiles show where the door is: face it into the castle. A Tower whose door faces outside cannot be climbed from inside. The King uses the same doors and gates.
+- Where a wall meets a Tower, a door at wall-walk height shows the way in.
+### Fixed
+- Soldiers going up a wall pick the way with the shortest total walk, so they no longer run to a far stair first.
+- A move order ends a wall post. A soldier on the wall walks to the nearest way down and steps off there, instead of jumping down or getting stuck.
+- On the Test map, wall lines are free and stand finished at once, like every other building there.
+- When a save fails its nature check, the message now names the object and its tile.
+
 ## [0.144.0] - 2026-11-17
 <!-- version: {"title":"Cloth: flax, weaver, clothing and the tailor's light armour","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added
