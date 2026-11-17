@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.12] - 2026-11-17
+<!-- version: {"title":"Barracks hiring slider no longer blinks","type":"fix","reconstructed":false,"saveVersion":64} -->
+### Fixed
+- The Barracks window's automatic hiring slider no longer blinks or disappears while people are hired; it keeps its place under the heading.
+
 ## [0.143.11] - 2026-11-17
 <!-- version: {"title":"Soldiers to Towers, Gates and walls by their picture","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Fixed

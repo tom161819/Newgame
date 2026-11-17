@@ -50,7 +50,11 @@ export function renderMilitary(scene,building,root,employees){
     hire.append(text,range);root._autoHire=hire;}
   {const range=hire.querySelector('input'),text=hire.querySelector('.barracks-auto-hire-text'),value=barracksAutoHire(building,capacity);hire._building=building;range.max=String(capacity);if(document.activeElement!==range)range.value=String(value);text.textContent=t('military.autoHire',{count:value,capacity});}
   // Point 58 (owner 15 Nov 2026): the automatic hiring slider sits at the very top of the Barracks window.
-  {const heading=root.parentElement?.querySelector?.('.dialog-heading');if(heading){if(hire.previousElementSibling!==heading)heading.after(hire);}else if(hire.parentElement!==root)root.prepend(hire);}
+  // Point 66 (owner 17 Nov 2026: "the automatic count blinks or does not show at all"): the issue line and the slider
+  // both claimed the place right after the heading (and the picture), so each render moved them past each other. The
+  // slider now has its own place after the issue line, which stays first.
+  {const dialog=root.parentElement,heading=dialog?.querySelector?.('.dialog-heading'),issue=dialog?.querySelector?.('#workplace-issue');let anchor=issue&&issue.parentElement===dialog?issue:heading;if(anchor&&anchor.nextElementSibling?.id==='workplace-image')anchor=anchor.nextElementSibling;
+    if(anchor){if(hire.previousElementSibling!==anchor)anchor.after(hire);const order=dialog.__uiOriginalOrder;if(Array.isArray(order)&&order[order.indexOf(anchor)+1]!==hire){const i=order.indexOf(hire);if(i>=0)order.splice(i,1);order.splice(order.indexOf(anchor)+1,0,hire);}}else if(hire.parentElement!==root)root.prepend(hire);}
   root.replaceChildren(...(hire.parentElement===root?[hire]:[]),element('h3','',t('military.title')),places,cardList,element('h4','',t('military.recruits',{count:recruits.length})),soldiers,element('h4','',t('military.units',{count:trained.length})),units);
 }
 export function handleMilitaryClick(scene,button){
