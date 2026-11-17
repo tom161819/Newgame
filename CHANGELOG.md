@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.13] - 2026-11-17
+<!-- version: {"title":"Bodies stay three days, blood stains in fights","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- The dead lie where they fell for three days: soldiers and enemy soldiers play their fall and stay on the ground, other people lie down. Wounds in a fight leave blood stains that fade within two days. Both are kept in saves and hidden under the fog of war.
+### Fixed
+- Enemy soldiers that had not moved yet sometimes showed the plain placeholder figure instead of their look.
+
 ## [0.143.12] - 2026-11-17
 <!-- version: {"title":"Barracks hiring slider no longer blinks","type":"fix","reconstructed":false,"saveVersion":64} -->
 ### Fixed

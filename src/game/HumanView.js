@@ -42,6 +42,7 @@ export class HumanView extends Phaser.GameObjects.Container {
     this.leftLeg=scene.add.rectangle(-3,-5,4,11,0x454334);this.rightLeg=scene.add.rectangle(3,-5,4,11,0x454334);
     this.body=scene.add.graphics();this.arms=[scene.add.rectangle(-7,-21,4,14,COLORS.armSkin),scene.add.rectangle(7,-21,4,14,COLORS.armSkin)];
     this.weapon=scene.add.graphics().setVisible(false);this.tool=scene.add.graphics().setVisible(false);this.art=scene.add.image(0,0,'__DEFAULT').setVisible(false);this.add([this.shadow,this.leftLeg,this.rightLeg,this.body,...this.arms,this.weapon,this.tool,this.art]);this.cargoBundle=new CargoBundleView(scene,this);this.paint();
+    if(definition?.look)this.updateLook();// an enemy soldier wears his look from the start (also if he never moves)
   }
   // Profession and name decide the approved look; the procedural figure stays until it loads.
   updateLook(){
@@ -126,20 +127,6 @@ export class HumanView extends Phaser.GameObjects.Container {
     const view=this.scene.cameras?.main?.worldView,onScreen=!view||this.x>view.x-80&&this.x<view.right+80&&this.y>view.y-80&&this.y<view.bottom+120;
     if(this.visible&&onScreen){const frame=fishingFrame(art,this.fishFacing??0,state.column);if(this.fishFrame!==frame||this.fishArt.texture.key!==key){this.fishFrame=frame;this.fishArt.setTexture(key,frame).setOrigin(art.origin.x,art.origin.y);}this.fishArt.setVisible(true);}
     return true;
-  }
-  // m-vojaci-3d: an animated soldier falls where he died (the fall frames, then he lies a moment and fades); the view
-  // itself is destroyed by the caller right after.
-  playDeath(){
-    const art=this.look&&this.lookReady?villagerArt(this.look):null,scene=this.scene;if(!art?.anim||!this.art.visible||!scene?.add)return null;
-    const k=FACING_INDEX[this.facing]??0,key=walkKey(this.look),frames=art.anim.die.map(c=>k*art.anim.columns+c);
-    const body=scene.add.image(this.x,this.y,key,frames[0]).setOrigin(art.walk.origin.x,art.walk.origin.y).setScale(art.walk.scale??1).setDepth(this.depth);
-    // One timer drives the fall (dieFps), the rest on the ground (1.8 s) and the fade (1.2 s).
-    const fall=frames.length*1000/art.anim.dieFps,end=fall+3000;let t=0;
-    const step=scene.time?.addEvent?.({delay:50,loop:true,callback:()=>{t+=50;if(!body.active){step.remove();return;}
-      body.setFrame(frames[Math.min(frames.length-1,Math.floor(t*art.anim.dieFps/1000))]);if(t>fall+1800)body.setAlpha(Math.max(0,1-(t-fall-1800)/1200));
-      if(t>=end){step.remove();body.destroy();}}});
-    if(!step)body.destroy();
-    return body;
   }
   setCargo(cargo){this.cargoBundle.update(cargo);}
   // #58 C2: a small red "!" over a striking or leaving resident.

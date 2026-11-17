@@ -1,5 +1,6 @@
 import { buildingMaxHP } from '../game/buildingHealth.js';
 import { HEATED_BUILDINGS } from '../data/heating.js';
+import { validBattleMarks } from './BattleMarks.js';
 import { validExpedition } from './Expedition.js';
 import { fishingGround } from './FishingSystem.js';
 import { SQUAD_MAX } from '../ui/armySquads.js';
@@ -117,6 +118,7 @@ export function serializeGameState(scene){
     ...(scene.lightFuel?{lightFuel:scene.lightFuel.exportState()}:{}),
     ...(scene.nightThreats?{nightThreats:scene.nightThreats.exportState()}:{}),
     ...(scene.heating?{heating:scene.heating.exportState()}:{}),
+    ...(scene.battleMarks&&(scene.battleMarks.corpses.length||scene.battleMarks.stains.length)?{battleMarks:scene.battleMarks.exportState()}:{}),
     ...(scene.royalGoals?{royalGoals:scene.royalGoals.exportState()}:{}),
     ...(scene.kingSkills?{kingSkills:scene.kingSkills.exportState()}:{}),
     // m-noc-zrychleni (82): the night speed-up tip was shown in this game (optional; only `true`, absent = not yet).
@@ -603,6 +605,7 @@ function validateAtSize(input,registry){
   // Day and night N2 (schema 56): which light places burn tonight and which soldiers carry a torch.
   part='lightFuel';if(s.lightFuel!==undefined)check(validLightFuelState(s.lightFuel)&&s.lightFuel.lit.every(id=>s.buildings.some(b=>b.id===id)));
   // Day and night N3 (schema 57): threat switches and campfires.
+  part='battleMarks';if(s.battleMarks!==undefined)check(validBattleMarks(s.battleMarks));
   part='heating';if(s.heating!==undefined)check(validHeatingState(s.heating,new Set(s.buildings.filter(b=>HEATED_BUILDINGS.includes(b.type)).map(b=>b.id))));
   part='nightThreats';if(s.nightThreats!==undefined)check(validNightThreatState(s.nightThreats,new Set(s.buildings.map(b=>b.id))));
   // E4: finished Royal tasks and counted production (optional, older saves start with none done).

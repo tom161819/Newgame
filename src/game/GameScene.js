@@ -2,6 +2,7 @@ import { BanditView,RaiderView } from './BanditView.js';
 import { shapeZoneWorld } from './zoneFeatures.js';
 import { setupZone,updateZone,zoneLook } from './zoneMode.js';
 import { createDungeonView } from './DungeonView.js';
+import { BattleMarks } from '../systems/BattleMarks.js';
 import { setupSandbox,placeSandboxBuilding,sandboxLand } from './sandboxMode.js';
 import { WorldPanel } from '../ui/WorldPanel.js';
 import { ScoutingSystem } from '../systems/ScoutingSystem.js';
@@ -297,6 +298,7 @@ export class GameScene extends Phaser.Scene {
     this.skillSystem.initialize(this.character);
     this.equipment=new EquipmentSystem(this.character,this.objectRegistry,this.inventory,()=>{this.equipmentPanel?.refresh();this.combatFeedback?.refresh();});
     this.combat=new CombatSystem({map:this.map,damageScale:unit=>this.heating?.combatFactor?.(unit)??1,canFight:unit=>unit.isAlive&&!(unit===this.character&&this.character.away)&&!unit.mounted&&(unit!==this.character||unit.state===PLAYER_STATE.GROUND),regenerationRate:unit=>this.regeneration.rateFor(unit),canTarget:(attacker,target)=>attacker.attackRange<=1||!this.workerSystem?.workers.has(attacker.id)||!this.fog||this.fog.isVisibleObject(target)});
+    this.battleMarks=new BattleMarks(this);// point 69: bodies and blood stains
     this.skillSystem.attachCombat(this.combat);
     this.resourceSpawners=[];
     for(const definition of this.objectRegistry.byCategory('resource').filter(d=>d.spawn)){
@@ -324,7 +326,7 @@ export class GameScene extends Phaser.Scene {
     this.combatFeedback=new CombatFeedback(this);
     this.combat.on('attack',(attacker,target)=>{if(this.animalSystem.animals.has(target.id))this.animalSystem.onAttacked(target,attacker);});
     this.combat.on('attack',(attacker,target)=>{if(this.workerSystem?.workers.has(target.id)&&target.profession==='soldier'&&target.isAlive)this.combat.startAttack(target,attacker);});
-    this.combat.on('damage',(unit,amount,attacker)=>{this.combatFeedback.hit(unit);this.combatFeedback.damaged(unit,amount);this.skillSystem.creditDamage(attacker,unit,amount);});
+    this.combat.on('damage',(unit,amount,attacker)=>{this.combatFeedback.hit(unit);if(amount>0)this.battleMarks?.addStain(unit);this.combatFeedback.damaged(unit,amount);this.skillSystem.creditDamage(attacker,unit,amount);});
     this.combat.on('death',(unit,killer)=>this.onUnitDeath(unit,killer));
     this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
     // Day and night N1: a third of the sight outside light at night (one light list per fog update).
@@ -857,10 +859,10 @@ export class GameScene extends Phaser.Scene {
     if(this.workerSystem.workers.has(unit.id)){
       // m-hlasky-udalosti (41): every death has a cause; a danger mark where it happened (54).
       const by=killer?(killer.definition?.id??killer.type??null):null,cause=by&&/^[a-z_]{1,40}$/.test(by)?`killed:${by}`:'wounds';unit.deathCause=cause;
-      if(unit.isSubject!==false)this.workerSystem.recordDeath(unit,cause);this.dangerMarks?.mark(unit.position);unit.view?.playDeath?.();this.workerSystem.onDeath(unit);return;}
+      if(unit.isSubject!==false)this.workerSystem.recordDeath(unit,cause);this.dangerMarks?.mark(unit.position);this.battleMarks?.addCorpse(unit);this.workerSystem.onDeath(unit);return;}
     const tile={x:Math.floor(unit.position.x),y:Math.floor(unit.position.y)},amount=Math.round(unit.definition.gameplay.meatDrop*devProduction('hunter'));
     if(killer){const event={type:'animalKilled',objectType:unit.type,quantity:1,objectId:unit.id};if(!this.workplaceSystem?.deferReward(killer,event))this.activities.emit(event.type,{...event,actor:killer});}
-    unit.view?.playDeath?.();this.mountSystem.onDeath(unit);this.animalSystem.remove(unit);this.combatFeedback.remove(unit.id);
+    this.battleMarks?.addCorpse(unit);this.mountSystem.onDeath(unit);this.animalSystem.remove(unit);this.combatFeedback.remove(unit.id);
     const drop=amount>0?this.dropSystem.create('meat',tile,amount):null;this.workerSystem.ai.animalDied(unit,killer,drop);
     if(amount>0)this.foodSystem.recordProduction('meat',amount,`meat-${unit.id}`);
     if(this.huntingSystem.target===unit)this.huntingSystem.cancel();
@@ -884,6 +886,7 @@ export class GameScene extends Phaser.Scene {
   }
   update(_time,delta) {
     this.dungeonView?.update?.();
+    this.battleMarks?.update(delta);
     // #60: while catching up after a hidden tab, every frame runs a batch of simulation steps and draws once.
     if(this.background?.running&&!this.visibilityPaused){this.background.step();this.activeFramePending=true;this.updateTimeDisplay();this.updateFoodDisplay();this.refreshVisibility();return;}
     if(this.gameOver||this.gameTime.paused||this.visibilityPaused)return;
