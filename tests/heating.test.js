@@ -52,7 +52,8 @@ test('Haulers fill woodpiles only in autumn and winter; the state saves and load
   const store=[...s.foodStorage.locations.values()].find(l=>s.foodStorage.isStock(l)&&l.allowed.includes('wood'));store.stock.wood=(store.stock.wood??0)+50;
   s.gameTime.day=1;assert.deepEqual(s.heating.candidates(),[]);
   s.gameTime.day=autumnDay;const list=s.heating.candidates();assert.equal(list.length,1);assert.equal(list[0].destinationId,`heat-${h.id}`);assert.equal(list[0].amount,HEATING.capacity);
-  s.gameTime.day=1;pile(s,h,4);s.heating.newDay(winterDay);assert.equal(s.heating.status.get(h.id),'warm');
+  // The weather is random; Frost burns 1.5× wood and 4 logs would not last (CI failed on 0.143.9), so fix it to Sunny.
+  s.gameTime.day=1;pile(s,h,4);s.seasons.weather='Sunny';s.heating.newDay(winterDay);assert.equal(s.heating.status.get(h.id),'warm');
   const saved=validateGameState(serializeGameState(s));assert.deepEqual(saved.heating.warm,[h.id]);
   const r=scene(false);loadGameState(r,structuredClone(saved));assert.equal(r.heating.status.get(h.id),'warm');assert.equal(r.heating.stock(h),1);
   assert.deepEqual(validateGameState(serializeGameState(r)),saved);
