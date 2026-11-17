@@ -3,6 +3,7 @@ import { shapeZoneWorld } from './zoneFeatures.js';
 import { setupZone,updateZone,zoneLook } from './zoneMode.js';
 import { createDungeonView } from './DungeonView.js';
 import { BattleMarks } from '../systems/BattleMarks.js';
+import { TorchFlames } from './TorchFlames.js';
 import { setupSandbox,placeSandboxBuilding,sandboxLand } from './sandboxMode.js';
 import { WorldPanel } from '../ui/WorldPanel.js';
 import { ScoutingSystem } from '../systems/ScoutingSystem.js';
@@ -887,6 +888,7 @@ export class GameScene extends Phaser.Scene {
   update(_time,delta) {
     this.dungeonView?.update?.();
     this.battleMarks?.update(delta);
+    (this.torchFlames??=new TorchFlames(this)).update(delta);
     // #60: while catching up after a hidden tab, every frame runs a batch of simulation steps and draws once.
     if(this.background?.running&&!this.visibilityPaused){this.background.step();this.activeFramePending=true;this.updateTimeDisplay();this.updateFoodDisplay();this.refreshVisibility();return;}
     if(this.gameOver||this.gameTime.paused||this.visibilityPaused)return;
@@ -941,7 +943,7 @@ export class GameScene extends Phaser.Scene {
     this.domestic?.update(activeDelta);
     this.childrenSystem?.update(activeDelta);
     this.porches?.update(activeDelta);
-    this.royalGoals?.update(activeDelta);this.lightFuel?.update();
+    this.royalGoals?.update(activeDelta);this.lightFuel?.update(activeDelta);
     this.nightThreats?.update(activeDelta);
     this.noticeRemaining=Math.max(0,this.noticeRemaining-activeDelta);if(!this.noticeRemaining)document.querySelector('#day-notice').hidden=true;
     return activeDelta;

@@ -97,9 +97,11 @@ class SandboxPanel {
     const remove=el('button','sandbox-remove',t('sandbox.remove'));remove.type='button';remove.dataset.sandboxUnit='remove';remove.addEventListener('click',()=>this.pick('remove'));this.buttons.set('remove',remove);
     const clearFoes=el('button','',t('sandbox.clearFoes'));clearFoes.type='button';clearFoes.addEventListener('click',()=>this.say(t('sandbox.cleared',{count:clearSandboxUnits(this.scene,'foes')})));
     const clearOurs=el('button','',t('sandbox.clearOurs'));clearOurs.type='button';clearOurs.addEventListener('click',()=>this.say(t('sandbox.cleared',{count:clearSandboxUnits(this.scene,'ours')})));
+    // Point 68: a torch for the chosen soldiers (free on the Test map; it shows its light at night and in the mine).
+    const torch=el('button','sandbox-torch',t('sandbox.torch'));torch.type='button';torch.addEventListener('click',()=>{const n=this.scene.lightFuel?.giveFree(this.scene.unitSelection?.workers?.()??[])??0;this.say(n?t('sandbox.torchGiven',{count:n}):t('sandbox.torchNone'));});
     const clearAll=el('button','',t('sandbox.clearAll'));clearAll.type='button';clearAll.addEventListener('click',()=>this.say(t('sandbox.cleared',{count:clearSandboxUnits(this.scene,'all')})));
     const charge=el('button','sandbox-charge',t('sandbox.charge'));charge.type='button';charge.addEventListener('click',()=>this.charge());
-    tools.append(remove,clearFoes,clearOurs,clearAll,charge);this.body.append(tools);
+    tools.append(remove,clearFoes,clearOurs,clearAll,charge,torch);this.body.append(tools);
     this.hint=el('p','sandbox-hint',t('sandbox.hint'));this.body.append(this.hint);
     for(const e of ['pointerdown','mousedown','wheel'])root.addEventListener(e,ev=>ev.stopPropagation());
     document.body.append(root);this.render();

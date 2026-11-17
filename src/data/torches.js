@@ -17,6 +17,10 @@ export const TORCHES=Object.freeze({
   pitchMakerFrom:.5,
   // Soldiers on watch take one torch at dusk; it lights 3 tiles around them for the night.
   handTorch:Object.freeze({radius:3}),
+  // Point 68 (owner 17 Nov 2026): not every soldier lights one – one torch for every 10 soldiers of a group (soldiers
+  // within 6 tiles of each other). A torch lasts a day; underground (always night) the bearer lights a new one each
+  // day, from the stores or, on an expedition, from the wagon's load.
+  perGroup:10,groupLink:6,regroupMs:5000,
   // A soldier with "Tend torches" refills places within 8 tiles of his post.
   tendRange:8,
   // A house without an active light within 6 tiles is dark at night: −30 Safety.

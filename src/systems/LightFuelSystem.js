@@ -6,7 +6,7 @@ import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 // uses it at once and burns until morning; an empty place stays dark, shows "No fuel" and is counted in one notice.
 // Places without `fuel` (castle, gate, bakery…) burn for free. Saved: which places burn tonight.
 export class LightFuelSystem {
-  constructor(scene){this.scene=scene;this.lit=new Set();this.hands=new Set();this.litDay=null;this.wasDark=false;this.listeners=new Set();}
+  constructor(scene){this.scene=scene;this.lit=new Set();this.hands=new Set();this.handDay=new Map();this.free=new Set();this.litDay=null;this.wasDark=false;this.listeners=new Set();this.regroup=0;}
   get storage(){return this.scene.foodStorage;}
   places(){return (this.scene.buildings??[]).filter(b=>buildingIsComplete(b)&&buildingDefinition(b).fuel);}
   locationId(building){return `fuel-${building.id}`;}
@@ -17,12 +17,14 @@ export class LightFuelSystem {
   changed(){for(const l of this.listeners)l();}
   register(building){if(buildingDefinition(building).fuel)this.storage?.register(building);}
   // At dusk every place takes a night's fuel if it has it; in the morning all go out.
-  update(){
+  update(delta=1000/60){
     const dn=this.scene.dayNight;if(!dn)return;const dark=dn.part()==='dusk'||dn.part()==='night',day=this.scene.gameTime.day;
     if(dark&&!this.wasDark&&this.litDay!==day)this.lightUp(day);
-    if(dn.part()==='day'&&(this.lit.size||this.hands.size)){this.lit.clear();this.hands.clear();this.changed();}
+    if(dn.part()==='day'&&(this.lit.size||this.hands.size)){this.lit.clear();this.hands.clear();this.handDay.clear();this.changed();}
     // A torch in hand burns out with its bearer leaving the watch (dead or gone).
-    for(const id of this.hands)if(!this.scene.workerSystem?.workers.get(id)?.isAlive)this.hands.delete(id);
+    for(const id of this.hands)if(!this.scene.workerSystem?.workers.get(id)?.isAlive){this.hands.delete(id);this.handDay.delete(id);this.free.delete(id);}
+    // Point 68: while it is dark the bearers follow the groups (every few seconds); underground a torch lasts a day.
+    if(dark&&(this.regroup-=delta)<=0){this.regroup=TORCHES.regroupMs;this.assignTorches(day);}
     this.wasDark=dark;
   }
   lightUp(day){
@@ -38,13 +40,38 @@ export class LightFuelSystem {
   }
   // Soldiers on the night watch take one Torch each from the stores (the nearest store with one).
   soldiersOnWatch(){return (this.scene.workerSystem?.liveWorkers?.()??[]).filter(w=>w.profession==='soldier'&&w.isAlive&&!w.restPhase);}
-  handOut(day){
-    this.hands.clear();const storage=this.storage;if(!storage)return;
-    for(const w of this.soldiersOnWatch()){
-      const stores=[...storage.locations.values()].filter(l=>storage.isStock(l)&&storage.free(l.id,'torch')>0).sort((a,b)=>Math.hypot(a.x-w.position.x,a.y-w.position.y)-Math.hypot(b.x-w.position.x,b.y-w.position.y));
-      if(stores.length&&storage.withdraw(stores[0].id,'torch',1)){this.hands.add(w.id);this.scene.resourceLedger?.expense('torch',1,'Hand Torch',{id:`hand:${w.id}:${day}`,entityId:w.id});}
-    }
+  handOut(day){this.hands.clear();this.handDay.clear();for(const id of this.free)this.hands.add(id);this.assignTorches(day);}
+  // Point 68: groups of soldiers (within groupLink tiles of each other) and, in each, one torch per perGroup soldiers –
+  // the bearers already lit keep theirs, new ones are the men nearest the group's middle.
+  groups(soldiers=this.soldiersOnWatch()){
+    const link=TORCHES.groupLink,left=new Set(soldiers),out=[];
+    while(left.size){const first=left.values().next().value,group=[first];left.delete(first);
+      for(let i=0;i<group.length;i++)for(const w of [...left])if(Math.hypot(w.position.x-group[i].position.x,w.position.y-group[i].position.y)<=link){group.push(w);left.delete(w);}
+      out.push(group);}
+    return out;
   }
+  assignTorches(day=this.scene.gameTime?.day??1){
+    let changed=false;
+    // underground the night does not end: a torch lit on an earlier day is spent and must be replaced
+    for(const id of [...this.hands])if(!this.free.has(id)&&(this.handDay.get(id)??day)<day){const w=this.scene.workerSystem?.workers.get(id);if(!(w&&this.takeTorch(w,day))){this.hands.delete(id);this.handDay.delete(id);changed=true;}}
+    for(const group of this.groups()){
+      const need=Math.ceil(group.length/TORCHES.perGroup),have=group.filter(w=>this.hands.has(w.id)).length;if(have>=need)continue;
+      const mid={x:group.reduce((n,w)=>n+w.position.x,0)/group.length,y:group.reduce((n,w)=>n+w.position.y,0)/group.length};
+      const candidates=group.filter(w=>!this.hands.has(w.id)).sort((a,b)=>Math.hypot(a.position.x-mid.x,a.position.y-mid.y)-Math.hypot(b.position.x-mid.x,b.position.y-mid.y));
+      for(const w of candidates.slice(0,need-have)){if(!this.takeTorch(w,day))break;this.hands.add(w.id);changed=true;}
+    }
+    if(changed)this.changed();
+  }
+  // One torch: from the nearest store with one, or on an expedition from the wagon's load.
+  takeTorch(w,day){
+    const storage=this.storage,zone=this.scene.zone;
+    const stores=storage?[...storage.locations.values()].filter(l=>storage.isStock(l)&&storage.free(l.id,'torch')>0).sort((a,b)=>Math.hypot(a.x-w.position.x,a.y-w.position.y)-Math.hypot(b.x-w.position.x,b.y-w.position.y)):[];
+    if(stores.length&&storage.withdraw(stores[0].id,'torch',1)){this.scene.resourceLedger?.expense('torch',1,'Hand Torch',{id:`hand:${w.id}:${day}`,entityId:w.id});this.handDay.set(w.id,day);return true;}
+    if(zone?.cargo?.torch>0){zone.cargo.torch--;if(!zone.cargo.torch)delete zone.cargo.torch;this.handDay.set(w.id,day);return true;}
+    return false;
+  }
+  // The Test map: these soldiers carry a torch at no cost (the button in the Test panel).
+  giveFree(workers){let n=0;for(const w of workers)if(w?.profession==='soldier'&&w.isAlive){this.free.add(w.id);this.hands.add(w.id);n++;}if(n)this.changed();return n;}
   // Torches in hand as lights: tile coordinates (sight, safety) and world pixels (light map).
   handLights(){return [...this.hands].map(id=>this.scene.workerSystem?.workers.get(id)).filter(w=>w?.isAlive).map(w=>({x:w.position.x,y:w.position.y,radius:TORCHES.handTorch.radius,workerId:w.id}));}
   carries(worker){return this.hands.has(worker?.id);}
@@ -72,7 +99,7 @@ export class LightFuelSystem {
     return out;
   }
   exportState(){return {lit:[...this.lit].sort((a,b)=>a-b),hands:[...this.hands].sort(),litDay:this.litDay,wasDark:this.wasDark};}
-  importState(data){this.lit=new Set(data?.lit??[]);this.hands=new Set(data?.hands??[]);this.litDay=data?.litDay??null;this.wasDark=!!data?.wasDark;}
+  importState(data){this.lit=new Set(data?.lit??[]);this.hands=new Set(data?.hands??[]);this.handDay=new Map([...this.hands].map(id=>[id,this.scene.gameTime?.day??1]));this.litDay=data?.litDay??null;this.wasDark=!!data?.wasDark;}
   destroy(){this.listeners.clear();}
 }
 export function validLightFuelState(data){

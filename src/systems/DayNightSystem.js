@@ -20,10 +20,12 @@ export class DayNightSystem {
   fraction(){const g=this.time;return g?g.elapsed/g.dayDuration:0;}
   dayOfYear(){const g=this.time;if(!g)return 1;return ((g.day-1)%(SEASON_DAYS*SEASONS.length))+1+this.fraction();}
   nightStart(){return nightStartFor(this.dayOfYear(),this.scene.seasons?.enabled!==false);}
-  part(){return dayPart(this.fraction(),this.nightStart());}
+  // Point 68 (owner 17 Nov 2026): inside the mine it is always night and no moon shines.
+  underground(){return !!this.scene.land?.dungeon;}
+  part(){return this.underground()?'night':dayPart(this.fraction(),this.nightStart());}
   isNight(){return this.part()==='night';}
-  darkness(){return darknessAt(this.fraction(),this.nightStart());}
-  moon(){return moonLight(this.time?.day??1);}
+  darkness(){return this.underground()?1:darknessAt(this.fraction(),this.nightStart());}
+  moon(){return this.underground()?0:moonLight(this.time?.day??1);}
   // Ambient darkness of the light map (0 by day … night alpha, a full moon a little lighter).
   ambientAlpha(){const d=this.darkness();return d*(DAY_NIGHT.ambient.night-DAY_NIGHT.ambient.fullMoon*this.moon());}
   // Lights that let people see at night (torches, braziers, campfires), in tile coordinates.
@@ -62,7 +64,7 @@ export class DayNightSystem {
   // Night speed-up: steps of simulation per frame. Skip to dawn runs faster and stops by itself at dawn; anything
   // that needs attention (a fight) stops both.
   speed(nightSpeed=DAY_NIGHT.defaultNightSpeed){
-    if(!this.isNight()){this.skipping=false;return 1;}
+    if(!this.isNight()||this.underground()){this.skipping=false;return 1;}
     if(this.attention?.()){this.skipping=false;return 1;}
     return this.skipping?DAY_NIGHT.skipSpeed:Math.max(1,nightSpeed);
   }
@@ -79,5 +81,5 @@ export class DayNightSystem {
     }
     return out;
   }
-  skipToDawn(){if(this.isNight())this.skipping=true;return this.skipping;}
+  skipToDawn(){if(this.isNight()&&!this.underground())this.skipping=true;return this.skipping;}
 }

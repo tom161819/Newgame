@@ -29,7 +29,7 @@ export class NightControls {
   update(){
     const dn=this.scene.dayNight,part=dn.part(),night=part==='night';
     if(this.part&&this.part.dataset.part!==part){this.part.dataset.part=part;this.part.textContent=t(`night.part.${part}`);this.part.title=night?t(`night.moon.${this.moonName(dn.moon())}`):'';}
-    if(this.skip){this.skip.hidden=!night;this.skip.classList.toggle('active',!!dn.skipping);}
+    if(this.skip){this.skip.hidden=!night||!!dn.underground?.();this.skip.classList.toggle('active',!!dn.skipping);}
     if(this.plans){const n=night?this.plannedCount():0;this.plans.hidden=!night||!n;const text=t('night.plans',{count:n});if(this.plans.textContent!==text)this.plans.textContent=text;}
   }
   moonName(light){return light>.85?'full':light<.15?'new':'half';}

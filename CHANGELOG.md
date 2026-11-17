@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.14] - 2026-11-17
+<!-- version: {"title":"Always night in the mine, one torch per ten soldiers","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Changed
+- Inside the mine it is always night: no daylight, no moon and no night speed-up or Skip to dawn.
+- Soldiers no longer all light a torch at night: one in every ten soldiers of a group carries one (the man nearest the group's middle). A torch lasts a day; inside the mine the bearer lights a new one each day, from the stores or, on an expedition, from the Horse Wagon's load – so take torches along with the food. What the wagon still carries comes home.
+### Added
+- A torch shows as a small flame above the bearer's hand.
+- Test map: a "Torch for the chosen" button gives the chosen soldiers a free torch.
+
 ## [0.143.13] - 2026-11-17
 <!-- version: {"title":"Bodies stay three days, blood stains in fights","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added

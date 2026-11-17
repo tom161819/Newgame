@@ -156,6 +156,8 @@ export function homeAfterZone(scene){
   if(fallen.size)p.ids=p.ids.filter(id=>!fallen.has(id));
   if(p.king&&home.player&&Number.isFinite(z.kingHP))home.player.currentHP=z.kingHP;
   if(z.loot.gold>0)p.loot={gold:(p.loot?.gold??0)+z.loot.gold};
+  // Point 68: what the wagon still carries comes home (torches burnt on the way are gone).
+  if(p.wagonId!=null&&z.cargo)p.cargo=structuredClone(z.cargo);
   if(!p.ids.length&&!p.king)home.scouting.party=null;
   else Object.assign(p,{phase:'returning',at:home.time.totalElapsed+SCOUTING.travelDays*home.gameSettings.dayLengthSeconds*1000});
   return {home,fallen:[...fallen]};
