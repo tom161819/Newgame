@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.11] - 2026-11-17
+<!-- version: {"title":"Soldiers to Towers, Gates and walls by their picture","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Fixed
+- Right-clicking a Tower, Gate or wall to send chosen soldiers there now works on the building's picture: a click on the tall Tower no longer sends them to the meadow behind it. With the King chosen too, he goes up as well.
+### Changed
+- Up to four soldiers stand on a Tower's or Gate's platform; the rest take the walls beside it.
+
 ## [0.143.10] - 2026-11-17
 <!-- version: {"title":"Test map Knights and enemy soldiers, sharper soldiers, closer zoom","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added

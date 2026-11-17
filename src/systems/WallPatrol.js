@@ -10,6 +10,8 @@ import { t } from '../i18n/index.js';
 // out (+3 sight; an Archer +2 range). Several soldiers spread over the stops. Only soldiers walk on walls.
 export const WALL_PATROL=Object.freeze({pause:Object.freeze([5000,15000]),sight:3,archerRange:2,retry:2000});
 
+// Where the men stand on a platform, in tiles from its middle.
+export const PLATFORM_SLOTS=Object.freeze([{x:0,y:0},{x:-.32,y:.32},{x:.32,y:-.32},{x:.3,y:.3}]);
 export const wallStops=(buildings,walls=wallIndex(buildings))=>[...walls.values()].filter(w=>isWallAccess(w,buildings));
 export const canPatrolWalls=buildings=>wallStops(buildings).length>0;
 // Walls reachable from `start` over joined wall tiles, as a path of tiles to `goal` (breadth first).
@@ -22,10 +24,11 @@ export function wallRoute(walls,start,goal){
 // m-vojaci-na-hradby (owner 14 Nov 2026, point 36): a post. Selected soldiers sent (right click) to a Stone Wall, a
 // Tower or a Gate climb up and stand there until another order: on the wall piece itself (several soldiers take the
 // pieces next to it), on the Tower's platform, or on the walls beside the Gate.
-export function postTiles(buildings,target,count){
+export function postTiles(buildings,target,count,takenSlots=new Set()){
   const walls=wallIndex(buildings),out=[];
   // Owner 15 Nov 2026 (65): a Gate has a platform too (like a Tower), so soldiers can stand on it.
-  if(['tower','gate','wall_gate'].includes(target.type)&&buildingIsComplete(target))out.push({x:target.x,y:target.y,tower:target.id});
+  // Owner 17 Nov 2026: up to four men stand on a platform (the others take the walls beside it).
+  if(['tower','gate','wall_gate'].includes(target.type)&&buildingIsComplete(target))for(let slot=0;slot<PLATFORM_SLOTS.length&&out.length<count;slot++)if(!takenSlots.has(slot))out.push({x:target.x,y:target.y,tower:target.id,slot});
   const starts=isWall(target)?[target]:[...walls.values()].filter(w=>target.tiles?.some(t=>Math.abs(t.x-w.x)+Math.abs(t.y-w.y)===1));
   const seen=new Set(),queue=[];for(const w of starts)if(walls.has(tileKey(w))&&!seen.has(tileKey(w))){seen.add(tileKey(w));queue.push(w);}
   for(let i=0;i<queue.length&&out.length<count;i++){const at=queue[i];out.push({x:at.x,y:at.y});
@@ -37,12 +40,12 @@ export class WallPatrol {
   walls(){return wallIndex(this.scene.buildings);}
   // Start or stop the order for a soldier.
   set(worker,on){
-    if(on){if(worker.wallPatrol?.onWall)this.leave(worker);worker.wallPatrol={phase:'toWall',...(on.x!==undefined?{post:{x:on.x,y:on.y,...(on.tower?{tower:on.tower}:{})}}:{})};return true;}
+    if(on){if(worker.wallPatrol?.onWall)this.leave(worker);worker.wallPatrol={phase:'toWall',...(on.x!==undefined?{post:{x:on.x,y:on.y,...(on.tower?{tower:on.tower,...(on.slot?{slot:on.slot}:{})}:{})}}:{})};return true;}
     if(worker.wallPatrol?.onWall)this.leave(worker);delete worker.wallPatrol;return true;
   }
   // Sends soldiers to a wall piece, Tower or Gate; returns how many got a post.
   post(workers,target){
-    const soldiers=workers.filter(w=>w.profession==='soldier'&&w.isAlive),tiles=postTiles(this.scene.buildings,target,soldiers.length);
+    const soldiers=workers.filter(w=>w.profession==='soldier'&&w.isAlive),taken=new Set((this.scene.workerSystem?.liveWorkers?.()??[]).filter(w=>!soldiers.includes(w)&&w.wallPatrol?.post?.tower===target.id).map(w=>w.wallPatrol.post.slot??0)),tiles=postTiles(this.scene.buildings,target,soldiers.length,taken);
     soldiers.slice(0,tiles.length).forEach((w,i)=>{delete w.huntWolfId;this.scene.workerSystem.commands?.resume?.(w);this.set(w,tiles[i]);});return Math.min(soldiers.length,tiles.length);
   }
   leave(worker){const p=worker.wallPatrol,ground=p?.ground??worker.wallGround??worker.tile;delete worker.wallGround;worker.onWall=null;worker.path=[];worker.nextTile=null;worker.tile={...ground};worker.position={x:ground.x+.5,y:ground.y+.5};if(p){p.onWall=false;p.phase='toWall';}}
@@ -53,7 +56,7 @@ export class WallPatrol {
       const tower=s.buildings.find(b=>b.id===p.post.tower&&buildingIsComplete(b));if(!tower){if(p.onWall)this.leave(worker);delete p.post;return true;}
       worker.workState='Patrolling';worker.workMessage=t('army.order.postActive');if(p.onWall)return true;
       const goals=towerNeighbors(tower).filter(g=>s.map[g.y]?.[g.x]===0);
-      if(goals.some(g=>g.x===worker.tile.x&&g.y===worker.tile.y)&&!worker.nextTile){const d=buildingDefinition(tower);p.onWall=true;p.ground={...worker.tile};worker.wallGround={...worker.tile};worker.onWall=tower;worker.path=[];worker.tile={x:tower.x,y:tower.y};worker.position={x:tower.x+d.width/2,y:tower.y+d.height/2};p.phase='post';return true;}
+      if(goals.some(g=>g.x===worker.tile.x&&g.y===worker.tile.y)&&!worker.nextTile){const d=buildingDefinition(tower);p.onWall=true;p.ground={...worker.tile};worker.wallGround={...worker.tile};worker.onWall=tower;worker.path=[];worker.tile={x:tower.x,y:tower.y};const o=PLATFORM_SLOTS[p.post.slot??0]??PLATFORM_SLOTS[0];worker.position={x:tower.x+d.width/2+o.x,y:tower.y+d.height/2+o.y};p.phase='post';return true;}
       if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=WALL_PATROL.retry;worker.moveTo(goals);}return true;
     }
     if(p.post&&!walls.has(tileKey(p.post)))delete p.post;

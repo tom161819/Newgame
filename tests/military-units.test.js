@@ -207,7 +207,9 @@ test('m-vojaci-na-hradby: soldiers sent to a wall piece or a Tower climb up and 
   const add=(type,x,y)=>{const d=s.objectRegistry.require(type),tiles=[];for(let j=0;j<d.height;j++)for(let i=0;i<d.width;i++)tiles.push({x:x+i,y:y+j});const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,x,y,tiles};s.buildings.push(b);for(const t of tiles)s.map[t.y][t.x]=d.walkable?0:1;s.towerViews.set(b.id,s.createBuildingView(d,b));return b;};
   const tower=add('tower',62,60);const walls=[];for(let x=64;x<72;x++)walls.push(add('wall',x,61));add('tower',72,60);s.events?.emit?.('buildings:changed');
   const target=walls[4];assert.deepEqual(postTiles(s.buildings,target,3).map(t=>`${t.x},${t.y}`),['68,61','69,61','67,61'],'the piece itself, then its neighbours');
-  assert.deepEqual(postTiles(s.buildings,tower,2),[{x:62,y:60,tower:tower.id},{x:64,y:61}],'a Tower: its platform, then the wall beside it');
+  // Owner 17 Nov 2026: up to four men on a platform, the others on the wall beside it.
+  assert.deepEqual(postTiles(s.buildings,tower,2),[{x:62,y:60,tower:tower.id,slot:0},{x:62,y:60,tower:tower.id,slot:1}],'a Tower: two men on its platform');
+  assert.deepEqual(postTiles(s.buildings,tower,6).map(t=>t.tower?`T${t.slot}`:`${t.x},${t.y}`),['T0','T1','T2','T3','64,61','65,61'],'four on the platform, then the wall beside it');
   const a=soldier(s,barracks,{x:58,y:64},3),b=soldier(s,barracks,{x:59,y:64},3),c=soldier(s,barracks,{x:60,y:66},3);
   assert.equal(s.military.wallPatrol.post([a,b],target),2);assert.equal(s.military.wallPatrol.post([c],tower),1);
   for(let i=0;i<6000;i++){s.tick(50);if([a,b,c].every(w=>w.wallPatrol?.phase==='post'))break;}
@@ -216,6 +218,9 @@ test('m-vojaci-na-hradby: soldiers sent to a wall piece or a Tower climb up and 
   const data=validateGameState(serializeGameState(s)),saved=id=>data.workers.find(x=>x.id===id);assert.deepEqual(saved(a.id).wallPatrol,{post:{x:a.wallPatrol.post.x,y:a.wallPatrol.post.y}});assert.deepEqual(saved(c.id).wallPatrol,{post:{x:62,y:60,tower:tower.id}});
   assert.throws(()=>validateGameState({...data,workers:data.workers.map(x=>x.id===a.id?{...x,wallPatrol:{post:{x:1.5,y:2}}}:x)}));
   s.military.wallPatrol.set(a,true);assert.equal(a.wallPatrol.post,undefined,'"Patrol – walls" ends the post');
+  // a second man on the same Tower keeps his place on the platform through Save/Load
+  assert.equal(s.military.wallPatrol.post([a,b],tower),2);const slots=validateGameState(serializeGameState(s)).workers.filter(x=>x.wallPatrol?.post?.tower===tower.id).map(x=>x.wallPatrol.post.slot??0).sort();assert.deepEqual(slots,[0,1,2],'the man already up there keeps his place, the new ones take the free ones');
+  assert.throws(()=>validateGameState({...data,workers:data.workers.map(x=>x.id===c.id?{...x,wallPatrol:{post:{x:62,y:60,tower:tower.id,slot:7}}}:x)}),'a platform has four places');
 });
 // Owner 15 Nov 2026 (65): soldiers get onto walls, Gates and Towers – a Gate has a platform like a Tower, and a soldier
 // sent to a wall piece climbs at that piece even when no Tower or Gate touches the wall.
@@ -224,7 +229,7 @@ test('owner 65: soldiers stand on a Gate and climb a wall without a Tower or Gat
   const {s,barracks}=kingdom();
   const add=(type,x,y)=>{const d=s.objectRegistry.require(type),tiles=[];for(let j=0;j<d.height;j++)for(let i=0;i<d.width;i++)tiles.push({x:x+i,y:y+j});const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,x,y,tiles};s.buildings.push(b);for(const t of tiles)s.map[t.y][t.x]=d.walkable?0:1;s.towerViews.set(b.id,s.createBuildingView(d,b));return b;};
   const walls=[];for(let x=64;x<70;x++)walls.push(add('wall',x,61));const gate=add('gate',70,60);s.events?.emit?.('buildings:changed');
-  assert.deepEqual(postTiles(s.buildings,gate,1),[{x:70,y:60,tower:gate.id}],'the Gate\'s platform first');
+  assert.deepEqual(postTiles(s.buildings,gate,1),[{x:70,y:60,tower:gate.id,slot:0}],'the Gate\'s platform first');
   const lone=[];for(let x=64;x<68;x++)lone.push(add('wall',x,70));s.events?.emit?.('buildings:changed');
   const a=soldier(s,barracks,{x:60,y:66},3),b=soldier(s,barracks,{x:61,y:66},3);
   assert.equal(s.military.wallPatrol.post([a],gate),1);assert.equal(s.military.wallPatrol.post([b],lone[1]),1);

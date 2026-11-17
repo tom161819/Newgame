@@ -102,8 +102,13 @@ export class UnitSelection {
         // m-vojaci-utok (point 39): a right click on an enemy (a wolf now, other enemies later) sends the selected soldiers at it.
         {const enemy=this.enemyAt(pointer),fighters=this.workers().filter(w=>w.profession==='soldier');
           if(enemy&&fighters.length){for(const w of fighters){s.workerSystem.commands.resume(w);s.military?.wallPatrol?.set(w,false);}if(s.military?.orderAttack)s.military.orderAttack(fighters,enemy);else for(const w of fighters){w.huntWolfId=enemy.id;w.militaryRetarget=0;}s.setStatus(t('army.attack',{count:fighters.length,name:enemy.definition.name}));if(this.king)s.kingOrder(pointer);this.draw();return true;}}
-        const tile=s.pointerTile(pointer),target=tile&&s.buildings.find(b=>buildingIsComplete(b)&&(isWall(b)||['tower','gate','wall_gate'].includes(b.type))&&b.tiles?.some(tl=>tl.x===tile.x&&tl.y===tile.y)),soldiers=this.workers().filter(w=>w.profession==='soldier');
-        if(target&&soldiers.length){const posted=s.military?.wallPatrol?.post(soldiers,target)??0;if(posted){s.setStatus(t('army.posted',{count:posted,name:buildingDefinition(target).name}));this.draw();return true;}s.setStatus(t('army.postNoWay'));return true;}
+        // Owner 17 Nov 2026 ("I click the Tower and the soldier goes to the meadow behind it"): a Tower or a Gate stands
+        // high over its tiles, so the click is matched to the building's picture (as for the King), not only to the
+        // tile under the pointer.
+        const tile=s.pointerTile(pointer);pointer.updateWorldPoint?.(s.cameras.main);const postable=b=>!!b&&buildingIsComplete(b)&&(isWall(b)||['tower','gate','wall_gate'].includes(b.type));
+        const picked=s.towerAtPoint?.(pointer.worldX,pointer.worldY,tile),target=postable(picked)?picked:tile&&s.buildings.find(b=>postable(b)&&b.tiles?.some(tl=>tl.x===tile.x&&tl.y===tile.y)),soldiers=this.workers().filter(w=>w.profession==='soldier');
+        if(target&&(soldiers.length||this.king)){if(this.king)s.kingOrder(pointer);if(!soldiers.length){this.draw();return true;}
+          const posted=s.military?.wallPatrol?.post(soldiers,target)??0;if(posted){s.setStatus(t('army.posted',{count:posted,name:buildingDefinition(target).name}));this.draw();return true;}s.setStatus(t('army.postNoWay'));return true;}
         // Owner 17 Nov 2026: the order is given when the button goes up; while it is held the blueprint shows the places
         // and dragging turns it.
         if(this.ids.size){const tile=s.pointerTile(pointer);pointer.updateWorldPoint(s.cameras.main);this.order={tile,x:pointer.x,y:pointer.y,world:{x:pointer.worldX,y:pointer.worldY},facing:null};this.drawOrder();}
