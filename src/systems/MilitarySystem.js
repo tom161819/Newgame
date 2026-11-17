@@ -77,8 +77,9 @@ export class MilitarySystem {
   enlistStartingGarrison(random=Math.random){const ws=this.scene.workerSystem,out=[];for(const {type,count} of START_GARRISON)for(let i=0;i<count;i++){if(ws.liveSubjects().length>=ws.capacity())return out;const w=ws.spawnNearStart(random);if(w&&this.enlist(w,type))out.push(w);}ws.updateUI();return out;}
   // New game only: a resident becomes a trained unit with the unit's own equipment (no Armory stock is used).
   // Garrison units (garrison:true) serve the Castle: they need no Barracks and stay soldiers until dismissed.
-  enlist(worker,type){
-    if(!worker?.isAlive||!UNIT_TYPES[type]||UNIT_TYPES[type].mount)return false;
+  // options.withoutHorse: the Test map's Knights stand on foot (the owner's Knight figure), no Stables needed.
+  enlist(worker,type,{withoutHorse=false}={}){
+    if(!worker?.isAlive||!UNIT_TYPES[type]||UNIT_TYPES[type].mount&&!withoutHorse)return false;
     if(!this.scene.workerSystem.jobs.assign(worker,'soldier'))return false;
     this.units.set(worker.id,{type,equipment:{...UNIT_TYPES[type].equipment},garrison:true});this.apply(worker);worker.currentHP=worker.maxHP;return true;
   }

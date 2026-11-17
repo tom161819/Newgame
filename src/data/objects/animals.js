@@ -73,3 +73,20 @@ animals.push({
   stats:{maxHP:80,attackDPS:9,armor:5,attackRange:1},
   animations:{mode:'procedural',states:['idle','walk'],directions:['N','NE','E','SE','S','SW','W','NW']},
 });
+
+// Owner 17 Nov 2026: the enemy army has the same four soldiers as ours (the owner's 3D models in steel blue, look in
+// ENEMY_ANIM_LOOKS); for the Test map now, armies of other castles later.
+const ENEMY_RANKS={soldier:{name:'Enemy Recruit',look:'enemy-recruit',speed:2.6,stats:{maxHP:70,attackDPS:7,armor:2,attackRange:1}},
+  archer:{name:'Enemy Archer',look:'enemy-archer',speed:2.6,stats:{maxHP:60,attackDPS:7,armor:0,attackRange:6}},
+  swordsman:{name:'Enemy Swordsman',look:'enemy-swordsman',speed:2.5,stats:{maxHP:100,attackDPS:10,armor:6,attackRange:1}},
+  knight:{name:'Enemy Knight',look:'enemy-knight',speed:2.8,stats:{maxHP:140,attackDPS:13,armor:10,attackRange:1}}};
+for(const [rank,r] of Object.entries(ENEMY_RANKS))animals.push({
+  id:`enemy_${rank}`,name:r.name,category:'animal',sprite:'/assets/characters/peasant/peasant.svg',look:r.look,
+  width:1,height:1,walkable:false,collectible:false,buildable:false,cost:{},interactions:['hunt'],
+  description:'A soldier of an enemy army in steel blue. Attacks anyone of the kingdom who comes close.',
+  renderMode:'procedural',renderer:'enemy-soldier',origin:{x:.5,y:.92},visualHeight:48,
+  visual:{hitArea:{x:-13,y:-44,width:26,height:39},healthBarOffset:48},depth:{offset:.1},
+  gameplay:{movementSpeed:r.speed,initialCount:0,behavior:'wander',huntable:true,meatDrop:0,wanderRadius:2,guardRadius:9,zoneOnly:true,hostile:true},
+  stats:{...r.stats},
+  animations:{mode:'procedural',states:['idle','walk'],directions:['N','NE','E','SE','S','SW','W','NW']},
+});

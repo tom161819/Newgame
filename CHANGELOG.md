@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.10] - 2026-11-17
+<!-- version: {"title":"Test map Knights and enemy soldiers, sharper soldiers, closer zoom","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- The Test map has all four of our ranks – the Knight joins (on foot) – and the same four as enemies: Enemy Recruit, Archer, Swordsman and Knight in steel blue. They fight, strike and fall like ours; the Enemy Archer shoots from afar.
+### Improved
+- Soldiers are drawn with twice the detail, so they stay sharp when you zoom in.
+- You can zoom in much closer (up to 3.2× instead of 1.8×).
+
 ## [0.143.9] - 2026-11-17
 <!-- version: {"title":"Rounder mine caves with rock obstacles, fog of war in the mine","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Improved

@@ -18,8 +18,8 @@ export function sandboxSettings(landId='home'){
   return gameSettings({...DEFAULT_GAME_SETTINGS,worldCode:land?zoneWorldCode(seed,`sandbox-${Date.now()}`,land.type,{dungeon:land.dungeon}):seed,...(land?{mapSize:100}:{}),fogOfWar:false,nightWolves:false,nightThieves:false,nightFires:false,startingGarrison:false,startingCastle:!land});
 }
 export const SANDBOX_UNITS=Object.freeze([
-  {group:'ours',id:'soldier',unit:'soldier'},{group:'ours',id:'archer',unit:'archer'},{group:'ours',id:'swordsman',unit:'swordsman'},
-  {group:'foes',id:'raider'},{group:'foes',id:'bandit'},{group:'foes',id:'cave_rat'},{group:'foes',id:'wolf'},
+  {group:'ours',id:'soldier',unit:'soldier'},{group:'ours',id:'archer',unit:'archer'},{group:'ours',id:'swordsman',unit:'swordsman'},{group:'ours',id:'knight',unit:'knight'},
+  {group:'foes',id:'enemy_soldier'},{group:'foes',id:'enemy_archer'},{group:'foes',id:'enemy_swordsman'},{group:'foes',id:'enemy_knight'},{group:'foes',id:'raider'},{group:'foes',id:'bandit'},{group:'foes',id:'cave_rat'},{group:'foes',id:'wolf'},
   {group:'animals',id:'deer'},{group:'animals',id:'wild_boar'},{group:'animals',id:'rabbit'},{group:'animals',id:'horse'},
 ].map(u=>Object.freeze(u)));
 export const SANDBOX_COUNTS=Object.freeze([1,5,10,25,50]);
@@ -60,7 +60,7 @@ export function tilesAround(scene,center,count){
 export function spawnSandboxUnits(scene,unitId,center,count){
   const s=scene,spec=SANDBOX_UNITS.find(u=>u.id===unitId);if(!spec)return 0;const tiles=tilesAround(s,center,count);let n=0;
   for(const tile of tiles){
-    if(spec.unit){const w=s.workerSystem.create(tile);if(s.military.enlist(w,spec.unit)){w.sandbox=true;n++;}else{w.isAlive=false;s.workerSystem.onDeath(w);}}
+    if(spec.unit){const w=s.workerSystem.create(tile);if(s.military.enlist(w,spec.unit,{withoutHorse:true})){w.sandbox=true;n++;}else{w.isAlive=false;s.workerSystem.onDeath(w);}}
     else{const d=s.objectRegistry.get(spec.id);if(!d)break;const a=s.animalSystem.create(d,tile);a.sandbox=true;n++;}
   }
   s.workerSystem.updateUI?.();return n;

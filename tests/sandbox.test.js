@@ -15,3 +15,12 @@ test('Test map: units are put on free tiles around the click',()=>{
   const tiles=tilesAround(scene,{x:10,y:10},12),keys=tiles.map(t=>`${t.x},${t.y}`);
   assert.equal(tiles.length,12);assert.equal(new Set(keys).size,12);assert.ok(!keys.includes('11,10')&&!keys.includes('9,10')&&!keys.includes('10,9'));assert.equal(keys[0],'10,10');
 });
+
+test('owner 17 Nov 2026: all four of our ranks on the Test map (the Knight on foot), and the same four as enemies',async()=>{
+  const { spawnSandboxUnits }=await import('../src/game/sandboxMode.js');const { workerScene }=await import('./helpers/workerScene.js');
+  assert.deepEqual(SANDBOX_UNITS.filter(u=>u.group==='ours').map(u=>u.unit),['soldier','archer','swordsman','knight']);
+  for(const rank of ['soldier','archer','swordsman','knight'])assert.ok(SANDBOX_UNITS.some(u=>u.group==='foes'&&u.id===`enemy_${rank}`),rank);
+  const s=workerScene(undefined,{foodProduction:true});assert.equal(spawnSandboxUnits(s,'knight',{x:60,y:60},2),2);
+  const knights=s.workerSystem.liveWorkers().filter(w=>s.military.unit(w)?.type==='knight');assert.equal(knights.length,2);
+  const w=s.workerSystem.create({x:64,y:64});assert.equal(s.military.enlist(w,'knight'),false,'in the game a Knight still needs a horse');
+});

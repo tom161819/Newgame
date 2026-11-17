@@ -81,7 +81,7 @@ export class UnitSelection {
     if(!art?.walk||!s?.textures?.exists?.(key))return null;const cache=this.pictures??=new Map();if(cache.has(look))return cache.get(look);
     try{const frame=s.textures.getFrame(key,0),src=frame?.source?.image;if(!src)return null;const W=36,H=50,ax=Math.round(art.walk.origin.x*art.walk.frameWidth),ay=Math.round(art.walk.origin.y*art.walk.frameHeight);
       const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
-      ctx.drawImage(src,frame.cutX+ax-W/2,frame.cutY+ay-H+3,W,H,0,0,W,H);const url=canvas.toDataURL();cache.set(look,url);return url;}catch{return null;}
+      const z=1/(art.walk.scale??1);ctx.imageSmoothingEnabled=z>1;ctx.drawImage(src,frame.cutX+ax-W*z/2,frame.cutY+ay-(H-3)*z,W*z,H*z,0,0,W,H);const url=canvas.toDataURL();cache.set(look,url);return url;}catch{return null;}
   }
   kindOf(w){return w.profession==='soldier'?`soldier:${this.scene.military?.unit?.(w)?.type??'recruit'}`:w.profession;}
   workers(){return [...this.ids].map(id=>this.scene.workerSystem.workers.get(id)).filter(w=>this.scene.workerSystem.commands.selectable(w));}

@@ -45,6 +45,8 @@ export class HumanView extends Phaser.GameObjects.Container {
   }
   // Profession and name decide the approved look; the procedural figure stays until it loads.
   updateLook(){
+    // An enemy soldier (an animal definition with a fixed look) wears that look.
+    if(this.definition?.look){const look=this.definition.look;if(look===this.look)return;this.look=look;this.lookReady=false;if(villagerArt(look))this.lookReady=ensureLook(this.scene,look,()=>{if(this.look===look&&this.scene){this.lookReady=true;this.applyArt();}});this.applyArt();return;}
     const worker=this.getData?.('worker');if(!worker)return;
     const sex=worker.identity?(worker.identity.sex==='f'?'female':'male'):villagerSex(worker.name),profession=worker.isSubject===false?worker.profession:(worker.displayProfession??'idle');
     // g-vojaci-grafika: a soldier wears the look of his rank (Recruits the plain soldier look).
@@ -60,10 +62,10 @@ export class HumanView extends Phaser.GameObjects.Container {
     if(!on){this.art.setVisible(false);return;}
     const art=villagerArt(this.look);this.tool.setVisible(false);this.weapon.setVisible(false);
     if(art.anim&&hasWalk(this.scene,this.look)){const frame=soldierFrame(art.anim,k,{walkedMs:this.walked??0,walkFps:art.walk.fps,moving:!!this.isWalking,attackMs:this.attackMs??0,attacking:!!this.attacking,idleCol:this.idleCol??art.anim.idle}),key=walkKey(this.look);
-      if(this.artFrame!==`${key}:${frame}`){this.artFrame=`${key}:${frame}`;this.art.setTexture(key,frame).setOrigin(art.walk.origin.x,art.walk.origin.y);}this.art.setVisible(true);return;}
+      if(this.artFrame!==`${key}:${frame}`){this.artFrame=`${key}:${frame}`;this.art.setTexture(key,frame).setOrigin(art.walk.origin.x,art.walk.origin.y).setScale(art.walk.scale??1);}this.art.setVisible(true);return;}
     if(hasWalk(this.scene,this.look)){const frame=walkFrame(k,this.walked??0,art.walk.fps,!!this.isWalking),key=walkKey(this.look);
-      if(this.artFrame!==`${key}:${frame}`){this.artFrame=`${key}:${frame}`;this.art.setTexture(key,frame).setOrigin(art.walk.origin.x,art.walk.origin.y);}this.art.setVisible(true);return;}
-    const origin=art.origins[k];this.artFrame=null;
+      if(this.artFrame!==`${key}:${frame}`){this.artFrame=`${key}:${frame}`;this.art.setTexture(key,frame).setOrigin(art.walk.origin.x,art.walk.origin.y).setScale(art.walk.scale??1);}this.art.setVisible(true);return;}
+    const origin=art.origins[k];this.artFrame=null;this.art.setScale(1);
     this.art.setTexture(lookKey(this.look,k)).setOrigin(origin.x,origin.y).setVisible(true);
   }
   paint(){
@@ -130,7 +132,7 @@ export class HumanView extends Phaser.GameObjects.Container {
   playDeath(){
     const art=this.look&&this.lookReady?villagerArt(this.look):null,scene=this.scene;if(!art?.anim||!this.art.visible||!scene?.add)return null;
     const k=FACING_INDEX[this.facing]??0,key=walkKey(this.look),frames=art.anim.die.map(c=>k*art.anim.columns+c);
-    const body=scene.add.image(this.x,this.y,key,frames[0]).setOrigin(art.walk.origin.x,art.walk.origin.y).setDepth(this.depth);
+    const body=scene.add.image(this.x,this.y,key,frames[0]).setOrigin(art.walk.origin.x,art.walk.origin.y).setScale(art.walk.scale??1).setDepth(this.depth);
     // One timer drives the fall (dieFps), the rest on the ground (1.8 s) and the fade (1.2 s).
     const fall=frames.length*1000/art.anim.dieFps,end=fall+3000;let t=0;
     const step=scene.time?.addEvent?.({delay:50,loop:true,callback:()=>{t+=50;if(!body.active){step.remove();return;}

@@ -15,7 +15,8 @@ test('each soldier sheet holds 8 facings of idle, walk, attack and fall frames',
   for(const [look,art] of Object.entries(SOLDIER_ANIM_ART)){
     const a=art.anim;assert.equal(a.columns,a.idles.length+a.walk.length+a.attack.length+a.die.length,look);assert.equal(a.idles[0],a.idle);assert.equal(a.idles.length,6);
     assert.deepEqual([a.walk.length,a.attack.length,a.die.length],[8,6,4]);
-    const size=pngSize(`public${art.base}.walk.png`);assert.equal(size.w,art.walk.frameWidth*a.columns,look);assert.equal(size.h,art.walk.frameHeight*8,look);
+    const size=pngSize(`public${art.base}.walk.png`);assert.equal(size.w,art.walk.frameWidth*a.perRow,look);assert.equal(size.h,art.walk.frameHeight*Math.ceil(8*a.columns/a.perRow),look);assert.ok(size.w<=4096&&size.h<=4096,`${look} fits a WebGL texture`);
+    assert.equal(art.walk.scale,.5,'drawn at half size: double detail for zooming in');
     assert.ok(art.walk.origin.x>0&&art.walk.origin.x<1&&art.walk.origin.y>.5&&art.walk.origin.y<1,look);}
 });
 
@@ -37,4 +38,11 @@ test('standing soldiers make small moves at their own random times, then stand s
   let back=0;while(soldierIdle(a,st,100,rnd)!==a.idle&&back<5000)back+=100;assert.ok(back<=2800,`still again after ${back} ms`);
   const other={};const cols=new Set();for(let n=0;n<4000;n++)cols.add(soldierIdle(a,other,100));assert.ok(cols.size>=3,'several different moves');
   assert.equal(soldierIdle({idle:0,idles:[0]},{},100),0);
+});
+
+test('the enemy army has the same four soldiers in its own colour, as hostile units for the Test map', async () => {
+  const { ENEMY_ANIM_LOOKS }=await import('../src/data/soldierAnimArt.js');const { objectRegistry }=await import('../src/systems/ObjectRegistry.js');
+  assert.deepEqual(Object.keys(ENEMY_ANIM_LOOKS).sort(),['archer','knight','soldier','swordsman']);
+  for(const [rank,look] of Object.entries(ENEMY_ANIM_LOOKS)){const d=objectRegistry.get(`enemy_${rank}`);assert.equal(d.look,look);assert.equal(d.gameplay.hostile,true);assert.equal(d.gameplay.zoneOnly,true);assert.equal(SOLDIER_ANIM_ART[look].side,'enemy');}
+  assert.ok(objectRegistry.get('enemy_archer').stats.attackRange>1,'the enemy archer shoots from afar');
 });

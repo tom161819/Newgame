@@ -62,6 +62,8 @@ export class CombatFeedback {
     const target=s.combat.attacks.get(king),attacking=!!target&&s.combat.canFight(king)&&inAttackRange(king,target,s.map);
     const direction=target?{x:target.position.x-king.position.x,y:target.position.y-king.position.y}:king.direction;
     s.player.setAttackPose?.(delta,attacking,direction);
+    // Enemy soldiers (animal definitions drawn as people) strike and face their target too.
+    for(const a of s.animalSystem?.animals?.values()??[]){if(!a.definition?.look||!a.view?.setAttackPose)continue;const target=s.combat.attacks.get(a),active=!!target&&inAttackRange(a,target,s.map);a.view.setAttackPose(delta,active,target?{x:target.position.x-a.position.x,y:target.position.y-a.position.y}:a.direction);}
     for(const worker of s.workerSystem?.liveWorkers()??[]){const target=s.combat.attacks.get(worker),active=!!target&&s.combat.canFight(worker)&&inAttackRange(worker,target,s.map);worker.view.setAttackPose?.(delta,active,target?{x:target.position.x-worker.position.x,y:target.position.y-worker.position.y}:worker.direction);}
   }
   refresh(){

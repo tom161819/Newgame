@@ -16,7 +16,8 @@ args = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else sys.argv[1:]
 blend, out, kind = args[0], args[1], args[2]
 samples = int(args[args.index('--samples') + 1]) if '--samples' in args else 16
 only = int(args[args.index('--only') + 1]) if '--only' in args else None
-first = int(args[args.index('--from') + 1]) if '--from' in args else 0  # render only columns from this one on
+first = int(args[args.index('--from') + 1]) if '--from' in args else 0
+hue = float(args[args.index('--hue') + 1]) if '--hue' in args else None  # army colour: node "Army cloth" Hue (0.5 = the owner's wine red)  # render only columns from this one on
 SS = 3; PPM = 30; FW, FH = 128, 136; ANCHOR = (64, 100)  # final frame and the feet point inside it
 
 bpy.ops.wm.open_mainfile(filepath=blend)
@@ -38,6 +39,10 @@ big = max(FW, FH)
 cam.data.shift_x = -(ANCHOR[0] - FW / 2) / big
 cam.data.shift_y = (ANCHOR[1] - FH / 2) / big
 
+if hue is not None:
+  for m in bpy.data.materials:
+    node = m.node_tree.nodes.get('Army cloth') if m.node_tree else None
+    if node and 'Hue' in node.inputs: node.inputs['Hue'].default_value = hue
 pb = arm.pose.bones
 for p in pb: p.rotation_mode = 'QUATERNION'
 X = Vector((1, 0, 0)); Z = Vector((0, 0, 1)); Y = Vector((0, 1, 0))

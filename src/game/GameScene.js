@@ -236,6 +236,7 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('human',(definition,context)=>new HumanView(this,context.x,context.y,definition));
     this.assets.registerRenderer('bandit',(definition,context)=>new BanditView(this,context.x,context.y,definition));
     this.assets.registerRenderer('raider',(definition,context)=>new RaiderView(this,context.x,context.y,definition));
+    this.assets.registerRenderer('enemy-soldier',(definition,context)=>new HumanView(this,context.x,context.y,definition));
     this.assets.registerRenderer('workplace',(_definition,context)=>new WorkplaceView(this,context.building,context.preview));
     this.assets.registerRenderer('food_building',(_definition,context)=>new WorkplaceView(this,context.building,context.preview));
     this.assets.registerRenderer('crop',(_definition,context)=>new CropPlotView(this,context.building,context.preview));
@@ -859,7 +860,7 @@ export class GameScene extends Phaser.Scene {
       if(unit.isSubject!==false)this.workerSystem.recordDeath(unit,cause);this.dangerMarks?.mark(unit.position);unit.view?.playDeath?.();this.workerSystem.onDeath(unit);return;}
     const tile={x:Math.floor(unit.position.x),y:Math.floor(unit.position.y)},amount=Math.round(unit.definition.gameplay.meatDrop*devProduction('hunter'));
     if(killer){const event={type:'animalKilled',objectType:unit.type,quantity:1,objectId:unit.id};if(!this.workplaceSystem?.deferReward(killer,event))this.activities.emit(event.type,{...event,actor:killer});}
-    this.mountSystem.onDeath(unit);this.animalSystem.remove(unit);this.combatFeedback.remove(unit.id);
+    unit.view?.playDeath?.();this.mountSystem.onDeath(unit);this.animalSystem.remove(unit);this.combatFeedback.remove(unit.id);
     const drop=amount>0?this.dropSystem.create('meat',tile,amount):null;this.workerSystem.ai.animalDied(unit,killer,drop);
     if(amount>0)this.foodSystem.recordProduction('meat',amount,`meat-${unit.id}`);
     if(this.huntingSystem.target===unit)this.huntingSystem.cancel();
