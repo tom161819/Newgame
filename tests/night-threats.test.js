@@ -197,3 +197,10 @@ test('m-pozar-imunita: a building whose fire was put out cannot catch fire again
   const back=new NightThreatSystem(s);back.importState(state.nightThreats);assert.equal(back.fireproof(house),true,'kept by Save/Load');
   s.gameTime.update(s.gameTime.dayDuration*.6);assert.equal(n.fireproof(house),false,'half a day later it can burn again');
 });
+
+test('owner 17 Nov 2026: a fire is no longer endless – one resident with a Well 8 tiles away puts it out in well under a minute, and a busy resident drops his task to help',()=>{
+  const {s,n}=world();const place=(type,x,y)=>{const d=s.objectRegistry.require(type);const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,x,y,tiles:[]};for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){b.tiles.push({x:x+dx,y:y+dy});s.map[y+dy][x+dx]=1;}s.buildings.push(b);return b;};
+  const house=place('house',60,60);place('well',69,60);const w=s.workerSystem.create({x:58,y:58});w.workTask={kind:'idle-test'};
+  n.random=()=>.5;n.ignite(house);let ms=0;for(;ms<120000&&n.burning(house);ms+=50){n.firefight(w,50);w.update(50);n.updateFires(50);}
+  assert.equal(n.burning(house),false,'put out');assert.ok(ms<45000,`took ${ms/1000} s`);assert.equal(w.workTask,null,'he dropped his task');assert.ok(s.buildings.includes(house));
+});

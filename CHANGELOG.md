@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.144.5] - 2026-11-17
+<!-- version: {"title":"Fires easier to put out","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Balance
+- Fires are easier to put out. A fire starts weaker, grows back four times slower, and each bucket puts out more. One resident with a Well 8 tiles away now puts a fire out in about half a minute; before, he never managed. Up to 8 residents within 20 tiles help, up from 6 within 15.
+### Changed
+- A resident busy with a task drops it to fight a fire. Only someone carrying goods keeps walking.
+
 ## [0.144.4] - 2026-11-17
 <!-- version: {"title":"Archers on walls shoot and keep their posts","type":"fix","reconstructed":false,"saveVersion":64} -->
 ### Fixed

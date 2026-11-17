@@ -277,14 +277,16 @@ export class NightThreatSystem {
       if(isWalkable(s.map,x,y)&&[[1,0],[-1,0],[0,1],[0,-1]].some(([ax,ay])=>isWaterGround(s.groundGrid?.[y+ay]?.[x+ax])))shore.push({x,y});}
     return {kind:'shore',goals:shore};
   }
-  // A resident within 15 tiles drops what he is doing (if his hands are free) and carries buckets; true = handled.
+  // A resident within 20 tiles drops what he is doing (if his hands are free) and carries buckets; true = handled.
   firefight(worker,delta){
-    const F=NIGHT_THREATS.fires,s=this.scene;if(!this.fires.size||worker.isSubject===false||!worker.isAlive||worker.workTask||worker.cargo){if(worker.firefight&&!this.fires.has(worker.firefight.fireId))worker.firefight=null;return false;}
+    const F=NIGHT_THREATS.fires,s=this.scene;if(!this.fires.size||worker.isSubject===false||!worker.isAlive||worker.cargo){if(worker.firefight&&!this.fires.has(worker.firefight.fireId))worker.firefight=null;return false;}
     let job=worker.firefight;
     if(job&&!this.fires.has(job.fireId)){worker.firefight=null;worker.path=[];worker.workState='Idle';worker.workMessage='';return false;}
     if(!job){
       const fire=[...this.fires.values()].map(f=>({f,b:s.buildings.find(x=>x.id===f.id)})).filter(x=>x.b&&this.gap(x.b,worker.position)<=F.helperRange).sort((a,z)=>this.gap(a.b,worker.position)-this.gap(z.b,worker.position))[0];
       if(!fire||s.workerSystem.liveSubjects().filter(w=>w.firefight?.fireId===fire.f.id).length>=F.helpers)return false;
+      // Owner 17 Nov 2026: a resident busy with a task (hands free) drops it and helps; only one carrying goods does not.
+      if(worker.workTask)s.workerSystem.ai?.cancel?.(worker);
       if(worker.restPhase)s.workerSystem.rest?.stop?.(worker);job=worker.firefight={fireId:fire.f.id,phase:'toWater',t:0};worker.path=[];
       // m-pozary (36): when the first resident answers, the fate is rolled once – 10 % the building is lost, otherwise it is saved.
       if(!fire.f.fate){fire.f.fate=this.random()<F.destroyChance?'lost':'saved';s.eventFeed?.push?.(`fire-help:${fire.f.id}:${s.gameTime?.day??1}`,t('threats.fireHelp',{name:s.objectRegistry.require(fire.b.type).name}),{target:fire.b});}
