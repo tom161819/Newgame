@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.17] - 2026-11-17
+<!-- version: {"title":"Older saves with an Armory load again","type":"fix","reconstructed":false,"saveVersion":64} -->
+### Fixed
+- A game saved before 0.143.16 with an Armory, Barracks or Marketplace loads again (their stores now take the new weapons).
+
 ## [0.143.16] - 2026-11-17
 <!-- version: {"title":"New units: Halberdier, Royal Archer, Crossbowman, Light Cavalry","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added

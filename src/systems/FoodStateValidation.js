@@ -55,7 +55,8 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   for(const l of storage.locations){
     const e=expected.get(l.id);check(e&&!locations.has(l.id));locations.set(l.id,l);
     // m-palivo-vyroba: a workshop whose recipe gained an input (Wood as fuel) keeps an older save's buffer with the new list.
-    if(e&&['input','output'].includes(l.kind)&&Array.isArray(l.allowed)&&l.allowed.every(r=>e.allowed.includes(r)))l.allowed=[...e.allowed];
+    // p70/p71: a store, kit or market that now accepts more goods (new equipment, Flax, Cloth) keeps an older save the same way.
+    if(e&&['input','output','storage','fallback','kit','market'].includes(l.kind)&&Array.isArray(l.allowed)&&l.allowed.every(r=>e.allowed.includes(r)))l.allowed=[...e.allowed];
     for(const [key,value]of Object.entries(e))check(JSON.stringify(l[key])===JSON.stringify(value));
     check(l.stock&&typeof l.stock==='object'&&!Array.isArray(l.stock));for(const [id,n]of Object.entries(l.stock)){check(l.allowed.includes(id));integer(n,1);}
     if(l.haulExcluded!==undefined){check(l.haulExcluded&&typeof l.haulExcluded==='object'&&!Array.isArray(l.haulExcluded));for(const [id,n]of Object.entries(l.haulExcluded)){check(l.allowed.includes(id));integer(n,1,l.stock[id]??0);}}

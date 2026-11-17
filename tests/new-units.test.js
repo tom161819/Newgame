@@ -54,3 +54,11 @@ test('p70: the Swordsmith, Bowyer and Armorer switch to Halberds, Crossbows and 
   const t=scene(false);loadGameState(t,validateGameState(state));
   for(const id of ids){const b=t.buildings.find(b=>b.id===id);assert.equal(t.foodProduction.records.get(id).recipe,Object.keys(t.objectRegistry.require(b.type).recipes)[0]);}
 });
+
+test('p70 fix: a save from before the new items (Armory, Barracks kit and Marketplace with the older lists) still loads',()=>{
+  const {s,armory,barracks}=kingdom();const market=building(s,'marketplace',40,60);s.foodStorage.register(market);
+  const state=serializeGameState(s),old=['bow','sword','armor'];
+  for(const l of state.foodStorage.locations){if(l.id===`armory-${armory.id}`||l.id===`kit-${barracks.id}`)l.allowed=l.allowed.filter(r=>old.includes(r));if(l.kind==='market')l.allowed=l.allowed.filter(r=>!['halberd','crossbow','light_armor'].includes(r));}
+  const t=scene(false);loadGameState(t,validateGameState(state));
+  assert.ok(t.foodStorage.locations.get(`armory-${armory.id}`).allowed.includes('halberd'));
+});
