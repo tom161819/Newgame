@@ -19,12 +19,25 @@ function clearGroups(world,keys){world.natureGroups=(world.natureGroups??[]).fil
 function setCell(world,x,y,rock,ground){const row=world.terrain[y];if(!row||x<1||y<1||x>=row.length-1||y>=world.terrain.length-1)return false;row[x]=rock;world.ground[y][x]=ground;world.bushes?.delete?.(`${x},${y}`);world.reeds?.delete?.(`${x},${y}`);return true;}
 function clearDisc(world,c,r,ground,touched){for(let y=c.y-r;y<=c.y+r;y++)for(let x=c.x-r;x<=c.x+r;x++)if(Math.hypot(x-c.x,y-c.y)<=r+.3&&setCell(world,x,y,0,ground))touched.add(`${x},${y}`);}
 
+// Owner 17 Nov 2026: a winding tunnel from one cavern to another, now narrow (one tile), now wide (four): the way
+// wanders around the straight line, its width breathes along it.
+export function tunnel(world,from,to,random,size){
+  let x=from.x,y=from.y,drift=0,width=1+random()*1.2;const phase=random()*6;
+  for(let step=0;step<600;step++){const dx=to.x-x,dy=to.y-y,dist=Math.hypot(dx,dy);if(dist<1.2)break;
+    drift=Math.max(-1.05,Math.min(1.05,drift*.92+(random()-.5)*.55));const a=Math.atan2(dy,dx)+drift*Math.min(1,dist/6);
+    x=Math.max(2,Math.min(size-3,x+Math.cos(a)*.7));y=Math.max(2,Math.min(size-3,y+Math.sin(a)*.7));
+    width=Math.max(.75,Math.min(2.3,width+(random()-.5)*.35+Math.sin(step*.11+phase)*.06));
+    const r=width;for(let yy=Math.floor(y-r);yy<=Math.ceil(y+r);yy++)for(let xx=Math.floor(x-r);xx<=Math.ceil(x+r);xx++)if(Math.hypot(xx-x,yy-y)<=r)setCell(world,xx,yy,0,GROUND.MUD);}
+  // the last stretch straight, so every tunnel really arrives
+  const n=Math.ceil(Math.hypot(to.x-x,to.y-y));for(let i=0;i<=n;i++){const px=Math.round(x+(to.x-x)*i/Math.max(1,n)),py=Math.round(y+(to.y-y)*i/Math.max(1,n));setCell(world,px,py,0,GROUND.MUD);setCell(world,px+1,py,0,GROUND.MUD);}
+}
+
 export function shapeZoneWorld(world,{type,id,dungeon=false},random){
   const zone=zoneById(id)??{dx:1,dy:0};
   const size=world.terrain.length,touched=new Set(),c=featureCenter(zone,size);let feature=null;
   if(dungeon){
     const R=ZONE_FEATURES.dungeon,entrance={x:Math.round(size/2),y:size-8};
-    for(let y=0;y<size;y++)for(let x=0;x<size;x++){world.terrain[y][x]=1;world.ground[y][x]=GROUND.SHORE_ROCKS;}
+    for(let y=0;y<size;y++)for(let x=0;x<size;x++){world.terrain[y][x]=1;world.ground[y][x]=GROUND.MUD;}
     world.bushes=new Map();world.reeds=new Set();world.natureGroups=[];
     const rooms=[{...entrance,r:3}];
     for(let i=0,tries=0;i<R.rooms&&tries<400;tries++){const r=between(random,R.roomRadius),p={x:8+Math.floor(random()*(size-16)),y:8+Math.floor(random()*(size-24)),r};
@@ -33,12 +46,11 @@ export function shapeZoneWorld(world,{type,id,dungeon=false},random){
     const joined=[rooms[0]];
     for(const room of rooms.slice(1).sort((a,b)=>Math.hypot(a.x-entrance.x,a.y-entrance.y)-Math.hypot(b.x-entrance.x,b.y-entrance.y))){
       const to=joined.reduce((best,o)=>Math.hypot(o.x-room.x,o.y-room.y)<Math.hypot(best.x-room.x,best.y-room.y)?o:best,joined[0]);
-      const sx=Math.sign(to.x-room.x)||1,sy=Math.sign(to.y-room.y)||1;
-      for(let x=room.x;x!==to.x+sx;x+=sx)for(const d of [0,1])setCell(world,x,room.y+d,0,GROUND.MUD);
-      for(let y=room.y;y!==to.y+sy;y+=sy)for(const d of [0,1])setCell(world,to.x+d,y,0,GROUND.MUD);
+      tunnel(world,room,to,random,size);
       joined.push(room);
     }
-    for(const room of rooms)clearDisc(world,room,room.r,GROUND.SHORE_ROCKS,touched);
+    // Owner 17 Nov 2026: rooms are uneven caverns (a few overlapping hollows), not round halls.
+    for(const room of rooms){clearDisc(world,room,room.r,GROUND.MUD,touched);for(let k=0;k<3;k++){const a=random()*Math.PI*2,d=room.r*.7,r=Math.max(2,room.r-1-Math.floor(random()*2));clearDisc(world,{x:Math.round(room.x+Math.cos(a)*d),y:Math.round(room.y+Math.sin(a)*d)},r,GROUND.MUD,touched);}}
     const far=[...rooms.slice(1)].sort((a,b)=>Math.hypot(b.x-entrance.x,b.y-entrance.y)-Math.hypot(a.x-entrance.x,a.y-entrance.y));
     feature={kind:'dungeon',entrance,rooms,chests:far.slice(0,R.chests).map((r,i)=>({key:`mine-${i}`,tile:{x:r.x,y:r.y},gold:between(random,R.gold)})),
       rats:rooms.slice(1).flatMap(r=>Array.from({length:between(random,R.rats)},(_,i)=>({x:r.x+((i%2)?1:-1),y:r.y+(i>1?1:0)})))};

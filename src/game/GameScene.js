@@ -1,6 +1,7 @@
 import { BanditView,RaiderView } from './BanditView.js';
 import { shapeZoneWorld } from './zoneFeatures.js';
 import { setupZone,updateZone,zoneLook } from './zoneMode.js';
+import { createDungeonView } from './DungeonView.js';
 import { setupSandbox,placeSandboxBuilding,sandboxLand } from './sandboxMode.js';
 import { WorldPanel } from '../ui/WorldPanel.js';
 import { ScoutingSystem } from '../systems/ScoutingSystem.js';
@@ -267,6 +268,8 @@ export class GameScene extends Phaser.Scene {
     this.fordKeys=new Set();for(let y=0;y<this.groundGrid.length;y++)for(let x=0;x<this.groundGrid[y].length;x++)if(isFordGround(this.groundGrid[y][x]))this.fordKeys.add(`${x},${y}`);
     this.map=mapFromWorld(this.terrainGrid,this.groundGrid);
     this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
+    // Inside the mine: rock walls along the passages, black rock beyond, a stone floor (DungeonView).
+    if(this.land?.dungeon)this.dungeonView=createDungeonView(this,(x,y)=>(this.terrainGrid[y]?.[x]??1)>=1);
     this.inventory=new Inventory();if(!this.loadState)this.inventory.add('gold',this.gameSettings.startingGold);
     this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);if(this.zone)this.gameTime.importState(this.zone.time??this.zone.home.time);this.regeneration=new RegenerationSystem();
     this.seasons=new SeasonSystem(this.gameTime,{enabled:this.gameSettings.seasonsEnabled,initialWeather:this.loadState?(this.loadState.seasons?.weather??'Sunny'):undefined});this.terrain.setSeason(this.seasons.season);for(const b of this.buildings??[])if((b.type==='village_green'||definitionFor(b,this.objectRegistry,true)?.decoration))this.towerViews.get(b.id)?.setSeason?.(this.seasons.season);

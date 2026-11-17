@@ -1220,6 +1220,8 @@ export class TerrainRenderer {
       }
       // Only rock outcrops need sprites: ordinary ground stops here without any fog or memory lookups.
       if(!this.map[y]?.[x])continue;
+      // Inside the mine the rock is drawn by DungeonView (walls along the passages, black beyond), not as outcrops.
+      if(this.scene.land?.dungeon)continue;
       const state=fog?.displayState({x,y})??VISIBILITY.VISIBLE;
       if(!this.tileData({x,y})[0]||state===VISIBILITY.UNEXPLORED)continue;
       if(fog?.enabled&&!fog.isInSightTile({x,y})&&!fog.explored[y*fog.width+x])continue;

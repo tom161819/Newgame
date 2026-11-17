@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.8] - 2026-11-17
+<!-- version: {"title":"Inside the mine: rock walls and winding tunnels","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Changed
+- Inside the mine the rock looks like rock: the passages have rough rock walls along their sides, everything beyond them stays black, and the floor is cave stone instead of grass with boulders.
+- The mine's tunnels wind between the caverns and narrow and widen along the way, and the caverns are uneven hollows.
+
 ## [0.143.7] - 2026-11-17
 <!-- version: {"title":"Unit bar out of the Army tab, livelier bandit camp","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Changed
