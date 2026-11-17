@@ -1,3 +1,4 @@
+import { createBanditCamp } from './BanditCamp.js';
 import { t } from '../i18n/index.js';
 import { SCOUTING,zoneById,zoneEdge,scoutTypeById } from '../data/scouting.js';
 import { encodeWorldCode,defaultWorldLevels,WORLD_SETTINGS,WORLD_SEED_MAX } from '../data/worldCode.js';
@@ -120,7 +121,7 @@ export function populateFeature(scene,f,{taken=[],cleared=false}={}){
   for(const chest of f.chests??[]){if(taken.includes(chest.key))continue;const free=nearFree(scene,chest.tile);if(!free)continue;
     const made=scene.treasureSystem?.create(free,{id:`zone-${chest.key}`,contents:{gold:chest.gold,equipment:[]},opened:false,looted:false});if(made){made.zoneKey=chest.key;out.chests.push(made);}}
   const spawn=(type,tiles)=>{const d=scene.objectRegistry.get(type);if(!d)return;for(const tile of tiles){const at=nearFree(scene,tile);if(at)out.guards.push(scene.animalSystem.create(d,at));}};
-  if(f.kind==='bandits'&&!cleared)spawn('bandit',f.guards);
+  if(f.kind==='bandits'){out.camp=createBanditCamp(scene,f.camp);if(!cleared)spawn('bandit',f.guards);}
   if(f.kind==='dungeon')spawn('cave_rat',f.rats);
   if(f.kind==='mine'||f.kind==='dungeon'){const p=tileCenter(f.entrance),g=scene.add.graphics().setDepth(p.y-1);g.fillStyle(0x0d0b09,.85);g.fillEllipse(p.x,p.y-4,40,20);g.lineStyle(2,0x5b4a36,.9);g.strokeEllipse(p.x,p.y-4,40,20);out.mouth=g;}
   return out;

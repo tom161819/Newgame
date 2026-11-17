@@ -127,11 +127,11 @@ export const WALK_CYCLE=Object.freeze([0,1,0,2]);
 export function walkFrame(k,walkedMs,fps,moving){return k*WALK_COLUMNS.length+(moving?WALK_CYCLE[Math.floor(walkedMs*fps/1000)%WALK_CYCLE.length]:0);}
 // Owner 17 Nov 2026: a standing soldier now and then makes a small move (shifts his weight, looks aside, shifts his
 // weapon, straightens up) at his own random times, so fifty standing men do not stand frozen alike. Returns the
-// idle column; state keeps {wait, left, col} per figure.
+// idle column; state keeps {wait, left, col} per figure. Owner 17 Nov (later): half as often again – waits of 1.7–7 s.
 export function soldierIdle(anim,state,delta,random=Math.random){
   const extra=(anim.idles??[]).filter(c=>c!==anim.idle);if(!extra.length)return anim.idle;
-  if(state.wait==null)state.wait=1500+random()*7000;
-  if(state.left>0){state.left-=delta;if(state.left>0)return state.col;state.wait=2500+random()*8000;}
+  if(state.wait==null)state.wait=1000+random()*4700;
+  if(state.left>0){state.left-=delta;if(state.left>0)return state.col;state.wait=1700+random()*5300;}
   state.wait-=delta;if(state.wait>0)return anim.idle;
   state.col=extra[Math.floor(random()*extra.length)];state.left=900+random()*1800;return state.col;
 }

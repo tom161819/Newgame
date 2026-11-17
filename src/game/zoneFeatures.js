@@ -48,7 +48,14 @@ export function shapeZoneWorld(world,{type,id,dungeon=false},random){
     const R=ZONE_FEATURES.bandits;clearDisc(world,c,R.radius,GROUND.MUD,touched);
     for(let y=c.y-1;y<=c.y+1;y++)for(let x=c.x-1;x<=c.x+1;x++)setCell(world,x,y,0,GROUND.SHORE_ROCKS);
     const n=between(random,R.guards);
-    feature={kind:'bandits',center:c,chests:[{key:'zone-0',tile:{...c},gold:between(random,R.gold)}],guards:Array.from({length:n},(_,i)=>{const a=i/n*Math.PI*2+random()*.5,d=2.5+random()*1.5;return {x:Math.round(c.x+Math.cos(a)*d),y:Math.round(c.y+Math.sin(a)*d)};})};
+    // Owner 17 Nov 2026: a lived-in camp – a fire with a cauldron in the middle, tents round it facing the fire (the
+    // chief's one larger, with the chest before it), log seats, crates and barrels, a weapon rack, bedrolls.
+    const turn=random()*Math.PI*2,tentCount=4,tents=Array.from({length:tentCount},(_,i)=>{const a=turn+i/tentCount*Math.PI*2+(random()-.5)*.35,d=4.3+random()*.5;return {x:c.x+Math.cos(a)*d,y:c.y+Math.sin(a)*d,angle:a+Math.PI,chief:i===0};});
+    const at=(a,d)=>({x:c.x+Math.cos(a)*d,y:c.y+Math.sin(a)*d}),gap=i=>turn+(i+.5)/tentCount*Math.PI*2,chief=tents[0];
+    const camp={fire:{...c},seats:[0,1,2].map(i=>({...at(turn+.4+i*2.1,1.55),angle:turn+.4+i*2.1+Math.PI/2})),crates:[{...at(gap(1),3.1),kind:'crate'},{...at(gap(1)+.25,3.4),kind:'barrel'},{...at(gap(1)-.22,3.5),kind:'barrel'},{...at(gap(1)+.1,2.8),kind:'sack'}],
+      rack:{...at(gap(2),3.3),angle:gap(2)+Math.PI/2},bedrolls:[1,3].map(i=>({...at(Math.atan2(tents[i].y-c.y,tents[i].x-c.x)+.42,3.2),angle:Math.atan2(tents[i].y-c.y,tents[i].x-c.x)})),tents};
+    const chestTile={x:Math.round(c.x+(chief.x-c.x)*.6),y:Math.round(c.y+(chief.y-c.y)*.6)};
+    feature={kind:'bandits',center:c,camp,chests:[{key:'zone-0',tile:chestTile,gold:between(random,R.gold)}],guards:Array.from({length:n},(_,i)=>{const a=gap(i%tentCount)+(i>=tentCount?.5:0)+(random()-.5)*.3,d=2.3+random()*1.1;return {x:Math.round(c.x+Math.cos(a)*d),y:Math.round(c.y+Math.sin(a)*d)};})};
   }else if(type==='ruins'){
     const R=ZONE_FEATURES.ruins,x0=c.x-Math.floor(R.width/2),y0=c.y-Math.floor(R.height/2),x1=x0+R.width-1,y1=y0+R.height-1;
     clearDisc(world,c,Math.max(R.width,R.height)/2+3,GROUND.GRASS,touched);

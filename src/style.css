@@ -1324,5 +1324,20 @@ body.in-sandbox #kingdom-bar, body.in-sandbox #royal-goals, body.in-sandbox #get
 body.sandbox-tool canvas { cursor:crosshair !important; }
 /* Owner 16 Nov 2026: chosen units by kind */
 .unit-kinds { display:inline-flex; flex-wrap:wrap; gap:4px; margin:0 6px; } .unit-kinds[hidden] { display:none; }
-.unit-kind { display:inline-flex; align-items:center; gap:3px; padding:2px 7px !important; min-height:0; border-radius:12px; font-size:.85rem; }
-.unit-kind-icon { font-size:1rem; line-height:1; } .unit-kind b { font-variant-numeric:tabular-nums; }
+.unit-kind { position:relative; display:inline-flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:0; width:52px; height:66px; padding:2px 2px 3px !important; min-height:0; border-radius:6px; font-size:.85rem; background:linear-gradient(180deg,#3b4a3c,#26312a); }
+.unit-kind-icon { display:flex; align-items:flex-end; justify-content:center; height:46px; font-size:1.6rem; line-height:1; } .unit-kind-icon img { width:36px; height:50px; margin-bottom:-4px; image-rendering:auto; filter:drop-shadow(0 1px 1px #0008); }
+.unit-kind b { position:absolute; right:3px; bottom:2px; font-size:1rem; font-variant-numeric:tabular-nums; color:#fff3c8; text-shadow:0 1px 2px #000, 0 0 3px #000; }
+
+/* Owner 17 Nov 2026: the unit bar opens out of the Army tab (left edge to the tab) and its orders are icons. */
+.unit-command-bar.docked { z-index:12; transform:none; justify-content:flex-start; border-radius:8px 8px 0 8px; max-width:none; }
+.unit-command-bar.docked span:first-child { text-align:left; }
+.unit-command-bar.docked::after { content:''; position:absolute; right:-1px; bottom:-2px; width:calc(var(--neck,90px) - 0px); height:3px; background:#1d292bf2; border-left:1px solid #b99a53; border-right:1px solid #b99a53; }
+.army-tab.joined { position:relative; z-index:9; background:#1d292b; border-color:#b99a53; border-top-color:transparent; border-top-left-radius:0; border-top-right-radius:0; color:#fff2c4; }
+.unit-icon-command { position:relative; min-width:38px; height:36px; padding:0 6px !important; font-size:18px; line-height:1; }
+.unit-kind.unit-icon-command { height:66px; }
+.unit-icon-command::after { content:attr(data-tip-title) "\A" attr(data-tip); white-space:pre-line; position:absolute; left:50%; bottom:calc(100% + 8px); transform:translateX(-50%); width:max-content; max-width:240px; padding:6px 9px; border-radius:5px; background:#141b12f5; border:1px solid #978657; color:#ece2c4; font-size:12px; line-height:1.35; text-align:left; pointer-events:none; opacity:0; transition:opacity .12s; z-index:30; }
+.unit-icon-command:hover::after, .unit-icon-command:focus-visible::after { opacity:1; }
+.unit-command-bar.docked .unit-kinds { margin:0 4px 0 0; }
+.unit-command-bar .unit-kind-icon { flex-basis:auto; font-size:1.6rem; }
+.unit-command-bar.docked .unit-stance, .unit-command-bar.docked .unit-formation { flex-basis:auto; margin-left:10px; padding-left:10px; border-left:1px solid #b99a5355; }
+.unit-command-bar .unit-kinds { flex-basis:100%; justify-content:flex-start; }

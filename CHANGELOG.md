@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.7] - 2026-11-17
+<!-- version: {"title":"Unit bar out of the Army tab, livelier bandit camp","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Changed
+- With soldiers chosen, the unit bar opens out of the Army tab, from the left edge of the screen to the tab. The chosen kinds show as larger boxes with the unit's picture and count, and the orders, stances and formations are icons; hovering one shows its name and what it does.
+- The bandit camp is a lived-in place: tents round a crackling fire with a cauldron on a tripod, the chief's larger tent with a banner and the chest before it, log seats, crates, barrels and sacks, a weapon rack and bedrolls.
+### Improved
+- Standing soldiers make their small moves half as often again.
+
 ## [0.143.6] - 2026-11-17
 <!-- version: {"title":"Formations, Test map lands, standing soldiers move","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added
