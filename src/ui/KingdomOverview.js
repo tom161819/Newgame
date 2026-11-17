@@ -4,6 +4,7 @@ import { migrantsPerDay,POPULATION } from '../data/jobs.js';
 import { ENCLOSURE } from '../game/enclosure.js';
 import { element } from './objectLabels.js';
 import { placeBottomLeft,fromDom,readBarCollapsed,writeBarCollapsed } from './hudLayout.js';
+import { CLOTHING } from '../data/clothing.js';
 
 // Owner request (7 Nov, plan m-horni-lista-prehled): the empty left part of the HUD's second row shows the kingdom at
 // a glance – residents / housing room, unemployed, average mood – and on hover, focus or tap a panel with the average
@@ -25,7 +26,9 @@ export function kingdomOverview(scene){
     seats:scene.workplaceSystem?.employees?(scene.buildings??[]).reduce((n,b)=>{const spec=scene.objectRegistry?.get?.(b.type)?.workplace;if(!spec||b.construction&&b.construction.state!=='complete')return n;return n+Math.max(0,(spec.capacity??0)-scene.workplaceSystem.employees(b).length);},0):0};
   return {detail,population:residents.length,capacity:workers?.capacity?.()??residents.length,unemployed:residents.filter(w=>w.profession==='idle').length,
     happiness,mood:happiness==null?null:moodFor(happiness).id,food:avg('food'),rest:avg('rest'),housing:avg('housing'),safety:avg('safety'),
-    attractiveness:attraction?Math.round(attraction.value):null,factors,settleBlock:attraction?.blockReason?.()??null};
+    attractiveness:attraction?Math.round(attraction.value):null,factors,settleBlock:attraction?.blockReason?.()??null,
+    // p71: the kingdom's Clothing level and what it does to Happiness.
+    clothing:scene.clothing?.active?.()?scene.clothing.percent():null,clothingEffect:scene.clothing?.happiness?.()??0,clothingNeed:scene.clothing?.dailyNeed?.()??0};
 }
 // m-prehled-kralovstvi-pozice (plan point 81, owner 9 Nov): the overview is no longer a popup under the top bar but a
 // permanent bar in the bottom-left corner of the map (#kingdom-bar), always in the same place, never over the camera
@@ -42,6 +45,7 @@ export function overviewExplain(o){
     d.striking||d.leaving||d.atRisk?t('explain.departuresNow',{striking:d.striking,leaving:d.leaving,atRisk:d.atRisk}):null,o.population>=o.capacity?t('explain.tip.capacity'):null];
   if(o.attractiveness!=null)lines.attractiveness=[t('explain.attractiveness',{value:o.attractiveness}),t('explain.attractivenessBase',{base:d.base}),...o.factors.map(([id,v])=>`${t(`overview.factor.${id}`)}: ${sign(v)}`),
     t('explain.attractivenessHappiness'),t('explain.attractivenessOther',{each:ENCLOSURE.ruins.each,max:ENCLOSURE.ruins.max}),o.settleBlock?t(`overview.settleBlock.${o.settleBlock}`):null];
+  if(o.clothing!=null)lines.clothing=[t('explain.clothing',{value:o.clothing,effect:sign(o.clothingEffect)}),t('explain.clothingNeed',{perDay:(Math.round(o.clothingNeed*10)/10).toLocaleString(),days:CLOTHING.wearDays}),o.clothing<60?t('explain.tip.clothing'):null];
   lines.unemployed=[t('explain.unemployed',{count:o.unemployed,seats:d.seats}),o.unemployed>3?t('explain.tip.unemployed'):null];
   if(o.happiness!=null){
     lines.happiness=[t('explain.happiness',{value:o.happiness,count:d.residents}),t('explain.happinessParts',{food:d.parts.food,rest:d.parts.rest,housing:d.parts.housing,safety:d.parts.safety,other:sign(d.other)}),t('explain.happinessWeights'),
@@ -129,6 +133,7 @@ export class KingdomOverview {
     const why=overviewExplain(o),tip=k=>why[k]?.join('\n')||undefined;
     const rows=[row(t('overview.bar.residents'),`${o.population} / ${o.capacity}`,o.population>=o.capacity?'warn':'',tip('residents')??t('overview.residents')),row(t('overview.unemployedLabel'),String(o.unemployed),o.unemployed?'warn':'',tip('unemployed')),
       ...['happiness','food','rest','housing','safety'].map(k=>row(t(`overview.need.${k}`),pct(o[k]),tone(o[k]),tip(k))),
+      ...(o.clothing!=null?[row(t('overview.need.clothing'),pct(o.clothing),tone(o.clothing),tip('clothing'))]:[]),
       row(t('overview.moodLabel'),o.mood?t(`needs.mood.${o.mood}`):'—',tone(o.happiness))];
     if(o.attractiveness!=null){
       rows.push(row(t('overview.bar.attractiveness'),`${o.attractiveness} %`,tone(o.attractiveness),tip('attractiveness')));

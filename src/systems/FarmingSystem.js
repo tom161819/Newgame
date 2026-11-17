@@ -184,7 +184,7 @@ export class FarmingSystem {
   importState(data){
     this.knownFarmIds=new Set(this.scene.buildings.filter(b=>b.type==='farmhouse').map(b=>b.id));
     for(const worker of this.scene.workerSystem.liveWorkers())this.stopTending(worker);
-    if(data){this.clocks={...data.clocks};this.refreshElapsed=data.refreshElapsed;this.records=new Map(data.records.map(r=>[r.buildingId,structuredClone(r)]));}
+    if(data){this.clocks={...Object.fromEntries(Object.keys(FARMING_RULES.crops).map(id=>[id,0])),...data.clocks};this.refreshElapsed=data.refreshElapsed;this.records=new Map(data.records.map(r=>[r.buildingId,structuredClone(r)]));}
     else for(const building of this.scene.buildings)this.register(building);
     for(const record of this.records.values()){const building=this.building(record.buildingId);if(building)this.paint(building,record);}
   }

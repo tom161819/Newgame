@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 import { objectRegistry,ObjectRegistry } from '../src/systems/ObjectRegistry.js';
 import { BUILDING_CATEGORIES,buildingsInCategory } from '../src/data/buildingCategories.js';
 test('each implemented building has a central valid menu category; All contains only actual buildables',()=>{
-  const all=buildingsInCategory(objectRegistry,'all');assert.deepEqual(new Set(all),new Set(objectRegistry.buildables()));assert.equal(all.length,38);
+  const all=buildingsInCategory(objectRegistry,'all');assert.deepEqual(new Set(all),new Set(objectRegistry.buildables()));assert.equal(all.length,41); // +3: Flax Field, Weaver, Tailor (p71)
   // #132: menuOrder only reorders inside a category; every other building keeps its place in All.
   // Owner 15 Nov 2026 (63): BUILDING_MENU_ORDER reorders inside a category; every building keeps its category's slots in All.
   objectRegistry.buildables().forEach((d,i)=>{assert.equal(all[i].buildingCategory,d.buildingCategory);});
   for(const d of objectRegistry.byCategory('building'))assert.ok(Object.hasOwn(BUILDING_CATEGORIES,d.buildingCategory));
-  assert.deepEqual(buildingsInCategory(objectRegistry,'defense').map(d=>d.id),['castle','gate','wall','tower','barracks','armory','bowyer','swordsmith','armorer']);
-  assert.deepEqual(buildingsInCategory(objectRegistry,'food').map(d=>d.id),['granary','hunting_lodge','fisherman_hut','farmhouse','orchard','wheat_field','mill','bakery']);
-  assert.deepEqual(buildingsInCategory(objectRegistry,'industry').map(d=>d.id),['lumberjack_hut','builder_workshop','quarry','iron_mine','smelter','pitch_kiln','wheelwright_workshop']);assert.deepEqual(buildingsInCategory(objectRegistry,'logistics').map(d=>d.id),['material_yard','warehouse','marketplace','stables']);
+  assert.deepEqual(buildingsInCategory(objectRegistry,'defense').map(d=>d.id),['castle','gate','wall','tower','barracks','armory','bowyer','swordsmith','armorer','tailor']);
+  assert.deepEqual(buildingsInCategory(objectRegistry,'food').map(d=>d.id),['granary','hunting_lodge','fisherman_hut','farmhouse','orchard','wheat_field','flax_field','mill','bakery']);
+  assert.deepEqual(buildingsInCategory(objectRegistry,'industry').map(d=>d.id),['lumberjack_hut','builder_workshop','quarry','iron_mine','smelter','pitch_kiln','wheelwright_workshop','weaver']);assert.deepEqual(buildingsInCategory(objectRegistry,'logistics').map(d=>d.id),['material_yard','warehouse','marketplace','stables']);
   assert.deepEqual(buildingsInCategory(objectRegistry,'housing').map(d=>d.id),['house','village_green','swing_tree','haystack','well','fountain']);assert.deepEqual(buildingsInCategory(objectRegistry,'infrastructure').map(d=>d.id),['stone_pavement','brazier','torch_post','campfire']);
 });
 test('data-only additions join their registered category automatically; uncategorized legacy extensions remain in All',()=>{
@@ -30,7 +30,7 @@ test('#132 menuOrder sorts within a category after the owner\'s list and must be
 // m-staveni-zdi-studna (59): Stone Wall, Tower and Gate keep their tool too.
 test('Farmhouse, Wheat Field, Orchard, Stone Wall, Tower and Gate keep their tool after an order; other buildings are placed once',()=>{
   const repeat=objectRegistry.buildables().filter(d=>d.repeatPlacement).map(d=>d.id).sort();
-  assert.deepEqual(repeat,['farmhouse','gate','orchard','tower','wall','wheat_field']);
+  assert.deepEqual(repeat,['farmhouse','flax_field','gate','orchard','tower','wall','wheat_field']);
   const registry=new ObjectRegistry(objectRegistry.all()),base=structuredClone(registry.require('tower'));
   assert.throws(()=>registry.register({...base,id:'bad_repeat',repeatPlacement:'yes'}),/opakované/);
 });

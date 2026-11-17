@@ -30,6 +30,7 @@ export function renderNeeds(root,status){
   const signed=n=>`${n>0?'+':n<0?'−':''}${Math.abs(n)}`,policyNow=Math.round(status.policy??0),policyTarget=status.policyTarget??policyNow;
   if(policyNow||policyTarget)lines.push(element('p','need-policy',Math.round(status.policy??0)===policyTarget&&Math.abs((status.policy??0)-policyTarget)<.01?t('needs.policyLine',{value:signed(policyNow)}):t('needs.policyLineMoving',{value:signed(policyNow),target:signed(policyTarget)})));
   if(status.heat)lines.push(element('p',status.heat>0?'need-heat':'need-cold',t(status.heat>0?'needs.heatLine':'needs.coldLine',{value:`${status.heat>0?'+':'−'}${Math.abs(status.heat)}`})));
+  if(status.clothing)lines.push(element('p',status.clothing>0?'need-clothed':'need-ragged',t(status.clothing>0?'needs.clothedLine':'needs.raggedLine',{value:signed(status.clothing)})));
   if(status.cat)lines.push(element('p','need-cat',t('needs.catLine',{value:`+${status.cat}`})));
   if(status.green)lines.push(element('p','need-green',t('needs.greenLine',{value:`+${status.green}`})));
   if(status.greenFamily)lines.push(element('p','need-green-family',t('needs.greenFamilyLine',{value:`+${status.greenFamily}`})));

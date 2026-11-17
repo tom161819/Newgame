@@ -31,5 +31,5 @@ export const militaryDefinitions=[
   item('armor','Armor','Armor',18,'Metal armour forged by an Armorer from 5 Iron and 2 Wood. Kept in an Armory.'),
   item('halberd','Halberd','Halberds',19,'A pole weapon forged by a Swordsmith from 4 Iron and 3 Wood. A Halberdier strikes with it from 2 tiles. Kept in an Armory.','sword'),
   item('crossbow','Crossbow','Crossbows',20,'A crossbow made by a Bowyer from 6 Wood and 1 Iron. Kept in an Armory.','bow'),
-  item('light_armor','Light Armor','Light Armor',21,'Light armour made by an Armorer from 2 Iron and 1 Wood. Kept in an Armory.','armor'),
+  item('light_armor','Light Armor','Light Armor',21,'A padded linen jacket sewn by a Tailor from 3 Cloth. Kept in an Armory.','armor'),
 ];

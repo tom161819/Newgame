@@ -28,7 +28,7 @@ function kingdom(items={sword:4,bow:2,armor:2}){
 const armoryStock=(s,armory)=>s.foodStorage.locations.get(`armory-${armory.id}`).stock;
 
 test('p70: Halberdier, Royal Archer, Crossbowman and Light Cavalry train from their own kit; the Halberdier strikes from 2 tiles as a melee fighter',()=>{
-  const {s,barracks,armory}=kingdom({sword:2,halberd:1,armor:2,bow:1,crossbow:1,light_armor:1});
+  const {s,barracks,armory}=kingdom({sword:2,halberd:1,armor:2,bow:1,crossbow:1,light_armor:2});
   const h=soldier(s,barracks,{x:50,y:56},9),r=soldier(s,barracks,{x:51,y:56},9),c=soldier(s,barracks,{x:52,y:56},9),k=soldier(s,barracks,{x:53,y:56},9);
   for(const [w,type]of [[h,'halberdier'],[r,'royal_archer'],[c,'crossbowman'],[k,'knight']])assert.equal(s.military.train(w,type),null,type);
   until(s,()=>s.military.units.size===4);
@@ -36,24 +36,26 @@ test('p70: Halberdier, Royal Archer, Crossbowman and Light Cavalry train from th
   assert.equal(r.attackRange,6);assert.equal(isRanged(r),true);assert.ok(r.maxHP>=120&&r.armor>=15,'the Royal Archer has the Swordsman\'s defence');
   assert.equal(c.attackRange,5);assert.equal(c.armor,15);
   assert.equal(k.speed,k.definition?.gameplay?.movementSpeed??k.speed,'the Knight walks');
-  assert.deepEqual(Object.keys(MILITARY_ITEMS).filter(id=>['halberd','crossbow','light_armor'].includes(id)).map(id=>MILITARY_ITEMS[id].workshop),['swordsmith','bowyer','armorer']);
+  assert.deepEqual(Object.keys(MILITARY_ITEMS).filter(id=>['halberd','crossbow','light_armor'].includes(id)).map(id=>MILITARY_ITEMS[id].workshop),['swordsmith','bowyer','tailor']);
   const stock=armoryStock(s,armory);for(const id of ['halberd','crossbow','light_armor'])assert.equal(stock[id]??0,0,id);
   const target={position:{x:h.position.x+2,y:h.position.y},tile:{x:h.tile.x+2,y:h.tile.y}};assert.equal(inAttackRange(h,target,s.map),true);
 });
 
-test('p70: the Swordsmith, Bowyer and Armorer switch to Halberds, Crossbows and Light Armor; an older save of the workshop loads on its first recipe',()=>{
+test('p70/p71: the Swordsmith and Bowyer switch to Halberds and Crossbows; the Armorer no longer offers Light Armor; an older save of the workshop loads on its first recipe',()=>{
   const s=scene(),ids=[];
   for(const [i,[type,second]] of [['swordsmith','halberd'],['bowyer','crossbow'],['armorer','light_armor']].entries()){
     const b=building(s,type,36+i*5,40),d=s.objectRegistry.require(type);ids.push(b.id);
     assert.deepEqual(Object.keys(d.recipes),[Object.keys(d.recipe.output)[0],second]);
     s.foodProduction.register(b);const record=s.foodProduction.records.get(b.id);assert.equal(record.recipe,Object.keys(d.recipes)[0]);
+    if(type==='armorer'){assert.equal(d.recipes.light_armor.retired,true);assert.equal(s.foodProduction.setRecipe(b.id,second),false,'retired: not offered');record.recipe='light_armor';continue;}
     assert.equal(s.foodProduction.setRecipe(b.id,second),true);
     assert.deepEqual(Object.keys(s.foodProduction.recipe(b).output),[second]);
   }
-  const state=serializeGameState(s);for(const r of state.foodProduction.records)if(ids.includes(r.buildingId))delete r.recipe;
+  const state=serializeGameState(s);for(const r of state.foodProduction.records)if(ids.slice(0,2).includes(r.buildingId))delete r.recipe;
   const t=scene(false);loadGameState(t,validateGameState(state));
-  for(const id of ids){const b=t.buildings.find(b=>b.id===id);assert.equal(t.foodProduction.records.get(id).recipe,Object.keys(t.objectRegistry.require(b.type).recipes)[0]);}
+  for(const id of ids){const b=t.buildings.find(b=>b.id===id);assert.equal(t.foodProduction.records.get(id).recipe,Object.keys(t.objectRegistry.require(b.type).recipes)[0],b.type);}
 });
+
 
 test('p70 fix: a save from before the new items (Armory, Barracks kit and Marketplace with the older lists) still loads',()=>{
   const {s,armory,barracks}=kingdom();const market=building(s,'marketplace',40,60);s.foodStorage.register(market);

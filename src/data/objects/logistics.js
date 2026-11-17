@@ -3,7 +3,7 @@ import { LOGISTICS_RULES,YARD_RESOURCES } from '../logistics.js';
 import { TRADE_RULES } from '../trade.js';
 export const logisticsBuildings=[
   {id:'warehouse',name:'Warehouse',width:3,height:3,cost:{stone:10,wood:4},constructionTime:30000,visualHeight:125,buildable:true,
-    storage:{capacity:200,resources:['pitch','torch'],accepts:'materials'},description:'A physical store for 200 crafted goods such as pitch and torches. Wood, stone, ore and iron go to a Material Yard.'},
+    storage:{capacity:200,resources:['pitch','torch','cloth'],accepts:'materials'},description:'A physical store for 200 crafted goods such as pitch, torches and cloth. Wood, stone, ore and iron go to a Material Yard.'},
   // m-sklady-materialu-koncept (21): an open yard only for raw building materials; its four fields show growing piles.
   {id:'material_yard',name:'Material Yard',width:4,height:2,cost:{wood:20},constructionTime:20000,visualHeight:40,buildable:true,
     storage:{capacity:LOGISTICS_RULES.yardCapacity,resources:[...YARD_RESOURCES],accepts:'yard'},renderer:'material_yard',

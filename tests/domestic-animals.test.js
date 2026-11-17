@@ -147,7 +147,7 @@ test('m-zvirata-3: rats and a cat at a Bakery survive a save (schema unchanged)'
 
 test('farmhouse-store: rats grow in a Farmhouse from its own grain store and a cat living there clears them',()=>{
   const {s,d,place,days,feed}=world({wheat:0}),farm=place('farmhouse',64,40),store=[...s.foodStorage.locations.values()].find(l=>l.buildingId===farm.id&&l.kind==='storage');
-  assert.ok(store,'the Farmhouse has its own store');assert.deepEqual(store.allowed,['wheat','flour']);assert.equal(store.capacity,200);
+  assert.ok(store,'the Farmhouse has its own store');assert.deepEqual(store.allowed,['wheat','flour','flax']);assert.equal(store.capacity,200);
   assert.ok(d.foodLocations().some(l=>l.id===store.id),'a rat location');assert.equal(s.foodStorage.deposit(store.id,'wheat',200),true);
   days(6);assert.ok(['many','infestation'].includes(ratLevel(d.buildingRats(farm.id))),'a full Farmhouse store breeds rats like a full Granary');
   assert.ok(store.stock.wheat<200,'rats ate wheat');assert.ok(feed.some(t=>/Farmhouse/.test(t)),'the rats notice names the Farmhouse');

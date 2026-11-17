@@ -5,19 +5,20 @@
 // derived from the current combat numbers, not historical facts.
 export const UNIT_TYPES=Object.freeze({
   soldier:Object.freeze({equipment:Object.freeze({weapon:'sword'}),modifiers:Object.freeze({maxHP:20}),trainingTime:20000,goldCost:5,wageBonus:1,requiredCombatLevel:1}),
-  swordsman:Object.freeze({equipment:Object.freeze({weapon:'sword'}),modifiers:Object.freeze({maxHP:60,attackBonus:50,armor:15}),trainingTime:45000,goldCost:12,wageBonus:2,requiredCombatLevel:3}),
+  // p71 (owner 17 Nov 2026): the Swordsman, Royal Archer, Crossbowman and Light Cavalry wear Light Armor from the Tailor.
+  swordsman:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'light_armor'}),modifiers:Object.freeze({maxHP:60,attackBonus:50,armor:15}),trainingTime:45000,goldCost:12,wageBonus:2,requiredCombatLevel:3}),
   archer:Object.freeze({equipment:Object.freeze({weapon:'bow'}),modifiers:Object.freeze({maxHP:10,attackRange:5}),trainingTime:30000,goldCost:8,wageBonus:1,requiredCombatLevel:1}),
   // p70 (owner 17 Nov 2026): the Knight now fights on foot (sword and armour, no horse); the mounted unit is the
   // Light Cavalry below. A Knight from an older save gives his horse back to the Stables on load.
   knight:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'armor'}),modifiers:Object.freeze({maxHP:100,attackBonus:50,armor:10}),trainingTime:60000,goldCost:25,wageBonus:4,requiredCombatLevel:4}),
   // p70 new units. Halberdier: halberd and armour, strikes from 2 tiles (still a melee fighter, see isRanged).
   halberdier:Object.freeze({equipment:Object.freeze({weapon:'halberd',armor:'armor'}),modifiers:Object.freeze({maxHP:60,armor:5,attackRange:1}),trainingTime:50000,goldCost:15,wageBonus:3,requiredCombatLevel:3}),
-  // Royal Archer: a bow and the Swordsman's defence (+60 HP, armour 15). Light armour joins his kit with the cloth chain (p71).
-  royal_archer:Object.freeze({equipment:Object.freeze({weapon:'bow'}),modifiers:Object.freeze({maxHP:60,attackBonus:20,armor:15,attackRange:5}),trainingTime:45000,goldCost:14,wageBonus:2,requiredCombatLevel:3}),
-  // Crossbowman: crossbow and light armour (made by the Armorer until the cloth chain, p71, gets its own workshop).
+  // Royal Archer: a bow and the Swordsman's defence (+60 HP, armour 15) and Light Armor.
+  royal_archer:Object.freeze({equipment:Object.freeze({weapon:'bow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:60,attackBonus:20,armor:15,attackRange:5}),trainingTime:45000,goldCost:14,wageBonus:2,requiredCombatLevel:3}),
+  // Crossbowman: crossbow and Light Armor.
   crossbowman:Object.freeze({equipment:Object.freeze({weapon:'crossbow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:30,attackRange:4}),trainingTime:40000,goldCost:12,wageBonus:2,requiredCombatLevel:2}),
   // Light Cavalry: sword and a tamed horse from the Stables, fast. His own look comes later (owner's art).
-  light_cavalry:Object.freeze({equipment:Object.freeze({weapon:'sword'}),mount:'horse',modifiers:Object.freeze({maxHP:50,attackBonus:30}),trainingTime:50000,goldCost:20,wageBonus:3,requiredCombatLevel:3}),
+  light_cavalry:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'light_armor'}),mount:'horse',modifiers:Object.freeze({maxHP:50,attackBonus:30}),trainingTime:50000,goldCost:20,wageBonus:3,requiredCombatLevel:3}),
 });
 // kasarna-branci (owner 9 Nov 2026): everyone employed in a Barracks starts as a Recruit – no equipment, basic combat
 // stats (the resident's own 60 HP and 6 DPS plus `modifiers`), patrols and defends near the Barracks like a unit, and
@@ -39,6 +40,8 @@ export const STANCES=Object.freeze({
   hold:Object.freeze({engage:0,follow:0,leash:0,hold:true,retreat:false}),
 });
 // The items one unit type needs, as {itemId: count}.
+// p71: units trained before Light Armor joined their kit keep the kit they got (validation and Save/Load accept it).
+export const legacyKit=type=>{const e=UNIT_TYPES[type]?.equipment;return e?.armor==='light_armor'&&type!=='crossbowman'?{[e.weapon]:1}:null;};
 export function unitKit(type){const kit={};for(const id of Object.values(UNIT_TYPES[type].equipment))kit[id]=(kit[id]??0)+1;return kit;}
 
 // m-zalozka-vojsko (owner, 12 Nov): soldiers on Patrol walk a round of the settlement – a ring `margin` tiles outside the

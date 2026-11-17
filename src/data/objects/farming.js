@@ -6,7 +6,7 @@ export const farmingBuildings = [
     // Owner 13 Nov 2026: the farmstead with its fenced yard is 4 × 4; Farmhouses of older saves (no `size`) stay 3 × 3.
     id:'farmhouse',name:'Farmhouse',menuOrder:20,repeatPlacement:true,width:4,height:4,legacyFootprint:{width:3,height:3},cost:{wood:10},constructionTime:25000,
     recommendsCompletedBuildings:['granary'],
-    description:`A farmhouse with three Farmer workplaces. Farmers tend crops within 15 tiles. Its store keeps ${FARMHOUSE_STORE.capacity} Wheat and Flour.`,
+    description:`A farmhouse with three Farmer workplaces. Farmers tend crops within 15 tiles. Its store keeps ${FARMHOUSE_STORE.capacity} Wheat, Flour and Flax.`,
     storage:{capacity:FARMHOUSE_STORE.capacity,resources:[...FARMHOUSE_STORE.resources]},
     walkable:false,workplace:WORKPLACES.farmhouse,workRadius:FARMING_RULES.workRadius,
     interactions:['manage_workers'],renderer:'workplace',visualHeight:110,
@@ -15,6 +15,9 @@ export const farmingBuildings = [
     {id:'wheat_field',name:'Wheat Field',menuOrder:30,cost:{},visualHeight:38,constructionTime:10000,
       recommendsCompletedBuildings:['farmhouse'],
       description:'Wheat grows for two game days. A farmer must physically harvest the ripe crop for 10 Wheat.'},
+    {id:'flax_field',name:'Flax Field',menuOrder:35,cost:{},visualHeight:38,constructionTime:10000,
+      recommendsCompletedBuildings:['farmhouse'],
+      description:'Flax grows for two game days. A farmer harvests the ripe flax for 8 Flax, which the Weaver turns into Cloth.'},
     {id:'orchard',name:'Orchard',menuOrder:40,cost:{},visualHeight:83,constructionTime:15000,
       recommendsCompletedBuildings:['farmhouse'],
       description:'Permanent fruit trees grow apples for three game days. A farmer harvests 8 Apple without replanting.'},
@@ -25,6 +28,7 @@ export const farmingBuildings = [
 
 export const farmingResources = [
   {id:'wheat',name:'Wheat',symbol:'🌾',inventoryOrder:30,edible:false,description:'Harvested wheat. It is not directly edible.'},
+  {id:'flax',name:'Flax',symbol:'🌿',inventoryOrder:31,edible:false,inventoryHideZero:true,description:'Harvested flax stalks. The Weaver turns them into Cloth.'},
   {id:'apple',name:'Apple',symbol:'🍎',inventoryOrder:40,edible:true,description:'Freshly harvested edible apples.'},
 ].map(d=>({...d,inventoryLabel:d.name,quantityNames:[d.name,d.name,d.name],category:'resource',sprite:`/assets/resources/${d.id}/${d.id}.svg`,
   width:1,height:1,walkable:true,collectible:true,buildable:false,cost:{},interactions:['collect'],renderMode:'sprite',

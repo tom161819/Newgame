@@ -25,7 +25,7 @@ export class FoodProductionSystem {
   setRecipe(buildingId,key){
     const record=this.records.get(buildingId),b=record&&this.building(buildingId),d=b&&buildingDefinition(b);if(!d?.recipes)return false;
     if(key==='auto'){if(!d.recipeChoice)return false;record.recipeMode='auto';this.chooseRecipes();this.scene.logisticsTasks?.invalidate?.();return true;}
-    if(!Object.hasOwn(d.recipes,key))return false;record.recipe=key;if(d.recipeChoice)record.recipeMode=key;this.scene.logisticsTasks?.invalidate?.();return true;
+    if(!Object.hasOwn(d.recipes,key)||d.recipes[key].retired)return false;record.recipe=key;if(d.recipeChoice)record.recipeMode=key;this.scene.logisticsTasks?.invalidate?.();return true;
   }
   recipeMode(building){const record=this.records.get(building.id),d=buildingDefinition(building);return d.recipeChoice?record?.recipeMode??'auto':record?.recipe;}
   // How many Torches the stores should hold before an automatic Pitch Kiln goes back to Pitch (per kiln, 0–torchTargetMax).
@@ -301,6 +301,6 @@ export class FoodProductionSystem {
   }
   toggle(buildingId,value){const record=this.records.get(buildingId);if(record)record.auto=!!value;}
   exportState(){return {records:structuredClone([...this.records.values()]),nextTransfer:this.nextTransfer};}
-  importState(data){if(data){this.records=new Map(data.records.map(r=>[r.buildingId,structuredClone(r)]));for(const r of this.records.values()){const b=this.scene.buildings.find(b=>b.id===r.buildingId),d=b&&buildingDefinition(b);if(d?.recipes){r.recipe??=defaultRecipeKey(d);if(r.cycle)r.cycle.recipe??=r.recipe;}}this.nextTransfer=data.nextTransfer;}else for(const b of this.scene.buildings)this.register(b);}
+  importState(data){if(data){this.records=new Map(data.records.map(r=>[r.buildingId,structuredClone(r)]));for(const r of this.records.values()){const b=this.scene.buildings.find(b=>b.id===r.buildingId),d=b&&buildingDefinition(b);if(d?.recipes){r.recipe??=defaultRecipeKey(d);if(r.cycle)r.cycle.recipe??=r.recipe;if(d.recipes[r.recipe]?.retired)r.recipe=defaultRecipeKey(d);}}this.nextTransfer=data.nextTransfer;}else for(const b of this.scene.buildings)this.register(b);}
   destroy(){this.records.clear();}
 }

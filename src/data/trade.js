@@ -6,7 +6,7 @@ export const TRADE_RULES=Object.freeze({buyMarkup:1.15,sellFactor:.8,marketplace
 // Bow, a Swordsmith 3 Bars + 2 Wood (128) into a Sword and an Armorer 5 Bars + 2 Wood (208) into Armor. At the proposed
 // prices making them would destroy value, so they are priced at their inputs plus roughly 10–15 % for the work.
 // `iron` is the older Iron resource that Warehouses still store; it trades like Iron Ore.
-export const BASE_PRICES=Object.freeze({wheat:2,apple:3,stone:3,wood:4,meat:5,fish:3,flour:5,bread:7,iron_ore:9,iron:40,bow:36,sword:145,armor:235,halberd:200,crossbow:85,light_armor:110,pitch:4,torch:2});
+export const BASE_PRICES=Object.freeze({wheat:2,apple:3,stone:3,wood:4,meat:5,fish:3,flour:5,bread:7,iron_ore:9,iron:40,bow:36,sword:145,armor:235,halberd:200,crossbow:85,light_armor:60,flax:3,cloth:12,pitch:4,torch:2});
 // Tradeable goods come from the resource registry: everything the HUD counts except Gold and vehicles.
 export function tradeableResources(registry){return registry.byCategory('resource').filter(d=>d.collectible&&d.id!=='gold'&&d.resourceCategory!=='vehicle');}
 const round=value=>Math.max(1,Math.round(value));

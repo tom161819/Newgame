@@ -106,10 +106,12 @@ export class WorkplacePanel {
     const recipePanel=document.querySelector('#food-production-details');recipePanel.hidden=!production;
     if(production){
       const format=items=>Object.entries(items).map(([id,n])=>`${n} ${s.objectRegistry.require(id).name}`).join(' + '),cycle=production.cycle;
-      const recipe=s.foodProduction.recipe(b),choice=document.querySelector('#recipe-choice'),choiceRow=document.querySelector('#recipe-choice-row');choiceRow.hidden=!spec.recipes;
-      if(spec.recipes){const auto=spec.recipeChoice?1:0;
-        if(choice.dataset.building!==String(b.id)||choice.options.length!==Object.keys(spec.recipes).length+auto){const option=(value,text)=>{const o=document.createElement('option');o.value=value;o.textContent=text;return o;};
-          choice.replaceChildren(...(auto?[option('auto',t('workplace.recipeAuto'))]:[]),...Object.entries(spec.recipes).map(([key,r])=>option(key,s.objectRegistry.require(Object.keys(r.output)[0]).name)));choice.dataset.building=String(b.id);}
+      const recipe=s.foodProduction.recipe(b),choice=document.querySelector('#recipe-choice'),choiceRow=document.querySelector('#recipe-choice-row');
+      // p71: a retired recipe (the Armorer's Light Armor) is not offered; one recipe left means no choice.
+      const offered=Object.entries(spec.recipes??{}).filter(([,r])=>!r.retired);choiceRow.hidden=offered.length<2;
+      if(offered.length>1){const auto=spec.recipeChoice?1:0;
+        if(choice.dataset.building!==String(b.id)||choice.options.length!==offered.length+auto){const option=(value,text)=>{const o=document.createElement('option');o.value=value;o.textContent=text;return o;};
+          choice.replaceChildren(...(auto?[option('auto',t('workplace.recipeAuto'))]:[]),...offered.map(([key,r])=>option(key,s.objectRegistry.require(Object.keys(r.output)[0]).name)));choice.dataset.building=String(b.id);}
         choice.value=s.foodProduction.recipeMode(b);}
       // m-smolar-pochodne: the automatic choice says what it makes and why, with the Torch target to set.
       let autoRow=document.querySelector('#recipe-auto-row');

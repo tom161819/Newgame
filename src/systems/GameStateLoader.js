@@ -115,7 +115,7 @@ export function loadGameState(scene,input){
   scene.childrenSystem?.importState(state.children);
   scene.lightFuel?.importState(state.lightFuel);
   scene.nightThreats?.importState(state.nightThreats);
-  scene.heating?.importState(state.heating);
+  scene.heating?.importState(state.heating);scene.clothing?.importState(state.clothing);
   scene.battleMarks?.importState(state.battleMarks);
   scene.royalGoals?.importState(state.royalGoals);
   scene.kingSkills?.importState(state.kingSkills);

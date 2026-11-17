@@ -11,7 +11,7 @@ export const linksEnabled=(storage=globalThis.localStorage)=>{try{return storage
 export const setLinksEnabled=(value,storage=globalThis.localStorage)=>{try{storage?.setItem(KEY,value?'1':'0');}catch{}};
 const centre=(b,d)=>({x:b.x+d.width/2,y:b.y+d.height/2});
 export function goodsOf(definition){
-  const recipes=[definition.recipe,...Object.values(definition.recipes??{})].filter(Boolean),input=new Set(),output=new Set();
+  const recipes=[definition.recipe,...Object.values(definition.recipes??{})].filter(r=>r&&!r.retired),input=new Set(),output=new Set();
   for(const r of recipes){for(const id of Object.keys(r.input??{}))input.add(id);for(const id of Object.keys(r.output??{}))output.add(id);}
   if(OUTPUT_PILES[definition.id])output.add(OUTPUT_PILES[definition.id]);
   for(const id of definition.produces??[])output.add(id);

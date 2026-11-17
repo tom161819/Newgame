@@ -12,23 +12,23 @@ export const MILITARY_ITEMS=Object.freeze({
   sword:Object.freeze({itemId:'sword',slot:'weapon',recipe:Object.freeze({iron:3,wood:2}),workshop:'swordsmith',modifiersFrom:'basic_sword'}),
   armor:Object.freeze({itemId:'armor',slot:'armor',recipe:Object.freeze({iron:5,wood:2}),workshop:'armorer',modifiersFrom:'basic_armor'}),
   bow:Object.freeze({itemId:'bow',slot:'weapon',recipe:Object.freeze({wood:8}),workshop:'bowyer',modifiers:Object.freeze({attackBonus:40}),range:6}),
-  // p70 (owner 17 Nov 2026): the Swordsmith switches to Halberds, the Bowyer to Crossbows, the Armorer to Light Armor.
+  // p70 (owner 17 Nov 2026): the Swordsmith switches to Halberds, the Bowyer to Crossbows; p71: the Tailor sews Light Armor from Cloth.
   halberd:Object.freeze({itemId:'halberd',slot:'weapon',recipe:Object.freeze({iron:4,wood:3}),workshop:'swordsmith',modifiers:Object.freeze({attackBonus:120})}),
   crossbow:Object.freeze({itemId:'crossbow',slot:'weapon',recipe:Object.freeze({wood:6,iron:1}),workshop:'bowyer',modifiers:Object.freeze({attackBonus:90}),range:5}),
-  light_armor:Object.freeze({itemId:'light_armor',slot:'armor',recipe:Object.freeze({iron:2,wood:1}),workshop:'armorer',modifiers:Object.freeze({armor:15})}),
+  light_armor:Object.freeze({itemId:'light_armor',slot:'armor',recipe:Object.freeze({cloth:3}),workshop:'tailor',modifiers:Object.freeze({armor:15})}),
 });
 
 // Unit roles C08 recruits from Soldiers. One weapon per role; armor optional unless required; Light Cavalry needs a mount
 // from real Stables, so they stay locked until Stage 12 builds them.
 export const UNIT_ROLES=Object.freeze({
   soldier:Object.freeze({profession:'soldier',weapon:'sword',armor:'optional',mount:null}),
-  swordsman:Object.freeze({profession:'soldier',weapon:'sword',armor:'optional',mount:null}),
+  swordsman:Object.freeze({profession:'soldier',weapon:'sword',armor:'required',mount:null}),
   archer:Object.freeze({profession:'soldier',weapon:'bow',armor:'optional',mount:null}),
   knight:Object.freeze({profession:'soldier',weapon:'sword',armor:'required',mount:null}),
   halberdier:Object.freeze({profession:'soldier',weapon:'halberd',armor:'required',mount:null}),
-  royal_archer:Object.freeze({profession:'soldier',weapon:'bow',armor:'optional',mount:null}),
+  royal_archer:Object.freeze({profession:'soldier',weapon:'bow',armor:'required',mount:null}),
   crossbowman:Object.freeze({profession:'soldier',weapon:'crossbow',armor:'required',mount:null}),
-  light_cavalry:Object.freeze({profession:'soldier',weapon:'sword',armor:'optional',mount:'horse',lockedUntil:'stables'}),
+  light_cavalry:Object.freeze({profession:'soldier',weapon:'sword',armor:'required',mount:'horse',lockedUntil:'stables'}),
 });
 
 // How a physical item moves (implemented by C08, MilitarySystem): a training order makes Haulers carry the unit's

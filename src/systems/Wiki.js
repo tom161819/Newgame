@@ -15,7 +15,7 @@ import { EDIBLE_RESOURCES } from '../data/seasons.js';
 // generated, so it follows the data. A chain row: [{page|sink, label}], left to right.
 const amounts=(registry,t,map)=>Object.entries(map??{}).map(([id,n])=>`${n} ${registry.get(id)?.name??id}`).join(', ');
 const seconds=ms=>Math.round(ms/100)/10;
-const recipesOf=d=>[d.recipe,...Object.values(d.recipes??{})].filter(Boolean).filter((r,i,all)=>all.findIndex(o=>JSON.stringify(o)===JSON.stringify(r))===i);
+const recipesOf=d=>[d.recipe,...Object.values(d.recipes??{})].filter(r=>r&&!r.retired).filter((r,i,all)=>all.findIndex(o=>JSON.stringify(o)===JSON.stringify(r))===i);
 
 // What a building takes in besides its recipe: fuel for its fire, kit for its soldiers.
 const KIT_RESOURCES=Object.freeze(['sword','armor','bow']);

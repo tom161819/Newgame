@@ -125,8 +125,10 @@ export class NeedsSystem {
     const around=this.scene.childrenSystem?.surroundings?.(house,homes)??{green:0,family:0,swing:0,well:0,fountain:0,total:0,capped:0},green=around.green,greenFamily=around.family,swing=around.swing,well=around.well,fountain=around.fountain??0;
     // m-topeni-domu: a warm House in autumn and winter (+), a cold one (−).
     const heat=this.scene.heating?.happiness?.(house??(home?.kind==='settlement'?this.scene.heating?.castle?.():null))??0;
-    const happiness=happinessOf(needs,penalty-policy+contextTotal-feast-cat-around.total-heat+starving),mood=moodFor(happiness);
-    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,starving,unfedDays:r.unfedDays??0,policy,policyTarget:this.scene.policy?.target?.()??0,policyContext:context,foodRations:this.scene.policy?.rations??'normal',foodBase:food.base,foodKinds:food.kinds,foodVariety:food.variety,foodTarget:food.target,foodUnfed:food.hungry,feast,heat,cat,green,greenFamily,swing,well,fountain,surroundingsCapped:around.capped,feastDaysLeft:this.scene.policy?.feastDaysLeft?.()??0,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty,Math.max(0,-policy)+contextTotal),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
+    // p71: the kingdom's Clothing level (+ well clothed, − ragged).
+    const clothing=this.scene.clothing?.happiness?.()??0;
+    const happiness=happinessOf(needs,penalty-policy+contextTotal-feast-cat-around.total-heat-clothing+starving),mood=moodFor(happiness);
+    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,starving,unfedDays:r.unfedDays??0,policy,policyTarget:this.scene.policy?.target?.()??0,policyContext:context,foodRations:this.scene.policy?.rations??'normal',foodBase:food.base,foodKinds:food.kinds,foodVariety:food.variety,foodTarget:food.target,foodUnfed:food.hungry,feast,heat,clothing,cat,green,greenFamily,swing,well,fountain,surroundingsCapped:around.capped,feastDaysLeft:this.scene.policy?.feastDaysLeft?.()??0,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty,Math.max(0,-policy)+contextTotal),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
   }
   summary(){
     const homes=this.homes(),list=this.residents().map(w=>this.status(w,homes));

@@ -27,7 +27,7 @@ function world({haulers=0}={}){
 const snapshot=s=>validateGameState(serializeGameState(s));
 
 test('a Farmhouse has a 200-unit store for Wheat and Flour only; the Granary no longer takes either',()=>{
-  const d=objectRegistry.require('farmhouse');assert.deepEqual(d.storage,{capacity:200,resources:['wheat','flour']});assert.equal(FARMHOUSE_STORE.capacity,200);
+  const d=objectRegistry.require('farmhouse');assert.deepEqual(d.storage,{capacity:200,resources:['wheat','flour','flax']});assert.equal(FARMHOUSE_STORE.capacity,200);
   assert.deepEqual(objectRegistry.require('granary').storage.resources,['meat','bread','apple','fish']);
   assert.equal(stockLocationId({id:7,type:'farmhouse'}),'farmhouse-7');assert.equal(resourceGroup(objectRegistry.require('wheat'),objectRegistry),'foodRaw');assert.equal(resourceGroup(objectRegistry.require('flour'),objectRegistry),'foodRaw');
   const {s,place,store}=world(),farm=place('farmhouse',44,40),granary=place('granary',58,40),l=store(farm);

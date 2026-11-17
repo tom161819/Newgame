@@ -15,7 +15,7 @@ export function storageGroup(resource,registry){return FOOD_RESOURCE_IDS.include
 // m-sklady-co-patri (owner, 12 Nov): a store says what it takes, with the amount of each (also 0), and why a good is
 // not coming (nobody makes it yet); one line says where the other goods belong.
 export const PRODUCERS=Object.freeze({wood:['lumberjack_hut'],stone:['quarry'],iron_ore:['iron_mine'],iron:['smelter'],pitch:['pitch_kiln'],torch:['pitch_kiln'],
-  wheat:['wheat_field'],flour:['mill'],bread:['bakery'],apple:['orchard'],meat:['hunting_lodge'],fish:['fisherman_hut'],sword:['swordsmith'],bow:['bowyer'],armor:['armorer']});
+  wheat:['wheat_field'],flour:['mill'],bread:['bakery'],apple:['orchard'],meat:['hunting_lodge'],fish:['fisherman_hut'],sword:['swordsmith'],bow:['bowyer'],armor:['armorer'],halberd:['swordsmith'],crossbow:['bowyer'],light_armor:['tailor'],flax:['flax_field'],cloth:['weaver']});
 export function storeAccepts(scene,location){
   const complete=type=>scene.buildings.some(b=>b.type===type&&(b.construction?.state??'complete')==='complete');
   return location.allowed.map(resource=>{const makers=PRODUCERS[resource]??[],made=!makers.length||makers.some(complete);return {resource,count:location.stock[resource]??0,missing:made?null:makers[0]};});

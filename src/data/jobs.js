@@ -24,6 +24,8 @@ export const JOBS=Object.freeze(localizeJobs({
   swordsmith:Object.freeze({portraitColor:'#5d6470',name:'Swordsmith',skill:'crafting',workplace:'swordsmith',requiresWorkplace:true}),
   armorer:Object.freeze({portraitColor:'#58606b',name:'Armorer',skill:'crafting',workplace:'armorer',requiresWorkplace:true}),
   pitch_maker:Object.freeze({portraitColor:'#4a3a2a',name:'Pitch Maker',skill:'crafting',workplace:'pitch_kiln',requiresWorkplace:true}),
+  weaver:Object.freeze({portraitColor:'#7a6e9a',name:'Weaver',skill:'crafting',workplace:'weaver',requiresWorkplace:true}),
+  tailor:Object.freeze({portraitColor:'#8c5a6a',name:'Tailor',skill:'crafting',workplace:'tailor',requiresWorkplace:true}),
 }));
 
 // m-prichody-odchody (owner 14 Nov 2026): a bigger settlement draws more newcomers a day – one, plus one for every

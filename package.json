@@ -1,6 +1,6 @@
 {
   "name": "newgame",
-  "version": "0.143.17",
+  "version": "0.144.0",
   "private": true,
   "type": "module",
   "engines": {

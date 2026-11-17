@@ -18,7 +18,7 @@ function soldier(s,barracks,tile,combatLevel=1){const w=s.workerSystem.create(ti
 function hauler(s,tile){const w=s.workerSystem.create(tile);s.workerSystem.jobs.assign(w,'hauler');return w;}
 function until(s,p,max=300000){let t=0;while(!p()&&t<max){s.tick(50);t+=50;}assert.ok(p(),`not reached after ${t} ms`);return t;}
 // A kingdom with an Armory holding items, a Barracks with Soldiers, two Haulers and Gold.
-function kingdom(items={sword:4,bow:2,armor:2}){
+function kingdom(items={sword:4,bow:2,armor:2,light_armor:2}){
   const s=scene(),armory=building(s,'armory',60,44),barracks=building(s,'barracks',50,50);
   for(const [id,n]of Object.entries(items))assert.equal(s.foodStorage.deposit(`armory-${armory.id}`,id,n),true);
   hauler(s,{x:56,y:48});hauler(s,{x:57,y:48});s.inventory.add('gold',200);return {s,armory,barracks};
@@ -28,7 +28,7 @@ const armoryStock=(s,armory)=>s.foodStorage.locations.get(`armory-${armory.id}`)
 test('unit types from central data: Soldier and Swordsman differ, the Archer shoots from range, the Knight fights on foot and Light Cavalry needs a horse from the Stables',()=>{
   assert.deepEqual(UNIT_TYPE_IDS,['soldier','swordsman','archer','knight','halberdier','royal_archer','crossbowman','light_cavalry']);
   const {soldier:a,swordsman:b,archer:c,knight:k,light_cavalry:l}=UNIT_TYPES;
-  assert.deepEqual([a.equipment,b.equipment,c.equipment,k.equipment],[{weapon:'sword'},{weapon:'sword'},{weapon:'bow'},{weapon:'sword',armor:'armor'}]);
+  assert.deepEqual([a.equipment,b.equipment,c.equipment,k.equipment],[{weapon:'sword'},{weapon:'sword',armor:'light_armor'},{weapon:'bow'},{weapon:'sword',armor:'armor'}]);
   assert.ok(b.modifiers.maxHP>a.modifiers.maxHP&&b.modifiers.armor>0&&b.trainingTime>a.trainingTime&&b.goldCost>a.goldCost&&b.requiredCombatLevel>a.requiredCombatLevel,'the Swordsman is the stronger, dearer infantry');
   assert.equal(c.modifiers.attackRange,5);assert.equal(k.mount,undefined);assert.equal(l.mount,'horse');
   assert.deepEqual(unitKit('knight'),{sword:1,armor:1});
@@ -45,14 +45,14 @@ test('training takes Gold, the exact items carried from the Armory by Haulers an
   for(const [w,type]of [[a,'soldier'],[b,'swordsman'],[c,'archer']])assert.equal(s.military.train(w,type),null);
   assert.equal(s.inventory.count('gold'),gold-5-12-8);assert.equal(s.military.train(a,'archer'),'training','one order per Soldier');
   until(s,()=>[...s.military.orders.values()].every(o=>o.state==='training'));
-  assert.deepEqual({...armoryStock(s,armory)},{sword:2,armor:2,bow:1},'exactly one item per order left the Armory');
+  assert.deepEqual({...armoryStock(s,armory)},{sword:2,armor:2,bow:1,light_armor:1},'exactly one item per order left the Armory');
   const saved=validateGameState(serializeGameState(s)),restored=scene(false);loadGameState(restored,structuredClone(saved));assert.deepEqual(validateGameState(serializeGameState(restored)),saved);s=restored;
   until(s,()=>s.military.units.size===3);
   const unit=id=>s.workerSystem.workers.get(id);
   assert.deepEqual([a,b,c].map(w=>s.military.units.get(w.id).type),['soldier','swordsman','archer']);
-  assert.deepEqual([unit(a.id),unit(b.id),unit(c.id)].map(w=>[w.maxHP,Math.round(w.attackDPS*100)/100,w.armor,w.attackRange]),[[80,12,0,1],[120,15,15,1],[70,8.4,0,6]]);
+  assert.deepEqual([unit(a.id),unit(b.id),unit(c.id)].map(w=>[w.maxHP,Math.round(w.attackDPS*100)/100,w.armor,w.attackRange]),[[80,12,0,1],[120,15,30,1],[70,8.4,0,6]]);
   const receipts=[...s.resourceLedger.history,s.resourceLedger.current].flatMap(d=>d.transactions).filter(t=>t.source==='Military Equipment');
-  assert.deepEqual(receipts.map(t=>[t.resource,t.quantity]).sort(),[['bow',1],['sword',1],['sword',1]]);
+  assert.deepEqual(receipts.map(t=>[t.resource,t.quantity]).sort(),[['bow',1],['light_armor',1],['sword',1],['sword',1]]);
   assert.equal(s.foodStorage.used(s.foodStorage.locations.get(`kit-${barracks.id}`)),0,'nothing left in the kit store');
   const wages=new WageSystem(s),plain=soldier(s,s.buildings.find(x=>x.type==='barracks'),{x:53,y:56},3);assert.equal(wages.dailyWage(unit(b.id)),BASE_DAILY_WAGES.soldier+UNIT_TYPES.swordsman.wageBonus,'a trained unit earns the Soldier wage and its type’s extra wage');assert.equal(wages.dailyWage(plain),BASE_DAILY_WAGES.recruit,'kasarna-branci: an untrained Recruit earns the Recruit wage');
 });

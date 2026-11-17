@@ -8,6 +8,9 @@ export const FARMING_RULES = Object.freeze({
   crops: Object.freeze({
     wheat_field: Object.freeze({ resource: 'wheat', growthDays: 2, yield: 10, workDuration: 4000, xp: 8,
       stages: ['Prepared soil', 'Young wheat', 'Growing wheat', 'Ripe wheat'] }),
+    // p71 (owner 17 Nov 2026): Flax for the Weaver's Cloth; harvested like wheat into the Farmhouse store.
+    flax_field: Object.freeze({ resource: 'flax', growthDays: 2, yield: 8, workDuration: 4000, xp: 8,
+      stages: ['Prepared soil', 'Young flax', 'Flowering flax', 'Ripe flax'] }),
     orchard: Object.freeze({ resource: 'apple', growthDays: 3, yield: 8, workDuration: 5000, xp: 10,
       stages: ['Resting trees', 'Blossoming trees', 'Small fruit', 'Ripe apples'] }),
   }),
@@ -15,5 +18,6 @@ export const FARMING_RULES = Object.freeze({
 // Owner decision 8 Nov 2026 (farmhouse-store): every Farmhouse keeps a store for grain – Wheat and Flour only, 200 units
 // together. Farmers bring the harvest here, Haulers supply the Mill and the Bakery from it and take the Mill's Flour
 // back. The Granary no longer takes Wheat or Flour; the Starter Stockpile still does (fallback while no Farmhouse has room).
-export const FARMHOUSE_STORE = Object.freeze({ capacity: 200, resources: Object.freeze(['wheat', 'flour']) });
+export const FARMHOUSE_STORE = Object.freeze({ capacity: 200, resources: Object.freeze(['wheat', 'flour', 'flax']) });
+// p71: the Farmhouse store keeps Flax too (it is not food, so the Granary never takes it).
 export const cropStage = (growth, required) => growth>=required-1e-8?3:Math.min(2,Math.floor(Math.max(0,growth)/required*3+1e-9));

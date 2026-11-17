@@ -11,9 +11,9 @@ export const buildingCategoryLabel=definition=>BUILDING_CATEGORIES[definition.bu
 // after the ordered ones). In All, each category keeps its slots, so only the order inside a category changes.
 // Owner 15 Nov 2026 (63): the order inside each category; buildings not listed follow by menuOrder, then registry order.
 export const BUILDING_MENU_ORDER=Object.freeze({
-  food:Object.freeze(['granary','hunting_lodge','fisherman_hut','farmhouse','orchard','wheat_field','mill','bakery']),
-  defense:Object.freeze(['castle','gate','wall','tower','barracks','armory','bowyer','swordsmith','armorer']),
-  industry:Object.freeze(['lumberjack_hut','builder_workshop','quarry','iron_mine','smelter','pitch_kiln','wheelwright_workshop']),
+  food:Object.freeze(['granary','hunting_lodge','fisherman_hut','farmhouse','orchard','wheat_field','flax_field','mill','bakery']),
+  defense:Object.freeze(['castle','gate','wall','tower','barracks','armory','bowyer','swordsmith','armorer','tailor']),
+  industry:Object.freeze(['lumberjack_hut','builder_workshop','quarry','iron_mine','smelter','pitch_kiln','wheelwright_workshop','weaver']),
   logistics:Object.freeze(['material_yard','warehouse','marketplace','stables']),
 });
 const listed=d=>{const i=BUILDING_MENU_ORDER[d.buildingCategory]?.indexOf(d.id)??-1;return i<0?Number.MAX_SAFE_INTEGER:i;};

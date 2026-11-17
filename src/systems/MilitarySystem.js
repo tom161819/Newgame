@@ -239,7 +239,7 @@ export class MilitarySystem {
     }
   }
   finish(order,worker){
-    this.orders.delete(order.id);const equipment={...UNIT_TYPES[order.type].equipment};if(UNIT_TYPES[order.type].mount)this.scene.stables?.mountRider(worker.id);this.units.set(worker.id,{type:order.type,equipment});
+    this.orders.delete(order.id);const equipment=Object.fromEntries(Object.entries(UNIT_TYPES[order.type].equipment).filter(([,id])=>order.items?.[id]>0));/* p71: an order trained before Light Armor joined the kit gives what it got */if(UNIT_TYPES[order.type].mount)this.scene.stables?.mountRider(worker.id);this.units.set(worker.id,{type:order.type,equipment});
     for(const[id,n]of Object.entries(order.items))this.scene.resourceLedger?.expense(id,n,'Military Equipment',{id:`military-equip:${order.id}:${id}`,entityId:worker.id});
     this.apply(worker);worker.currentHP=worker.maxHP;this.scene.activities?.emit('unitTrained',{actor:worker,objectType:order.type,quantity:1});this.scene.updateInventory?.();
   }

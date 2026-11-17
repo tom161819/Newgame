@@ -53,7 +53,7 @@ test('the King tames a wild horse by riding it 25 s and leaves it in Stables wit
 
 test('Light Cavalry needs a free stabled horse (the Knight walks since p70): reserved for training, ridden afterwards (faster), returned on discharge; Save/Load; a mounted Knight from an older save gives the horse back',()=>{
   let s=scene();const st=building(s,'stables',50,50),barracks=building(s,'barracks',34,46),armory=building(s,'armory',62,40);
-  s.foodStorage.register(armory);s.foodStorage.register(barracks);s.foodStorage.deposit(`armory-${armory.id}`,'sword',1);s.inventory.add('gold',100);
+  s.foodStorage.register(armory);s.foodStorage.register(barracks);s.foodStorage.deposit(`armory-${armory.id}`,'sword',1);s.foodStorage.deposit(`armory-${armory.id}`,'light_armor',1);s.inventory.add('gold',100);
   for(const t of [{x:56,y:44},{x:57,y:44}]){const h=s.workerSystem.create(t);s.workerSystem.jobs.assign(h,'hauler');}
   const knight=s.workerSystem.create({x:35,y:52});assert.equal(s.workplaceSystem.assign(barracks,knight),true);Object.assign(knight.skills.combat,{level:4,currentXP:0,totalXP:totalXPForLevel(4),xpToNextLevel:getXPRequired(4)});
   assert.equal(s.military.blocker(knight,'light_cavalry'),'horse','no tamed horse yet');

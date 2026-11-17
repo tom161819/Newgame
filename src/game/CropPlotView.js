@@ -44,7 +44,7 @@ export class CropPlotView {
     const key=`crop-plants:${this.definition.id}:${this.season}:${this.stage}:${tint??'normal'}`;
     if(!this.scene.textures.exists(key)){
       const g=this.scene.make.graphics({x:0,y:0,add:false});g.translateCanvas(32,92);
-      if(this.definition.id==='wheat_field')this.wheat(g,tint);else this.tree(g,tint);
+      if(this.definition.id==='wheat_field')this.wheat(g,tint);else if(this.definition.id==='flax_field')this.flax(g,tint);else this.tree(g,tint);
       g.generateTexture(key,64,112);g.destroy();
     }
     return key;
@@ -58,6 +58,19 @@ export class CropPlotView {
       const x=-17+column*13+row*4,y=-6+row*5;
       g.lineStyle(1.6,color);g.lineBetween(x,y,x,y-height);g.lineBetween(x,y-height*.4,x-5,y-height*.65);g.lineBetween(x,y-height*.55,x+4,y-height*.8);
       if(this.stage>=2){g.lineStyle(this.stage===3?2.5:1.8,color);for(let i=0;i<3;i++){const top=y-height+i*3;g.lineBetween(x,top,x-3,top-3);g.lineBetween(x,top,x+3,top-3);}}
+    }
+  }
+  // p71: Flax – thin straight stems, sky-blue flowers when it blooms, straw-brown when ripe (drawn until Studio art).
+  flax(g,tint){
+    g.lineStyle(1,tint??0x3d3928,.6);
+    for(let row=-1;row<=1;row++)g.lineBetween(-22,row*6-5,19,row*6+9);
+    if(!this.stage)return;
+    const height=[0,9,22,26][this.stage],color=tint??(this.season==='Winter'?0xcac09b:this.stage===3?0xb59a5a:0x6f9a4a);
+    for(let row=0;row<3;row++)for(let column=0;column<4;column++){
+      const x=-19+column*10+row*4,y=-6+row*5;
+      g.lineStyle(1.2,color);g.lineBetween(x,y,x+(column%2?1:-1),y-height);
+      if(this.stage===2&&this.season!=='Winter'){g.fillStyle(tint??0x7fa6dc);g.fillCircle(x+(column%2?1:-1),y-height-1.5,2.4);}
+      if(this.stage===3){g.fillStyle(tint??0x8d6f3a);g.fillCircle(x+(column%2?1:-1),y-height-1,1.6);}
     }
   }
   tree(g,tint){

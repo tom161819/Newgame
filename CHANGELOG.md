@@ -5,6 +5,16 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.144.0] - 2026-11-17
+<!-- version: {"title":"Cloth: flax, weaver, clothing and the tailor's light armour","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- Cloth: a Flax Field (tended from a Farmhouse) grows Flax, the Weaver weaves it into Cloth, kept in a Warehouse.
+- Clothing is a new part of Happiness. Clothes wear out in 20 days; each morning Cloth from the stores renews them. Well clothed residents are happier (+4), ragged ones less happy (down to −4). The Kingdom overview shows Clothing.
+- The Tailor sews Light Armor from Cloth.
+### Changed
+- The Swordsman, Royal Archer, Crossbowman and Light Cavalry now need Light Armor to train. Units trained before keep their kit.
+- The Armorer no longer makes Light Armor.
+
 ## [0.143.17] - 2026-11-17
 <!-- version: {"title":"Older saves with an Armory load again","type":"fix","reconstructed":false,"saveVersion":64} -->
 ### Fixed

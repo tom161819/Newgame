@@ -7,6 +7,7 @@ import { SQUAD_MAX } from '../ui/armySquads.js';
 import { validHaulPriority } from '../data/logistics.js';
 import { validNightThreatState } from './NightThreatSystem.js';
 import { validHeatingState } from './HeatingSystem.js';
+import { validClothingState } from './ClothingSystem.js';
 import { validRoyalGoalState } from './RoyalGoals.js';
 import { validKingSkillState } from './KingSkills.js';
 import { validNightSpeedTipState } from '../data/dayNight.js';
@@ -52,7 +53,7 @@ import { captureMapKnowledge } from '../game/mapMemoryObjects.js';
 import { validateMapMemory } from './MapMemoryValidation.js';
 import { FORESTRY,emptyNaturalState } from '../data/naturalResources.js';
 import { EMPLOYMENT_PROFESSIONS,PRIORITY_RANGE } from '../data/employment.js';
-import { UNIT_TYPES } from '../data/military.js';
+import { UNIT_TYPES,legacyKit } from '../data/military.js';
 import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { validIdentity,identityKey } from '../data/names.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
@@ -118,6 +119,7 @@ export function serializeGameState(scene){
     ...(scene.lightFuel?{lightFuel:scene.lightFuel.exportState()}:{}),
     ...(scene.nightThreats?{nightThreats:scene.nightThreats.exportState()}:{}),
     ...(scene.heating?{heating:scene.heating.exportState()}:{}),
+    ...(scene.clothing?{clothing:scene.clothing.exportState()}:{}),
     ...(scene.battleMarks&&(scene.battleMarks.corpses.length||scene.battleMarks.stains.length)?{battleMarks:scene.battleMarks.exportState()}:{}),
     ...(scene.royalGoals?{royalGoals:scene.royalGoals.exportState()}:{}),
     ...(scene.kingSkills?{kingSkills:scene.kingSkills.exportState()}:{}),
@@ -479,11 +481,13 @@ function validateAtSize(input,registry){
     for(const id of siteAssignments)if(id!=='king'){const w=s.workers?.find(w=>w.id===id);check(w?.isAlive&&['build','dismantle','repair'].includes(w.workTask?.kind)&&['builder','farmer'].includes(w.profession));}
   }else check(!s.buildings.some(b=>!buildingIsComplete(b)));
   const plots=s.buildings.filter(b=>buildingIsComplete(b)&&bdef(b).crop);
+  const LATER_CROPS=['flax_field'];
   part='farming';if(s.farming!==undefined){
-    const f=s.farming;check(f&&f.clocks&&typeof f.clocks==='object'&&Object.keys(f.clocks).length===Object.keys(FARMING_RULES.crops).length);
-    for(const id of Object.keys(FARMING_RULES.crops))number(f.clocks[id]);number(f.refreshElapsed,0,FARMING_RULES.refreshInterval);array(f.records);check(f.records.length===plots.length);const recorded=new Set();
+    // p71: a crop added later (the Flax Field) has no clock in an older save; it starts at 0.
+    const f=s.farming;check(f&&f.clocks&&typeof f.clocks==='object'&&Object.keys(f.clocks).every(id=>Object.hasOwn(FARMING_RULES.crops,id)));
+    for(const id of Object.keys(FARMING_RULES.crops))if(f.clocks[id]!==undefined||!LATER_CROPS.includes(id))number(f.clocks[id]);number(f.refreshElapsed,0,FARMING_RULES.refreshInterval);array(f.records);check(f.records.length===plots.length);const recorded=new Set();
     for(const r of f.records){const plot=plots.find(b=>b.id===r.buildingId);check(plot&&!recorded.has(r.buildingId));recorded.add(r.buildingId);const crop=bdef(plot).crop;
-      number(r.growthDays,0,crop.growthDays);number(r.lastClock,0,f.clocks[plot.type]);integer(r.stage,0,3);check(r.stage===seasonalCropStage(plot.type,r.growthDays,crop.growthDays,s.seasons?.season));integer(r.cycle);
+      number(r.growthDays,0,crop.growthDays);number(r.lastClock,0,f.clocks[plot.type]??0);integer(r.stage,0,3);check(r.stage===seasonalCropStage(plot.type,r.growthDays,crop.growthDays,s.seasons?.season));integer(r.cycle);
       check(r.reservedBy==null||s.workers?.some(w=>w.isAlive&&w.id===r.reservedBy&&w.profession==='farmer'&&w.workTask?.kind==='harvest'&&w.workTask.targetId===r.buildingId));
     }
   }else check(!plots.length);
@@ -538,7 +542,8 @@ function validateAtSize(input,registry){
   part='exploration';validateMapMemory(s.exploration,registry,{check,number,integer,array});
   // Automatic employment: ON/OFF, a 1–5 priority for every workplace profession, residents held Unemployed by hand.
   part='employment';if(s.employment!==undefined){const e=s.employment;check(e&&typeof e==='object'&&Object.keys(e).filter(k=>k!=='haulers').sort().join()==='blockedBuildings,blockedTypes,enabled,held,priorities'&&typeof e.enabled==='boolean'&&(e.haulers===undefined||Number.isInteger(e.haulers)&&e.haulers>=0&&e.haulers<=30));
-    check(e.priorities&&typeof e.priorities==='object'&&Object.keys(e.priorities).sort().join()===[...EMPLOYMENT_PROFESSIONS].sort().join());for(const value of Object.values(e.priorities))integer(value,PRIORITY_RANGE.min,PRIORITY_RANGE.max);
+    // p71: Weavers and Tailors came later; an older save has no priority for them (the default applies).
+    check(e.priorities&&typeof e.priorities==='object'&&Object.keys(e.priorities).every(k=>EMPLOYMENT_PROFESSIONS.includes(k))&&EMPLOYMENT_PROFESSIONS.every(k=>Object.hasOwn(e.priorities,k)||['weaver','tailor'].includes(k)));for(const value of Object.values(e.priorities))integer(value,PRIORITY_RANGE.min,PRIORITY_RANGE.max);
     array(e.held);check(new Set(e.held).size===e.held.length&&e.held.every(id=>wIds.has(id)));
     array(e.blockedBuildings);check(new Set(e.blockedBuildings).size===e.blockedBuildings.length);for(const id of e.blockedBuildings){integer(id,1);const b=s.buildings.find(b=>b.id===id);check(b&&buildingIsComplete(b)&&!b.unverified&&!!bdef(b).workplace);}
     array(e.blockedTypes);check(new Set(e.blockedTypes).size===e.blockedTypes.length);for(const type of e.blockedTypes)check(typeof type==='string'&&!!definition(type,'building').workplace);}
@@ -574,10 +579,10 @@ function validateAtSize(input,registry){
   const st0=new Set((s.stables?.horses??[]).filter(h=>h.riderId).map(h=>h.riderId));
   part='military';if(s.military!==undefined){const m=s.military;check(m&&typeof m==='object'&&Object.keys(m).sort().join()==='nextOrder,orders,units');integer(m.nextOrder,1);array(m.units);array(m.orders);
     const workers=new Map(s.workers.map(w=>[w.id,w])),seen=new Set(),kit=type=>Object.values(UNIT_TYPES[type].equipment);
-    for(const u of m.units){check(u&&['equipment,type,workerId','equipment,garrison,type,workerId'].includes(Object.keys(u).sort().join())&&(u.garrison===undefined||u.garrison===true)&&Object.hasOwn(UNIT_TYPES,u.type)&&(!UNIT_TYPES[u.type].mount||st0.has(u.workerId))&&workers.get(u.workerId)?.isAlive&&!seen.has(u.workerId));seen.add(u.workerId);check(JSON.stringify(u.equipment)===JSON.stringify(UNIT_TYPES[u.type].equipment));}
+    for(const u of m.units){check(u&&['equipment,type,workerId','equipment,garrison,type,workerId'].includes(Object.keys(u).sort().join())&&(u.garrison===undefined||u.garrison===true)&&Object.hasOwn(UNIT_TYPES,u.type)&&(!UNIT_TYPES[u.type].mount||st0.has(u.workerId))&&workers.get(u.workerId)?.isAlive&&!seen.has(u.workerId));seen.add(u.workerId);const legacy=legacyKit(u.type);check(JSON.stringify(u.equipment)===JSON.stringify(UNIT_TYPES[u.type].equipment)||!!legacy&&JSON.stringify(u.equipment)===JSON.stringify({weapon:UNIT_TYPES[u.type].equipment.weapon}));}
     const ids=new Set();for(const o of m.orders){check(o&&Object.keys(o).sort().join()==='barracksId,id,items,required,state,type,workDone,workerId'&&Object.hasOwn(UNIT_TYPES,o.type)&&(!UNIT_TYPES[o.type].mount||st0.has(o.workerId)));integer(o.id,1,m.nextOrder-1);check(!ids.has(o.id)&&!seen.has(o.workerId));ids.add(o.id);seen.add(o.workerId);
       const w=workers.get(o.workerId);check(w?.isAlive&&w.profession==='soldier'&&w.assignedWorkplaceId===o.barracksId&&s.buildings.some(b=>b.id===o.barracksId&&b.type==='barracks'));check(o.required===UNIT_TYPES[o.type].trainingTime);number(o.workDone,0,o.required);
-      check(['supplying','training'].includes(o.state));const items={};if(o.state==='training')for(const id of kit(o.type))items[id]=(items[id]??0)+1;check(o.items&&JSON.stringify(Object.entries(o.items).sort())===JSON.stringify(Object.entries(items).sort()));if(o.state==='supplying')check(o.workDone===0);}}
+      check(['supplying','training'].includes(o.state));const items={};if(o.state==='training')for(const id of kit(o.type))items[id]=(items[id]??0)+1;const older=o.state==='training'?legacyKit(o.type):null;check(o.items&&(JSON.stringify(Object.entries(o.items).sort())===JSON.stringify(Object.entries(items).sort())||!!older&&JSON.stringify(Object.entries(o.items).sort())===JSON.stringify(Object.entries(older).sort())));if(o.state==='supplying')check(o.workDone===0);}}
   // Trade F1.2: the merchant caravan (schema 38). Its stock and Gold are the merchant's own, never the kingdom's.
   part='caravans';if(s.caravans!==undefined){
     const v=s.caravans,now=s.time?.totalElapsed??Number.MAX_SAFE_INTEGER;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='active,nextVisitAt,seq');integer(v.seq,0);
@@ -607,6 +612,8 @@ function validateAtSize(input,registry){
   // Day and night N3 (schema 57): threat switches and campfires.
   part='battleMarks';if(s.battleMarks!==undefined)check(validBattleMarks(s.battleMarks));
   part='heating';if(s.heating!==undefined)check(validHeatingState(s.heating,new Set(s.buildings.filter(b=>HEATED_BUILDINGS.includes(b.type)).map(b=>b.id))));
+  // p71: the kingdom's Clothing level (optional; an older save starts fully clothed).
+  part='clothing';if(s.clothing!==undefined)check(validClothingState(s.clothing));
   part='nightThreats';if(s.nightThreats!==undefined)check(validNightThreatState(s.nightThreats,new Set(s.buildings.map(b=>b.id))));
   // E4: finished Royal tasks and counted production (optional, older saves start with none done).
   part='royalGoals';if(s.royalGoals!==undefined)check(validRoyalGoalState(s.royalGoals));
