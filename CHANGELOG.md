@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.9] - 2026-11-17
+<!-- version: {"title":"Rounder mine caves with rock obstacles, fog of war in the mine","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Improved
+- Inside the mine the cave walls are rounder and more broken, with only an occasional sharp corner, and the caverns hold rock pillars and outcrops you must walk round, plus boulders, stalagmites, rubble and still puddles.
+### Fixed
+- Inside the mine the fog of war now covers the rock too: walls and stones you have not seen stay hidden, and those you only remember are dimmed.
+
 ## [0.143.8] - 2026-11-17
 <!-- version: {"title":"Inside the mine: rock walls and winding tunnels","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Changed

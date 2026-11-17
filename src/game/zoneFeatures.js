@@ -51,6 +51,14 @@ export function shapeZoneWorld(world,{type,id,dungeon=false},random){
     }
     // Owner 17 Nov 2026: rooms are uneven caverns (a few overlapping hollows), not round halls.
     for(const room of rooms){clearDisc(world,room,room.r,GROUND.MUD,touched);for(let k=0;k<3;k++){const a=random()*Math.PI*2,d=room.r*.7,r=Math.max(2,room.r-1-Math.floor(random()*2));clearDisc(world,{x:Math.round(room.x+Math.cos(a)*d),y:Math.round(room.y+Math.sin(a)*d)},r,GROUND.MUD,touched);}}
+    // Owner 17 Nov 2026 (later): rock pillars and outcrops stand in the caverns – kept only where every cavern can
+    // still be reached from the entrance and the middle of each cavern (chest, rats) stays free.
+    const reachAll=()=>{const seen=new Set([`${entrance.x},${entrance.y}`]),q=[entrance];while(q.length){const p=q.pop();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const x=p.x+dx,y=p.y+dy,k=`${x},${y}`;if(world.terrain[y]?.[x]===0&&!seen.has(k)){seen.add(k);q.push({x,y});}}}return rooms.every(r=>seen.has(`${r.x},${r.y}`));};
+    const SHAPES=[[[0,0]],[[0,0],[1,0]],[[0,0],[0,1]],[[0,0],[1,0],[0,1]],[[0,0],[1,0],[0,1],[1,1]],[[0,0],[1,1]]];
+    for(const room of rooms.slice(1))for(let k=0,n=between(random,[1,3]);k<n;k++){
+      const a=random()*Math.PI*2,d=2+random()*Math.max(.5,room.r-1.5),at={x:Math.round(room.x+Math.cos(a)*d),y:Math.round(room.y+Math.sin(a)*d)},shape=SHAPES[Math.floor(random()*SHAPES.length)];
+      const cells=shape.map(([dx,dy])=>({x:at.x+dx,y:at.y+dy})).filter(c=>world.terrain[c.y]?.[c.x]===0&&Math.hypot(c.x-room.x,c.y-room.y)>=2.2);if(!cells.length)continue;
+      for(const c of cells)world.terrain[c.y][c.x]=1;if(!reachAll())for(const c of cells)world.terrain[c.y][c.x]=0;}
     const far=[...rooms.slice(1)].sort((a,b)=>Math.hypot(b.x-entrance.x,b.y-entrance.y)-Math.hypot(a.x-entrance.x,a.y-entrance.y));
     feature={kind:'dungeon',entrance,rooms,chests:far.slice(0,R.chests).map((r,i)=>({key:`mine-${i}`,tile:{x:r.x,y:r.y},gold:between(random,R.gold)})),
       rats:rooms.slice(1).flatMap(r=>Array.from({length:between(random,R.rats)},(_,i)=>({x:r.x+((i%2)?1:-1),y:r.y+(i>1?1:0)})))};

@@ -269,7 +269,7 @@ export class GameScene extends Phaser.Scene {
     this.map=mapFromWorld(this.terrainGrid,this.groundGrid);
     this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
     // Inside the mine: rock walls along the passages, black rock beyond, a stone floor (DungeonView).
-    if(this.land?.dungeon)this.dungeonView=createDungeonView(this,(x,y)=>(this.terrainGrid[y]?.[x]??1)>=1);
+    if(this.land?.dungeon)this.dungeonView=createDungeonView(this,(x,y)=>(this.terrainGrid[y]?.[x]??1)>=1,{keep:[this.zoneFeature?.entrance,...(this.zoneFeature?.chests??[]).map(c=>c.tile),...(this.zoneFeature?.rats??[])].filter(Boolean)});
     this.inventory=new Inventory();if(!this.loadState)this.inventory.add('gold',this.gameSettings.startingGold);
     this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);if(this.zone)this.gameTime.importState(this.zone.time??this.zone.home.time);this.regeneration=new RegenerationSystem();
     this.seasons=new SeasonSystem(this.gameTime,{enabled:this.gameSettings.seasonsEnabled,initialWeather:this.loadState?(this.loadState.seasons?.weather??'Sunny'):undefined});this.terrain.setSeason(this.seasons.season);for(const b of this.buildings??[])if((b.type==='village_green'||definitionFor(b,this.objectRegistry,true)?.decoration))this.towerViews.get(b.id)?.setSeason?.(this.seasons.season);
@@ -882,6 +882,7 @@ export class GameScene extends Phaser.Scene {
     const output=document.querySelector('#vision-status');if(output.textContent!==text)output.textContent=text;
   }
   update(_time,delta) {
+    this.dungeonView?.update?.();
     // #60: while catching up after a hidden tab, every frame runs a batch of simulation steps and draws once.
     if(this.background?.running&&!this.visibilityPaused){this.background.step();this.activeFramePending=true;this.updateTimeDisplay();this.updateFoodDisplay();this.refreshVisibility();return;}
     if(this.gameOver||this.gameTime.paused||this.visibilityPaused)return;

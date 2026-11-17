@@ -25,3 +25,12 @@ test('the rock view: walls show faces only towards a passage, the rest of the ro
   assert.equal(at(5,5).edge,false,'far rock is not an edge');assert.ok(at(1,1).edge);
   assert.ok(height(3,3)<15,'the wall in front of the passage stays low');assert.ok(height(2,2)>25,'the wall behind it stands tall');
 });
+
+test('rounded caves: jutting rock corners are shaved, pocket corners filled; pillars show their rocky top', () => {
+  // rock everywhere except a 4×4 room at 2..5 with a single pillar at 3,3
+  const wall=(x,y)=>!(x>=2&&x<=5&&y>=2&&y<=5)||(x===3&&y===3),{tiles,shift,isIsland}=dungeonShapes((x,y)=>x<0||y<0||x>7||y>7||wall(x,y),8);
+  assert.ok(isIsland(3,3)&&!isIsland(0,0));assert.ok(tiles.find(t=>t.x===3&&t.y===3).island);
+  const moved=[[2,2],[6,2],[2,6],[6,6]].filter(([x,y])=>{const p=shift(x,y);return p.x!==x||p.y!==y;});
+  assert.ok(moved.length>=3,'most room corners are rounded, now and then one stays sharp');
+  const c=shift(2,2);assert.ok(c.x>=2&&c.y>=2,'a pocket corner moves into the room');
+});
