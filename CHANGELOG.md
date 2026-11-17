@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.144.3] - 2026-11-17
+<!-- version: {"title":"Goal ring on walls, Towers and Gates","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Improved
+- Selected soldiers sent to a wall, Tower or Gate show a ring up there where they will stand, like the goal ring on the ground.
+
 ## [0.144.2] - 2026-11-17
 <!-- version: {"title":"Battle panel only for a real fight","type":"fix","reconstructed":false,"saveVersion":64} -->
 ### Fixed

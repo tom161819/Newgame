@@ -208,6 +208,8 @@ export class UnitSelection {
     for(const w of workers){
       this.graphics.lineStyle(1.25/zoom,0xffd768,.55).strokeEllipse(w.view.x,w.view.y,24,10);
       const goal=w.commandState?.goal;if(goal){const p=tileCenter(goal);this.graphics.lineStyle(1/zoom,0xffd768,.35).strokeEllipse(p.x,p.y,16,8);}
+      // Owner 17 Nov 2026: a soldier sent to a wall, Tower or Gate shows where he goes up there, like on the ground.
+      const post=s.military?.wallPatrol?.postPoint?.(w);if(post)this.graphics.lineStyle(1/zoom,0xffd768,.5).strokeEllipse(post.x,post.y,16,8);
     }
     // Owner 16 Nov 2026: drawn in the world from the same camera points the selection uses, so the box stays under the
     // pointer at every zoom (a scroll-free overlay is still zoomed around the screen middle).

@@ -93,3 +93,14 @@ test('the way down from any wall piece is the nearest door; doors at the wall-wa
   assert.deepEqual(upperDoors(tower,s.buildings),[{side:'E',column:1}]);
   const shape=doorShape(tower,{side:'E',column:1});assert.ok(shape.top.y<Math.min(shape.bl.y,shape.br.y)-20,'drawn up at the wall-walk height');
 });
+
+test('owner 17 Nov 2026: a post has a ring up on the wall or the Tower platform, where the soldier will stand',async()=>{
+  const { tileCenter }=await import('../src/game/isometric.js');
+  const s=scene(),barracks=building(s,'barracks',24,24),{tower,walls}=fort(s,0),a=soldier(s,barracks,{x:22,y:23}),b=soldier(s,barracks,{x:23,y:23});
+  const wall=walls.find(w=>w.x===21&&w.y===30);s.military.wallPatrol.post([a],wall);s.military.wallPatrol.post([b],tower);
+  const p=s.military.wallPatrol.postPoint(a),ground=tileCenter({x:21,y:30});assert.ok(Math.abs(p.x-ground.x)<1e-6&&p.y<ground.y-40,'above the wall tile, at the wall-walk height');
+  const q=s.military.wallPatrol.postPoint(b);assert.ok(q.y<tileCenter({x:26,y:20}).y-120,'up on the Tower platform');
+  follow(s,[a,b],()=>a.wallPatrol?.phase==='post'&&b.wallPatrol?.phase==='post');
+  for(const w of [a,b]){const ring=s.military.wallPatrol.postPoint(w);s.military.wallPatrol.place(w);assert.ok(Math.hypot(w.view.x-ring.x,w.view.y-ring.y)<1,'he stands on his ring');}
+  assert.equal(s.military.wallPatrol.postPoint(soldier(s,barracks,{x:22,y:25})),null);
+});

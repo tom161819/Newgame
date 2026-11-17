@@ -112,6 +112,14 @@ export class WallPatrol {
     p.target={x:pick.st.x,y:pick.st.y};worker.path=pick.route;
     const [a,b]=WALL_PATROL.pause;p.until=now+pick.route.length*700+a+Math.random()*(b-a);p.phase='pause';return true;
   }
+  // Owner 17 Nov 2026: where the post of a selected soldier is drawn (a ring up on the wall, Tower or Gate, like the
+  // goal ring on the ground), in world space; null without a post.
+  postPoint(worker){
+    const post=worker.wallPatrol?.post;if(!post)return null;const s=this.scene;
+    const building=post.tower?s.buildings.find(b=>b.id===post.tower):wallIndex(s.buildings).get(tileKey(post));if(!building)return null;
+    let at={x:post.x+.5,y:post.y+.5};if(post.tower){const c=platformCenter(building),o=PLATFORM_SLOTS[post.slot??0]??PLATFORM_SLOTS[0];at={x:c.x+o.x,y:c.y+o.y};}
+    const point=gridToWorld(at.x,at.y),center=tileCenter(building),top=towerTop(building);return {x:point.x+top.x-center.x,y:point.y+top.y-center.y};
+  }
   // Where a soldier on a wall is drawn: on top of the wall under him.
   place(worker){
     const wall=worker.onWall;if(!wall)return false;const point=gridToWorld(worker.position.x,worker.position.y),center=tileCenter(wall),top=towerTop(wall);
