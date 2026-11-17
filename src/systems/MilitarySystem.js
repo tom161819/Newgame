@@ -6,7 +6,7 @@ import { MILITARY_ITEMS } from '../data/militaryEquipment.js';
 import { buildingIsComplete } from '../game/buildings.js';
 import { recalculateStats } from './UnitStats.js';
 import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
-import { inAttackRange } from './CombatSystem.js';
+import { inAttackRange,isRanged } from './CombatSystem.js';
 import { MILITARY_RULES,PATROL,STANCES } from '../data/military.js';
 import { freeAround,awayFrom } from '../game/combatSpacing.js';
 
@@ -77,7 +77,7 @@ export class MilitarySystem {
   enlistStartingGarrison(random=Math.random){const ws=this.scene.workerSystem,out=[];for(const {type,count} of START_GARRISON)for(let i=0;i<count;i++){if(ws.liveSubjects().length>=ws.capacity())return out;const w=ws.spawnNearStart(random);if(w&&this.enlist(w,type))out.push(w);}ws.updateUI();return out;}
   // New game only: a resident becomes a trained unit with the unit's own equipment (no Armory stock is used).
   // Garrison units (garrison:true) serve the Castle: they need no Barracks and stay soldiers until dismissed.
-  // options.withoutHorse: the Test map's Knights stand on foot (the owner's Knight figure), no Stables needed.
+  // options.withoutHorse: the Test map's Light Cavalry stands without a horse, no Stables needed.
   enlist(worker,type,{withoutHorse=false}={}){
     if(!worker?.isAlive||!UNIT_TYPES[type]||UNIT_TYPES[type].mount&&!withoutHorse)return false;
     if(!this.scene.workerSystem.jobs.assign(worker,'soldier'))return false;
@@ -157,7 +157,7 @@ export class MilitarySystem {
     if(worker.expeditionGather!=null){const m=this.scene.buildings.find(b=>b.id===worker.expeditionGather);if(m){worker.workState='Traveling to Target';worker.workMessage=t('expedition.gathering');
       if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0&&Math.max(Math.abs(worker.tile.x-(m.x+1)),Math.abs(worker.tile.y-(m.y+1)))>4){worker.aiCooldown=1500;worker.moveTo(towerNeighbors(m));}return true;}delete worker.expeditionGather;}
     // m-hlidka-hradby: on the wall walk (or on the way up) the patrol leads; an Archer on a wall shoots threats in range.
-    if(worker.wallPatrol){this.wallPatrol??=new WallPatrol(this.scene);if(worker.onWall&&worker.attackRange>1){const target=this.threat(worker);if(target&&inAttackRange(worker,target,this.scene.map)){worker.path=[];combat.startAttack(worker,target);return true;}}
+    if(worker.wallPatrol){this.wallPatrol??=new WallPatrol(this.scene);if(worker.onWall&&isRanged(worker)){const target=this.threat(worker);if(target&&inAttackRange(worker,target,this.scene.map)){worker.path=[];combat.startAttack(worker,target);return true;}}
       if(this.wallPatrol.update(worker,delta))return true;}
     // kasarna-branci: Recruits defend near their Barracks too, with their basic stats.
     if(!(unit||this.isRecruit(worker))||worker.commandState?.state==='Holding')return false;
@@ -180,7 +180,7 @@ export class MilitarySystem {
       // Combat test 16 Nov 2026: the attacked group fights on – the next enemy near him, not standing idle.
       // …and with an attack order, the rest of the enemies around the place he was sent to.
       const next=(this.nearestEnemy(worker,stance.follow,a=>this.attackers(a)<MILITARY_RULES.crowd)??this.nearestEnemy(worker,stance.follow))??(worker.attackArea&&!stance.hold?this.nearestEnemy({position:worker.attackArea},worker.attackRadius??MILITARY_RULES.orderRadius,a=>this.attackers(a)<MILITARY_RULES.crowd)??this.nearestEnemy({position:worker.attackArea},worker.attackRadius??MILITARY_RULES.orderRadius):null);if(next){worker.huntWolfId=next.id;hunted=next;}else{delete worker.attackArea;delete worker.attackRadius;}}}
-    const ranged=worker.attackRange>1;
+    const ranged=isRanged(worker);
     // Archers shoot the nearest enemy they can reach rather than walking to a far one.
     if(ranged&&!stance.hold){const inReach=this.nearestEnemy(worker,worker.attackRange,a=>inAttackRange(worker,a,this.scene.map)&&combat.canTarget(worker,a));if(inReach&&(!hunted||!inAttackRange(worker,hunted,this.scene.map)))hunted=inReach;}
     // Spread out: a melee soldier whose enemy already has enough fighters around it takes a free one close by.
@@ -193,7 +193,7 @@ export class MilitarySystem {
     // Archers keep their distance: an enemy right next to one makes him step back (unless he holds).
     if(ranged&&!stance.hold&&!worker.nextTile&&(worker.kiteWait??0)<=0){const close=this.nearestEnemy(worker,1.6);if(close&&this.attackers(close)>0){worker.kiteWait=2500;combat.stopAttack(worker);const to=awayFrom(this.scene,worker.tile,close.tile,3);if(to.length){worker.moveTo(to);return true;}}}
     worker.kiteWait=Math.max(0,(worker.kiteWait??0)-delta);
-    const ready=!worker.nextTile&&(ranged?inAttackRange(worker,target,this.scene.map)&&combat.canTarget(worker,target):canInteractAdjacent(this.scene.map,worker,target));
+    const ready=!worker.nextTile&&(ranged?inAttackRange(worker,target,this.scene.map)&&combat.canTarget(worker,target):canInteractAdjacent(this.scene.map,worker,target)||worker.attackRange>1&&inAttackRange(worker,target,this.scene.map)&&combat.canTarget(worker,target));
     if(ready){worker.path=[];combat.startAttack(worker,target);const dx=target.position.x-worker.position.x,dy=target.position.y-worker.position.y,n=Math.hypot(dx,dy);if(n)worker.direction={x:dx/n,y:dy/n};return true;}
     if(!ranged)combat.stopAttack(worker);
     if(stance.hold){worker.path=[];return true;}
@@ -247,5 +247,11 @@ export class MilitarySystem {
   importState(data){
     this.units=new Map((data?.units??[]).map(u=>[u.workerId,{type:u.type,equipment:{...u.equipment},...(u.garrison?{garrison:true}:{})}]));
     this.orders=new Map((data?.orders??[]).map(o=>[o.id,structuredClone(o)]));this.nextOrder=data?.nextOrder??1;
+  }
+  // p70: a Knight from a save made before he lost his horse gives it back (called once the Stables are loaded).
+  releaseUnusedHorses(){
+    const st=this.scene.stables;if(!st)return;const riders=new Set([...this.units].filter(([,u])=>UNIT_TYPES[u.type]?.mount).map(([id])=>id));
+    for(const o of this.orders.values())if(UNIT_TYPES[o.type]?.mount)riders.add(o.workerId);
+    for(const h of [...st.horses.values()])if(h.riderId&&!riders.has(h.riderId)){const w=this.scene.workerSystem?.liveWorkers?.().find(w=>w.id===h.riderId);st.returnHorse(h.riderId,w?.tile??null);if(w&&this.units.has(w.id))this.apply(w);}
   }
 }

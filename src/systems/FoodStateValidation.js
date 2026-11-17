@@ -81,11 +81,13 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   const adjacent=(l,t)=>l&&((t.x>=l.x&&t.x<l.x+l.width&&(t.y===l.y-1||t.y===l.y+l.height))||(t.y>=l.y&&t.y<l.y+l.height&&(t.x===l.x-1||t.x===l.x+l.width))||(l.kind==='fallback'&&t.x===l.x&&t.y===l.y));
   const capacity=(id,owner,resource,amount)=>{if(id==null)return;const r=reservations.get(id);check(r?.kind==='capacity'&&r.owner===owner&&r.resource===resource&&r.amount===amount&&!capacityRefs.has(id));capacityRefs.add(id);};
   check(production.records.length===producers.length);
+  // p70: the weapon workshops gained a recipe choice without a save bump; their older records name no recipe (the first).
+  const LATER_CHOICE=new Set(['swordsmith','bowyer','armorer']);
   for(const r of production.records){
     const b=producers.find(b=>b.id===r.buildingId);check(b&&!records.has(b.id));records.set(b.id,r);check(typeof r.auto==='boolean');integer(r.nextCycle,1);integer(r.completed,0,r.nextCycle-1);
     check(r.nextCycle===1+r.completed+(r.cycle?1:0));
     // S12: a workshop with recipe choices keeps the chosen one; a running batch keeps the recipe it started with.
-    const d=definitionFor(b,registry);if(d.recipes){check(Object.hasOwn(d.recipes,r.recipe));if(r.cycle)check(Object.hasOwn(d.recipes,r.cycle.recipe));}else check(r.recipe===undefined&&r.cycle?.recipe===undefined);
+    const d=definitionFor(b,registry);if(d.recipes){check(r.recipe===undefined&&LATER_CHOICE.has(b.type)||Object.hasOwn(d.recipes,r.recipe));if(r.cycle)check(r.cycle.recipe===undefined&&LATER_CHOICE.has(b.type)||Object.hasOwn(d.recipes,r.cycle.recipe));}else check(r.recipe===undefined&&r.cycle?.recipe===undefined);
     // Fix (owner 13 Nov, save check "food"): a finished batch waiting in the output keeps the recipe it was made with,
     // also after the workshop switched to another one (Pitch Kiln: Torches wait, the kiln is back on Pitch).
     const waitingResource=!r.cycle&&r.outputReservation&&d.recipes?reservations.get(r.outputReservation)?.resource:null;

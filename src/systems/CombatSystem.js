@@ -3,6 +3,9 @@ import { clampArmor } from './UnitStats.js';
 import { hasLineOfSight } from '../game/lineOfSight.js';
 export { clampArmor,createCombatStats } from './UnitStats.js';
 
+// p70: a unit with a reach of 2 (the Halberdier) is still a melee fighter; shooting starts above that.
+export const isRanged=unit=>unit.attackRange>2;
+
 export function inAttackRange(attacker,target,map=null) {
   const dx=Math.abs(attacker.position.x-target.position.x),dy=Math.abs(attacker.position.y-target.position.y);
   if(Math.max(dx,dy)>attacker.attackRange+1e-8)return false;

@@ -18,16 +18,16 @@ test('C07 goods: Bow, Sword and Armor are stored equipment goods made by their w
   for(const item of Object.values(MILITARY_ITEMS)){
     assert.ok(EQUIPMENT_SLOTS.includes(item.slot));const d=objectRegistry.require(item.itemId);
     assert.deepEqual([d.category,d.resourceCategory],['resource','equipment']);
-    assert.deepEqual(objectRegistry.require(item.workshop).recipe.input,item.recipe,`${item.workshop} recipe`);assert.deepEqual(objectRegistry.require(item.workshop).recipe.output,{[item.itemId]:1});
+    const w=objectRegistry.require(item.workshop),r=Object.values(w.recipes??{one:w.recipe}).find(r=>r.output[item.itemId]);assert.ok(r,`${item.workshop} makes ${item.itemId}`);assert.deepEqual(r.input,item.recipe,`${item.workshop} recipe`);assert.deepEqual(r.output,{[item.itemId]:1});
     for(const resource of Object.keys(item.recipe))assert.equal(objectRegistry.require(resource).category,'resource');
     if(item.modifiersFrom)assert.equal(objectRegistry.require(item.modifiersFrom).equipment.slot,item.slot,'C08 reuses the king item modifiers');
   }
 });
 
-test('unit roles: one weapon each from the contract, Soldiers only, Knights locked until real Stables with a reservable horse',()=>{
-  const weapons=new Set(Object.values(MILITARY_ITEMS).filter(i=>i.slot==='weapon').map(i=>i.itemId));assert.deepEqual([...weapons].sort(),['bow','sword']);
+test('unit roles: one weapon each from the contract, Soldiers only, Light Cavalry locked until real Stables with a reservable horse',()=>{
+  const weapons=new Set(Object.values(MILITARY_ITEMS).filter(i=>i.slot==='weapon').map(i=>i.itemId));assert.deepEqual([...weapons].sort(),['bow','crossbow','halberd','sword']);
   for(const role of Object.values(UNIT_ROLES)){assert.ok(JOBS[role.profession]);assert.ok(weapons.has(role.weapon));}
-  assert.equal(UNIT_ROLES.knight.mount,'horse');assert.equal(UNIT_ROLES.knight.lockedUntil,'stables');
+  assert.equal(UNIT_ROLES.knight.mount,null);assert.equal(UNIT_ROLES.light_cavalry.mount,'horse');assert.equal(UNIT_ROLES.light_cavalry.lockedUntil,'stables');
   assert.equal(HORSE_CONTRACT.wildHorsesAssignable,false);
   // The king keeps exactly his two slots; mount is a contract slot for units, not an inventory slot.
   assert.match(readFileSync(new URL('../src/systems/EquipmentSystem.js',import.meta.url),'utf8'),/this\.slots=\{weapon:null,armor:null\}/);

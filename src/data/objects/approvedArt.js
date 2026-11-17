@@ -164,7 +164,9 @@ export const MILITARY_LOOKS=Object.freeze({soldier:Object.freeze({male:['militar
   knight:Object.freeze({male:['military-knight-blue','military-knight-red'],female:['military-knight-woman']})});
 // m-vojaci-3d (owner 16 Nov 2026): the four ranks wear the owner's rigged 3D soldiers, rendered with walk, attack and
 // fall animations (SOLDIER_ANIM_ART); the earlier painted looks stay only as data for the Studio.
-export function militaryLook(type,sex,id=''){if(SOLDIER_ANIM_LOOKS[type])return SOLDIER_ANIM_LOOKS[type];const list=MILITARY_LOOKS[type]?.[sex];if(!list)return null;let h=0;for(const c of String(id))h=(h*31+c.charCodeAt(0))>>>0;return list[h%list.length];}
+// p70: the new ranks wear the nearest 3D figure until their own art comes (the owner sends the Light Cavalry later).
+export const STAND_IN_LOOKS=Object.freeze({halberdier:'knight',royal_archer:'archer',crossbowman:'archer',light_cavalry:'swordsman'});
+export function militaryLook(type,sex,id=''){type=SOLDIER_ANIM_LOOKS[type]?type:STAND_IN_LOOKS[type]??type;if(SOLDIER_ANIM_LOOKS[type])return SOLDIER_ANIM_LOOKS[type];const list=MILITARY_LOOKS[type]?.[sex];if(!list)return null;let h=0;for(const c of String(id))h=(h*31+c.charCodeAt(0))>>>0;return list[h%list.length];}
 export function villagerSex(name=''){const first=String(name).split(' ')[0];return FEMALE_NAMES.has(first)||/a$/i.test(first)?'female':'male';}
 
 export function withApprovedArt(definition){

@@ -6,7 +6,7 @@ export const TRADE_RULES=Object.freeze({buyMarkup:1.15,sellFactor:.8,marketplace
 // Bow, a Swordsmith 3 Bars + 2 Wood (128) into a Sword and an Armorer 5 Bars + 2 Wood (208) into Armor. At the proposed
 // prices making them would destroy value, so they are priced at their inputs plus roughly 10–15 % for the work.
 // `iron` is the older Iron resource that Warehouses still store; it trades like Iron Ore.
-export const BASE_PRICES=Object.freeze({wheat:2,apple:3,stone:3,wood:4,meat:5,fish:3,flour:5,bread:7,iron_ore:9,iron:40,bow:36,sword:145,armor:235,pitch:4,torch:2});
+export const BASE_PRICES=Object.freeze({wheat:2,apple:3,stone:3,wood:4,meat:5,fish:3,flour:5,bread:7,iron_ore:9,iron:40,bow:36,sword:145,armor:235,halberd:200,crossbow:85,light_armor:110,pitch:4,torch:2});
 // Tradeable goods come from the resource registry: everything the HUD counts except Gold and vehicles.
 export function tradeableResources(registry){return registry.byCategory('resource').filter(d=>d.collectible&&d.id!=='gold'&&d.resourceCategory!=='vehicle');}
 const round=value=>Math.max(1,Math.round(value));
@@ -15,7 +15,7 @@ const round=value=>Math.max(1,Math.round(value));
 // costs less. The factor and its reasons are computed from current stocks when prices are shown or an order is quoted;
 // an order keeps the price agreed at confirmation.
 export const PRICE_MODEL=Object.freeze({min:.75,max:1.35,kingdomWeight:.2,merchantWeight:.15,defaultReference:50,
-  referenceStock:Object.freeze({iron:10,bow:5,sword:3,armor:2}),historyDays:20,recentTrades:12});
+  referenceStock:Object.freeze({iron:10,bow:5,sword:3,armor:2,halberd:2,crossbow:3,light_armor:2}),historyDays:20,recentTrades:12});
 // Trade F3 (automatic trade, S14 §12–13): off by default. Each good has one rule – sell above a reserve at a minimum
 // price, or buy when the stock falls below a level, up to a target, at a maximum price – never both, so a good cannot be
 // bought and sold back automatically. Rules are checked every `checkMs` of game time while a caravan trades, and each
@@ -86,6 +86,6 @@ export const MERCHANT_TYPES=Object.freeze({
 // m-karavana-vyslat (owner, 12 Nov): the kingdom's own caravan. A free Horse Wagon carries the goods (load units as a
 // Hauler with a Horse Wagon); soldiers may escort it. It is away 2–4 days; an ambush may take part of the goods (30 %
 // without escort, less per escort, at least 3 %); escorts never die. Goods sell at today's market price ± 10 %.
-export const EXPEDITION=Object.freeze({days:Object.freeze([2,4]),risk:.3,minRisk:.03,escort:Object.freeze({recruit:.05,soldier:.08,swordsman:.08,archer:.08,knight:.12}),
+export const EXPEDITION=Object.freeze({days:Object.freeze([2,4]),risk:.3,minRisk:.03,escort:Object.freeze({recruit:.05,soldier:.08,swordsman:.08,archer:.08,knight:.12,halberdier:.1,royal_archer:.1,crossbowman:.09,light_cavalry:.1}),
   loss:Object.freeze([.2,.6]),spread:.1,gatherHours:2,hurt:.5});
 export function expeditionRisk(escortTypes){return Math.max(EXPEDITION.minRisk,EXPEDITION.risk-escortTypes.reduce((n,type)=>n+(EXPEDITION.escort[type]??EXPEDITION.escort.recruit),0));}

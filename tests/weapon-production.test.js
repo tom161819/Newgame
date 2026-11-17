@@ -15,8 +15,8 @@ const stock=(s,location)=>s.foodStorage.locations.get(location)?.stock??{};
 
 test('Bow, Sword and Armor go only to an Armory; Warehouses and the Starter Stockpile never take them',()=>{
   const s=scene(),r=s.objectRegistry;
-  assert.deepEqual(storageResources(r.require('armory'),r).sort(),['armor','bow','sword']);
-  for(const id of ['warehouse','material_yard','starter_stockpile'])for(const item of ['bow','sword','armor'])assert.equal(storageResources(r.require(id),r).includes(item),false,`${id} ${item}`);
+  assert.deepEqual(storageResources(r.require('armory'),r).sort(),['armor','bow','crossbow','halberd','light_armor','sword']);
+  for(const id of ['warehouse','material_yard','starter_stockpile'])for(const item of ['bow','sword','armor','halberd','crossbow','light_armor'])assert.equal(storageResources(r.require(id),r).includes(item),false,`${id} ${item}`);
   assert.equal(r.require('armory').storage.capacity,40);
 });
 

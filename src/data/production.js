@@ -26,6 +26,11 @@ export const PITCH_RECIPES=Object.freeze({
   pitch:Object.freeze({input:Object.freeze({wood:4}),output:Object.freeze({pitch:2}),duration:15000,skill:'crafting',xp:8,inputSources:Object.freeze({wood:'Pitch Making'}),outputSource:'Pitch Kiln Production'}),
   torches:Object.freeze({input:Object.freeze({wood:2,pitch:2}),output:Object.freeze({torch:6}),duration:10000,skill:'crafting',xp:8,inputSources:Object.freeze({wood:'Torch Making',pitch:'Torch Making'}),outputSource:'Pitch Kiln Production'}),
 });
+// p70 (owner 17 Nov 2026): the three weapon and armour workshops switch production in the building window.
+const recipe=(input,fuel,output,duration,xp,inputSources,outputSource)=>Object.freeze({input:Object.freeze(input),...(fuel?{fuel:Object.freeze(fuel)}:{}),output:Object.freeze(output),duration,skill:'crafting',xp,inputSources:Object.freeze(inputSources),outputSource});
+export const SWORDSMITH_RECIPES=Object.freeze({sword:PRODUCTION_RECIPES.swordsmith,halberd:recipe({iron:4,wood:3},{wood:1},{halberd:1},55000,14,{iron:'Swordsmithing',wood:'Forge Fuel'},'Swordsmith Production')});
+export const BOWYER_RECIPES=Object.freeze({bow:PRODUCTION_RECIPES.bowyer,crossbow:recipe({wood:6,iron:1},null,{crossbow:1},40000,12,{wood:'Bowmaking',iron:'Bowmaking'},'Bowyer Production')});
+export const ARMORER_RECIPES=Object.freeze({armor:PRODUCTION_RECIPES.armorer,light_armor:recipe({iron:2,wood:1},{wood:1},{light_armor:1},40000,10,{iron:'Armorsmithing',wood:'Forge Fuel'},'Armorer Production')});
 export const WHEELWRIGHT_RECIPES=Object.freeze({wheelbarrow:PRODUCTION_RECIPES.wheelwright_workshop,horse_wagon:HORSE_WAGON_RECIPE});
 // m-ukladani-chyba (owner, 12 Nov): earlier balance of recipes that changed while the save schema stayed the same. A batch
 // that was running (or finished and waiting) when the game was saved keeps the recipe it started with, so a save made

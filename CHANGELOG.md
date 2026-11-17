@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.143.16] - 2026-11-17
+<!-- version: {"title":"New units: Halberdier, Royal Archer, Crossbowman, Light Cavalry","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- Four new units in the Barracks: the Halberdier (halberd and armour, strikes from 2 tiles), the Royal Archer (a bow with the Swordsman's defence), the Crossbowman (crossbow and light armour) and the Light Cavalry (sword and a horse from the Stables). They wear the nearest existing figure until their own look comes.
+- The Swordsmith can switch to Halberds, the Bowyer to Crossbows and the Armorer to Light Armor in the building window. The Armory keeps the new items.
+### Changed
+- The Knight now fights on foot (sword and armour, no horse). A mounted Knight from an older save gives his horse back to the Stables.
+
 ## [0.143.15] - 2026-11-17
 <!-- version: {"title":"A cat or dog can join the expedition","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added

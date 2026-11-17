@@ -12,7 +12,7 @@ import { squads,makeSquad,dissolveSquad,squadMembers } from './armySquads.js';
 // (he stands where he is put – "Guard here", or the right mouse button on the map for the chosen ones). A click on a row
 // moves the camera to the soldier and marks him; Shift + click adds or removes one, the camera then shows them all.
 // The orders are the existing unit commands (hold / move / resume), so they are saved and loaded as before.
-const RANK_ORDER=['knight','swordsman','archer','soldier'];
+const RANK_ORDER=['knight','light_cavalry','halberdier','swordsman','royal_archer','crossbowman','archer','soldier'];
 export function armyRows(scene){
   const military=scene.military,names=new Intl.Collator(language()==='cs'?'cs':'en',{numeric:true});
   const rank=w=>{const type=military?.unit(w)?.type;return type?RANK_ORDER.indexOf(type):RANK_ORDER.length;};

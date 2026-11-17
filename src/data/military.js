@@ -7,7 +7,17 @@ export const UNIT_TYPES=Object.freeze({
   soldier:Object.freeze({equipment:Object.freeze({weapon:'sword'}),modifiers:Object.freeze({maxHP:20}),trainingTime:20000,goldCost:5,wageBonus:1,requiredCombatLevel:1}),
   swordsman:Object.freeze({equipment:Object.freeze({weapon:'sword'}),modifiers:Object.freeze({maxHP:60,attackBonus:50,armor:15}),trainingTime:45000,goldCost:12,wageBonus:2,requiredCombatLevel:3}),
   archer:Object.freeze({equipment:Object.freeze({weapon:'bow'}),modifiers:Object.freeze({maxHP:10,attackRange:5}),trainingTime:30000,goldCost:8,wageBonus:1,requiredCombatLevel:1}),
-  knight:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'armor'}),mount:'horse',modifiers:Object.freeze({maxHP:100,attackBonus:50,armor:10}),trainingTime:60000,goldCost:25,wageBonus:4,requiredCombatLevel:4}),
+  // p70 (owner 17 Nov 2026): the Knight now fights on foot (sword and armour, no horse); the mounted unit is the
+  // Light Cavalry below. A Knight from an older save gives his horse back to the Stables on load.
+  knight:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'armor'}),modifiers:Object.freeze({maxHP:100,attackBonus:50,armor:10}),trainingTime:60000,goldCost:25,wageBonus:4,requiredCombatLevel:4}),
+  // p70 new units. Halberdier: halberd and armour, strikes from 2 tiles (still a melee fighter, see isRanged).
+  halberdier:Object.freeze({equipment:Object.freeze({weapon:'halberd',armor:'armor'}),modifiers:Object.freeze({maxHP:60,armor:5,attackRange:1}),trainingTime:50000,goldCost:15,wageBonus:3,requiredCombatLevel:3}),
+  // Royal Archer: a bow and the Swordsman's defence (+60 HP, armour 15). Light armour joins his kit with the cloth chain (p71).
+  royal_archer:Object.freeze({equipment:Object.freeze({weapon:'bow'}),modifiers:Object.freeze({maxHP:60,attackBonus:20,armor:15,attackRange:5}),trainingTime:45000,goldCost:14,wageBonus:2,requiredCombatLevel:3}),
+  // Crossbowman: crossbow and light armour (made by the Armorer until the cloth chain, p71, gets its own workshop).
+  crossbowman:Object.freeze({equipment:Object.freeze({weapon:'crossbow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:30,attackRange:4}),trainingTime:40000,goldCost:12,wageBonus:2,requiredCombatLevel:2}),
+  // Light Cavalry: sword and a tamed horse from the Stables, fast. His own look comes later (owner's art).
+  light_cavalry:Object.freeze({equipment:Object.freeze({weapon:'sword'}),mount:'horse',modifiers:Object.freeze({maxHP:50,attackBonus:30}),trainingTime:50000,goldCost:20,wageBonus:3,requiredCombatLevel:3}),
 });
 // kasarna-branci (owner 9 Nov 2026): everyone employed in a Barracks starts as a Recruit – no equipment, basic combat
 // stats (the resident's own 60 HP and 6 DPS plus `modifiers`), patrols and defends near the Barracks like a unit, and
@@ -17,7 +27,7 @@ export const RECRUIT=Object.freeze({modifiers:Object.freeze({maxHP:10})});
 // m-start-v2 (owner 7 Nov 2026): a new game starts with this garrison at the Castle, with its own equipment.
 export const START_GARRISON=Object.freeze([Object.freeze({type:'soldier',count:2}),Object.freeze({type:'archer',count:2})]);
 export const UNIT_TYPE_IDS=Object.freeze(Object.keys(UNIT_TYPES));
-// A Knight rides a tamed horse from the Stables: it is reserved for the training and kept by the Knight.
+// A mounted unit (Light Cavalry) rides a tamed horse from the Stables: it is reserved for the training and kept by the rider.
 export const KNIGHT_SPEED=1.5;
 export const MILITARY_RULES=Object.freeze({guardRadius:12,retarget:600,kitCapacityPerOrder:2,followRadius:10,spreadRadius:6,crowd:3,engageRadius:5,retreatBelow:.25,retreatUntil:.5,retreatSafe:8,orderRadius:12,groupLink:5});
 // Combat 16 Nov 2026: soldier stances (worker.stance, saved; aggressive when missing). engage = fights an enemy this

@@ -301,6 +301,6 @@ export class FoodProductionSystem {
   }
   toggle(buildingId,value){const record=this.records.get(buildingId);if(record)record.auto=!!value;}
   exportState(){return {records:structuredClone([...this.records.values()]),nextTransfer:this.nextTransfer};}
-  importState(data){if(data){this.records=new Map(data.records.map(r=>[r.buildingId,structuredClone(r)]));this.nextTransfer=data.nextTransfer;}else for(const b of this.scene.buildings)this.register(b);}
+  importState(data){if(data){this.records=new Map(data.records.map(r=>[r.buildingId,structuredClone(r)]));for(const r of this.records.values()){const b=this.scene.buildings.find(b=>b.id===r.buildingId),d=b&&buildingDefinition(b);if(d?.recipes){r.recipe??=defaultRecipeKey(d);if(r.cycle)r.cycle.recipe??=r.recipe;}}this.nextTransfer=data.nextTransfer;}else for(const b of this.scene.buildings)this.register(b);}
   destroy(){this.records.clear();}
 }

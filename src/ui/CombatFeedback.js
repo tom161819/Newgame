@@ -1,5 +1,5 @@
 import { t } from '../i18n/index.js';
-import { inAttackRange } from '../systems/CombatSystem.js';
+import { inAttackRange,isRanged } from '../systems/CombatSystem.js';
 
 // Enemies: wolves and the hostile animals of the scouted lands (bandits, rats).
 const isEnemyUnit=u=>u?.type==='wolf'||!!u?.definition?.gameplay?.hostile;
@@ -22,7 +22,7 @@ export class CombatFeedback {
   // Arrows: an archer who is shooting sends a visible arrow about once a second.
   arrows(delta){
     const s=this.scene;if(!s.add?.graphics)return;
-    for(const [a,target] of s.combat.attacks){if(!(a.attackRange>1)||!a.isAlive||!target?.isAlive||!inAttackRange(a,target,s.map))continue;a.arrowWait=(a.arrowWait??Math.random()*900)-delta;if(a.arrowWait>0)continue;a.arrowWait=900;
+    for(const [a,target] of s.combat.attacks){if(!isRanged(a)||!a.isAlive||!target?.isAlive||!inAttackRange(a,target,s.map))continue;a.arrowWait=(a.arrowWait??Math.random()*900)-delta;if(a.arrowWait>0)continue;a.arrowWait=900;
       const from=a===s.character?s.player:a.view,to=target===s.character?s.player:target.view;if(!from?.visible||!to)continue;
       const g=s.add.graphics().setDepth(Math.max(from.depth,to.depth)+1),start={x:from.x,y:from.y-24},end={x:to.x,y:to.y-18},angle=Math.atan2(end.y-start.y,end.x-start.x);
       g.lineStyle(2,0x3b2a1a,1).lineBetween(-7,0,7,0).fillStyle(0xd9d4c4,1).fillTriangle(7,-2,7,2,11,0);g.setPosition(start.x,start.y).setRotation(angle);
