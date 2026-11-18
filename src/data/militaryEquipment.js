@@ -11,10 +11,10 @@ export const EQUIPMENT_SLOTS=Object.freeze(['weapon','armor','mount']);
 export const MILITARY_ITEMS=Object.freeze({
   sword:Object.freeze({itemId:'sword',slot:'weapon',recipe:Object.freeze({iron:3,wood:2}),workshop:'swordsmith',modifiersFrom:'basic_sword'}),
   armor:Object.freeze({itemId:'armor',slot:'armor',recipe:Object.freeze({iron:5,wood:2}),workshop:'armorer',modifiersFrom:'basic_armor'}),
-  bow:Object.freeze({itemId:'bow',slot:'weapon',recipe:Object.freeze({wood:8}),workshop:'bowyer',modifiers:Object.freeze({attackBonus:40}),range:6}),
+  bow:Object.freeze({itemId:'bow',slot:'weapon',recipe:Object.freeze({wood:8}),workshop:'bowyer',modifiers:Object.freeze({attackBonus:40}),range:9}),
   // p70 (owner 17 Nov 2026): the Swordsmith switches to Halberds, the Bowyer to Crossbows; p71: the Tailor sews Light Armor from Cloth.
   halberd:Object.freeze({itemId:'halberd',slot:'weapon',recipe:Object.freeze({iron:4,wood:3}),workshop:'swordsmith',modifiers:Object.freeze({attackBonus:120})}),
-  crossbow:Object.freeze({itemId:'crossbow',slot:'weapon',recipe:Object.freeze({wood:6,iron:1}),workshop:'bowyer',modifiers:Object.freeze({attackBonus:90}),range:5}),
+  crossbow:Object.freeze({itemId:'crossbow',slot:'weapon',recipe:Object.freeze({wood:6,iron:1}),workshop:'bowyer',modifiers:Object.freeze({attackBonus:90}),range:7.5}),
   light_armor:Object.freeze({itemId:'light_armor',slot:'armor',recipe:Object.freeze({cloth:3}),workshop:'tailor',modifiers:Object.freeze({armor:15})}),
 });
 

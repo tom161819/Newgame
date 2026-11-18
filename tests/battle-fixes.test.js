@@ -111,7 +111,7 @@ test('point 3: archers lob a shot over a wall at short range for half the damage
   assert.equal(blockersBetween(s.map,{x:50,y:48},{x:50,y:52}),1);assert.equal(blockersBetween(s.map,{x:50,y:48},{x:50,y:49}),0);
   const [archer]=units(s,'archer',{x:50,y:52},1),[foe]=units(s,'enemy_soldier',{x:50,y:48},1),at=(u,x,y)=>{u.tile={x,y};u.position={x:x+.5,y:y+.5};u.path=[];u.nextTile=null;};
   at(archer,50,52);at(foe,50,48);assert.equal(inAttackRange(archer,foe,s.map),true,'4 tiles, one wall between');assert.equal(shotFactor(archer,foe,s.map),LOB.damage);
-  at(foe,50,46);assert.equal(inAttackRange(archer,foe,s.map),false,'6 tiles over a wall is too far');
+  at(foe,50,44);assert.equal(inAttackRange(archer,foe,s.map),false,'8 tiles over a wall is too far');
   at(foe,50,48);s.map[49][50]=1;s.map[51][50]=1;assert.equal(inAttackRange(archer,foe,s.map),false,'three tiles thick is too much');s.map[49][50]=0;s.map[51][50]=0;
   assert.equal(inAttackRange({...archer,profession:'hunter',definition:{}},foe,s.map),false,'a Hunter does not lob');
   // An enemy archer lobs too, and the damage really is half.
@@ -124,7 +124,7 @@ test('point 3: archers lob a shot over a wall at short range for half the damage
 test('point 3: an archer whose enemy stands behind a wall walks to a place he can lob from and shoots',()=>{
   const s=scene();s.character.away=true;for(let x=30;x<=75;x++)for(const y of [44,50])s.map[y][x]=1;for(let y=44;y<=50;y++)for(const x of [30,75])s.map[y][x]=1;
   const [foe]=units(s,'enemy_soldier',{x:52,y:48},1),[archer]=units(s,'archer',{x:52,y:60},1);s.military.orderAttack([archer],foe);
-  until(s,()=>s.combat.attacks.get(archer)===foe&&foe.currentHP<foe.maxHP,40000);assert.ok(archer.tile.y>50,'he stayed outside the wall');assert.ok(Math.max(Math.abs(archer.tile.x-foe.tile.x),Math.abs(archer.tile.y-foe.tile.y))<=4);
+  until(s,()=>s.combat.attacks.get(archer)===foe&&foe.currentHP<foe.maxHP,40000);assert.ok(archer.tile.y>50,'he stayed outside the wall');assert.ok(Math.max(Math.abs(archer.tile.x-foe.tile.x),Math.abs(archer.tile.y-foe.tile.y))<=6);
 });
 
 test('point 3: archers ordered at a wooden enemy building shoot fire arrows until it burns; at stone they do not shoot',async()=>{

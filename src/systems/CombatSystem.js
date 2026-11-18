@@ -25,7 +25,7 @@ export function inAttackRange(attacker,target,map=null) {
 // Battle test 18 Nov 2026, point 3 ("archers do nothing in a siege"): a soldier with a bow or crossbow, and an enemy
 // archer, lobs a shot over an obstacle at most `over` tiles thick (a wall, a Gate) at a target within `range` tiles,
 // for `damage` of the normal damage. Hunters and the King still need a clear line.
-export const LOB=Object.freeze({range:4,over:2,damage:.5});
+export const LOB=Object.freeze({range:6,over:2,damage:.5});
 export const canLob=unit=>unit.attackRange>2&&(unit.profession==='soldier'||!!unit.definition?.gameplay?.hostile);
 const lobbed=(attacker,a,b,map)=>canLob(attacker)&&Math.max(Math.abs(a.x-b.x),Math.abs(a.y-b.y))<=LOB.range&&blockersBetween(map,a,b)<=LOB.over;
 // Share of the damage a shot does: 1 with a clear line (or from a wall), LOB.damage when lobbed.

@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.10] - 2026-11-18
+<!-- version: {"title":"Long-range units shoot 50 % further","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- All long-range units shoot 50 % further: Archer and Royal Archer 9 tiles (was 6), Crossbowman 7.5 (was 5), enemy archers 9 (was 6), Catapult 18 (was 12). A lobbed shot over a wall reaches 6 tiles (was 4).
+
 ## [0.146.9] - 2026-11-18
 <!-- version: {"title":"Weapon and armour icons in the selection panel","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Added

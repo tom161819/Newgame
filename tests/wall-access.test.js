@@ -109,9 +109,9 @@ test('owner 17 Nov 2026: an archer on the wall shoots an enemy outside (range +2
   const s=scene(),barracks=building(s,'barracks',24,24),{walls}=fort(s,0),w=soldier(s,barracks,{x:22,y:23});
   assert.equal(s.military.enlist?.(w,'archer')??true,true);
   s.military.wallPatrol.post([w],walls.find(b=>b.x===25&&b.y===30));follow(s,[w],()=>w.wallPatrol?.phase==='post');assert.ok(w.onWall);
-  assert.equal(w.attackRange,6);
-  const foe=s.animalSystem.create(s.objectRegistry.require('raider'),{x:25,y:37});const hp=foe.currentHP;
+  assert.equal(w.attackRange,9);
+  const foe=s.animalSystem.create(s.objectRegistry.require('raider'),{x:25,y:40});const hp=foe.currentHP;
   for(let ms=0;ms<20000&&foe.isAlive;ms+=50)s.tick(50);
-  assert.ok(foe.currentHP<hp,'shot at 7 tiles from the wall');assert.ok(w.onWall,'still up there');assert.deepEqual(w.tile,{x:25,y:30});
+  assert.ok(foe.currentHP<hp,'shot at 10 tiles from the wall (9 + 2 from the height)');assert.ok(w.onWall,'still up there');assert.deepEqual(w.tile,{x:25,y:30});
   assert.equal(s.workerSystem.rest?.eligible?.(w)??false,false,'no rest at home while on a wall order');
 });

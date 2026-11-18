@@ -7,16 +7,16 @@ export const UNIT_TYPES=Object.freeze({
   soldier:Object.freeze({equipment:Object.freeze({weapon:'sword'}),modifiers:Object.freeze({maxHP:20}),trainingTime:20000,goldCost:5,wageBonus:1,requiredCombatLevel:1}),
   // p71 (owner 17 Nov 2026): the Swordsman, Royal Archer, Crossbowman and Light Cavalry wear Light Armor from the Tailor.
   swordsman:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'light_armor'}),modifiers:Object.freeze({maxHP:60,attackBonus:50,armor:15}),trainingTime:45000,goldCost:12,wageBonus:2,requiredCombatLevel:3}),
-  archer:Object.freeze({equipment:Object.freeze({weapon:'bow'}),modifiers:Object.freeze({maxHP:10,attackRange:5}),trainingTime:30000,goldCost:8,wageBonus:1,requiredCombatLevel:1}),
+  archer:Object.freeze({equipment:Object.freeze({weapon:'bow'}),modifiers:Object.freeze({maxHP:10,attackRange:8}),trainingTime:30000,goldCost:8,wageBonus:1,requiredCombatLevel:1}),
   // p70 (owner 17 Nov 2026): the Knight now fights on foot (sword and armour, no horse); the mounted unit is the
   // Light Cavalry below. A Knight from an older save gives his horse back to the Stables on load.
   knight:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'armor'}),modifiers:Object.freeze({maxHP:100,attackBonus:50,armor:10}),trainingTime:60000,goldCost:25,wageBonus:4,requiredCombatLevel:4}),
   // p70 new units. Halberdier: halberd and armour, strikes from 2 tiles (still a melee fighter, see isRanged).
   halberdier:Object.freeze({equipment:Object.freeze({weapon:'halberd',armor:'armor'}),modifiers:Object.freeze({maxHP:60,attackRange:1}),bonusVs:Object.freeze({mounted:1.5}),trainingTime:50000,goldCost:15,wageBonus:3,requiredCombatLevel:3}),
   // Royal Archer: a bow and the Swordsman's defence (+60 HP, armour 15) and Light Armor.
-  royal_archer:Object.freeze({equipment:Object.freeze({weapon:'bow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:60,attackBonus:20,armor:15,attackRange:5}),trainingTime:45000,goldCost:14,wageBonus:2,requiredCombatLevel:3}),
+  royal_archer:Object.freeze({equipment:Object.freeze({weapon:'bow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:60,attackBonus:20,armor:15,attackRange:8}),trainingTime:45000,goldCost:14,wageBonus:2,requiredCombatLevel:3}),
   // Crossbowman: crossbow and Light Armor.
-  crossbowman:Object.freeze({equipment:Object.freeze({weapon:'crossbow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:30,attackRange:4}),pierce:.5,trainingTime:40000,goldCost:12,wageBonus:2,requiredCombatLevel:2}),
+  crossbowman:Object.freeze({equipment:Object.freeze({weapon:'crossbow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:30,attackRange:6.5}),pierce:.5,trainingTime:40000,goldCost:12,wageBonus:2,requiredCombatLevel:2}),
   // Light Cavalry: sword and a tamed horse from the Stables, fast. His own look comes later (owner's art).
   light_cavalry:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'light_armor'}),mount:'horse',charge:Object.freeze({run:5,damage:35}),modifiers:Object.freeze({maxHP:50,attackBonus:30}),trainingTime:50000,goldCost:20,wageBonus:3,requiredCombatLevel:3}),
   // Owner 18 Nov 2026: a Catapult crew (a Recruit and a finished Catapult from the Builder's Workshop) and a Military
@@ -42,7 +42,9 @@ export const KNIGHT_SPEED=1.5;
 // Owner 18 Nov 2026: siege engines and supply. A Catapult throws one Stone every `reload` ms at an enemy building between
 // `minRange` and `range` tiles, `damage` hit points a hit, holding up to `ammo` Stones. The Military Wagon loads at a store
 // it stands near (`loadRadius`) up to `load` of each supply and hands it to units within `supplyRadius`.
-export const CATAPULT=Object.freeze({range:12,minRange:3,reload:5000,damage:100,ammo:10,cost:Object.freeze({wood:30,iron:6}),constructionTime:40000});
+// Owner 18 Nov 2026: all long-range units shoot 50 % further – Archer and Royal Archer 6 → 9 tiles, Crossbowman 5 → 7.5,
+// enemy archers 6 → 9, the Catapult 12 → 18 (and the lobbed shot over a wall 4 → 6, CombatSystem LOB).
+export const CATAPULT=Object.freeze({range:18,minRange:3,reload:5000,damage:100,ammo:10,cost:Object.freeze({wood:30,iron:6}),constructionTime:40000});
 // followRadius: a free Wagon drives after a Catapult short of Stones this near.
 export const WAGON_SUPPLY=Object.freeze({load:Object.freeze({stone:30,food:20,torch:10}),loadRadius:4,supplyRadius:6,followRadius:40,every:1000});
 // Fire arrows (battle test, point 3): archers ordered at a wooden enemy building shoot it from their range for

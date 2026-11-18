@@ -31,7 +31,7 @@ test('unit types from central data: Soldier and Swordsman differ, the Archer sho
   const {soldier:a,swordsman:b,archer:c,knight:k,light_cavalry:l}=UNIT_TYPES;
   assert.deepEqual([a.equipment,b.equipment,c.equipment,k.equipment],[{weapon:'sword'},{weapon:'sword',armor:'light_armor'},{weapon:'bow'},{weapon:'sword',armor:'armor'}]);
   assert.ok(b.modifiers.maxHP>a.modifiers.maxHP&&b.modifiers.armor>0&&b.trainingTime>a.trainingTime&&b.goldCost>a.goldCost&&b.requiredCombatLevel>a.requiredCombatLevel,'the Swordsman is the stronger, dearer infantry');
-  assert.equal(c.modifiers.attackRange,5);assert.equal(k.mount,undefined);assert.equal(l.mount,'horse');
+  assert.equal(c.modifiers.attackRange,8);assert.equal(k.mount,undefined);assert.equal(l.mount,'horse');
   assert.deepEqual(unitKit('knight'),{sword:1,armor:1});
   const {s,barracks}=kingdom(),w=soldier(s,barracks,{x:50,y:56},9);
   assert.equal(s.military.blocker(w,'light_cavalry'),'horse');assert.equal(s.military.train(w,'light_cavalry'),'horse');assert.equal(s.military.orders.size,0);
@@ -51,7 +51,7 @@ test('training takes Gold, the exact items carried from the Armory by Haulers an
   until(s,()=>s.military.units.size===3);
   const unit=id=>s.workerSystem.workers.get(id);
   assert.deepEqual([a,b,c].map(w=>s.military.units.get(w.id).type),['soldier','swordsman','archer']);
-  assert.deepEqual([unit(a.id),unit(b.id),unit(c.id)].map(w=>[w.maxHP,Math.round(w.attackDPS*100)/100,w.armor,w.attackRange]),[[80,12,0,1],[120,15,30,1],[70,8.4,0,6]]);
+  assert.deepEqual([unit(a.id),unit(b.id),unit(c.id)].map(w=>[w.maxHP,Math.round(w.attackDPS*100)/100,w.armor,w.attackRange]),[[80,12,0,1],[120,15,30,1],[70,8.4,0,9]]);
   const receipts=[...s.resourceLedger.history,s.resourceLedger.current].flatMap(d=>d.transactions).filter(t=>t.source==='Military Equipment');
   assert.deepEqual(receipts.map(t=>[t.resource,t.quantity]).sort(),[['bow',1],['light_armor',1],['sword',1],['sword',1]]);
   assert.equal(s.foodStorage.used(s.foodStorage.locations.get(`kit-${barracks.id}`)),0,'nothing left in the kit store');

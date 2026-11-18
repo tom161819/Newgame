@@ -33,8 +33,8 @@ test('p70: Halberdier, Royal Archer, Crossbowman and Light Cavalry train from th
   for(const [w,type]of [[h,'halberdier'],[r,'royal_archer'],[c,'crossbowman'],[k,'knight']])assert.equal(s.military.train(w,type),null,type);
   until(s,()=>s.military.units.size===4);
   assert.equal(h.attackRange,2);assert.equal(isRanged(h),false);assert.ok(h.armor>=30);
-  assert.equal(r.attackRange,6);assert.equal(isRanged(r),true);assert.ok(r.maxHP>=120&&r.armor>=15,'the Royal Archer has the Swordsman\'s defence');
-  assert.equal(c.attackRange,5);assert.equal(c.armor,15);
+  assert.equal(r.attackRange,9);assert.equal(isRanged(r),true);assert.ok(r.maxHP>=120&&r.armor>=15,'the Royal Archer has the Swordsman\'s defence');
+  assert.equal(c.attackRange,7.5);assert.equal(c.armor,15);
   assert.equal(k.speed,k.definition?.gameplay?.movementSpeed??k.speed,'the Knight walks');
   assert.deepEqual(Object.keys(MILITARY_ITEMS).filter(id=>['halberd','crossbow','light_armor'].includes(id)).map(id=>MILITARY_ITEMS[id].workshop),['swordsmith','bowyer','tailor']);
   const stock=armoryStock(s,armory);for(const id of ['halberd','crossbow','light_armor'])assert.equal(stock[id]??0,0,id);
