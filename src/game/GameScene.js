@@ -79,6 +79,7 @@ import '../ui/resourceLedger.css';
 import { Inventory } from './inventory.js';
 import { drawStone, generateResourcePositions, resourceTiles, tileKey, ResourceSpawner } from './stones.js';
 import { rebuildRuin } from './ruinRebuild.js';
+import { damageStage,damagedTexture } from './buildingDamage.js';
 import { levelDefinition, placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors,entryTiles,sideTiles,DOOR_SIDES, buildingDefinition,buildingDepth,buildingIsComplete, definitionFor } from './buildings.js';
 import { edgeLight,fadeStep } from './sightFade.js';
 import { footprintShown,applyFootprint,selectedBuildingIds } from './footprintHighlight.js';
@@ -428,7 +429,7 @@ export class GameScene extends Phaser.Scene {
     this.input.on('gameout',()=>{/* Only a map building's tooltip: Phaser handles the queued canvas "out" after the HUD gauge's pointerenter, which would cancel its preview (map now under the HUD to the window edge, 9 Nov 2026). */if(this.storePreview?.key?.startsWith?.('building:'))this.storePreview.hide();this.rockMiningTool.cancelDrag();this.unitSelection.cancelDrag();this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;this.clearWallPreviews();document.querySelector('#object-tooltip').hidden=true;});
     // #97: a Gate opens across its wall: in a wall running east–west the opening faces the other way (mirrored sprite).
     // m-staveni-zdi-studna (59): the axis comes from the wall run, else from the Gate's stored gateAxis (gateAxis in walls.js).
-    this.orientGates=()=>{const index=wallIndex(this.buildings,true);for(const b of this.buildings)if(b.type==='wall_gate'||b.type==='gate'){/* Point 48 (owner 14 Nov 2026): the axis chosen with the blueprint stays; walls built later never turn a Gate. A Gate of an older save takes its axis once. */b.gateAxis??=gateAxis(index,b);this.flipGateView(this.towerViews.get(b.id),b,b.gateAxis==='x');}else if(b.type==='tower')this.faceTowerView(this.towerViews.get(b.id),b.facing??0);this.towerDoors?.refresh();};
+    this.orientGates=()=>{const index=wallIndex(this.buildings,true);for(const b of this.buildings)if(b.type==='wall_gate'||b.type==='gate'){/* Point 48 (owner 14 Nov 2026): the axis chosen with the blueprint stays; walls built later never turn a Gate. A Gate of an older save takes its axis once. */b.gateAxis??=gateAxis(index,b);this.flipGateView(this.towerViews.get(b.id),b,b.gateAxis==='x');}else if(b.type==='tower')this.faceTowerView(this.towerViews.get(b.id),b.facing??0,b);this.towerDoors?.refresh();};
     this.towerDoors=new TowerDoors(this);
     this.events.on('buildings:changed',this.orientGates);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{this.events.off('buildings:changed',this.orientGates);this.towerDoors?.destroy();
@@ -676,9 +677,16 @@ export class GameScene extends Phaser.Scene {
   }
   // Owner 17 Nov 2026: a Tower shows its door on the side it faces (0 S: the approved sprite; 1 E: the door on the right
   // face; 2 N and 3 W: on a hidden face, so no door shows). Provisional sprites cut from the approved one.
-  faceTowerView(view,facing){
-    const sprite=view?.back?.sprite??view?.view?.back?.sprite;if(!sprite)return;const layer=[null,'art-door-e','art-no-door','art-no-door'][facing]??null,key=layer&&this.assets?.hasTexture('tower',layer)?this.assets.key('tower',layer):this.assets?.textureKey?.('tower');
+  faceTowerView(view,facing,building=null){
+    const sprite=view?.back?.sprite??view?.view?.back?.sprite;if(!sprite)return;const layer=[null,'art-door-e','art-no-door','art-no-door'][facing]??null,clean=layer&&this.assets?.hasTexture('tower',layer)?this.assets.key('tower',layer):this.assets?.textureKey?.('tower');
+    // Owner 18 Nov 2026: a damaged Tower shows cracks and fallen bricks (its outline stays: the front layer must fit).
+    const key=clean&&building?damagedTexture(this,clean,damageStage(building),building.id,{chip:false}):clean;
     if(key&&sprite.texture?.key!==key)sprite.setTexture(key);const o=this.objectRegistry.require('tower').origin;sprite.setFlipX(false);sprite.setOrigin(o.x,o.y);
+  }
+  // A building's hit points changed (siege, fire, repair): its picture takes the damage stage (walls, Towers, Gates).
+  damageLook(building){
+    const view=this.towerViews.get(building.id);if(!view)return;if(view.syncDamage){view.syncDamage(building);return;}
+    if(building.type==='tower')this.faceTowerView(view,building.facing??0,building);else if(building.type==='gate'||building.type==='wall_gate')this.flipGateView(view,building,building.gateAxis==='x');
   }
   // The tiles in front of the door of the Tower being placed: the only way up from the ground.
   markTowerDoor(anchor,definition,facing){
@@ -686,7 +694,8 @@ export class GameScene extends Phaser.Scene {
     g.fillStyle(0xf2cf63,.55);g.lineStyle(2,0xffe49a,1);for(const tile of tiles){const poly=tilePolygon(tile);g.fillPoints(poly,true);g.strokePoints(poly,true);}
   }
   flipGateView(view,building,flip){
-    const sprite=view?.back?.sprite??view?.view?.back?.sprite;if(!sprite)return;const o=building.definition?.origin??{x:.38372,y:.84348};sprite.setFlipX(flip);sprite.setOrigin(flip?1-o.x:o.x,o.y);
+    const sprite=view?.back?.sprite??view?.view?.back?.sprite;if(!sprite)return;
+    {const current=sprite.texture?.key;if(!sprite.cleanKey||!(current===sprite.cleanKey||String(current).startsWith(`${sprite.cleanKey}:damage`)))sprite.cleanKey=current;const clean=sprite.cleanKey,key=clean&&buildingIsComplete(building)?damagedTexture(this,clean,damageStage(building),building.id,{chip:false}):clean;if(key&&sprite.texture?.key!==key)sprite.setTexture(key);}const o=building.definition?.origin??{x:.38372,y:.84348};sprite.setFlipX(flip);sprite.setOrigin(flip?1-o.x:o.x,o.y);
   }
   // m-staveni-zdi-studna (59): R (or Shift+wheel) turns the Gate being placed; a wall run under the cursor still decides.
   rotateGate(){

@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.3] - 2026-11-18
+<!-- version: {"title":"Walls show their damage","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Added
+- Walls show how badly they are hit. Under three quarters of their hit points they crack and lose battlements, under a half the top breaks off, under a quarter only a breached stump is left; stones lie at the foot. A repaired wall is whole again. Towers and Gates get cracks and fallen bricks.
+- A wall that falls leaves a heap of stones on the ground for a while.
+
 ## [0.146.2] - 2026-11-18
 <!-- version: {"title":"Sieges with defenders inside, standing soldiers fight","type":"fix","reconstructed":false,"saveVersion":65} -->
 ### Fixed

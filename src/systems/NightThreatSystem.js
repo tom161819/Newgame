@@ -257,7 +257,7 @@ export class NightThreatSystem {
       fire.health-=100*(delta/(day*F.burnDays))*(fire.intensity/100);if(fire.fate==='saved')fire.health=Math.max(F.savedHealth,fire.health);
       if(fire.health<=0){this.burnDown(b);continue;}
       // m-budovy-hp: the fire takes the building's hit points; what is left after the fire stays until it is repaired.
-      {const max=buildingMaxHP(b);if(max){const hp=Math.max(0,Math.round(max*fire.health)/100);if(hp<max)b.hp=Math.min(b.hp??max,hp);}}
+      {const max=buildingMaxHP(b);if(max){const hp=Math.max(0,Math.round(max*fire.health)/100);if(hp<max){b.hp=Math.min(b.hp??max,hp);s.damageLook?.(b);}}}
       if(spread&&this.enabled.fires)for(const other of s.buildings){if(other===b||!this.flammable(other)||this.fires.has(other.id)||this.fireproof(other))continue;if(this.gap(other,this.center(b))<=F.range+buildingDefinition(b).width/2&&this.random()<F.spreadChance)this.ignite(other);}
     }
   }

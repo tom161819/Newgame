@@ -5,6 +5,7 @@ import { isWall,wallIndex,connectionsFor } from './walls.js';
 import { APPROVED_WALL_ART } from '../data/objects/approvedArt.js';
 import { splitPixels } from './wallShadows.js';
 import { assetURL } from '../systems/AssetManager.js';
+import { damageStage,damagedTexture,rubble } from './buildingDamage.js';
 
 // The approved wall kit loads on first use; open walls repaint when it arrives.
 const wallKey=piece=>`wall-art:${piece}`,liveWalls=new Set();
@@ -69,7 +70,10 @@ export class FortificationView {
     for(const tile of building.tiles){floor.fillPoints(tilePolygon(tile),true);floor.strokePoints(tilePolygon(tile),true);}
     const links=isWall(building)?building.connections??connectionsFor(wallIndex(this.scene.buildings),building):{};
     this.hitArea=new Phaser.Geom.Polygon([{x:a.x,y:a.y-h-14},{x:b.x,y:b.y-h-14},b,c,e,{x:e.x,y:e.y-h-14}]);
-    if(this.paintArt(building,links,depth,tint))return;
+    // Owner 18 Nov 2026: a damaged wall shows it – stage 1 loses merlons and cracks, 2 and 3 break off from the top; fallen
+    // stones lie at its foot (buildingDamage.js).
+    const stage=this.damage=damageStage(building);
+    if(this.paintArt(building,links,depth,tint,stage)){this.paintRubble(front,points,stage,building,tint);return;}
     const shadow=d.shadow;if(shadow){g.fillStyle(shadow.color,shadow.alpha);g.fillEllipse(shadow.x,shadow.y,shadow.width,shadow.height);}
     // Sousední tělesa tyto stěny překryjí. Ponechání obou ploch zamezí
     // otevřenému řezu, když se soused skryje za hranicí Fog of War.
@@ -88,14 +92,16 @@ export class FortificationView {
   }
   // Approved kit: the block plus the parapets of open sides; S and E stand in
   // front of units on the wall walk, exactly like the procedural layers.
-  paintArt(building,links,depth,tint){
+  paintArt(building,links,depth,tint,stage=0){
     const use=isWall(building)&&wallArtReady(this.scene);
     for(const [piece,art]of Object.entries(APPROVED_WALL_ART)){
-      const show=use&&(piece==='block'||!links[piece]);
+      // From stage 2 the top of the block is broken off, so the parapets on it are gone.
+      const show=use&&(piece==='block'||!links[piece]&&stage<2);
       // Remember which pieces belong to the wall: culling hides and shows the whole view later.
       this.artShown[piece]=show;
       if(!show){this.art[piece]?.setVisible(false);this.shadows[piece]?.setVisible(false);continue;}
       const front=piece==='S'||piece==='E',image=this.art[piece]??=this.scene.add.image(0,0,bodyKey(piece)),shadow=this.shadows[piece]??=this.scene.add.image(0,0,shadowKey(piece));
+      const key=damagedTexture(this.scene,bodyKey(piece),stage,building.id??0);if(image.texture?.key!==key)image.setTexture(key);
       image.setOrigin(art.origin.x,art.origin.y).setPosition(this.base.x,this.base.y).setDepth(this.preview?(front?10002:10001):front?depth+.3:depth).setVisible(this.back.visible).setAlpha(this.back.alpha);
       shadow.setOrigin(art.origin.x,art.origin.y).setPosition(this.base.x,this.base.y).setDepth(this.preview?10000:WALL_SHADOW_DEPTH).setVisible(this.back.visible).setAlpha(this.back.alpha);
       if(tint==null)image.clearTint();else image.setTint(tint);
@@ -103,6 +109,12 @@ export class FortificationView {
     this.afterPaint?.();
     return use;
   }
+  paintRubble(g,points,stage,building,tint){
+    if(!stage||this.preview)return;const shades=[0x8f8368,0xa39678,0x6f6652];
+    for(const stone of rubble(points,stage,building.id??0)){g.fillStyle(tint??shades[Math.floor(stone.shade*shades.length)%shades.length],1);g.fillEllipse(stone.x,stone.y,stone.w*2,stone.h*2);g.fillStyle(0x3d382c,.35);g.fillEllipse(stone.x+1,stone.y+stone.h*.7,stone.w*1.6,stone.h);}
+  }
+  // Called when the building's hit points changed: repaints only when the stage changed.
+  syncDamage(building){if(damageStage(building)!==(this.damage??0))this.paint(building,this.tint);}
   get artImages(){return [...Object.values(this.art),...Object.values(this.shadows)];}
   contains(x,y){return Phaser.Geom.Polygon.Contains(this.hitArea,x-this.base.x,y-this.base.y);}
   setAlpha(value){const v=this.preview?value*.5:value;this.footprint.setAlpha(value);this.back.setAlpha(v);this.front.setAlpha(v);for(const image of this.artImages)image.setAlpha(v);return this;}

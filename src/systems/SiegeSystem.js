@@ -5,6 +5,7 @@ import { detachLostBuilding,removeBuildingShell } from '../game/buildingRemoval.
 import { gridToWorld } from '../game/isometric.js';
 import { isWalkable } from '../game/map.js';
 import { isRanged } from './CombatSystem.js';
+import { rubble } from '../game/buildingDamage.js';
 
 // Owner 18 Nov 2026 ("melee units can attack walls"; Test map: "switch to the enemy and build enemy walls and
 // buildings"): a building can belong to the enemy (`building.enemy`, steel-blue tint, a closed Gate). Our melee soldiers
@@ -14,7 +15,7 @@ export const ENEMY_TINT=0x9fb4ea;
 // autoRadius: a melee soldier with no enemy soldier near him attacks an enemy building this close by himself.
 // skipFor: a building he could not get a place at is left alone this long; breachRadius: how far a soldier looks for a
 // wall to break through to an enemy he cannot reach.
-export const SIEGE_RULES=Object.freeze({damageShare:.5,retarget:1200,giveUpAfter:4,autoRadius:4,skipFor:8000,breachRadius:40});
+export const SIEGE_RULES=Object.freeze({damageShare:.5,retarget:1200,giveUpAfter:4,autoRadius:4,skipFor:8000,breachRadius:40,rubbleStays:90000});
 export const isEnemyBuilding=b=>!!b?.enemy;
 export const siegeable=b=>isEnemyBuilding(b)&&buildingIsComplete(b)&&!!buildingHP(b);
 export const canSiege=w=>!!w?.isAlive&&w.profession==='soldier'&&!w.crew&&!isRanged(w)&&(w.attackDPS??0)>0;
@@ -100,12 +101,17 @@ export class SiegeSystem {
     const s=this.scene,name=buildingDefinition(b).name,at={x:b.x,y:b.y};
     for(const w of s.workerSystem?.liveWorkers?.()??[]){if(w.siegeTargetId===b.id)this.stop(w);delete w.cutOff;}
     this.bars.get(b.id)?.destroy?.();this.bars.delete(b.id);
+    // Owner 18 Nov 2026: the fallen wall leaves a heap of stones on its ground for a while (it does not block the way).
+    if(s.add?.graphics&&s.tweens?.add){const g=s.add.graphics().setDepth(-85),shades=[0x8f8368,0xa39678,0x6f6652];
+      for(const tile of b.tiles??[]){const c=gridToWorld(tile.x+.5,tile.y+.5),corners=[{x:c.x,y:c.y-12},{x:c.x+24,y:c.y},{x:c.x,y:c.y+12},{x:c.x-24,y:c.y}];
+        for(const stone of [...rubble(corners,3,b.id),...rubble(corners.map(p=>({x:c.x+(p.x-c.x)*.4,y:c.y+(p.y-c.y)*.4})),3,b.id+7)]){g.fillStyle(0x3d382c,.3).fillEllipse(stone.x+1,stone.y+stone.h*.7,stone.w*2,stone.h*1.4);g.fillStyle(shades[Math.floor(stone.shade*3)%3],1).fillEllipse(stone.x,stone.y,stone.w*2.4,stone.h*2.4);}}
+      s.tweens.add({targets:g,alpha:0,delay:SIEGE_RULES.rubbleStays,duration:8000,onComplete:()=>g.destroy()});}
     detachLostBuilding(s,b);removeBuildingShell(s,b);s.refreshWallConnections?.();s.events?.emit?.('buildings:changed');s.updateInventory?.();
     s.setStatus?.(t('siege.destroyed',{name}));s.eventFeed?.push?.(`siege:${b.id}`,t('siege.destroyed',{name}),{target:{x:at.x+1,y:at.y+1}});
   }
   // A hit-point bar over a damaged enemy building.
   drawBar(b){
-    const s=this.scene;if(!s.add?.graphics)return;const hp=buildingHP(b);if(!hp)return;
+    const s=this.scene;s.damageLook?.(b);if(!s.add?.graphics)return;const hp=buildingHP(b);if(!hp)return;
     let g=this.bars.get(b.id);if(hp.hp>=hp.max){g?.destroy?.();this.bars.delete(b.id);return;}
     if(!g){g=s.add.graphics();this.bars.set(b.id,g);}
     const d=buildingDefinition(b),p=gridToWorld(b.x+d.width/2,b.y+d.height/2),top=p.y-(d.visualHeight??d.visual?.wallHeight??60)-14,w=Math.max(34,Math.min(90,(d.width+d.height)*16)),share=Math.max(0,hp.hp/hp.max);

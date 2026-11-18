@@ -36,7 +36,7 @@ export class RepairSystem {
   releaseWorkers(id){const record=this.jobs.get(id);for(const workerId of [...(record?.assignedBuilders??[])]){const w=this.scene.workerSystem.workers.get(workerId);if(w)this.scene.workerSystem.ai.cancel(w);}}
   // A job stops without a refund (the materials went into the work) when the building is gone, burning or demolished.
   cancel(id){if(!this.jobs.has(id))return false;this.releaseWorkers(id);const b=this.target(id),record=this.jobs.get(id);if(b)delete b[field(record)];this.jobs.delete(id);this.scene.constructionSystem.revision++;return true;}
-  applyHP(b,record){const max=buildingHP(b)?.max;if(!max)return;const hp=Math.min(max,record.startHp+(max-record.startHp)*record.workDone/record.requiredWork);if(hp>=max-1e-6)delete b.hp;else b.hp=Math.round(hp*100)/100;}
+  applyHP(b,record){const max=buildingHP(b)?.max;if(!max)return;const hp=Math.min(max,record.startHp+(max-record.startHp)*record.workDone/record.requiredWork);if(hp>=max-1e-6)delete b.hp;else b.hp=Math.round(hp*100)/100;this.scene.damageLook?.(b);}
   update(delta){
     if(delta<=0||this.scene.gameOver||this.scene.gameTime.paused)return;const system=this.scene.constructionSystem;
     this.checkIn-=delta;if(this.checkIn<=0){this.checkIn=REPAIR_CHECK_MS;for(const b of this.scene.buildings)if(!this.jobs.has(b.id)&&this.eligible(b))this.request(b);}
