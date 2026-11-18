@@ -166,7 +166,9 @@ export class MilitarySystem {
   // The enemy is cut off: break through an enemy building on the way; an archer (or with no wall to break) waits.
   cutOff(worker,enemy,delta){
     const siege=this.siege;this.scene.combat.stopAttack(worker);
-    if(canSiege(worker)&&worker.commandState?.state!=='Holding'){
+    // On a move order (standing or on the way) he leaves an enemy he cannot get to alone.
+    if(worker.commandState?.state==='Holding'||worker.commandState?.state==='MovingToHold')return false;
+    if(canSiege(worker)){
       if(siege.target(worker)==null){const b=siege.breachTarget(worker,enemy);if(b)siege.breach(worker,b);}
       if(worker.siegeTargetId!=null&&siege.update(worker,delta))return true;
     }
@@ -199,6 +201,8 @@ export class MilitarySystem {
     if(goal&&worker.holdAway&&!worker.nextTile&&!worker.path.length&&!worker.holdReturn){
       if(worker.tile.x===goal.x&&worker.tile.y===goal.y){worker.holdAway=false;worker.holdTries=0;}else{worker.holdReturn=1000;/* a comrade may stand on his place for a moment: a few tries */if(!worker.moveTo([goal])&&(worker.holdTries=(worker.holdTries??0)+1)>=10){worker.holdAway=false;worker.holdTries=0;}}}
   }
+  // Attack-move: on the way to where he was sent he fights like his stance says (true while he does).
+  advance(worker,delta){const unit=this.unit(worker);if(worker.stance==='hold'||unit&&UNIT_TYPES[unit.type]?.vehicle)return false;return this.updateSoldier(worker,delta,{held:{x:worker.tile.x,y:worker.tile.y}});}
   // Soldier behaviour on top of patrolling. Returns true when it took over this frame.
   // `held`: the place of a soldier standing on a move order (see `holding`); he fights from it and is led back to it.
   updateSoldier(worker,delta,{held=null}={}){

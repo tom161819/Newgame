@@ -1,6 +1,7 @@
 import { gridToWorld } from './isometric.js';
 import { readLightSettings,resolveLights,LightMap,LIGHT_TYPES,hash01 } from '../render/lightLab.js';
 import LIGHTING_V1 from '../data/lighting-v1.json';
+import { battleGlow,UNIT_GLOW } from './battleGlow.js';
 
 // Owner 9 Nov 2026: "lighting v1" from the Studio Light Lab. The Lab's light map is the night: the screen (at the
 // settings' resolution) is filled with the ambient colour (white by day, the dusk colour while it darkens, the night
@@ -27,6 +28,7 @@ export class NightOverlay {
     for(const w of this.dayNight.houseWindows())out.push({type:'window',x:w.x,y:w.y,seed:seed(w.x,w.y)});
     for(const h of s.lightFuel?.handLights?.()??[]){const p=gridToWorld(h.x,h.y);out.push({type:'torch',x:p.x,y:p.y,seed:seed(h.x,h.y)});}
     for(const f of s.fireViews?.lights?.()??[])out.push({type:'campfire',x:f.x,y:f.y,seed:seed(f.x,f.y)});
+    for(const u of battleGlow(s)){const p=gridToWorld(u.position.x,u.position.y);out.push({type:'lantern',x:p.x,y:p.y,seed:0,...UNIT_GLOW});}
     return out;
   }
   update(delta=16){

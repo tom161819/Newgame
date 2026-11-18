@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.5] - 2026-11-18
+<!-- version: {"title":"Attack-move, guard shifts, enemy Gate, night glow","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Added
+- Attack-move: the new button beside the stances (or Ctrl with the right click) sends soldiers to a place so that they fight every enemy they meet on the way and then go on.
+- An enemy Gate shows closed doors. It opens when its melee defenders come out against your people; while it is open, your soldiers can get in. It closes again after the defenders have left it.
+- In a night battle the selected soldiers and everybody in a fight have a small pale glow, so you can see where the fighting is.
+### Changed
+- Soldiers rest in two shifts: one half in the first third of the day, the other half in the second. Somebody is always on watch, and in the evening and at night everybody is.
+
 ## [0.146.4] - 2026-11-18
 <!-- version: {"title":"Retreat to the Castle, alarm, Catapult supply","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Added

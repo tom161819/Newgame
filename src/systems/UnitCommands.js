@@ -19,7 +19,7 @@ export class UnitCommands {
   // Owner 18 Nov 2026: a sleeping soldier can be chosen (from the Army panel or a group key) and an order wakes him.
   selectable(worker){return this.owns(worker)&&(worker.sleepingIn==null||worker.profession==='soldier')&&this.scene.fog.isVisibleObject(worker);}
   interrupt(worker){
-    this.system.ai.cancel(worker);worker.manualRockId=null;delete worker.siegeTargetId;worker.arriving=false;worker.commandRetry=0;worker.commandWait=0;
+    this.system.ai.cancel(worker);worker.manualRockId=null;delete worker.siegeTargetId;delete worker.attackMove;worker.arriving=false;worker.commandRetry=0;worker.commandWait=0;
     // Complete the already reserved half-step; never snap a moving cargo owner.
     worker.path=[];worker.workplaceReached=false;
   }
@@ -77,7 +77,7 @@ export class UnitCommands {
       // Owner 16 Nov 2026: not one long file – a group marches in lanes beside each other along one leader route,
       // each lane shifted by the soldier's place in the formation (its slot's offset from the click).
       if(lead&&selected.length>2){const lanes=this.laneRoute(nav,start,lead,{x:goal.x-target.x,y:goal.y-target.y},goal);if(lanes)route=lanes;}
-      this.interrupt(worker);delete worker.wallPatrol;worker.commandState={state:'MovingToHold',goal:{x:goal.x,y:goal.y}};worker.holdFace=face;if(down){delete worker.wallDescent;wp.descend(worker,route.path,target);}else worker.path=route.path;worker.workState='MovingToHold';used.add(tileKey(goal));accepted++;
+      this.interrupt(worker);delete worker.wallPatrol;worker.commandState={state:'MovingToHold',goal:{x:goal.x,y:goal.y}};worker.holdFace=face;if(options.attack&&worker.profession==='soldier')worker.attackMove=true;if(down){delete worker.wallDescent;wp.descend(worker,route.path,target);}else worker.path=route.path;worker.workState='MovingToHold';used.add(tileKey(goal));accepted++;
     }
     return accepted;
   }
@@ -102,8 +102,13 @@ export class UnitCommands {
     const command=worker.commandState;
     worker.workState=command.state;worker.workMessage='';worker.commandWait=Math.max(0,(worker.commandWait??0)-delta);
     if(worker.wallDescent){worker.update(delta);return true;}
+    // Battle test 18 Nov 2026, point 8 (attack-move): on the way he fights the enemies who come near, then goes on.
+    if(command.state==='MovingToHold'&&worker.attackMove&&worker.profession==='soldier'){
+      if(this.scene.military?.advance?.(worker,delta)){worker.attackFought=true;worker.update(delta);return true;}
+      if(worker.attackFought){worker.attackFought=false;if(!worker.nextTile)worker.path=[];worker.commandWait=0;worker.commandRetry=0;}
+    }
     if(command.state==='MovingToHold'&&!worker.nextTile&&!worker.path.length){
-      if(tileKey(worker.tile)===tileKey(command.goal)){command.state='Holding';worker.workState='Holding';// The facing of a formation is a look, not saved state (the save keeps goal and state only).
+      if(tileKey(worker.tile)===tileKey(command.goal)){command.state='Holding';worker.workState='Holding';delete worker.attackMove;// The facing of a formation is a look, not saved state (the save keeps goal and state only).
         if(worker.holdFace&&worker.view){const v=FACE_VECTORS[worker.holdFace];if(v)worker.direction={...v};worker.view.facing=worker.holdFace;worker.view.paint?.();worker.view.applyArt?.();}}
       else if(!worker.commandWait){
         // Bound replans when a newly discovered wall or another unit blocks us.

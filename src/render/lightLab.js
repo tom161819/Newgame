@@ -131,7 +131,9 @@ export function resolveLights(sources, settings, { darkness, seconds = 0 }) {
     const on = (s.on ?? 1) * switchOn(darkness, s.seed ?? 0, settings.global);
     const strength = t.strength * on * flicker(seconds, t.flicker, t.speed, s.seed ?? 0);
     if (strength <= 0.005) continue;
-    out.push({ type: s.type, x: s.x, y: s.y, rx: t.radius * TILE_RX, ry: t.radius * TILE_RY, up: t.height, color: hexToRgb(t.color), strength, seed: s.seed ?? 0 });
+    // A source may be a smaller or differently coloured light of its type (`scale`, `color`): the glow around units in a night battle.
+    const k = s.scale ?? 1;
+    out.push({ type: s.type, x: s.x, y: s.y, rx: t.radius * k * TILE_RX, ry: t.radius * k * TILE_RY, up: t.height * k, color: hexToRgb(s.color ?? t.color), strength, seed: s.seed ?? 0 });
   }
   return out;
 }

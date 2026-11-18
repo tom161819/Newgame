@@ -99,7 +99,7 @@ export class WorkerSystem {
     }
     this.updateUI();
   }
-  update(delta){this.scene.alarm?.update(delta);for(const worker of this.liveWorkers())if(worker.isSubject!==false){this.ai.update(worker,delta);syncWorkerUniform(this.scene,worker);
+  update(delta){this.scene.alarm?.update(delta);this.scene.enemyGates?.update(delta);for(const worker of this.liveWorkers())if(worker.isSubject!==false){this.ai.update(worker,delta);syncWorkerUniform(this.scene,worker);
     // m-obyvatele-jmena-spanek-pohyb (42): only a resting resident standing still stays inside.
     if(worker.sleepingIn!=null&&(worker.restPhase!=='resting'&&!worker.alarm||worker.nextTile||worker.path.length))worker.sleepingIn=null;}else worker.update(delta);}
   // (42) Residents sleeping inside a building now (House or Castle).

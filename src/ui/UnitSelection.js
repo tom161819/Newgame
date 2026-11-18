@@ -37,6 +37,9 @@ export class UnitSelection {
     // Combat 16 Nov 2026: the stance of the chosen soldiers (aggressive, defensive, hold).
     this.stance=document.createElement('span');this.stance.className='unit-stance';this.stance.hidden=true;this.stanceButtons={};
     for(const id of ['aggressive','defensive','hold']){const b=document.createElement('button');b.type='button';b.dataset.stance=id;b.addEventListener('click',()=>{for(const w of this.workers())if(w.profession==='soldier'){if(id==='aggressive')delete w.stance;else w.stance=id;if(id==='hold'){w.path=[];delete w.huntWolfId;}}this.signature=null;this.draw();});this.stance.append(b);this.stanceButtons[id]=b;}
+    // Battle test 18 Nov 2026, point 8: attack-move – armed with this button (or Ctrl held with the right click), the next
+    // move order makes the soldiers fight every enemy they meet on the way and then go on.
+    this.attackMove=false;this.attackButton=document.createElement('button');this.attackButton.type='button';this.attackButton.dataset.unitCommand='attackMove';this.attackButton.addEventListener('click',()=>{this.attackMove=!this.attackMove;this.signature=null;this.draw();});this.stance.append(this.attackButton);
     this.panel.append(this.stance);
     // Owner 17 Nov 2026: the formation the chosen men take when sent somewhere (holding the right button shows it and
     // turns it with the mouse).
@@ -115,7 +118,7 @@ export class UnitSelection {
           const posted=s.military?.wallPatrol?.post(soldiers,target)??0;if(posted){s.setStatus(t('army.posted',{count:posted,name:buildingDefinition(target).name}));this.draw();return true;}s.setStatus(t('army.postNoWay'));return true;}
         // Owner 17 Nov 2026: the order is given when the button goes up; while it is held the blueprint shows the places
         // and dragging turns it.
-        if(this.ids.size){const tile=s.pointerTile(pointer);pointer.updateWorldPoint(s.cameras.main);this.order={tile,x:pointer.x,y:pointer.y,world:{x:pointer.worldX,y:pointer.worldY},facing:null};this.drawOrder();}
+        if(this.ids.size){const tile=s.pointerTile(pointer);pointer.updateWorldPoint(s.cameras.main);this.order={tile,x:pointer.x,y:pointer.y,world:{x:pointer.worldX,y:pointer.worldY},facing:null,attack:!!pointer.event?.ctrlKey};this.drawOrder();}
         if(this.king)s.kingOrder(pointer);return true;}
       return false;
     }
@@ -153,7 +156,7 @@ export class UnitSelection {
   orderFacing(){const o=this.order,w=this.workers();if(o.facing)return o.facing;if(!w.length)return {x:1,y:0};const m={x:w.reduce((n,u)=>n+u.tile.x,0)/w.length,y:w.reduce((n,u)=>n+u.tile.y,0)/w.length};return {x:o.tile.x-m.x,y:o.tile.y-m.y};}
   giveOrder(){
     const o=this.order,s=this.scene;this.order=null;this.blueprint.clear();if(!o?.tile||!this.ids.size)return;
-    const count=s.workerSystem.commands.move(this.workers(),o.tile,{formation:this.formation,facing:o.facing??null});s.setStatus(t(count?'command.moving':'command.noRoute',{count}));this.draw();
+    const attack=!!(this.attackMove||o.attack)&&this.workers().some(w=>w.profession==='soldier'),count=s.workerSystem.commands.move(this.workers(),o.tile,{formation:this.formation,facing:o.facing??null,attack});s.setStatus(t(count?(attack?'command.attackMoving':'command.moving'):'command.noRoute',{count}));if(this.attackMove){this.attackMove=false;this.signature=null;}this.draw();
   }
   // The blueprint: a ring for each place of the formation and an arrow the way the men will face.
   drawOrder(){
@@ -200,7 +203,8 @@ export class UnitSelection {
       for(const [action,button]of Object.entries(this.buttons))iconButton(button,COMMAND_ICONS[action],t(`command.${action}`),t(`command.${action}Tip`));
       this.buttons.inspect.disabled=workers.length!==1;
       {const soldiers=workers.filter(w=>w.profession==='soldier');this.stance.hidden=!soldiers.length;if(soldiers.length){const now=new Set(soldiers.map(w=>w.stance??'aggressive'));
-        for(const [id,b] of Object.entries(this.stanceButtons)){iconButton(b,STANCE_ICONS[id],t(`army.stance.${id}`),t(`army.stance.${id}Tip`));b.classList.toggle('on',now.size===1&&now.has(id));}}
+        for(const [id,b] of Object.entries(this.stanceButtons)){iconButton(b,STANCE_ICONS[id],t(`army.stance.${id}`),t(`army.stance.${id}Tip`));b.classList.toggle('on',now.size===1&&now.has(id));}
+        iconButton(this.attackButton,'🏹➜',t('command.attackMove'),t('command.attackMoveTip'));this.attackButton.classList.toggle('on',this.attackMove);}
         this.formationBar.hidden=workers.length<2;for(const [id,b] of Object.entries(this.formationButtons)){iconButton(b,FORMATION_ICONS[id],t(`army.formation.${id}`),`${t(`army.formation.${id}Tip`)} ${t('command.formationHint')}`);b.classList.toggle('on',this.formation===id);}}if(!this.panel.hidden)this.placeAboveBar();
       const haulers=workers.filter(w=>w.profession==='hauler');this.haul.hidden=haulers.length<2;
       if(!this.haul.hidden){const option=(v,text)=>{const o=document.createElement('option');o.value=v;o.textContent=text;return o;};

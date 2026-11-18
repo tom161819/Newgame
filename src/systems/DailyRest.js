@@ -18,7 +18,8 @@ export const isRestTime=gameTime=>!!gameTime&&gameTime.elapsed>=gameTime.dayDura
 // m-vojaci-chyba (owner point 87): not on day 1 – they have stood no night watch yet. A new game starts at the dawn of
 // day 1, so the starting garrison used to walk into the Castle at once and sleep there, hidden, for the first third of
 // the day: "they are in the population but I can't find them".
-export const isSoldierRestTime=gameTime=>!!gameTime?.restStartFraction&&(gameTime.day??2)>1&&gameTime.elapsed>=gameTime.dayDuration*DAY_NIGHT.soldierRest.from&&gameTime.elapsed<gameTime.dayDuration*DAY_NIGHT.soldierRest.to;
+export const soldierShift=worker=>(Number(String(worker?.id??'').replace(/\D/g,''))||0)%(DAY_NIGHT.soldierRest.shifts??1);
+export const isSoldierRestTime=(gameTime,worker=null)=>{if(!gameTime?.restStartFraction||!((gameTime.day??2)>1))return false;const r=DAY_NIGHT.soldierRest,span=r.to-r.from,from=r.from+soldierShift(worker)*span,at=gameTime.elapsed/gameTime.dayDuration;return at>=from&&at<from+span;};
 export const RESTING_STATES=Object.freeze(['Going Home','Resting']);
 
 export class DailyRest {
@@ -30,10 +31,10 @@ export class DailyRest {
   }
   // A soldier on the night watch (day/night cycle on) rests in the first third of the day, never at night.
   nightWatch(worker){return worker.profession==='soldier'&&!!this.scene.gameTime?.restStartFraction;}
-  wants(worker){if(this.nightWatch(worker))return isSoldierRestTime(this.scene.gameTime);return isRestTime(this.scene.gameTime)||this.rest(worker)<DAILY_REST.tiredBelow;}
+  wants(worker){if(this.nightWatch(worker))return isSoldierRestTime(this.scene.gameTime,worker);return isRestTime(this.scene.gameTime)||this.rest(worker)<DAILY_REST.tiredBelow;}
   // A task in hand, cargo or a Stablehand's taming job is finished first; the resident picks no new work meanwhile.
   busy(worker){return !!(worker.workTask||worker.cargo||this.scene.stables?.jobs?.has(worker.id));}
-  done(worker){if(this.nightWatch(worker))return !isSoldierRestTime(this.scene.gameTime);return !isRestTime(this.scene.gameTime)&&this.rest(worker)>=DAILY_REST.rested;}
+  done(worker){if(this.nightWatch(worker))return !isSoldierRestTime(this.scene.gameTime,worker);return !isRestTime(this.scene.gameTime)&&this.rest(worker)>=DAILY_REST.rested;}
   // Returns true while the resident goes home or rests; WorkerAI then skips his job for this frame.
   update(worker){
     if(!this.eligible(worker)){if(worker.restPhase)this.stop(worker);return false;}

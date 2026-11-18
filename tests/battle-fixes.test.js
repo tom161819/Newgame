@@ -7,6 +7,7 @@ const { placeBuilding } = await import('../src/game/buildings.js');
 const { AlarmSystem,ALARM } = await import('../src/systems/AlarmSystem.js');
 const { MILITARY_RULES,CATAPULT,WAGON_SUPPLY } = await import('../src/data/military.js');
 const { markEnemyBuilding } = await import('../src/systems/SiegeSystem.js');
+const { findPathToAny } = await import('../src/game/pathfinding.js');
 
 // Owner 18 Nov 2026: "ok udělej všechny návrhy oprav z testu" (project document claude/test-bitev-0.146.md).
 const scene=()=>workerScene(undefined,{foodProduction:true,workplaces:true});
@@ -54,4 +55,52 @@ test('point 4: a Catapult out of Stones tells the player once; an empty Wagon fe
 test('point 11: on the Test map nobody goes hungry',()=>{
   const s=scene();s.sandbox=true;const [w]=units(s,'soldier',{x:40,y:50},1);for(const id of ['bread','meat','apple','fish'])s.inventory.spend?.(id,s.inventory.count(id));
   assert.equal(s.foodSystem.eat(w),true);s.sandbox=false;
+});
+
+test('point 8: attack-move – soldiers fight the enemies they meet on the way and then walk on to where they were sent; a plain move walks past',()=>{
+  const s=scene();s.character.away=true;const us=units(s,'swordsman',{x:30,y:50},5),enemies=units(s,'enemy_soldier',{x:45,y:51},3);
+  assert.equal(s.workerSystem.commands.move(us,{x:62,y:50},{attack:true}),5);assert.ok(us.every(w=>w.attackMove));
+  until(s,()=>enemies.every(e=>!e.isAlive),90000);assert.ok(us.some(w=>w.isAlive&&w.commandState.state==='MovingToHold'),'still on the way');
+  until(s,()=>us.filter(w=>w.isAlive).every(w=>w.commandState.state==='Holding'),90000);for(const w of us.filter(w=>w.isAlive)){assert.ok(far(w.tile,{x:62,y:50})<=4);assert.equal(w.attackMove,undefined);}
+  // A new plain order ends it.
+  const t=scene();t.character.away=true;const [w]=units(t,'swordsman',{x:30,y:50},1);t.workerSystem.commands.move([w],{x:60,y:50},{attack:true});t.workerSystem.commands.move([w],{x:40,y:50});assert.equal(w.attackMove,undefined);
+});
+
+test('point 9: two shifts – at any time of the day at most half of the soldiers have their rest time',async()=>{
+  const { isSoldierRestTime,soldierShift } = await import('../src/systems/DailyRest.js');const soldiers=Array.from({length:10},(_,i)=>({id:`worker-${i+1}`}));
+  assert.deepEqual([...new Set(soldiers.map(soldierShift))].sort(),[0,1]);
+  for(let f=0;f<1;f+=.02){const time={restStartFraction:()=>.75,day:3,elapsed:f*1000,dayDuration:1000},resting=soldiers.filter(w=>isSoldierRestTime(time,w)).length;assert.ok(resting<=5,`${resting} rest at ${f.toFixed(2)}`);if(f>=.68)assert.equal(resting,0,'everybody watches in the evening and at night');}
+  assert.equal(isSoldierRestTime({restStartFraction:()=>.75,day:1,elapsed:100,dayDuration:1000},soldiers[1]),false,'not on day 1');
+});
+
+test('point 5: an enemy Gate is closed; it opens while a melee defender near it goes for our people (ours may walk in then) and closes after',async()=>{
+  const { EnemyGates,ENEMY_GATE } = await import('../src/systems/EnemyGates.js');
+  const s=scene();s.character.away=true;s.enemyGates=new EnemyGates(s);
+  const put=(type,x,y)=>{const d=s.objectRegistry.require(type),tiles=[];for(let j=0;j<d.height;j++)for(let i=0;i<d.width;i++)tiles.push({x:x+i,y:y+j});const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,x,y,tiles};s.buildings.push(b);for(const t of tiles)s.map[t.y][t.x]=d.walkable?0:1;s.towerViews.set(b.id,s.createBuildingView(d,b));markEnemyBuilding(s,b);return b;};
+  for(let x=50;x<62;x++){if(x!==55&&x!==56){put('wall',x,48);put('wall',x,49);}put('wall',x,40);}for(let y=41;y<48;y++){put('wall',50,y);put('wall',61,y);}
+  const gate=put('gate',55,48),closed=()=>gate.tiles.every(t=>s.map[t.y][t.x]===1),open=()=>gate.tiles.every(t=>s.map[t.y][t.x]===0);
+  const way=()=>findPathToAny(s.map,{x:58,y:53},[{x:57,y:44}]);
+  s.tick(400);assert.ok(closed()&&!s.enemyGates.isOpen(gate)&&!way(),'closed with nobody about: no way in');
+  // Enemy archers alone do not open it.
+  const archers=units(s,'enemy_archer',{x:53,y:44},2),[bait]=units(s,'swordsman',{x:55,y:53},1);bait.stance='hold';
+  for(let i=0;i<60;i++)s.tick(50);assert.ok(closed(),'archers stay behind the closed Gate');for(const a of archers)s.animalSystem.remove(a);
+  const guards=units(s,'enemy_soldier',{x:55,y:45},3);
+  until(s,()=>open(),15000);assert.ok(s.enemyGates.isOpen(gate));
+  until(s,()=>guards.some(g=>g.tile.y>=50),30000);assert.ok(true,'the defenders came out through the Gate');
+  // Ours get in while it is open.
+  assert.ok(way(),'a route through the open Gate');
+  // With the defenders dead it closes, but never on somebody inside it.
+  for(const g of guards)s.animalSystem.remove(g);const [stander]=units(s,'swordsman',{x:55,y:52},1);stander.stance='hold';stander.tile={x:55,y:48};stander.position={x:55.5,y:48.5};stander.path=[];stander.nextTile=null;
+  for(let i=0;i<(ENEMY_GATE.stayOpen+2000)/50;i++)s.tick(50);assert.ok(open(),'not shut on a man in the Gate');
+  stander.tile={x:55,y:52};stander.position={x:55.5,y:52.5};for(let i=0;i<40;i++)s.tick(50);assert.ok(closed()&&!way(),'closed again');
+});
+
+test('point 10: in a night battle the selected soldiers and everybody in a fight get a small glow; a light source can be scaled',async()=>{
+  const { battleGlow,UNIT_GLOW } = await import('../src/game/battleGlow.js');const { resolveLights,defaultLightSettings } = await import('../src/render/lightLab.js');
+  const s=scene();s.character.away=true;const us=units(s,'swordsman',{x:40,y:50},3),[foe]=units(s,'enemy_soldier',{x:70,y:50},1);
+  assert.equal(battleGlow(s).length,0);s.unitSelection={ids:new Set([us[0].id])};assert.deepEqual(battleGlow(s),[us[0]]);
+  s.combat.attacks.set(us[1],foe);assert.deepEqual(new Set(battleGlow(s)),new Set([us[0],us[1],foe]),'attacker and target, either side');s.combat.attacks.delete(us[1]);
+  s.lightFuel={carries:w=>w===us[0]};assert.equal(battleGlow(s).length,0,'a torch bearer has his own light');
+  const settings=defaultLightSettings(),at={darkness:1,seconds:0},[full]=resolveLights([{type:'lantern',x:0,y:0,seed:0}],settings,at),[glow]=resolveLights([{type:'lantern',x:0,y:0,seed:0,...UNIT_GLOW}],settings,at);
+  assert.ok(glow.rx<full.rx*.7&&glow.strength<full.strength*.7,'smaller and weaker than a lantern');assert.notDeepEqual(glow.color,full.color);
 });

@@ -8,7 +8,9 @@ export const DAY_NIGHT=Object.freeze({
   dawnEnd:.05,duskLength:.10,
   nightStart:Object.freeze({Spring:.75,Summer:.82,Autumn:.75,Winter:.62}),
   // Soldiers keep the night watch and rest in the first third of the day instead.
-  soldierRest:Object.freeze({from:0,to:1/3}),
+  // Battle test 18 Nov 2026, point 9: two shifts – half of the soldiers sleep in the first third of the day, the other
+  // half in the second, so somebody is always on guard by day; at night all of them watch.
+  soldierRest:Object.freeze({from:0,to:1/3,shifts:2}),
   // Without light everybody (soldiers too) sees a third of the normal sight at night.
   nightSight:1/3,
   // Light radius in pixels → tiles (an isometric tile is 64×32, a light's radius is measured on screen).
