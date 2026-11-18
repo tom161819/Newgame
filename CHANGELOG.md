@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.9] - 2026-11-18
+<!-- version: {"title":"Weapon and armour icons in the selection panel","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Added
+- Each unit box in the selection panel shows small icons of the weapon and armour that kind uses; the tooltip names them.
+
 ## [0.146.8] - 2026-11-18
 <!-- version: {"title":"Right click removes a kind from the selection","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Added

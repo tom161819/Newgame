@@ -35,3 +35,11 @@ test('owner 18 Nov 2026: a right click on a kind box takes that kind out of the 
   drop.call(self,'king');assert.equal(self.king,false);assert.deepEqual([...self.ids],['b']);
   drop.call(self,'knight');assert.equal(cleared,1,'the last kind out clears the selection');assert.ok(drawn>=2);
 });
+
+test('owner 18 Nov 2026: each kind box shows the weapon and armour of that kind, weapon first',async()=>{
+  const { gearOf,GEAR_ICONS } = await import('../src/ui/gearIcons.js');const { UNIT_TYPES } = await import('../src/data/military.js');
+  assert.deepEqual(gearOf({armor:'light_armor',weapon:'crossbow'}),['crossbow','light_armor']);assert.deepEqual(gearOf({weapon:'sword'}),['sword']);assert.deepEqual(gearOf({}),[]);assert.deepEqual(gearOf(null),[]);
+  for(const [type,u] of Object.entries(UNIT_TYPES))for(const id of Object.values(u.equipment))assert.ok(GEAR_ICONS[id],`${type}: an icon for ${id}`);
+  assert.equal(new Set(Object.values(GEAR_ICONS)).size,Object.keys(GEAR_ICONS).length,'every item has its own icon');
+  assert.match(src,/kindGear\(kind,workers\)/);
+});

@@ -9,6 +9,7 @@ import { knownMap } from '../game/knownMap.js';
 import { blockingDialog } from './dockedPanels.js';
 import { setSquad,squadMembers } from './armySquads.js';
 import { JOBS } from '../data/jobs.js';
+import { GEAR_ICONS,gearOf } from './gearIcons.js';
 
 const DOUBLE_CLICK_MS=400;
 import { APPROVED_VILLAGER_ART,walkKey } from '../data/objects/approvedArt.js';
@@ -75,6 +76,7 @@ export class UnitSelection {
       // Owner 17 Nov 2026: a box with the unit's picture and the count (the emoji when there is no picture yet).
       const pic=this.kindPicture(kind,workers);if(!pic&&kind!=='king')this.missingPicture=true;const i=document.createElement('span');i.className='unit-kind-icon';if(pic){const img=document.createElement('img');img.src=pic;img.alt='';i.append(img);}else i.textContent=this.kindIcon(kind);
       const c=document.createElement('b');c.textContent=String(n);b.append(i,c);
+      {const gear=this.kindGear(kind,workers);if(gear.length){const g=document.createElement('span');g.className='unit-kind-gear';for(const id of gear){const e=document.createElement('i');e.className=`gear-${id}`;e.innerHTML=GEAR_ICONS[id];g.append(e);}b.append(g);const names=gear.map(id=>t(`object.${id}.name`)).join(' · ');b.dataset.tipTitle=`${b.dataset.tipTitle} · ${names}`;b.setAttribute('aria-label',`${b.getAttribute('aria-label')} · ${names}`);}}
       b.addEventListener('click',()=>{if(kind==='king')this.set([this.scene.character]);else this.set(this.workers().filter(w=>this.kindOf(w)===kind));});
       // Owner 18 Nov 2026: a right click on a box takes that kind out of the selection.
       b.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();this.dropKind(kind);});return b;}));
@@ -88,6 +90,8 @@ export class UnitSelection {
       const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
       const z=1/(art.walk.scale??1);ctx.imageSmoothingEnabled=z>1;ctx.drawImage(src,frame.cutX+ax-W*z/2,frame.cutY+ay-(H-3)*z,W*z,H*z,0,0,W,H);const url=canvas.toDataURL();cache.set(look,url);return url;}catch{return null;}
   }
+  // The weapon and armour of a kind (from one of its men).
+  kindGear(kind,workers){if(!kind.startsWith('soldier:'))return [];const w=workers.find(u=>this.kindOf(u)===kind);return gearOf(this.scene.military?.unit?.(w)?.equipment);}
   kindOf(w){return w.profession==='soldier'?`soldier:${this.scene.military?.unit?.(w)?.type??'recruit'}`:w.profession;}
   workers(){return [...this.ids].map(id=>this.scene.workerSystem.workers.get(id)).filter(w=>this.scene.workerSystem.commands.selectable(w));}
   // m-kral-vyber (point 52): the King is selected like the others (click or drag) and ordered with the right button.
