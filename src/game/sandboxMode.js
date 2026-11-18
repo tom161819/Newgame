@@ -62,8 +62,19 @@ export function tilesAround(scene,center,count){
     if(Math.max(Math.abs(x-center.x),Math.abs(y-center.y))===r&&map[y]?.[x]===0&&!scene.resourceOccupancy?.has(`${x},${y}`)&&!taken.has(`${x},${y}`)){out.push({x,y});taken.add(`${x},${y}`);}
   return out;
 }
+// Battle test, point 2: enemy archers put on an enemy wall, Tower or Gate stand up on it (nearest free places first).
+const FORT=['wall','tower','gate','wall_gate'];
+function wallPlaces(scene,center,count){
+  const s=scene,at=s.buildings.find(b=>b.enemy&&FORT.includes(b.type)&&b.tiles?.some(p=>p.x===center.x&&p.y===center.y));if(!at)return null;
+  const taken=new Set([...s.animalSystem.animals.values()].filter(a=>a.onWall&&a.isAlive).map(a=>`${a.tile.x},${a.tile.y}`)),out=[];
+  for(const b of s.buildings)if(b.enemy&&FORT.includes(b.type))for(const p of b.tiles??[])if(!taken.has(`${p.x},${p.y}`))out.push({b,p});
+  return out.sort((a,z)=>Math.hypot(a.p.x-center.x,a.p.y-center.y)-Math.hypot(z.p.x-center.x,z.p.y-center.y)).slice(0,count);
+}
 export function spawnSandboxUnits(scene,unitId,center,count){
-  const s=scene,spec=SANDBOX_UNITS.find(u=>u.id===unitId);if(!spec)return 0;const tiles=tilesAround(s,center,count);let n=0;
+  const s=scene,spec=SANDBOX_UNITS.find(u=>u.id===unitId);if(!spec)return 0;
+  {const d=!spec.unit&&s.objectRegistry.get(spec.id),places=d&&(d.stats?.attackRange??1)>2&&d.gameplay?.hostile&&s.enemyArmy?wallPlaces(s,center,count):null;
+    if(places){let n=0;for(const {b,p} of places){const ground=tilesAround(s,p,1)[0];if(!ground)break;const a=s.animalSystem.create(d,ground);a.sandbox=true;if(s.enemyArmy.mount(a,b,p))n++;}return n;}}
+  const tiles=tilesAround(s,center,count);let n=0;
   for(const tile of tiles){
     if(spec.unit){const w=s.workerSystem.create(tile);if(s.military.enlist(w,spec.unit,{withoutHorse:true})){w.sandbox=true;s.military.engines?.sandboxCrew?.(w,spec.unit);n++;}else{w.isAlive=false;s.workerSystem.onDeath(w);}}
     else{const d=s.objectRegistry.get(spec.id);if(!d)break;const a=s.animalSystem.create(d,tile);a.sandbox=true;n++;}
@@ -110,7 +121,9 @@ class SandboxPanel {
     const torch=el('button','sandbox-torch',t('sandbox.torch'));torch.type='button';torch.addEventListener('click',()=>{const n=this.scene.lightFuel?.giveFree(this.scene.unitSelection?.workers?.()??[])??0;this.say(n?t('sandbox.torchGiven',{count:n}):t('sandbox.torchNone'));});
     const clearAll=el('button','',t('sandbox.clearAll'));clearAll.type='button';clearAll.addEventListener('click',()=>this.say(t('sandbox.cleared',{count:clearSandboxUnits(this.scene,'all')})));
     const charge=el('button','sandbox-charge',t('sandbox.charge'));charge.type='button';charge.addEventListener('click',()=>this.charge());
-    tools.append(remove,clearFoes,clearOurs,clearAll,charge,torch);this.body.append(tools);
+    // Battle test, point 2: the enemy army marches on the Castle.
+    const attack=el('button','sandbox-enemy-attack',t('sandbox.enemyAttack'));attack.type='button';attack.addEventListener('click',()=>{const n=this.scene.enemyArmy?.march()??0;this.say(n?t('army.attacking',{count:n}):t('sandbox.noArmy'));});
+    tools.append(remove,clearFoes,clearOurs,clearAll,charge,attack,torch);this.body.append(tools);
     this.hint=el('p','sandbox-hint',t('sandbox.hint'));this.body.append(this.hint);
     for(const e of ['pointerdown','mousedown','wheel'])root.addEventListener(e,ev=>ev.stopPropagation());
     document.body.append(root);this.render();

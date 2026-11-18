@@ -153,3 +153,38 @@ test('unit roles: the Crossbowman ignores half the armour, the Halberdier hits r
   const [next]=units(s,'enemy_soldier',{x:rider.tile.x+1,y:rider.tile.y},1);assert.equal(charge(rider,next),0,'no charge without a ride');
   rider.chargeFrom={x:rider.position.x-6,y:rider.position.y};assert.ok(charge(rider,next)>0,'a new ride gives a new charge');assert.equal(charge(halb,next),0,'only riders charge');
 });
+
+const armyScene=async()=>{const { EnemyArmy } = await import('../src/systems/EnemyArmy.js');const { EnemyGates } = await import('../src/systems/EnemyGates.js');const s=scene();s.character.away=true;s.enemyArmy=new EnemyArmy(s);s.enemyGates=new EnemyGates(s);return s;};
+const ourWall=(s,type,x,y)=>{const d=s.objectRegistry.require(type),tiles=[];for(let j=0;j<d.height;j++)for(let i=0;i<d.width;i++)tiles.push({x:x+i,y:y+j});const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,x,y,tiles};s.buildings.push(b);for(const t of tiles)s.map[t.y][t.x]=d.walkable?0:1;s.towerViews.set(b.id,s.createBuildingView(d,b));return b;};
+
+test('point 2: the enemy army marches on the Castle, fights whom it meets there and attacks the buildings around it; the Castle holds',async()=>{
+  const { ENEMY_ARMY } = await import('../src/systems/EnemyArmy.js');const { buildingHP } = await import('../src/game/buildingHealth.js');
+  const s=await armyScene(),castle=build(s,'castle',30,48),house=build(s,'house',38,49),enemies=units(s,'enemy_swordsman',{x:75,y:50},5);
+  assert.equal(s.enemyArmy.march(),5);assert.ok(enemies.every(e=>e.marching));
+  until(s,()=>enemies.some(e=>Math.hypot(e.tile.x-castle.x,e.tile.y-castle.y)<10),60000);
+  until(s,()=>buildingHP(house).hp<buildingHP(house).max||buildingHP(castle).hp<buildingHP(castle).max,60000);
+  for(let i=0;i<3000;i++)s.tick(50);const c=buildingHP(castle);assert.ok(c.hp>=c.max*ENEMY_ARMY.castleFloor-1e-6,'the Castle holds');
+  // Our soldiers coming out are fought, not ignored.
+  const [guard]=units(s,'knight',{x:34,y:52},1);until(s,()=>enemies.some(e=>e.isAlive&&e.retaliationTarget===guard)||!guard.isAlive,30000);
+});
+
+test('point 2: our walls in the way are broken through; our Gate shuts while the enemy is near and opens again after',async()=>{
+  const { buildingHP } = await import('../src/game/buildingHealth.js');
+  const s=await armyScene();build(s,'castle',30,48);const walls=[];for(let y=0;y<s.map.length;y++)if(y!==50&&y!==51)walls.push(ourWall(s,'wall',45,y));const gate=ourWall(s,'gate',44,50);
+  // the wall line is closed except for the Gate (a 2-wide gap at x=44..45, y=50..51)
+  const open=()=>gate.tiles.every(p=>s.map[p.y][p.x]===0);s.tick(400);assert.ok(open(),'open with nobody about');
+  const enemies=units(s,'enemy_soldier',{x:60,y:50},4);s.enemyArmy.march();
+  until(s,()=>!open(),40000);assert.equal(findPathToAny(s.map,{x:60,y:50},[{x:35,y:50}]),null,'shut: no way in');
+  until(s,()=>walls.some(w=>buildingHP(w)&&buildingHP(w).hp<buildingHP(w).max)||buildingHP(gate).hp<buildingHP(gate).max||!s.buildings.includes(gate),60000);
+  for(const e of enemies)s.animalSystem.remove(e);for(let i=0;i<20;i++)s.tick(50);assert.ok(!s.buildings.includes(gate)||open(),'open again');
+});
+
+test('point 2: enemy archers put on an enemy wall stand on it and shoot; melee cannot reach them and break the wall, the archer falls',async()=>{
+  const { spawnSandboxUnits } = await import('../src/game/sandboxMode.js');const { inAttackRange } = await import('../src/systems/CombatSystem.js');
+  const s=await armyScene();for(let x=50;x<56;x++)markEnemyBuilding(s,ourWall(s,'wall',x,50));
+  assert.equal(spawnSandboxUnits(s,'enemy_archer',{x:52,y:50},2),2);const archers=[...s.animalSystem.animals.values()].filter(a=>a.onWall);assert.equal(archers.length,2);
+  for(const a of archers)assert.equal(a.tile.y,50);
+  const [mark]=units(s,'archer',{x:52,y:57},1);mark.stance='hold';until(s,()=>mark.currentHP<mark.maxHP,10000);assert.ok(s.combat.attacks.get(archers[0])===mark||s.combat.attacks.get(archers[1])===mark,'they shoot from the wall (7 tiles: 2 tiles further from the height)');
+  const [sword]=units(s,'swordsman',{x:52,y:52},1);const a0=archers[0];sword.position={x:a0.tile.x+.5,y:51.5};sword.tile={x:a0.tile.x,y:51};assert.equal(inAttackRange(sword,a0,s.map),false,'a blade does not reach up');
+  s.military.orderAttack([sword,...units(s,'knight',{x:a0.tile.x,y:53},3)],a0);until(s,()=>!a0.onWall||!a0.isAlive,90000);assert.ok(!s.buildings.some(b=>b.tiles.some(p=>p.x===a0.tile.x&&p.y===50))||!a0.isAlive,'the wall under him fell');
+});

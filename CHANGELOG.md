@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.7] - 2026-11-18
+<!-- version: {"title":"Enemy army attacks, wall archers, our Gate shuts","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Added
+- Test map: the new button "Enemy attacks" sends the enemy soldiers against your kingdom. They march on the Castle, fight everyone they meet, break through walls and buildings in their way and attack the buildings around the Castle. The Castle holds at a quarter of its hit points.
+- Enemy archers put on an enemy wall, Tower or Gate stand up on it and shoot from there. Swords cannot reach them: break the wall, and the archer falls with it.
+- Your Gate shuts while an enemy is near and opens again when he is gone.
+
 ## [0.146.6] - 2026-11-18
 <!-- version: {"title":"Archers in sieges, fire arrows, unit roles","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Added

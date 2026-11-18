@@ -17,6 +17,7 @@ export class AnimalController {
   update(delta){
     this.availableWorkMs=0;
     if(!this.active||!this.isAlive||this.mounted)return;
+    if(this.onWall){this.scene.enemyArmy?.place(this);this.view.animate?.(delta,false,this.direction);return;}
     // Nová budova může zneplatnit vzdálenější část staré cesty.
     if(this.path.length&&this.commandState?.state!=='MovingToHold'&&this.steppingAside==null){/* point 45: the way off a new blueprint starts on closed ground */
       let previous=this.nextTile??this.tile;

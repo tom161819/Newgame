@@ -287,6 +287,8 @@ export class MilitarySystem {
     // an enemy with no way to him (behind enemy walls) is not waited for – a melee soldier breaks through the wall on
     // the way (or keeps hitting the wall he was sent at); with the wall down the way is looked for again.
     const now=this.scene.gameTime?.totalElapsed??0;
+    // An enemy archer up on his wall: a melee soldier cannot reach him – he breaks the wall (point 2).
+    if(!ranged&&target.onWall&&!worker.onWall&&!(worker.cutOff?.id===target.id))worker.cutOff={id:target.id,until:now+MILITARY_RULES.cutOffFor};
     if(worker.cutOff?.id===target.id&&target!==current&&!(inAttackRange(worker,target,this.scene.map)&&combat.canTarget(worker,target))){
       if(now>=worker.cutOff.until&&this.reachable(worker,target))delete worker.cutOff;
       else{if(now>=worker.cutOff.until)worker.cutOff.until=now+MILITARY_RULES.cutOffFor;return this.cutOff(worker,target,delta);}

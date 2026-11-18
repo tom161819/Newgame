@@ -53,6 +53,9 @@ export class AnimalSystem {
       // N3: wolves are led by the night threat system (hunting, keeping out of light, leaving at dawn).
       if(animal.definition.gameplay.nightPredator&&this.scene.nightThreats?.leadsWolf?.(animal,delta)){animal.update(delta);continue;}
       // m-mapa-kraje: bandits and mine rats attack a party member who comes close.
+      // Battle test, point 2: an enemy archer up on his wall shoots from there; a marching enemy follows the army's order.
+      if(animal.onWall&&this.scene.enemyArmy){this.scene.enemyArmy.shoot(animal);animal.update(delta);continue;}
+      if(animal.marching&&this.scene.enemyArmy?.lead(animal,delta)){animal.update(delta);continue;}
       // Back to his post after a chase that led too far or ended: on the way he goes only for somebody inside his
       // chase radius (and strikes back when hit).
       if(animal.returning&&!animal.retaliationTarget){const p=animal.post,g=animal.definition.gameplay,foe=p?this.guardTarget(animal):null;

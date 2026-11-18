@@ -13,6 +13,8 @@ const reach=attacker=>attacker.attackRange+(attacker.onWall&&attacker.attackRang
 export function inAttackRange(attacker,target,map=null) {
   const dx=Math.abs(attacker.position.x-target.position.x),dy=Math.abs(attacker.position.y-target.position.y);
   if(Math.max(dx,dy)>reach(attacker)+1e-8)return false;
+  // Up on a wall nobody on the ground reaches him with a blade (battle test, point 2): the wall has to fall first.
+  if(target.onWall&&!attacker.onWall&&attacker.attackRange<=2)return false;
   const a={x:Math.floor(attacker.position.x),y:Math.floor(attacker.position.y)},b={x:Math.floor(target.position.x),y:Math.floor(target.position.y)};
   if(map&&attacker.attackRange<=1&&a.x!==b.x&&a.y!==b.y){
     return isWalkable(map,a.x,b.y)&&isWalkable(map,b.x,a.y);

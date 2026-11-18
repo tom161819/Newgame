@@ -146,7 +146,7 @@ export class SiegeSystem {
     s.tweens.add({targets:dot,x:to.x,y:to.y-top,duration:320,onComplete:()=>dot.destroy()});
   }
   // The building falls: its functions go like a burnt one's, the ground under it is free again.
-  destroy(b){
+  destroy(b,{ours=false}={}){
     const s=this.scene,name=buildingDefinition(b).name,at={x:b.x,y:b.y};
     for(const w of s.workerSystem?.liveWorkers?.()??[]){if(w.siegeTargetId===b.id)this.stop(w);delete w.cutOff;}
     this.bars.get(b.id)?.destroy?.();this.bars.delete(b.id);
@@ -156,7 +156,8 @@ export class SiegeSystem {
         for(const stone of [...rubble(corners,3,b.id),...rubble(corners.map(p=>({x:c.x+(p.x-c.x)*.4,y:c.y+(p.y-c.y)*.4})),3,b.id+7)]){g.fillStyle(0x3d382c,.3).fillEllipse(stone.x+1,stone.y+stone.h*.7,stone.w*2,stone.h*1.4);g.fillStyle(shades[Math.floor(stone.shade*3)%3],1).fillEllipse(stone.x,stone.y,stone.w*2.4,stone.h*2.4);}}
       s.tweens.add({targets:g,alpha:0,delay:SIEGE_RULES.rubbleStays,duration:8000,onComplete:()=>g.destroy()});}
     detachLostBuilding(s,b);removeBuildingShell(s,b);s.refreshWallConnections?.();s.events?.emit?.('buildings:changed');s.updateInventory?.();
-    s.setStatus?.(t('siege.destroyed',{name}));s.eventFeed?.push?.(`siege:${b.id}`,t('siege.destroyed',{name}),{target:{x:at.x+1,y:at.y+1}});
+    s.enemyArmy?.fall?.(b);
+    {const text=t(ours?'army.buildingLost':'siege.destroyed',{name});s.setStatus?.(text);s.eventFeed?.push?.(`siege:${b.id}`,text,{important:ours,target:{x:at.x+1,y:at.y+1}});}
   }
   // A hit-point bar over a damaged enemy building.
   drawBar(b){

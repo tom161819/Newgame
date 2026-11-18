@@ -1,4 +1,5 @@
 import { buildingIsComplete } from '../game/buildings.js';
+import { t } from '../i18n/index.js';
 
 // Battle test 18 Nov 2026, point 5 ("Gate of the enemy"): an enemy Gate is closed and shows it (closed doors in the
 // arch – provisional, drawn by code over the approved Gate picture). It opens for a sortie: while a melee defender who
@@ -10,6 +11,9 @@ const GATES=['gate','wall_gate'];
 // The arch in the Gate picture, as shares of the sprite (unflipped: the opening looks down-right).
 const ARCH=[[.475,.825],[.65,.755],[.65,.6],[.6,.56],[.52,.575],[.475,.64]];
 export const isEnemyGate=b=>!!b?.enemy&&GATES.includes(b.type);
+// Battle test, point 2: our own Gate shuts while an enemy soldier is within `ourCloseRadius` tiles (never on somebody in it).
+export const OUR_GATE=Object.freeze({closeRadius:7});
+export const isOurGate=b=>!!b&&!b.enemy&&GATES.includes(b.type);
 export class EnemyGates{
   constructor(scene){this.scene=scene;this.wait=0;this.state=new Map();}
   isOpen(building){return !!this.state.get(building?.id)?.open;}
@@ -38,7 +42,12 @@ export class EnemyGates{
       if(this.sortie(b))st.left=ENEMY_GATE.stayOpen;else st.left=Math.max(0,st.left-step);
       const want=st.left>0||st.open&&this.occupied(b);if(want!==st.open)this.set(b,st,want);else if(!st.open)this.paint(b,st);
     }
-    for(const [id,st] of this.state)if(!live.has(id)){st.doors?.destroy?.();this.state.delete(id);}
+    for(const b of s.buildings??[]){
+      if(!isOurGate(b)||!buildingIsComplete(b))continue;live.add(b.id);let st=this.state.get(b.id);if(!st){st={open:true,ours:true,left:0,doors:null};this.state.set(b.id,st);}
+      const c=this.centre(b),foe=[...(s.animalSystem?.animals?.values?.()??[])].some(a=>a.isAlive&&a.active!==false&&a.definition?.gameplay?.hostile&&Math.hypot(a.position.x-c.x,a.position.y-c.y)<=OUR_GATE.closeRadius);
+      const want=!foe||(st.open&&this.occupied(b));if(want!==st.open){if(!want&&!st.told){st.told=true;s.setStatus?.(t('army.gateShut'));}this.set(b,st,want);}else if(!st.open)this.paint(b,st);
+    }
+    for(const [id,st] of this.state)if(!live.has(id)){if(st.ours){const b=s.buildings.find(x=>x.id===id);if(b)for(const tl of b.tiles??[])if(s.map[tl.y]?.[tl.x]!=null)s.map[tl.y][tl.x]=0;}{st.doors?.destroy?.();this.state.delete(id);}}
   }
   set(b,st,open){st.open=open;for(const t of b.tiles??[])if(this.scene.map[t.y]?.[t.x]!=null)this.scene.map[t.y][t.x]=open?0:1;this.paint(b,st);}
   // Closed doors in the arch; they follow the sprite (a Gate across the other axis is mirrored).
