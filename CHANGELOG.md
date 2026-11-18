@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.1] - 2026-11-18
+<!-- version: {"title":"Attack orders before the morning rest","type":"fix","reconstructed":false,"saveVersion":65} -->
+### Fixed
+- Soldiers ordered to attack an enemy wall or an enemy went to the Castle to sleep instead when the order came in the morning (from day 2 soldiers rest in the first third of the day). The Catapult drove away the same way instead of coming closer and shooting. An order now comes first: the men wake up and go.
+- A soldier from a Barracks no longer walks to his Barracks first after an attack order.
+- An enemy coming near sleeping soldiers wakes them. Sleeping soldiers can be chosen from the Army panel and ordered.
+
 ## [0.146.0] - 2026-11-18
 <!-- version: {"title":"New 3D soldiers: five more units","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Added

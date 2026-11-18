@@ -46,6 +46,9 @@ export class WorkerAI {
     // Owner 17 Nov 2026: a soldier on a wall order (post or patrol) keeps it – no resting at home, no walk to the
     // Barracks first; the military order leads every frame.
     if(worker.profession==='soldier'&&worker.wallPatrol&&this.scene.military){if(worker.restPhase)this.system.rest?.stop(worker);if(!this.scene.military.updateSoldier(worker,delta)&&!worker.onWall)this.patrol?.(worker);worker.update(delta);return;}
+    // Owner 18 Nov 2026: a soldier on duty (an attack or siege order, a fight, an enemy near; MilitarySystem.onDuty) follows
+    // it at once – it used to wait behind the morning rest and the walk to his Barracks, so the men walked off instead.
+    if(worker.profession==='soldier'&&this.scene.military?.onDuty?.(worker)){if(worker.restPhase)this.system.rest?.stop(worker);if(this.scene.military.updateSoldier(worker,delta)){worker.update(delta);return;}}
     if((worker.profession==='hunter'&&worker.currentHP<worker.maxHP*WORK_RULES.fleeRatio)||['Fleeing','Recovering'].includes(worker.workState)){
       this.recover(worker);worker.update(delta);return;
     }

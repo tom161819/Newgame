@@ -26,7 +26,7 @@ export class DailyRest {
   rest(worker){return this.scene.needs?.records.get(worker.id)?.rest??100;}
   eligible(worker){
     return !!this.scene.needs&&worker.isAlive&&worker.isSubject!==false&&!worker.arriving&&this.system.workers.get(worker.id)===worker
-      &&(!worker.commandState||worker.commandState.state==='Working')&&/* owner 17 Nov 2026: a soldier on a wall order keeps it, like a manual order */!worker.wallPatrol&&(!DAILY_REST.exempt.includes(worker.profession)||this.nightWatch(worker));
+      &&(!worker.commandState||worker.commandState.state==='Working')&&/* owner 17 Nov 2026: a soldier on a wall order keeps it, like a manual order */!worker.wallPatrol&&/* owner 18 Nov 2026: nor does a soldier on duty (an order, a fight, an enemy near) go to bed */!(worker.profession==='soldier'&&this.scene.military?.onDuty?.(worker))&&(!DAILY_REST.exempt.includes(worker.profession)||this.nightWatch(worker));
   }
   // A soldier on the night watch (day/night cycle on) rests in the first third of the day, never at night.
   nightWatch(worker){return worker.profession==='soldier'&&!!this.scene.gameTime?.restStartFraction;}

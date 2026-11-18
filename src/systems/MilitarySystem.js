@@ -1,7 +1,7 @@
 import { t } from '../i18n/index.js';
 import { towerNeighbors } from '../game/buildings.js';
 import { WallPatrol,WALL_PATROL } from './WallPatrol.js';
-import { UNIT_TYPES,unitKit,KNIGHT_SPEED,START_GARRISON,RECRUIT } from '../data/military.js';
+import { UNIT_TYPES,unitKit,KNIGHT_SPEED,START_GARRISON,RECRUIT,CATAPULT } from '../data/military.js';
 import { MILITARY_ITEMS } from '../data/militaryEquipment.js';
 import { buildingIsComplete } from '../game/buildings.js';
 import { recalculateStats } from './UnitStats.js';
@@ -9,7 +9,7 @@ import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
 import { inAttackRange,isRanged,WALL_ARCHER_RANGE } from './CombatSystem.js';
 import { MILITARY_RULES,PATROL,STANCES } from '../data/military.js';
 import { freeAround,awayFrom } from '../game/combatSpacing.js';
-import { SiegeSystem } from './SiegeSystem.js';
+import { SiegeSystem,siegeable,canSiege } from './SiegeSystem.js';
 import { SiegeEngines } from './SiegeEngines.js';
 
 // C08: Soldiers employed in a Barracks are trained into units. Training is paid in Gold, needs the unit's real items
@@ -139,6 +139,22 @@ export class MilitarySystem {
       this.siege?.stop(w);w.huntWolfId=best.id;w.attackArea={x:mid.x,y:mid.y};w.attackRadius=Math.round(radius);w.militaryRetarget=0;
     }
     return group.length;
+  }
+  // Owner 18 Nov 2026 ("soldiers cannot be sent at walls; the Catapult drives away instead of coming closer"): from day 2
+  // soldiers sleep in the first third of the day, and that rest – and, for a Barracks soldier, the walk to his Barracks
+  // after every order – came before the attack order: the men (and the Catapult) walked off to the Castle. A soldier
+  // on duty skips both: one with an order, in a fight, attacked, with an enemy in sight near him, or a Catapult crew or
+  // melee soldier with an enemy building in reach. Units of the Test map are always on duty.
+  hasOrder(worker){return worker.siegeTargetId!=null||!!worker.huntWolfId||!!worker.attackArea||worker.scoutZone!=null||worker.expeditionGather!=null||!!this.scene.combat?.attacks?.has?.(worker);}
+  onDuty(worker){
+    if(!worker?.isAlive||worker.profession!=='soldier')return false;if(worker.sandbox||this.hasOrder(worker))return true;
+    const now=this.scene.gameTime?.totalElapsed??0,last=worker.dutyCheck;if(last&&now>=last.at&&now-last.at<MILITARY_RULES.dutyCheck)return last.on;
+    let on=false;for(const [a,target] of this.scene.combat?.attacks??[])if(target===worker&&a.isAlive){on=true;break;}
+    on||=!!this.nearestEnemy(worker,MILITARY_RULES.guardRadius);
+    if(!on&&worker.stance!=='hold'){const type=this.unit(worker)?.type;
+      if(type==='catapult')on=this.scene.buildings.some(b=>siegeable(b)&&Math.hypot(b.x-worker.tile.x,b.y-worker.tile.y)<=CATAPULT.range+2);
+      else if(!UNIT_TYPES[type]?.vehicle&&canSiege(worker))on=!!this.siege.near(worker);}
+    worker.dutyCheck={at:now,on};return on;
   }
   attackers(target){let n=0;for(const [a,t] of this.scene.combat?.attacks??[])if(t===target&&a.isAlive)n++;return n;}
   threat(worker){

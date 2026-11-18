@@ -16,7 +16,8 @@ export const commanded=worker=>worker.commandState?.state==='MovingToHold'||work
 export class UnitCommands {
   constructor(system){this.system=system;this.scene=system.scene;}
   owns(worker){return !!worker?.isAlive&&worker.isSubject!==false&&this.system.workers.get(worker.id)===worker&&!worker.leaving;}
-  selectable(worker){return this.owns(worker)&&worker.sleepingIn==null&&this.scene.fog.isVisibleObject(worker);}
+  // Owner 18 Nov 2026: a sleeping soldier can be chosen (from the Army panel or a group key) and an order wakes him.
+  selectable(worker){return this.owns(worker)&&(worker.sleepingIn==null||worker.profession==='soldier')&&this.scene.fog.isVisibleObject(worker);}
   interrupt(worker){
     this.system.ai.cancel(worker);worker.manualRockId=null;delete worker.siegeTargetId;worker.arriving=false;worker.commandRetry=0;worker.commandWait=0;
     // Complete the already reserved half-step; never snap a moving cargo owner.

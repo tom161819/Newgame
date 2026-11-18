@@ -40,3 +40,44 @@ test('owner 18 Nov 2026: a move order ends the attack on a wall',()=>{
   s.military.siege.order([w],wall);for(let i=0;i<10;i++)s.tick(50);assert.equal(w.siegeTargetId,wall.id);
   s.workerSystem.commands.move([w],{x:70,y:70});for(let i=0;i<5;i++)s.tick(50);assert.equal(w.siegeTargetId,undefined);
 });
+
+// Owner 18 Nov 2026: "s vojáky nejde zaútočit na hradby, katapult … místo toho aby se přiblížil a začal střílet tak začne
+// odjíždět". From day 2 soldiers sleep in the first third of the day (after the night watch) and that rest came before
+// the order: they walked to the Castle instead.
+const { placeBuilding } = await import('../src/game/buildings.js');
+const morning=s=>{s.gameTime.restStartFraction=()=>.75;s.gameTime.day=2;s.gameTime.elapsed=s.gameTime.dayDuration*.05;};
+const until=(s,p,max=120000)=>{let t=0;while(!p()&&t<max){s.tick(50);t+=50;}assert.ok(p(),`not reached after ${t} ms`);return t;};
+function build(s,type,x,y){const d=s.objectRegistry.require(type);for(const [r,n]of Object.entries(d.cost))s.inventory.add(r,n);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(result.error);s.towerViews.set(result.building.id,s.createBuildingView(d,result.building));result.building.progress=1;result.building.completed=true;return result.building;}
+
+test('owner 18 Nov 2026: a soldier resting in the morning obeys an order to attack a wall – he wakes, walks there and breaks it',()=>{
+  const s=workerScene(undefined,{foodProduction:true,workplaces:true}),castle=build(s,'castle',30,30),wall=add(s,'wall',60,50);markEnemyBuilding(s,wall);
+  const w=s.workerSystem.create({x:38,y:36});w.arriving=false;assert.ok(s.military.enlist(w,'swordsman',{withoutHorse:true}));
+  morning(s);until(s,()=>w.sleepingIn===castle.id,60000);assert.equal(s.military.onDuty(w),false,'no order, no enemy: he sleeps after the night watch');
+  assert.equal(s.workerSystem.commands.selectable(w),true,'a sleeping soldier can still be chosen and ordered');
+  assert.equal(s.military.siege.order([w],wall),1);assert.equal(s.military.onDuty(w),true);
+  for(let i=0;i<10;i++)s.tick(50);assert.equal(w.sleepingIn,null,'the order wakes him');assert.equal(w.restPhase,null);assert.equal(w.workMessage,'Attacking the wall');
+  until(s,()=>{morning(s);return !s.buildings.includes(wall);});
+  // …and with the wall down and nothing else to do he goes to bed again.
+  morning(s);until(s,()=>w.restPhase!=null,20000);
+});
+
+test('owner 18 Nov 2026: an attack order on an enemy also beats the morning rest, and an enemy near a sleeper wakes him',()=>{
+  const s=workerScene(undefined,{foodProduction:true,workplaces:true}),castle=build(s,'castle',30,30);
+  const w=s.workerSystem.create({x:38,y:36});w.arriving=false;assert.ok(s.military.enlist(w,'swordsman',{withoutHorse:true}));
+  morning(s);until(s,()=>w.sleepingIn===castle.id,60000);
+  const raider=s.animalSystem.create(s.objectRegistry.require('raider'),{x:60,y:60});s.military.orderAttack([w],raider);
+  morning(s);until(s,()=>!raider.isAlive||!w.isAlive);assert.equal(w.restPhase,null,'he fought instead of sleeping');
+  if(w.isAlive){morning(s);until(s,()=>w.sleepingIn===castle.id,60000);const wolf=s.animalSystem.create(s.objectRegistry.require('raider'),{x:w.tile.x+6,y:w.tile.y+6});s.simulate(1500);assert.equal(w.sleepingIn,null,'an enemy in sight near him wakes him');assert.ok(wolf);}
+});
+
+test('owner 18 Nov 2026: a Barracks soldier with an order does not walk to his Barracks first; a Catapult crew comes closer and shoots in the morning',()=>{
+  const s=workerScene(undefined,{foodProduction:true,workplaces:true});build(s,'castle',20,20);const barracks=build(s,'barracks',30,60),wall=add(s,'wall',70,40);markEnemyBuilding(s,wall);
+  const w=s.workerSystem.create({x:60,y:44});w.arriving=false;assert.equal(s.workplaceSystem.assign(barracks,w),true);assert.ok(s.military.enlist(w,'swordsman',{withoutHorse:true}));
+  const from=Math.hypot(w.tile.x-wall.x,w.tile.y-wall.y);s.military.siege.order([w],wall);let far=from;
+  until(s,()=>{far=Math.max(far,Math.hypot(w.tile.x-wall.x,w.tile.y-wall.y));return (buildingHP(wall)?.hp??200)<200;});assert.ok(far<=from+2,`he went straight at the wall (farthest ${far}, started ${from})`);
+  // The Catapult: 30 tiles away in the morning of day 2 – it rolls into range and bombards, it does not drive home.
+  const fort=add(s,'wall',70,80);markEnemyBuilding(s,fort);spawnSandboxUnits(s,'catapult',{x:40,y:80},1);const crew=s.workerSystem.liveWorkers().find(x=>s.military.unit(x)?.type==='catapult');crew.sandbox=false;
+  morning(s);assert.equal(s.military.siege.order([crew],fort),1);let worst=0;const start=Math.hypot(crew.tile.x-fort.x,crew.tile.y-fort.y);
+  until(s,()=>{morning(s);worst=Math.max(worst,Math.hypot(crew.tile.x-fort.x,crew.tile.y-fort.y));return (buildingHP(fort)?.hp??200)<200;},200000);
+  assert.ok(worst<=start+2,'the Catapult never drove away from its target');assert.equal(crew.restPhase??null,null);
+});
