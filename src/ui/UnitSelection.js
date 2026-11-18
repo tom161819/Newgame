@@ -75,7 +75,9 @@ export class UnitSelection {
       // Owner 17 Nov 2026: a box with the unit's picture and the count (the emoji when there is no picture yet).
       const pic=this.kindPicture(kind,workers);if(!pic&&kind!=='king')this.missingPicture=true;const i=document.createElement('span');i.className='unit-kind-icon';if(pic){const img=document.createElement('img');img.src=pic;img.alt='';i.append(img);}else i.textContent=this.kindIcon(kind);
       const c=document.createElement('b');c.textContent=String(n);b.append(i,c);
-      b.addEventListener('click',()=>{if(kind==='king')this.set([this.scene.character]);else this.set(this.workers().filter(w=>this.kindOf(w)===kind));});return b;}));
+      b.addEventListener('click',()=>{if(kind==='king')this.set([this.scene.character]);else this.set(this.workers().filter(w=>this.kindOf(w)===kind));});
+      // Owner 18 Nov 2026: a right click on a box takes that kind out of the selection.
+      b.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();this.dropKind(kind);});return b;}));
     this.kinds.hidden=counts.size===0;
   }
   // The standing picture of a kind (its first chosen man's look, facing the viewer), cut from the loaded sheet.
@@ -90,6 +92,8 @@ export class UnitSelection {
   workers(){return [...this.ids].map(id=>this.scene.workerSystem.workers.get(id)).filter(w=>this.scene.workerSystem.commands.selectable(w));}
   // m-kral-vyber (point 52): the King is selected like the others (click or drag) and ordered with the right button.
   set(workers){this.king=workers.includes(this.scene.character)&&this.scene.character.isAlive&&!this.scene.character.away;this.ids=new Set(workers.filter(w=>this.scene.workerSystem.commands.selectable(w)).map(w=>w.id));this.draw();}
+  // Takes one kind (or the King) out of the selection.
+  dropKind(kind){if(kind==='king'){this.king=false;this.draw();return;}const rest=this.workers().filter(w=>this.kindOf(w)!==kind);if(!rest.length&&!this.king){this.clear();return;}this.ids=new Set(rest.map(w=>w.id));this.draw();}
   clear(){this.ids.clear();this.king=false;this.anchor=null;this.draw();}
   act(action){
     const workers=this.workers(),s=this.scene;if(action==='clear'){this.clear();return;}

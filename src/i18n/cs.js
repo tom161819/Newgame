@@ -110,7 +110,7 @@ export default {
   "army.formation.lineTip": "Dvě řady vedle sebe, široká fronta.",
   "army.formation.blockTip": "Sevřený blok, skoro čtverec.",
   "army.formation.wedgeTip": "Hrotem vpřed, rozšiřuje se dozadu.",
-  "command.kindTip": "Kliknutím ponecháš ve výběru jen tento druh.",
+  "command.kindTip": "Kliknutím ponecháš ve výběru jen tento druh. Pravým tlačítkem ho z výběru odebereš.",
   "command.formationHint": "Podrž pravé tlačítko: náhled formace, tažením ji otočíš.",
   "command.MovingToHold": "Přesun na určenou pozici",
   "command.Holding": "Drží pozici",

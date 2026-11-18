@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.8] - 2026-11-18
+<!-- version: {"title":"Right click removes a kind from the selection","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Added
+- A right click on a unit box in the selection panel takes that kind of unit out of the selection.
+
 ## [0.146.7] - 2026-11-18
 <!-- version: {"title":"Enemy army attacks, wall archers, our Gate shuts","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Added

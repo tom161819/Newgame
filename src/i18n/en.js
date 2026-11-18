@@ -110,7 +110,7 @@ export default {
   "army.formation.lineTip": "Two ranks abreast, a wide front.",
   "army.formation.blockTip": "A tight block, nearly square.",
   "army.formation.wedgeTip": "Point forward, widening to the back.",
-  "command.kindTip": "Click to keep only this kind chosen.",
+  "command.kindTip": "Click to keep only this kind chosen. Right-click to take it out of the selection.",
   "command.formationHint": "Hold the right button for the formation blueprint; drag to turn it.",
   "command.MovingToHold": "Moving to hold position",
   "command.Holding": "Holding position",

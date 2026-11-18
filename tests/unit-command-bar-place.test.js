@@ -25,3 +25,13 @@ test('owner 17 Nov 2026: with soldiers chosen the bar opens out of the Army tab,
   self.workers=()=>[{profession:'hauler'}];place.call(self,{querySelectorAll:()=>[],querySelector:()=>tab});
   assert.ok(!self.panel.classList.has('docked')&&!tab.classList.has('joined'),'workers only: the bar stays in the middle');assert.equal(style.width,'');
 });
+
+test('owner 18 Nov 2026: a right click on a kind box takes that kind out of the selection',()=>{
+  assert.match(src,/addEventListener\('contextmenu',e=>\{e\.preventDefault\(\);e\.stopPropagation\(\);this\.dropKind\(kind\);\}\)/);
+  const drop=UnitSelection?.prototype?.dropKind;if(!drop)return;
+  const ws=[{id:'a',k:'archer'},{id:'b',k:'knight'},{id:'c',k:'archer'}];let drawn=0,cleared=0;
+  const self={ids:new Set(['a','b','c']),king:true,workers(){return ws.filter(w=>this.ids.has(w.id));},kindOf:w=>w.k,draw(){drawn++;},clear(){cleared++;this.ids=new Set();this.king=false;}};
+  drop.call(self,'archer');assert.deepEqual([...self.ids],['b']);assert.equal(self.king,true);
+  drop.call(self,'king');assert.equal(self.king,false);assert.deepEqual([...self.ids],['b']);
+  drop.call(self,'knight');assert.equal(cleared,1,'the last kind out clears the selection');assert.ok(drawn>=2);
+});
