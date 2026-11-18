@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.11] - 2026-11-18
+<!-- version: {"title":"Strays join the party by Hunting level","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- On an expedition a stray dog or cat joins the party by itself when the soldiers come within 5 tiles – with a chance by the best Hunting level in the party (25 % at level 1, +5 % a level, at most 90 %). Each animal tries once; the button in its window makes the same single try. It then comes home with the party.
+
 ## [0.146.10] - 2026-11-18
 <!-- version: {"title":"Long-range units shoot 50 % further","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Changed

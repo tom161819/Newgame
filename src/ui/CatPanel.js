@@ -71,8 +71,11 @@ export class CatPanel {
     const d=this.scene.domestic;if(!this.scene.zone||!animal)return false;
     if(animal.state==='party'){lines.push(element('p','cat-help',t('pets.partyHelp')));return true;}
     if(animal.state!=='stray'||animal.leaving)return false;
-    const b=element('button','',t('pets.joinParty'));b.type='button';b.dataset.joinParty=animal.id;b.addEventListener('click',()=>{if(d.joinParty(animal.id)){this.scene.setStatus?.(t('pets.joined',{name:animal.name}));this.close();}});
-    lines.push(element('p','cat-help',t('pets.joinHelp')),b);return true;
+    // Owner 18 Nov 2026: one try, with the chance by the best Hunting level in the party.
+    if(animal.partyTried){lines.push(element('p','cat-help',t('pets.joinRefused')));return true;}
+    const z=this.scene.zone,units=[...(z.soldiers??[]).filter(w=>w.isAlive),...(z.king&&this.scene.character?.isAlive?[this.scene.character]:[])];
+    const b=element('button','',t('pets.joinParty'));b.type='button';b.dataset.joinParty=animal.id;b.addEventListener('click',()=>{const ok=d.tryJoin(animal.id,units);this.scene.setStatus?.(t(ok?'pets.joined':'pets.joinRefusedNow',{name:animal.name}));this.close();});
+    lines.push(element('p','cat-help',t('pets.joinHelp')),element('p','cat-help',t('pets.joinChance',{chance:Math.round(d.joinChance(units)*100),level:d.partyHuntingLevel(units)})),b);return true;
   }
   timeLeft(cat){const days=Math.max(0,(cat.leaveAt-this.scene.gameTime.totalElapsed)/this.scene.gameTime.dayDuration);return Math.round(days*10)/10;}
   choose(buildingId){

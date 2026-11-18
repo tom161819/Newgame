@@ -33,3 +33,21 @@ test('the party brings its pets home with it', async () => {
   const back=homeAfterZone({zone,inventory:{count:()=>0},gameTime:{exportState:()=>({totalElapsed:9})},character:{},domestic:{partyPets:()=>[{kind:'dog',name:'Rek'}]}});
   assert.deepEqual(back.home.scouting.party.pets,[{kind:'dog',name:'Rek'}]);assert.ok(validScouting(back.home.scouting,{workerIds:new Set(['s0'])}));
 });
+
+test('owner 18 Nov 2026: a stray near the party tries once to join, with a chance by the best Hunting level (soldiers and the King count)', async () => {
+  const { PARTY_STRAY } = await import('../src/data/domesticAnimals.js');
+  const s=scene(),men=[s.workerSystem.create({x:40,y:40}),s.workerSystem.create({x:42,y:40})];s.zone={soldiers:men};const d=s.domestic;
+  for(const m of men){m.skills??={};m.skills.hunting={level:1};}
+  assert.equal(d.partyHuntingLevel(men),1);assert.equal(d.joinChance(men),PARTY_STRAY.base);
+  men[1].skills.hunting.level=8;assert.equal(d.partyHuntingLevel(men),8);assert.ok(Math.abs(d.joinChance(men)-(PARTY_STRAY.base+7*PARTY_STRAY.perLevel))<1e-9);
+  men[1].skills.hunting.level=50;assert.equal(d.joinChance(men),PARTY_STRAY.max);
+  const king={position:{x:0,y:0},skills:{hunting:{level:5}}};assert.equal(d.partyHuntingLevel([men[0],king]),5,'the King counts');
+  // Far away nothing happens; near the party one try decides (random .5 here).
+  men[1].skills.hunting.level=1;const dog=d.newDog({x:60.5,y:40.5,home:{x:60.5,y:40.5},state:'stray',leaveAt:d.now()+3*d.day}),cat=d.newCat({x:44.5,y:41.5,home:{x:44.5,y:41.5},state:'stray',leaveAt:d.now()+3*d.day});
+  d.partyStrays(men);assert.equal(dog.state,'stray');assert.equal(dog.partyTried,undefined,'too far: no try');
+  assert.equal(cat.state,'stray');assert.equal(cat.partyTried,true,'25 % at level 1 against a roll of .5: it would not come');
+  d.partyStrays(men);assert.equal(cat.state,'stray','one try only');assert.equal(d.joinParty(cat.id),true,'the forced join still works (tests, old saves)');
+  men[0].skills.hunting.level=9;dog.x=43.5;d.partyStrays(men);assert.equal(dog.state,'party','65 % at level 9 against .5: it comes');
+  assert.deepEqual(d.partyPets().map(p=>p.kind).sort(),['cat','dog']);
+  const home=scene();const c=home.domestic.newCat({x:40.5,y:40.5,state:'stray'});home.domestic.partyStrays([home.workerSystem.create({x:40,y:40})]);assert.equal(c.partyTried,undefined,'only on an expedition');
+});

@@ -148,6 +148,8 @@ export function updateZone(scene){
     chest.looted=true;chest.opened=true;chest.view?.setOpened?.(true);z.loot.gold+=chest.contents.gold;if(!z.taken.includes(chest.zoneKey))z.taken.push(chest.zoneKey);
     scene.eventFeed?.push?.(`zone-chest:${chest.id}`,t('zone.chest',{gold:chest.contents.gold}),{important:true});refreshBanner(scene);}}
   if(chestTakenByKing(scene))refreshBanner(scene);
+  // Owner 18 Nov 2026: a stray dog or cat near the party tries to join it (chance by the best Hunting level).
+  scene.domestic?.partyStrays?.(units);
   if(z.guards?.length&&!z.clearedSaid&&z.guards.every(a=>!a.isAlive)){z.clearedSaid=true;if(scene.zoneFeature?.kind==='bandits'){z.cleared=true;scene.eventFeed?.push?.('zone-cleared',t('zone.cleared'),{important:true});}}
   if(z.enterButton){const e=scene.zoneFeature.entrance,near=units.some(u=>Math.max(Math.abs(u.tile.x-e.x),Math.abs(u.tile.y-e.y))<=2);if(z.enterButton.disabled===near){z.enterButton.disabled=!near;z.enterButton.title=near?'':t('zone.enterMineFar');}}
   if(!units.length&&(z.soldiers.length||z.king)&&!(z.king&&!scene.character?.isAlive)){z.leaving=true;scene.eventFeed?.push?.('zone-lost',t('zone.lost'),{important:true});setTimeout(()=>scene.game.registry.get('application')?.leaveZone(),2500);}

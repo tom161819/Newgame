@@ -41,6 +41,10 @@ export const ratLevel=population=>{let level='none';for(const [id,from]of RATS.l
 // tame: 20 % + 8 % per hunting level, at most 90 %, one try per stray. Hunting with the dog: the Hunter moves 30 %
 // faster and deals 50 % more damage while the dog is close (about +30 % meat a day, see the change record); game within 8 tiles of the dog can be chosen as a target
 // (and shows as a faint outline under Fog of War). A dog at 0 HP is injured: it goes home and heals in a day.
+// Owner 18 Nov 2026: on an expedition a stray dog or cat tries to join the party by itself when one of the party comes
+// within `near` tiles – once per animal. The chance grows with the best Hunting level in the party (soldiers count,
+// the King too): base at level 1, + perLevel each level above, at most max.
+export const PARTY_STRAY=Object.freeze({near:5,base:.25,perLevel:.05,max:.9});
 export const DOGS=Object.freeze({
   maxHP:60,healDays:1,speed:2.2,followDistance:1.4,
   // Around its Hunter the dog roams irregularly within a small circle; at the hunting lodge it sits and now and then

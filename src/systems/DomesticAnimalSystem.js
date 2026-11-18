@@ -1,4 +1,4 @@
-import { RATS,CATS,DOGS,ratLevel,tameChance,HOUSE_RATS,RAT_BUILDINGS } from '../data/domesticAnimals.js';
+import { PARTY_STRAY, RATS,CATS,DOGS,ratLevel,tameChance,HOUSE_RATS,RAT_BUILDINGS } from '../data/domesticAnimals.js';
 import { FOOD_RESOURCE_IDS } from '../data/foodProduction.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { PLAYER_START,COLUMNS,ROWS } from '../game/config.js';
@@ -104,6 +104,21 @@ export class DomesticAnimalSystem {
   joinParty(id){const a=this.cats.get(id)??this.dogs.get(id);if(!a||!this.scene.zone||a.state!=='stray'||a.leaving)return false;
     a.state='party';a.leaveAt=null;a.tamerId=null;a.home=null;a.target=null;const dog=id.startsWith('dog-');
     this.feed(`pet:party:${id}`,t(dog?'pets.dog.feed.joined':'pets.feed.joined',{name:a.name}));this.changed();return true;}
+  // The best Hunting level among the party, and the chance a stray joins with it.
+  partyHuntingLevel(units){let best=1;for(const u of units??[]){const skills=(u.definition&&this.scene.skillSystem?.initialize?.(u))||u.skills;best=Math.max(best,skills?.hunting?.level??1);}return best;}
+  joinChance(units){const P=PARTY_STRAY;return Math.min(P.max,P.base+P.perLevel*(this.partyHuntingLevel(units)-1));}
+  // One try per stray: it joins the party, or it will not come (it stays a stray of the land).
+  tryJoin(id,units){
+    const a=this.cats.get(id)??this.dogs.get(id);if(!a||!this.scene.zone||a.state!=='stray'||a.leaving||a.partyTried)return false;a.partyTried=true;
+    if(this.random()<this.joinChance(units))return this.joinParty(id);
+    const dog=id.startsWith('dog-');this.feed(`pet:refused:${id}`,t(dog?'pets.dog.feed.refused':'pets.feed.refused',{name:a.name}));this.changed();return false;
+  }
+  // Called on an expedition: a stray near anyone of the party tries to join.
+  partyStrays(units){
+    if(!this.scene.zone||!units?.length)return;const r=PARTY_STRAY.near;
+    for(const a of [...this.cats.values(),...this.dogs.values()]){if(a.state!=='stray'||a.leaving||a.partyTried)continue;
+      if(units.some(u=>u.position&&Math.hypot(a.x-u.position.x,a.y-u.position.y)<=r))this.tryJoin(a.id,units);}
+  }
   partyPets(){return [...this.cats.values(),...this.dogs.values()].filter(a=>a.state==='party').map(a=>({kind:a.id.startsWith('dog-')?'dog':'cat',name:a.name}));}
   addPartyPet(pet,at){const fields={name:pet.name,x:at.x+.5,y:at.y+.5,state:'party'};return pet.kind==='dog'?this.newDog(fields):this.newCat(fields);}
   // A pet back home from the party: a stray by the arrival point that stays until it is given a home.
