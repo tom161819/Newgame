@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.144.6] - 2026-11-18
+<!-- version: {"title":"Enemy buildings on the Test map, melee attacks on walls","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- Test map: the Test panel has a "Build for" switch – Kingdom or Enemy. Buildings and walls built for the enemy are steel blue, and enemy Gates stay shut.
+- Melee soldiers can attack enemy walls, Towers, Gates and other enemy buildings. Select them and right-click the building: they surround it and hit it until it falls, and the way opens. A bar over the building shows its hit points. Archers do not shoot at stone. On the Test map "Charge" sends the melee at the nearest enemy building when no enemy soldiers are left.
+
 ## [0.144.5] - 2026-11-17
 <!-- version: {"title":"Fires easier to put out","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Balance

@@ -9,12 +9,13 @@ import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
 import { inAttackRange,isRanged,WALL_ARCHER_RANGE } from './CombatSystem.js';
 import { MILITARY_RULES,PATROL,STANCES } from '../data/military.js';
 import { freeAround,awayFrom } from '../game/combatSpacing.js';
+import { SiegeSystem } from './SiegeSystem.js';
 
 // C08: Soldiers employed in a Barracks are trained into units. Training is paid in Gold, needs the unit's real items
 // (Haulers carry them from an Armory to the Barracks kit store) and game time at the Barracks. A trained unit wears
 // its items; discharge or death drops them where the unit stands and Haulers return them to an Armory.
 export class MilitarySystem {
-  constructor(scene){this.scene=scene;this.units=new Map();this.orders=new Map();this.nextOrder=1;this.wallPatrol=new WallPatrol(scene);}
+  constructor(scene){this.scene=scene;this.units=new Map();this.orders=new Map();this.nextOrder=1;this.wallPatrol=new WallPatrol(scene);this.siege=new SiegeSystem(scene);}
   get storage(){return this.scene.foodStorage;}
   barracks(id){return this.scene.buildings.find(b=>b.id===id&&b.type==='barracks'&&buildingIsComplete(b))??null;}
   // m-zalozka-vojsko: the patrol round of the settlement – walkable waypoints on a ring around all finished buildings,
@@ -130,7 +131,7 @@ export class MilitarySystem {
     for(const w of order){
       let best=null,score=Infinity;for(const a of group){const n=load.get(a)??0;if(w.attackRange<=1&&n>=MILITARY_RULES.crowd)continue;const d=Math.hypot(a.position.x-w.position.x,a.position.y-w.position.y)+n*3+(a===enemy?-1:0);if(d<score){score=d;best=a;}}
       best??=enemy;load.set(best,(load.get(best)??0)+(w.attackRange<=1?1:0));
-      w.huntWolfId=best.id;w.attackArea={x:mid.x,y:mid.y};w.attackRadius=Math.round(radius);w.militaryRetarget=0;
+      this.siege?.stop(w);w.huntWolfId=best.id;w.attackArea={x:mid.x,y:mid.y};w.attackRadius=Math.round(radius);w.militaryRetarget=0;
     }
     return group.length;
   }
@@ -194,7 +195,7 @@ export class MilitarySystem {
     // An enemy coming close is fought without an order.
     if(!hunted&&!combat.attacks.get(worker)){const near=this.nearestEnemy(worker,stance.hold?worker.attackRange+.5:stance.engage);if(near)hunted=near;}
     const current=combat.attacks.get(worker)?.isAlive&&combat.attacks.get(worker).definition?combat.attacks.get(worker):null;
-    const target=current??(stance.hold?hunted:this.threat(worker)??hunted);if(!target)return false;
+    const target=current??(stance.hold?hunted:this.threat(worker)??hunted);if(!target)return this.siege?.update(worker,delta)??false;
     worker.workState='Working';worker.workMessage='Defending the kingdom';
     // Archers keep their distance: an enemy right next to one makes him step back (unless he holds).
     if(ranged&&!stance.hold&&!worker.nextTile&&(worker.kiteWait??0)<=0){const close=this.nearestEnemy(worker,1.6);if(close&&this.attackers(close)>0){worker.kiteWait=2500;combat.stopAttack(worker);const to=awayFrom(this.scene,worker.tile,close.tile,3);if(to.length){worker.moveTo(to);return true;}}}

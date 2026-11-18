@@ -102,6 +102,10 @@ export class UnitSelection {
         // m-vojaci-utok (point 39): a right click on an enemy (a wolf now, other enemies later) sends the selected soldiers at it.
         {const enemy=this.enemyAt(pointer),fighters=this.workers().filter(w=>w.profession==='soldier');
           if(enemy&&fighters.length){for(const w of fighters){s.workerSystem.commands.resume(w);s.military?.wallPatrol?.set(w,false);}if(s.military?.orderAttack)s.military.orderAttack(fighters,enemy);else for(const w of fighters){w.huntWolfId=enemy.id;w.militaryRetarget=0;}s.setStatus(t('army.attack',{count:fighters.length,name:enemy.definition.name}));if(this.king)s.kingOrder(pointer);this.draw();return true;}}
+        // Owner 18 Nov 2026: a right click on an enemy building (a wall, Tower, Gate or house of the enemy) sends the selected
+        // melee soldiers to break it; archers stay where they are.
+        {const siege=this.siegeAt(pointer),fighters=this.workers().filter(w=>w.profession==='soldier');
+          if(siege&&fighters.length){const n=s.military?.siege?.order(fighters,siege)??0;s.setStatus(t(n?'siege.order':'siege.noMelee',{count:n,name:buildingDefinition(siege).name}));if(this.king)s.kingOrder(pointer);this.draw();return true;}}
         // Owner 17 Nov 2026 ("I click the Tower and the soldier goes to the meadow behind it"): a Tower or a Gate stands
         // high over its tiles, so the click is matched to the building's picture (as for the King), not only to the
         // tile under the pointer.
@@ -163,9 +167,10 @@ export class UnitSelection {
   // The King's picture as a click target (his view is a container; a little room around it helps on small zoom).
   onKing(x,y){const b=this.scene.player?.getBounds?.();return !!b&&this.scene.character.state==='ground'&&x>=b.x-6&&x<=b.x+b.width+6&&y>=b.y-24&&y<=b.y+b.height+4;}
   // An enemy under the pointer that soldiers may be sent at.
+  siegeAt(pointer){const s=this.scene;if(!s.military?.siege)return null;pointer.updateWorldPoint(s.cameras.main);return s.military.siege.at(pointer.worldX,pointer.worldY,s.pointerTile(pointer));}
   enemyAt(pointer){const s=this.scene;pointer.updateWorldPoint(s.cameras.main);const a=s.animalSystem?.atPoint(pointer.worldX,pointer.worldY);return a&&a.isAlive&&isEnemy(a)&&s.fog.isVisibleObject(a)?a:null;}
   // The pointer turns into crossed swords over an enemy while soldiers are selected.
-  hover(pointer){const s=this.scene,canvas=s.game.canvas;if(s.buildMode||s.rockMiningTool?.enabled)return;const attack=this.ids.size>0&&this.workers().some(w=>w.profession==='soldier')&&!!this.enemyAt(pointer);
+  hover(pointer){const s=this.scene,canvas=s.game.canvas;if(s.buildMode||s.rockMiningTool?.enabled)return;const attack=this.ids.size>0&&this.workers().some(w=>w.profession==='soldier')&&(!!this.enemyAt(pointer)||!!this.siegeAt(pointer));
     if(attack!==this.attackCursor){this.attackCursor=attack;canvas.style.cursor=attack?ATTACK_CURSOR:'';}}
   // Owner 16 Nov 2026: the bar sits above the build bar at the bottom of the screen, never behind it.
   placeAboveBar(doc=globalThis.document){

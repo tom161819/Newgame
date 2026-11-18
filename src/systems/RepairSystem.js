@@ -17,7 +17,7 @@ const field=record=>record?.kind==='upgrade'?'upgrade':'repair';
 export class RepairSystem {
   constructor(scene){this.scene=scene;this.jobs=new Map();this.checkIn=0;}
   target(id){return this.scene.buildings.find(b=>b.id===id);}
-  damaged(b){const s=buildingHP(b);return !!s&&s.hp<s.max;}
+  damaged(b){if(b?.enemy)return false;const s=buildingHP(b);return !!s&&s.hp<s.max;}
   eligible(b){return !!b&&this.scene.buildings.includes(b)&&buildingIsComplete(b)&&!b.upgrade&&!b.demolition&&!b.unverified&&!this.scene.nightThreats?.burning?.(b)&&this.damaged(b);}
   // Orders a repair when the stores can pay; returns the job or null.
   request(b){

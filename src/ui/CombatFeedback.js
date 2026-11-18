@@ -67,7 +67,7 @@ export class CombatFeedback {
     s.player.setAttackPose?.(delta,attacking,direction);
     // Enemy soldiers (animal definitions drawn as people) strike and face their target too.
     for(const a of s.animalSystem?.animals?.values()??[]){if(!a.definition?.look||!a.view?.setAttackPose)continue;const target=s.combat.attacks.get(a),active=!!target&&inAttackRange(a,target,s.map);a.view.setAttackPose(delta,active,target?{x:target.position.x-a.position.x,y:target.position.y-a.position.y}:a.direction);}
-    for(const worker of s.workerSystem?.liveWorkers()??[]){const target=s.combat.attacks.get(worker),active=!!target&&s.combat.canFight(worker)&&inAttackRange(worker,target,s.map);worker.view.setAttackPose?.(delta,active,target?{x:target.position.x-worker.position.x,y:target.position.y-worker.position.y}:worker.direction);}
+    for(const worker of s.workerSystem?.liveWorkers()??[]){const target=s.combat.attacks.get(worker),siege=!target&&worker.siegeTargetId!=null?worker.siegeHit:null,active=!!target&&s.combat.canFight(worker)&&inAttackRange(worker,target,s.map)||!!siege;worker.view.setAttackPose?.(delta,active,target?{x:target.position.x-worker.position.x,y:target.position.y-worker.position.y}:siege??worker.direction);}
   }
   refresh(){
     const s=this.scene,king=s.character,output=document.querySelector('#king-health');
