@@ -42,7 +42,14 @@ test('g-nasadit-prirodu: rocks, shrubs and crop tiles pick packed frames for eve
     for(const type of ['bush_meadow','bush_berry','bush_flowering'])for(let i=0;i<10;i++)assert.ok(natureFrame(bushLook(type,i,7,season)),`${type} ${season}`);
     for(const type of ['wheat_field','orchard'])for(const stage of [0,1,2,3])assert.ok(natureFrame(cropLook(type,stage,season,{x:stage,y:5})),`${type} ${stage} ${season}`);
   }
-  assert.equal(bushLook('bush_scrub',1,1,'Summer'),null,'the desert scrub keeps its art');
+  // Owner 18 Nov 2026: Blender bushes – one model and view per tile the whole year, the tile's season; the desert scrub too.
+  for(const type of ['bush_meadow','bush_berry','bush_flowering','bush_scrub'])for(let i=0;i<10;i++){
+    const looks=['Spring','Summer','Autumn','Winter'].map(season=>bushLook(type,i,4,season));
+    for(const [k,look] of looks.entries())assert.match(look,new RegExp(`-${['spring','summer','autumn','winter'][k]}-(000|090|180|270)$`),type);
+    assert.equal(new Set(looks.map(l=>l.replace(/-(spring|summer|autumn|winter)-/,'-'))).size,1,'same model and view all year');
+  }
+  assert.match(bushLook('bush_scrub',1,1,'Summer'),/^bush-scrub-summer-/);
+  for(let i=0;i<40;i++)assert.match(bushLook('bush_berry',i,2,'Summer'),/^(shrubs-(rosehip|bramble)-[123]|bush-berry)-/);
   assert.equal(cropLook('wheat_field',3,'Summer',{x:0,y:0}).startsWith('wheat-field-tile-ripe'),true);
   assert.equal(cropLook('orchard',0,'Winter',{x:0,y:0}).startsWith('orchard-tree-winter'),true);
 });
@@ -72,8 +79,12 @@ test('velke-prirodni-objekty: every approved thicket, ridge, 2 × 2 rock and 3 �
 test('velke-prirodni-objekty: thickets are hazel or bramble in spring and summer, autumn and winter looks; rock groups and large deposits by season and fill', () => {
   for(const [w,h] of NATURE_GROUP_SIZES.thicket){
     const tiles=w*h,hazel=Array(tiles).fill('bush_meadow'),bramble=Array(tiles).fill('bush_berry');
-    for(const season of ['Spring','Summer']){assert.equal(thicketLook({w,h},hazel,season),`thicket-${w}x${h}-hazel`);assert.equal(thicketLook({w,h},bramble,season),`thicket-${w}x${h}-bramble`);}
-    assert.equal(thicketLook({w,h},hazel,'Autumn'),`thicket-${w}x${h}-autumn`);assert.equal(thicketLook({w,h},bramble,'Winter'),`thicket-${w}x${h}-winter`);
+    // Owner 18 Nov 2026: the Blender thickets, by kind and season; a long thicket only in views 000 and 180.
+    for(const season of ['Spring','Summer','Autumn','Winter'])for(let i=0;i<8;i++){
+      const s=season.toLowerCase(),a=thicketLook({x:i,y:3,w,h},hazel,season),b=thicketLook({x:i,y:3,w,h},bramble,season),m=thicketLook({x:i,y:3,w,h},[...hazel.slice(1),'bush_berry'],season);
+      assert.match(a,new RegExp(`^thicket-${w}x${h}-hazel-${s}-(000|090|180|270)$`));assert.match(b,new RegExp(`^thicket-${w}x${h}-bramble-${s}-`));if(tiles>2)assert.match(m,new RegExp(`^thicket-${w}x${h}-mixed-${s}-`));
+      if(w!==h)assert.match(a,/-(000|180)$/);assert.ok(natureFrame(a)&&natureFrame(b)&&natureFrame(m));
+    }
   }
   for(const season of ['Spring','Summer','Autumn','Winter'])for(let i=0;i<12;i++){
     const ridge=rockGroupLook({x:i,y:i*7,w:4,h:2},season),obstacle=rockGroupLook({x:i*3,y:i,w:2,h:2},season);
@@ -89,4 +100,18 @@ test('velke-prirodni-objekty: thickets are hazel or bramble in spring and summer
   assert.match(depositLook({type:'iron_deposit_large',id:'d',remaining:100,max:240}),/^iron-deposit-medium-red-/);
   for(const remaining of [300,150,30,0])for(const season of ['Spring','Summer','Autumn','Winter'])for(const type of ['stone_deposit_large','iron_deposit_large'])
     assert.ok(natureFrame(depositLook({type,id:`d${remaining}`,remaining,max:300,season})),`${type} ${remaining} ${season}`);
+});
+
+test('owner 18 Nov 2026: the Blender bush atlas holds 28 models x 4 seasons x 4 views, each frame a copy of its render', async () => {
+  const { BUSH_ATLAS }=await import('../src/data/bushArt.js');
+  const names=Object.keys(BUSH_ATLAS.frames);assert.equal(names.length,448);
+  const atlas=decodePng(readFileSync(new URL('../public/assets/nature/bush-atlas.v1.png',import.meta.url)));
+  assert.equal(atlas.width,BUSH_ATLAS.width);assert.equal(atlas.height,BUSH_ATLAS.height);
+  for(const name of ['shrubs-hazel-2-summer-090','thicket-3x2-mixed-winter-180','bush-scrub-autumn-270']){
+    const f=BUSH_ATLAS.frames[name],m=/^(.*)-(spring|summer|autumn|winter)-(\d{3})$/.exec(name);
+    const png=decodePng(readFileSync(new URL(`../art/sprites/bush-renders/${m[1]}/${m[2]}-${m[3]}.png`,import.meta.url)));
+    assert.equal(png.width,f.w);assert.equal(png.height,f.h);
+    for(let y=0;y<f.h;y+=3)for(let x=0;x<f.w;x+=3)for(let c=0;c<4;c++)assert.equal(atlas.data[((f.y+y)*atlas.width+f.x+x)*4+c],png.data[(y*f.w+x)*4+c],name);
+    assert.ok(f.origin.x>0&&f.origin.x<1&&f.origin.y>0&&f.origin.y<=1);
+  }
 });

@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.144.6] - 2026-11-18
+<!-- version: {"title":"Blender bushes and thickets","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Changed
+- Bushes and thickets use the owner's new Blender models: five shrub species in three shapes, four decoration bushes and hazel, bramble and mixed thickets. Each has its own look in spring, summer, autumn and winter and is seen from one of four sides, so bushes no longer all look the same.
+
 ## [0.144.5] - 2026-11-17
 <!-- version: {"title":"Fires easier to put out","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Balance
