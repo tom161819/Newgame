@@ -4,6 +4,9 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+
+## [0.145.1] - 2026-11-18
+<!-- version: {"title":"Blender bushes and thickets","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Changed
 - Bushes and thickets use the owner's new Blender models: five shrub species in three shapes, four decoration bushes and hazel, bramble and mixed thickets. Each has its own look in spring, summer, autumn and winter and is seen from one of four sides, so bushes no longer all look the same.
 
