@@ -4,7 +4,8 @@ import { setupZone,updateZone,zoneLook } from './zoneMode.js';
 import { createDungeonView } from './DungeonView.js';
 import { BattleMarks } from '../systems/BattleMarks.js';
 import { TorchFlames } from './TorchFlames.js';
-import { setupSandbox,placeSandboxBuilding,sandboxLand } from './sandboxMode.js';
+import { setupSandbox,placeSandboxBuilding,sandboxLand,sandboxBuilt } from './sandboxMode.js';
+import { ENEMY_TINT } from '../systems/SiegeSystem.js';
 import { WorldPanel } from '../ui/WorldPanel.js';
 import { ScoutingSystem } from '../systems/ScoutingSystem.js';
 import { castleRules } from '../data/castle.js';
@@ -797,7 +798,7 @@ export class GameScene extends Phaser.Scene {
     const result=placeWallLine(options);
     this.dragAnchor=null;
     if(result.error){this.wallLastLine=tiles;this.previewTracking=false;this.previewKey=null;this.updateBuildingPreview();return;}
-    for(const building of result.buildings){if(!this.sandbox)this.constructionSystem.plan(building);this.towerViews.set(building.id,this.createBuildingView(this.selectedBuilding,building));if(building.unverified)this.rememberBlueprint(building);}
+    for(const building of result.buildings){if(!this.sandbox)this.constructionSystem.plan(building);this.towerViews.set(building.id,this.createBuildingView(this.selectedBuilding,building));if(this.sandbox)sandboxBuilt(this,building);if(building.unverified)this.rememberBlueprint(building);}
     this.refreshWallConnections();this.updateInventory();if(this.sandbox)this.events.emit('buildings:changed');
     const message=t('status.wallBlueprints',{count:result.buildings.length,cost:formatCost(result.cost,this.objectRegistry)});
     // m-staveni-zdi-studna (59): the wall tool stays selected for the next line (Esc, right click or another building ends it).
@@ -808,7 +809,7 @@ export class GameScene extends Phaser.Scene {
     this.wallMap=wallIndex(this.buildings);
     for(const building of this.wallMap.values()){
       const connections=connectionsFor(this.wallMap,building),key=JSON.stringify(connections);
-      if(key!==building.connectionKey){building.connections=connections;building.connectionKey=key;this.towerViews.get(building.id)?.paint(building);}
+      if(key!==building.connectionKey){building.connections=connections;building.connectionKey=key;this.towerViews.get(building.id)?.paint(building,building.enemy?ENEMY_TINT:null);}
     }
   }
   showMarker(tile) { this.marker.clear().lineStyle(2,0xe3c879,1).strokePoints(tilePolygon(tile),true).setVisible(true); }

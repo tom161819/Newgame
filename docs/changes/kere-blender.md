@@ -1,4 +1,4 @@
-# The owner's Blender bushes and thickets (0.144.6)
+# The owner's Blender bushes and thickets (0.145.1)
 
 ## What and why
 Owner 17 Nov 2026: "keře by měli být schválený můžeš je nasadit?" – the bushes and thickets from Blender were approved in the Asset Studio (the `*-views` variants, Grafika bundle 0250). That bundle could not be read here (one 4.6 MB line), so the owner sent the render pack again on 18 Nov ("keře jsou zde", `Medieval_Kingdom_Kere_a_houstiny.zip`): 28 models × 4 seasons × 4 views.

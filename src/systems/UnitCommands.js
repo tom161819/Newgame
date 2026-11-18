@@ -18,7 +18,7 @@ export class UnitCommands {
   owns(worker){return !!worker?.isAlive&&worker.isSubject!==false&&this.system.workers.get(worker.id)===worker&&!worker.leaving;}
   selectable(worker){return this.owns(worker)&&worker.sleepingIn==null&&this.scene.fog.isVisibleObject(worker);}
   interrupt(worker){
-    this.system.ai.cancel(worker);worker.manualRockId=null;worker.arriving=false;worker.commandRetry=0;worker.commandWait=0;
+    this.system.ai.cancel(worker);worker.manualRockId=null;delete worker.siegeTargetId;worker.arriving=false;worker.commandRetry=0;worker.commandWait=0;
     // Complete the already reserved half-step; never snap a moving cargo owner.
     worker.path=[];worker.workplaceReached=false;
   }
@@ -110,6 +110,7 @@ export class UnitCommands {
         else{worker.commandRetry=(worker.commandRetry??0)+1;worker.commandWait=1000;const route=findPathToAny(this.navigation(worker),worker.tile,[command.goal]);if(route)worker.path=route.path;}
       }
     }
+    if(command.state==='Holding'&&worker.profession==='soldier')this.scene.military?.holding?.(worker,delta);
     const before=tileKey(worker.tile);worker.update(delta);if(before!==tileKey(worker.tile))worker.commandRetry=0;return true;
   }
 }

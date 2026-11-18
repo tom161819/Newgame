@@ -9,12 +9,14 @@ import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
 import { inAttackRange,isRanged,WALL_ARCHER_RANGE } from './CombatSystem.js';
 import { MILITARY_RULES,PATROL,STANCES } from '../data/military.js';
 import { freeAround,awayFrom } from '../game/combatSpacing.js';
+import { SiegeSystem } from './SiegeSystem.js';
+import { SiegeEngines } from './SiegeEngines.js';
 
 // C08: Soldiers employed in a Barracks are trained into units. Training is paid in Gold, needs the unit's real items
 // (Haulers carry them from an Armory to the Barracks kit store) and game time at the Barracks. A trained unit wears
 // its items; discharge or death drops them where the unit stands and Haulers return them to an Armory.
 export class MilitarySystem {
-  constructor(scene){this.scene=scene;this.units=new Map();this.orders=new Map();this.nextOrder=1;this.wallPatrol=new WallPatrol(scene);}
+  constructor(scene){this.scene=scene;this.units=new Map();this.orders=new Map();this.nextOrder=1;this.wallPatrol=new WallPatrol(scene);this.siege=new SiegeSystem(scene);this.engines=new SiegeEngines(scene);}
   get storage(){return this.scene.foodStorage;}
   barracks(id){return this.scene.buildings.find(b=>b.id===id&&b.type==='barracks'&&buildingIsComplete(b))??null;}
   // m-zalozka-vojsko: the patrol round of the settlement – walkable waypoints on a ring around all finished buildings,
@@ -47,6 +49,7 @@ export class MilitarySystem {
   blocker(worker,type){
     const spec=UNIT_TYPES[type];if(!spec)return 'unknown';
     if(spec.mount==='horse'&&!this.scene.stables?.freeHorse())return 'horse';
+    if(spec.vehicle&&!this.engines.free(spec.vehicle))return `vehicle_${spec.vehicle}`;
     if(this.unit(worker))return 'trained';
     if(!this.isRecruit(worker)||!this.barracks(worker.assignedWorkplaceId))return 'notSoldier';if(this.order(worker))return 'training';
     if((worker.skills.combat?.level??1)<spec.requiredCombatLevel)return 'skill';
@@ -58,7 +61,8 @@ export class MilitarySystem {
   supplyBlocker(type){
     const spec=UNIT_TYPES[type];if(!spec)return 'unknown';
     if(spec.mount==='horse'&&!this.scene.stables?.freeHorse())return 'horse';
-    if(!this.scene.buildings.some(b=>b.type==='armory'&&buildingIsComplete(b)))return 'armory';
+    if(spec.vehicle&&!this.engines.free(spec.vehicle))return `vehicle_${spec.vehicle}`;
+    if(Object.keys(unitKit(type)).length&&!this.scene.buildings.some(b=>b.type==='armory'&&buildingIsComplete(b)))return 'armory';
     if(Object.keys(this.kitShortage(type)).length)return 'kit';
     if(this.scene.inventory.count('gold')<spec.goldCost)return 'gold';
     return null;
@@ -88,10 +92,11 @@ export class MilitarySystem {
     if(!this.scene.inventory.spend('gold',spec.goldCost,{source:'Military Training',id:`military-training:${id}`,entityId:worker.id}))return 'gold';
     this.orders.set(id,{id,workerId:worker.id,barracksId:worker.assignedWorkplaceId,type,state:'supplying',workDone:0,required:spec.trainingTime,items:{}});
     if(spec.mount==='horse')this.scene.stables.reserveHorse(worker.id);
+    if(spec.vehicle&&!this.engines.reserve(worker,spec.vehicle)){this.cancel(id);return `vehicle_${spec.vehicle}`;}
     this.scene.updateInventory?.();return null;
   }
   cancel(orderId){
-    const order=this.orders.get(orderId);if(!order)return false;this.orders.delete(orderId);if(UNIT_TYPES[order.type].mount)this.scene.stables?.returnHorse(order.workerId);
+    const order=this.orders.get(orderId);if(!order)return false;this.orders.delete(orderId);if(UNIT_TYPES[order.type].mount)this.scene.stables?.returnHorse(order.workerId);if(UNIT_TYPES[order.type].vehicle){const w=this.scene.workerSystem.workers.get(order.workerId);if(w)this.engines.release(w);}
     const kit=`kit-${order.barracksId}`;for(const[id,n]of Object.entries(order.items))if(!this.storage.deposit(kit,id,n))this.storage.spill(id,n,this.tileOf(order.barracksId));
     this.scene.inventory.add('gold',UNIT_TYPES[order.type].goldCost,{source:'Military Training Refund',type:'refund',id:`military-refund:${order.id}`,entityId:order.workerId});
     this.scene.updateInventory?.();return true;
@@ -99,15 +104,16 @@ export class MilitarySystem {
   tileOf(barracksId){const b=this.barracks(barracksId)??this.scene.buildings.find(b=>b.id===barracksId);return b?{x:b.x-1,y:b.y}:this.scene.character.tile;}
   // A trained unit wears its type's modifiers and items; a Recruit the RECRUIT modifiers; anyone else neither.
   apply(worker){
-    const unit=this.unit(worker);if(!unit){delete worker.statModifiers.militaryEquipment;if(this.isRecruit(worker))worker.statModifiers.military={...RECRUIT.modifiers};else delete worker.statModifiers.military;recalculateStats(worker);if(worker.definition?.gameplay?.movementSpeed)worker.speed=worker.definition.gameplay.movementSpeed;return;}
+    const unit=this.unit(worker);if(!unit){delete worker.crew;delete worker.statModifiers.militaryEquipment;if(this.isRecruit(worker))worker.statModifiers.military={...RECRUIT.modifiers};else delete worker.statModifiers.military;recalculateStats(worker);if(worker.definition?.gameplay?.movementSpeed)worker.speed=worker.definition.gameplay.movementSpeed;return;}
     const items={};for(const id of Object.values(unit.equipment)){const item=MILITARY_ITEMS[id],mods=item.modifiers??this.scene.objectRegistry.require(item.modifiersFrom).equipment.modifiers;for(const[k,v]of Object.entries(mods))items[k]=(items[k]??0)+v;}
     worker.statModifiers.militaryEquipment=items;worker.statModifiers.military={...UNIT_TYPES[unit.type].modifiers};recalculateStats(worker);
-    worker.speed=(worker.definition?.gameplay?.movementSpeed??worker.speed)*(UNIT_TYPES[unit.type].mount?KNIGHT_SPEED:1);
+    worker.speed=(worker.definition?.gameplay?.movementSpeed??worker.speed)*(UNIT_TYPES[unit.type].mount?KNIGHT_SPEED:1)*(UNIT_TYPES[unit.type].speedFactor??1);worker.crew=!!UNIT_TYPES[unit.type].vehicle;
   }
   // Discharge or death: the unit's items fall where it stands; Haulers carry them back to an Armory.
   release(worker,{dead=false}={}){
     const unit=this.unit(worker);const order=this.order(worker);if(order)this.cancel(order.id);if(!unit)return false;
     if(UNIT_TYPES[unit.type].mount)this.scene.stables?.returnHorse(worker.id,worker.tile);
+    if(UNIT_TYPES[unit.type].vehicle)this.engines.release(worker);
     this.units.delete(worker.id);const at=this.scene.gameTime?.totalElapsed??0;
     for(const[slot,id]of Object.entries(unit.equipment)){this.storage.spill(id,1,worker.tile);this.scene.resourceLedger?.income(id,1,'Recovered Equipment',{id:`military-return:${worker.id}:${slot}:${at}`,entityId:worker.id});}
     if(!dead)this.apply(worker);else{delete worker.statModifiers.military;delete worker.statModifiers.militaryEquipment;}
@@ -130,7 +136,7 @@ export class MilitarySystem {
     for(const w of order){
       let best=null,score=Infinity;for(const a of group){const n=load.get(a)??0;if(w.attackRange<=1&&n>=MILITARY_RULES.crowd)continue;const d=Math.hypot(a.position.x-w.position.x,a.position.y-w.position.y)+n*3+(a===enemy?-1:0);if(d<score){score=d;best=a;}}
       best??=enemy;load.set(best,(load.get(best)??0)+(w.attackRange<=1?1:0));
-      w.huntWolfId=best.id;w.attackArea={x:mid.x,y:mid.y};w.attackRadius=Math.round(radius);w.militaryRetarget=0;
+      this.siege?.stop(w);w.huntWolfId=best.id;w.attackArea={x:mid.x,y:mid.y};w.attackRadius=Math.round(radius);w.militaryRetarget=0;
     }
     return group.length;
   }
@@ -146,11 +152,20 @@ export class MilitarySystem {
     }
     return best;
   }
+  // Owner 18 Nov 2026: a soldier standing where he was sent (Holding): a Catapult crew bombards what is in range and a
+  // Wagon supplies, without moving; a melee soldier with an enemy building close and no enemy soldier near goes at it.
+  holding(worker,delta){
+    const unit=this.unit(worker);if(unit&&UNIT_TYPES[unit.type]?.vehicle){this.engines.update(worker,delta,{move:false});return;}
+    if(worker.stance==='hold'||this.nearestEnemy(worker,(STANCES[worker.stance]??STANCES.aggressive).engage))return;
+    const b=this.siege.near(worker);if(b)this.siege.order([worker],b);
+  }
   // Soldier behaviour on top of patrolling. Returns true when it took over this frame.
   updateSoldier(worker,delta){
     const order=this.order(worker),combat=this.scene.combat,unit=this.unit(worker);
     if(order?.state==='training'){combat.stopAttack(worker);worker.workState='Working';worker.workMessage='Training';
       if(!this.scene.workplaceSystem.atWorkplace(worker)&&!worker.nextTile&&!worker.path.length&&worker.aiCooldown<=0){worker.aiCooldown=1000;worker.moveTo(this.scene.workplaceSystem.goals(worker));}return true;}
+    // Owner 18 Nov 2026: a Catapult crew or a Military Wagon never fights; it bombards or supplies (SiegeEngines).
+    if(unit&&UNIT_TYPES[unit.type]?.vehicle){combat.stopAttack(worker);return this.engines.update(worker,delta);}
     // m-mapa-kraje: a scouting party walks to the map edge.
     if(worker.scoutZone!=null&&this.scene.scouting?.updateSoldier(worker))return true;
     // m-karavana-vyslat: escorts walk to the Marketplace while the caravan gathers.
@@ -194,7 +209,7 @@ export class MilitarySystem {
     // An enemy coming close is fought without an order.
     if(!hunted&&!combat.attacks.get(worker)){const near=this.nearestEnemy(worker,stance.hold?worker.attackRange+.5:stance.engage);if(near)hunted=near;}
     const current=combat.attacks.get(worker)?.isAlive&&combat.attacks.get(worker).definition?combat.attacks.get(worker):null;
-    const target=current??(stance.hold?hunted:this.threat(worker)??hunted);if(!target)return false;
+    const target=current??(stance.hold?hunted:this.threat(worker)??hunted);if(!target)return this.siege?.update(worker,delta)??false;
     worker.workState='Working';worker.workMessage='Defending the kingdom';
     // Archers keep their distance: an enemy right next to one makes him step back (unless he holds).
     if(ranged&&!stance.hold&&!worker.nextTile&&(worker.kiteWait??0)<=0){const close=this.nearestEnemy(worker,1.6);if(close&&this.attackers(close)>0){worker.kiteWait=2500;combat.stopAttack(worker);const to=awayFrom(this.scene,worker.tile,close.tile,3);if(to.length){worker.moveTo(to);return true;}}}
@@ -238,7 +253,7 @@ export class MilitarySystem {
     for(const order of [...this.orders.values()].sort((a,b)=>a.id-b.id)){
       const worker=this.scene.workerSystem.workers.get(order.workerId);
       if(!worker?.isAlive||worker.assignedWorkplaceId!==order.barracksId||!this.barracks(order.barracksId)){this.cancel(order.id);continue;}
-      if(order.state==='supplying'){const kit=unitKit(order.type);if(this.storage.withdrawBatch(`kit-${order.barracksId}`,kit)){order.items=kit;order.state='training';}else continue;}
+      if(order.state==='supplying'){const kit=unitKit(order.type);if(!Object.keys(kit).length||this.storage.withdrawBatch(`kit-${order.barracksId}`,kit)){order.items=kit;order.state='training';}else continue;}
       if(!this.scene.workplaceSystem.atWorkplace(worker))continue;
       order.workDone=Math.min(order.required,order.workDone+Math.max(0,delta)*(this.scene.workplaceSystem.workFactor?.(worker)??1));
       if(order.workDone>=order.required)this.finish(order,worker);

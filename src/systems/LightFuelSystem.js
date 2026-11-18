@@ -65,6 +65,8 @@ export class LightFuelSystem {
   // One torch: from the nearest store with one, or on an expedition from the wagon's load.
   takeTorch(w,day){
     const storage=this.storage,zone=this.scene.zone;
+    // Owner 18 Nov 2026: a Military Wagon nearby hands out its Torches first.
+    if(this.scene.military?.engines?.torch?.(w)){this.handDay.set(w.id,day);return true;}
     const stores=storage?[...storage.locations.values()].filter(l=>storage.isStock(l)&&storage.free(l.id,'torch')>0).sort((a,b)=>Math.hypot(a.x-w.position.x,a.y-w.position.y)-Math.hypot(b.x-w.position.x,b.y-w.position.y)):[];
     if(stores.length&&storage.withdraw(stores[0].id,'torch',1)){this.scene.resourceLedger?.expense('torch',1,'Hand Torch',{id:`hand:${w.id}:${day}`,entityId:w.id});this.handDay.set(w.id,day);return true;}
     if(zone?.cargo?.torch>0){zone.cargo.torch--;if(!zone.cargo.torch)delete zone.cargo.torch;this.handDay.set(w.id,day);return true;}

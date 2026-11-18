@@ -18,7 +18,7 @@ test('Test map: units are put on free tiles around the click',()=>{
 
 test('owner 17 Nov 2026: all four of our ranks on the Test map (the Knight on foot), and the same four as enemies',async()=>{
   const { spawnSandboxUnits }=await import('../src/game/sandboxMode.js');const { workerScene }=await import('./helpers/workerScene.js');
-  assert.deepEqual(SANDBOX_UNITS.filter(u=>u.group==='ours').map(u=>u.unit),['soldier','archer','swordsman','knight','halberdier','royal_archer','crossbowman','light_cavalry']);
+  assert.deepEqual(SANDBOX_UNITS.filter(u=>u.group==='ours').map(u=>u.unit),['soldier','archer','swordsman','knight','halberdier','royal_archer','crossbowman','light_cavalry','catapult','military_wagon']);
   for(const rank of ['soldier','archer','swordsman','knight'])assert.ok(SANDBOX_UNITS.some(u=>u.group==='foes'&&u.id===`enemy_${rank}`),rank);
   const s=workerScene(undefined,{foodProduction:true});assert.equal(spawnSandboxUnits(s,'knight',{x:60,y:60},2),2);
   const knights=s.workerSystem.liveWorkers().filter(w=>s.military.unit(w)?.type==='knight');assert.equal(knights.length,2);

@@ -27,7 +27,7 @@ function kingdom(items={sword:4,bow:2,armor:2,light_armor:2}){
 const armoryStock=(s,armory)=>s.foodStorage.locations.get(`armory-${armory.id}`).stock;
 
 test('unit types from central data: Soldier and Swordsman differ, the Archer shoots from range, the Knight fights on foot and Light Cavalry needs a horse from the Stables',()=>{
-  assert.deepEqual(UNIT_TYPE_IDS,['soldier','swordsman','archer','knight','halberdier','royal_archer','crossbowman','light_cavalry']);
+  assert.deepEqual(UNIT_TYPE_IDS,['soldier','swordsman','archer','knight','halberdier','royal_archer','crossbowman','light_cavalry','catapult','military_wagon']);
   const {soldier:a,swordsman:b,archer:c,knight:k,light_cavalry:l}=UNIT_TYPES;
   assert.deepEqual([a.equipment,b.equipment,c.equipment,k.equipment],[{weapon:'sword'},{weapon:'sword',armor:'light_armor'},{weapon:'bow'},{weapon:'sword',armor:'armor'}]);
   assert.ok(b.modifiers.maxHP>a.modifiers.maxHP&&b.modifiers.armor>0&&b.trainingTime>a.trainingTime&&b.goldCost>a.goldCost&&b.requiredCombatLevel>a.requiredCombatLevel,'the Swordsman is the stronger, dearer infantry');

@@ -155,7 +155,7 @@ test('86: StorePreview shows the building tooltip after the delay and keeps the 
 });
 
 test('86/82: nightSpeedTip needs no SAVE_VERSION bump (64 since the building move); nightSpeedTip is optional, strictly validated, and round-trips',()=>{
-  assert.equal(SAVE_VERSION,64);
+  assert.equal(SAVE_VERSION,65);
   const {s}=world();s.nightSpeedUp=new NightSpeedUp(s,{read:()=>1,save:()=>{},tip:null});
   const plain=serializeGameState(s);assert.equal(Object.hasOwn(plain,'nightSpeedTip'),false,'absent until shown');validateGameState(plain);
   s.nightSpeedUp.tipShown=true;const shown=serializeGameState(s);assert.equal(shown.nightSpeedTip,true);validateGameState(shown);
