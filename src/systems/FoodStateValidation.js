@@ -85,7 +85,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   // p70: the weapon workshops gained a recipe choice without a save bump; their older records name no recipe (the first).
   const LATER_CHOICE=new Set(['swordsmith','bowyer','armorer']);
   for(const r of production.records){
-    const b=producers.find(b=>b.id===r.buildingId);check(b&&!records.has(b.id));records.set(b.id,r);check(typeof r.auto==='boolean');integer(r.nextCycle,1);integer(r.completed,0,r.nextCycle-1);
+    const b=producers.find(b=>b.id===r.buildingId);check(b&&!records.has(b.id));records.set(b.id,r);check(typeof r.auto==='boolean');if(r.stockLimit!==undefined)integer(r.stockLimit,0,9999);integer(r.nextCycle,1);integer(r.completed,0,r.nextCycle-1);
     check(r.nextCycle===1+r.completed+(r.cycle?1:0));
     // S12: a workshop with recipe choices keeps the chosen one; a running batch keeps the recipe it started with.
     const d=definitionFor(b,registry);if(d.recipes){check(r.recipe===undefined&&LATER_CHOICE.has(b.type)||Object.hasOwn(d.recipes,r.recipe));if(r.cycle)check(r.cycle.recipe===undefined&&LATER_CHOICE.has(b.type)||Object.hasOwn(d.recipes,r.cycle.recipe));}else check(r.recipe===undefined&&r.cycle?.recipe===undefined);

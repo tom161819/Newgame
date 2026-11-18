@@ -110,6 +110,7 @@ export class UnitCommands {
         else{worker.commandRetry=(worker.commandRetry??0)+1;worker.commandWait=1000;const route=findPathToAny(this.navigation(worker),worker.tile,[command.goal]);if(route)worker.path=route.path;}
       }
     }
+    if(command.state==='Holding'&&worker.profession==='soldier')this.scene.military?.holding?.(worker,delta);
     const before=tileKey(worker.tile);worker.update(delta);if(before!==tileKey(worker.tile))worker.commandRetry=0;return true;
   }
 }

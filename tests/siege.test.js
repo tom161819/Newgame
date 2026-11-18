@@ -31,7 +31,7 @@ test('owner 18 Nov 2026: melee soldiers walk to an enemy wall, hit it down and t
   assert.equal(s.military.siege.order(soldiers,target),4,'only the four swordsmen go');assert.equal(archer.siegeTargetId,undefined);
   let t=0,hit=false;while(t<120000&&s.buildings.includes(target)){s.tick(50);t+=50;if((buildingHP(target)?.hp??0)<200)hit=true;}
   assert.ok(hit,'the wall lost hit points');assert.equal(s.buildings.includes(target),false,'the wall fell');assert.equal(s.map[50][61],0,'its tile is walkable again');
-  assert.ok(soldiers.filter(canSiege).every(w=>w.siegeTargetId==null),'the order ends with the wall');assert.ok(s.buildings.includes(walls[0])&&s.buildings.includes(walls[2]),'the neighbours stand');
+  assert.ok(soldiers.filter(canSiege).every(w=>w.siegeTargetId==null||walls.some(x=>x.id===w.siegeTargetId&&s.buildings.includes(x))),'with the wall down they go on at the enemy walls beside it by themselves');assert.ok(s.buildings.includes(walls[0])&&s.buildings.includes(walls[2]),'the neighbours stand');
 });
 
 test('owner 18 Nov 2026: a move order ends the attack on a wall',()=>{

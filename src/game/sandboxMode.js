@@ -19,7 +19,7 @@ export function sandboxSettings(landId='home'){
   return gameSettings({...DEFAULT_GAME_SETTINGS,worldCode:land?zoneWorldCode(seed,`sandbox-${Date.now()}`,land.type,{dungeon:land.dungeon}):seed,...(land?{mapSize:100}:{}),fogOfWar:false,nightWolves:false,nightThieves:false,nightFires:false,startingGarrison:false,startingCastle:!land});
 }
 export const SANDBOX_UNITS=Object.freeze([
-  {group:'ours',id:'soldier',unit:'soldier'},{group:'ours',id:'archer',unit:'archer'},{group:'ours',id:'swordsman',unit:'swordsman'},{group:'ours',id:'knight',unit:'knight'},{group:'ours',id:'halberdier',unit:'halberdier'},{group:'ours',id:'royal_archer',unit:'royal_archer'},{group:'ours',id:'crossbowman',unit:'crossbowman'},{group:'ours',id:'light_cavalry',unit:'light_cavalry'},
+  {group:'ours',id:'soldier',unit:'soldier'},{group:'ours',id:'archer',unit:'archer'},{group:'ours',id:'swordsman',unit:'swordsman'},{group:'ours',id:'knight',unit:'knight'},{group:'ours',id:'halberdier',unit:'halberdier'},{group:'ours',id:'royal_archer',unit:'royal_archer'},{group:'ours',id:'crossbowman',unit:'crossbowman'},{group:'ours',id:'light_cavalry',unit:'light_cavalry'},{group:'ours',id:'catapult',unit:'catapult'},{group:'ours',id:'military_wagon',unit:'military_wagon'},
   {group:'foes',id:'enemy_soldier'},{group:'foes',id:'enemy_archer'},{group:'foes',id:'enemy_swordsman'},{group:'foes',id:'enemy_knight'},{group:'foes',id:'raider'},{group:'foes',id:'bandit'},{group:'foes',id:'cave_rat'},{group:'foes',id:'wolf'},
   {group:'animals',id:'deer'},{group:'animals',id:'wild_boar'},{group:'animals',id:'rabbit'},{group:'animals',id:'horse'},
 ].map(u=>Object.freeze(u)));
@@ -65,7 +65,7 @@ export function tilesAround(scene,center,count){
 export function spawnSandboxUnits(scene,unitId,center,count){
   const s=scene,spec=SANDBOX_UNITS.find(u=>u.id===unitId);if(!spec)return 0;const tiles=tilesAround(s,center,count);let n=0;
   for(const tile of tiles){
-    if(spec.unit){const w=s.workerSystem.create(tile);if(s.military.enlist(w,spec.unit,{withoutHorse:true})){w.sandbox=true;n++;}else{w.isAlive=false;s.workerSystem.onDeath(w);}}
+    if(spec.unit){const w=s.workerSystem.create(tile);if(s.military.enlist(w,spec.unit,{withoutHorse:true})){w.sandbox=true;s.military.engines?.sandboxCrew?.(w,spec.unit);n++;}else{w.isAlive=false;s.workerSystem.onDeath(w);}}
     else{const d=s.objectRegistry.get(spec.id);if(!d)break;const a=s.animalSystem.create(d,tile);a.sandbox=true;n++;}
   }
   s.workerSystem.updateUI?.();return n;
@@ -73,7 +73,7 @@ export function spawnSandboxUnits(scene,unitId,center,count){
 export function removeSandboxUnit(scene,unit){
   const s=scene;if(!unit)return false;s.combat?.stopAttack?.(unit);
   if(s.animalSystem.animals.has(unit.id)){s.animalSystem.remove(unit);s.combatFeedback?.remove?.(unit.id);return true;}
-  if(s.workerSystem.workers.has(unit.id)&&unit.isAlive){unit.isAlive=false;unit.currentHP=0;s.workerSystem.onDeath(unit);s.needs?.records?.delete?.(unit.id);s.combatFeedback?.remove?.(unit.id);s.workerSystem.updateUI?.();return true;}
+  if(s.workerSystem.workers.has(unit.id)&&unit.isAlive){const engine=s.military?.engines?.vehicleOf?.(unit);if(engine){s.vehicles.vehicles.delete(engine.id);s.vehicles.changed();}unit.isAlive=false;unit.currentHP=0;s.workerSystem.onDeath(unit);s.needs?.records?.delete?.(unit.id);s.combatFeedback?.remove?.(unit.id);s.workerSystem.updateUI?.();return true;}
   return false;
 }
 export function clearSandboxUnits(scene,group='all'){

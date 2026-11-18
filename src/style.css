@@ -1342,3 +1342,6 @@ body.sandbox-tool canvas { cursor:crosshair !important; }
 .unit-command-bar .unit-kind-icon { flex-basis:auto; font-size:1.6rem; }
 .unit-command-bar.docked .unit-stance, .unit-command-bar.docked .unit-formation { flex-basis:auto; margin-left:10px; padding-left:10px; border-left:1px solid #b99a5355; }
 .unit-command-bar .unit-kinds { flex-basis:100%; justify-content:flex-start; }
+
+.stock-limit-row { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:4px 0; } .stock-limit-row label { display:flex; gap:6px; align-items:center; } .stock-limit-row input { width:5.5em; } .stock-limit-row small { opacity:.8; }
+.builder-workshop-engines { margin-top:8px; padding-top:6px; border-top:1px solid rgba(227,197,122,.25); }

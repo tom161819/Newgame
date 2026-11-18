@@ -27,8 +27,8 @@ export class VehicleSystem {
         if(VEHICLES[type]?.requiresHorse){v.horseId=this.scene.stables?.harness(b.id,v.id)??null;this.changed();}this.scene.updateInventory?.();
       }}
   }
-  unreserve(worker){const v=this.reservedBy(worker);if(v){v.operatorId=null;v.state='parked';this.changed();}}
-  park(worker){const v=this.held(worker);if(!v)return false;v.x=worker.tile.x;v.y=worker.tile.y;v.operatorId=null;v.state='parked';worker.vehicleType=null;this.changed();return true;}
+  unreserve(worker){const v=this.reservedBy(worker);if(v){v.operatorId=null;v.state='parked';delete v.crew;this.changed();}}
+  park(worker){const v=this.held(worker);if(!v)return false;v.x=worker.tile.x;v.y=worker.tile.y;v.operatorId=null;v.state='parked';delete v.crew;worker.vehicleType=null;this.changed();return true;}
   // Idle Hauler in Auto/Wheelbarrow mode: go to the nearest free vehicle and take it. Returns true while doing so.
   updateHauler(worker){
     if(worker.profession!=='hauler'){this.unreserve(worker);if(this.held(worker)&&!worker.cargo)this.park(worker);return false;}
@@ -54,11 +54,13 @@ export class VehicleSystem {
   // Death or another job: the vehicle stays where the worker stands; another Hauler can take it.
   release(worker){this.unreserve(worker);this.park(worker);}
   update(){
-    this.rollOut();
+    this.rollOut();this.scene.military?.engines?.convertFinished?.();
     for(const v of this.vehicles.values()){
       if(v.horseId!=null&&!this.usable(v)){v.horseId=null;this.changed();}
       if(v.horseId!=null){const a=this.scene.animalSystem?.animals.get(v.horseId),p=this.position(v);if(a){a.position={x:p.x,y:p.y};a.tile={x:Math.floor(p.x),y:Math.floor(p.y)};}}
       if(!v.operatorId)continue;const w=this.scene.workerSystem.workers.get(v.operatorId);
+      // Owner 18 Nov 2026: a Catapult or Military Wagon goes with its crew (a soldier), never parked by the Hauler rules.
+      if(v.crew){if(!w?.isAlive||w.profession!=='soldier'){v.operatorId=null;v.state='parked';delete v.crew;this.changed();}else if(v.state==='inUse'){v.x=w.tile.x;v.y=w.tile.y;}continue;}
       if(v.state==='inUse'&&!this.usable(v)&&!w?.cargo&&w){this.park(w);continue;}
       if(!w?.isAlive){v.operatorId=null;v.state='parked';this.changed();continue;}
       if(v.state==='inUse'){v.x=w.tile.x;v.y=w.tile.y;if(w.profession!=='hauler'&&!w.cargo)this.park(w);}}

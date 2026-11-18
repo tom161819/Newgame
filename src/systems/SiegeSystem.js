@@ -11,10 +11,11 @@ import { isRanged } from './CombatSystem.js';
 // sent at one (right click with soldiers selected) stand around it and hit it; its hit points go down by their attack,
 // (at half strength: stone takes blows badly) and at zero it falls – the way opens. Archers do not shoot at stone.
 export const ENEMY_TINT=0x9fb4ea;
-export const SIEGE_RULES=Object.freeze({damageShare:.5,retarget:1200,giveUpAfter:4});
+// autoRadius: a melee soldier with no enemy soldier near him attacks an enemy building this close by himself.
+export const SIEGE_RULES=Object.freeze({damageShare:.5,retarget:1200,giveUpAfter:4,autoRadius:4});
 export const isEnemyBuilding=b=>!!b?.enemy;
 export const siegeable=b=>isEnemyBuilding(b)&&buildingIsComplete(b)&&!!buildingHP(b);
-export const canSiege=w=>!!w?.isAlive&&w.profession==='soldier'&&!isRanged(w)&&(w.attackDPS??0)>0;
+export const canSiege=w=>!!w?.isAlive&&w.profession==='soldier'&&!w.crew&&!isRanged(w)&&(w.attackDPS??0)>0;
 // Ground tiles touching the building (sides and corners) from which a melee soldier reaches it.
 export function siegeTiles(map,building){
   const {x,y}=building,{width,height}=buildingDefinition(building),out=[];
@@ -35,20 +36,30 @@ export class SiegeSystem {
     return list.find(b=>s.towerViews?.get(b.id)?.contains?.(x,y))??(tile?list.find(b=>b.tiles?.some(p=>p.x===tile.x&&p.y===tile.y)):null)??null;
   }
   // Each melee soldier gets his own place around the building where there is one; returns how many go.
+  // The nearest enemy building within `radius` tiles of the soldier (measured to its footprint).
+  near(worker,radius=SIEGE_RULES.autoRadius){
+    let best=null,d=Infinity;for(const b of this.scene.buildings){if(!siegeable(b))continue;const {width,height}=buildingDefinition(b),dx=Math.max(b.x-worker.tile.x,0,worker.tile.x-(b.x+width-1)),dy=Math.max(b.y-worker.tile.y,0,worker.tile.y-(b.y+height-1)),e=Math.max(dx,dy);if(e<=radius&&e<d){d=e;best=b;}}
+    return best;
+  }
   order(soldiers,building){
-    const s=this.scene,melee=soldiers.filter(canSiege);if(!siegeable(building)||!melee.length)return 0;
+    // Catapult crews take the building as their target too (SiegeEngines shoots it from range).
+    const engines=soldiers.filter(w=>w?.crew&&this.scene.military?.unit?.(w)?.type==='catapult'&&w.isAlive);
+    for(const w of engines){this.scene.workerSystem.commands?.resume?.(w);w.siegeTargetId=building.id;}
+    const s=this.scene,melee=soldiers.filter(canSiege);if(!siegeable(building)||!melee.length)return engines.length;
     const spots=siegeTiles(s.map,building),used=new Set();
     for(const w of melee){
       s.workerSystem.commands?.resume?.(w);s.military?.wallPatrol?.set?.(w,false);s.combat?.stopAttack?.(w);delete w.huntWolfId;delete w.attackArea;delete w.attackRadius;
       const sorted=[...spots].sort((a,b)=>Math.hypot(a.x-w.tile.x,a.y-w.tile.y)-Math.hypot(b.x-w.tile.x,b.y-w.tile.y)),free=sorted.find(p=>!used.has(`${p.x},${p.y}`));if(free)used.add(`${free.x},${free.y}`);
       w.siegeTargetId=building.id;w.siegeSpot=free??null;w.siegeRetarget=0;w.siegeMisses=0;
     }
-    return melee.length;
+    return melee.length+engines.length;
   }
   stop(worker){delete worker.siegeTargetId;delete worker.siegeSpot;delete worker.siegeMisses;worker.siegeHit=null;}
   // Called by the soldier's behaviour when no enemy unit needs him; true when the siege took over this frame.
   update(worker,delta){
-    if(worker.siegeTargetId==null)return false;
+    // Owner 18 Nov 2026: with no enemy soldier around (the caller found none), a melee soldier near an enemy building
+    // attacks it by himself; a soldier told to hold his ground does not.
+    if(worker.siegeTargetId==null){if(worker.stance==='hold'||!canSiege(worker))return false;const b=this.near(worker);if(!b)return false;this.order([worker],b);}
     const state=worker.commandState?.state;if(state==='MovingToHold'||state==='Holding'||!canSiege(worker)){this.stop(worker);return false;}
     const b=this.target(worker);if(!b){this.stop(worker);return false;}
     const s=this.scene,{width,height}=buildingDefinition(b),center={x:b.x+width/2,y:b.y+height/2};

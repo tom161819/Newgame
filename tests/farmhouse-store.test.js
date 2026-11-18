@@ -77,7 +77,7 @@ test('trade finds Farmhouse stock: Wheat sold from a Farmhouse, bought Flour sto
 });
 
 test('Farmhouse stores survive Save/Load in save schema 61; forged grain in a Granary or an overfull Farmhouse is rejected',()=>{
-  assert.equal(SAVE_VERSION,64);assert.equal(saveSchemaStatus({saveVersion:61}).compatible,false,'alpha policy: schema 61 saves are refused');
+  assert.equal(SAVE_VERSION,65);assert.equal(saveSchemaStatus({saveVersion:61}).compatible,false,'alpha policy: schema 61 saves are refused');
   const {s,place,store}=world(),farm=place('farmhouse',44,40),granary=place('granary',58,40);s.foodStorage.deposit(store(farm).id,'wheat',30);s.foodStorage.deposit(store(farm).id,'flour',12);s.foodStorage.deposit(`granary-${granary.id}`,'bread',5);
   const saved=snapshot(s),r=workerScene(saved.terrain,{construction:true,logistics:true,starter:false,gameSettings:gameSettings()});loadGameState(r,structuredClone(saved));
   assert.deepEqual(serializeGameState(r),saved);assert.deepEqual(r.foodStorage.locations.get(`farmhouse-${farm.id}`).stock,{wheat:30,flour:12});assert.equal(r.inventory.count('wheat'),30);

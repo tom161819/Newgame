@@ -4,6 +4,7 @@ import { dataName } from '../i18n/names.js';
 import { buildingDefinition } from '../game/buildings.js';
 import { BUILDER_WORKSHOP } from '../data/builderWorkshop.js';
 import { JOBS } from '../data/jobs.js';
+import { formatCost } from './objectLabels.js';
 
 // #118: the Builder's Workshop panel: how many Builders it serves, who they are, and how many Builders in the kingdom
 // still work without a workshop.
@@ -23,7 +24,16 @@ export class BuilderWorkshopPanel {
     document.querySelector('#builder-workshop-title').textContent=dataName(buildingDefinition(b));
     document.querySelector('#builder-workshop-count').textContent=t('builderWorkshop.count',{count:served.length,capacity});
     document.querySelector('#builder-workshop-list').replaceChildren(...(served.length?served.map(w=>element('li','',w.name??`${JOBS.builder.name} ${w.id}`)):[element('li','builder-workshop-empty',t('builderWorkshop.none'))]));
+    this.renderEngines(b);
     document.querySelector('#builder-workshop-kingdom').textContent=without>0?t('builderWorkshop.without',{count:without,percent:Math.round((1-BUILDER_WORKSHOP.unservedSpeed)*100)}):t('builderWorkshop.allServed');
+  }
+  // Owner 18 Nov 2026: the Builders here also build Catapults – a site beside the workshop, built like a building.
+  renderEngines(b){
+    const s=this.scene;if(!s.military?.engines)return;let box=this.dialog.querySelector('#builder-workshop-engines');
+    if(!box){box=element('section','builder-workshop-engines');box.id='builder-workshop-engines';const text=element('p','builder-workshop-engines-text'),button=element('button','',t('siege.orderCatapult',{cost:formatCost(s.objectRegistry.require('catapult_site').cost,s.objectRegistry)}));button.type='button';button.id='order-catapult';
+      button.addEventListener('click',()=>{const result=s.military.engines.orderCatapult(this.building);s.setStatus(result.error??t('siege.catapultOrdered'));this.render();},{signal:this.controller.signal});box.append(text,button);document.querySelector('#builder-workshop-kingdom').after(box);}
+    const building=s.military.engines.sites(b).length,ready=[...(s.vehicles?.vehicles.values()??[])].filter(v=>v.type==='catapult'&&v.state==='parked').length;
+    box.querySelector('p').textContent=t('siege.catapultStatus',{building,ready});
   }
   open(building){
     this.building=building;this.render();

@@ -16,7 +16,20 @@ function wagonTexture(scene){
   for(const x of [46,62]){g.fillStyle(0x5a4a3a);g.fillCircle(x,29,6);g.lineStyle(1.5,0x2e241a);g.strokeCircle(x,29,6);}
   g.generateTexture(WAGON,72,40);g.destroy();return WAGON;
 }
-const textureFor=(scene,type)=>type==='horse_wagon'?wagonTexture(scene):texture(scene);
+// Owner 18 Nov 2026: Catapult (procedural until the owner approves art): a wheeled frame with the throwing arm and its
+// sling, a few Stones in the basket.
+const CATAPULT='vehicle-catapult';
+function catapultTexture(scene){
+  if(scene.textures.exists(CATAPULT))return CATAPULT;
+  const g=scene.make.graphics({x:0,y:0,add:false});
+  g.fillStyle(0x2e241a,.3);g.fillEllipse(36,52,62,10);
+  g.fillStyle(0x7a5233);g.fillPoints([{x:8,y:40},{x:62,y:40},{x:60,y:46},{x:10,y:46}],true);g.lineStyle(1.5,0x3b2616);g.strokePoints([{x:8,y:40},{x:62,y:40},{x:60,y:46},{x:10,y:46}],true);
+  g.lineStyle(4,0x6a4528);g.lineBetween(22,40,32,18);g.lineBetween(46,40,36,18);g.lineStyle(2,0x3b2616);g.lineBetween(30,22,38,22);
+  g.lineStyle(4,0x8a5e36);g.lineBetween(56,38,18,8);g.fillStyle(0x5b4630);g.fillEllipse(16,8,12,7);g.fillStyle(0x8d8a80);g.fillCircle(14,6,3);g.fillCircle(18,6,2.5);
+  for(const x of [18,52]){g.fillStyle(0x5a4a3a);g.fillCircle(x,48,7);g.lineStyle(1.5,0x2e241a);g.strokeCircle(x,48,7);g.lineBetween(x-5,48,x+5,48);}
+  g.generateTexture(CATAPULT,72,58);g.destroy();return CATAPULT;
+}
+const textureFor=(scene,type)=>type==='horse_wagon'?wagonTexture(scene):type==='catapult'?catapultTexture(scene):texture(scene);
 function texture(scene){
   if(scene.textures.exists(KEY))return KEY;
   const g=scene.make.graphics({x:0,y:0,add:false});

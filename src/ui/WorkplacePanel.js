@@ -127,6 +127,15 @@ export class WorkplacePanel {
       document.querySelector('#food-production-buffers').hidden=!this.ownStore.hidden;/* m-okno-budovy-sklad: the Building store section shows the same */
       document.querySelector('#food-production-buffers').textContent=t('workplace.buffers',{input:format(input.stock)||t('transport.empty'),output:format(output.stock)||t('transport.empty')});
       document.querySelector('#food-production-missing').textContent=cycle?t('workplace.batch',{list:format(cycle.inputs)}):t('workplace.missing',{list:format(Object.fromEntries(Object.entries(recipe.input).map(([id,n])=>[id,Math.max(0,n-(input.stock[id]??0))])))});
+      // Owner 18 Nov 2026: "make up to X in the stores" – empty = no limit.
+      {let row=document.querySelector('#stock-limit-row');
+        if(!row){row=document.createElement('p');row.id='stock-limit-row';row.className='stock-limit-row';const label=document.createElement('label'),text=document.createElement('span'),input=document.createElement('input'),note=document.createElement('small');
+          input.type='number';input.min='0';input.max='9999';input.step='1';input.id='stock-limit';input.placeholder='∞';text.id='stock-limit-text';note.id='stock-limit-note';label.append(text,input);row.append(label,note);
+          input.addEventListener('change',()=>{if(this.building)s.foodProduction.setStockLimit(this.building.id,input.value===''?null:input.value);this.signature=null;this.refresh();});
+          document.querySelector('#food-production-status').after(row);}
+        const limit=s.foodProduction.stockLimit(b),[outId]=Object.entries(recipe.output)[0],held=s.foodProduction.stockHeld(outId),input=row.querySelector('input');
+        row.querySelector('span').textContent=t('workplace.stockLimit',{item:s.objectRegistry.require(outId).name});if(document.activeElement!==input)input.value=limit==null?'':String(limit);
+        row.querySelector('small').textContent=limit==null?t('workplace.stockLimitNone',{held}):t(held>=limit?'workplace.stockLimitReached':'workplace.stockLimitBelow',{held,limit});}
       const toggle=document.querySelector('#toggle-food-production');toggle.textContent=t('workplace.auto',{state:t(production.auto?'state.on':'state.off')});toggle.setAttribute('aria-pressed',String(production.auto));
     }
     document.querySelector('#workplace-name').textContent=buildingName(b);const image=document.querySelector('#workplace-image');image.src=s.assets.previewURL(spec);image.alt=buildingName(b);

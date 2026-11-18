@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.145.0] - 2026-11-18
+<!-- version: {"title":"Catapult, Military Wagon, stock limits","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Added
+- Catapult. In the Builder's Workshop, "Build a Catapult" (30 Wood, 6 Iron) puts a site beside the workshop and Builders build it. In a Barracks a Recruit trains as its crew, walks to it and rolls it. It throws Stones at enemy walls, Towers, Gates and buildings 3 to 12 tiles away (60 hit points a hit, one Stone each, up to 10 Stones). It never shoots at people. Select it and right-click an enemy building, or it shoots what is in range by itself.
+- Military Wagon. In a Barracks a Recruit with a free Horse Wagon (and its horse) becomes a supply wagon. Beside a store it loads 30 Stones, 20 food and 10 Torches. Catapults within 6 tiles get Stones from it; soldiers within 6 tiles eat from it and take their night Torches from it.
+- Workshops have "Make up to … in the stores". With a number set, a workshop starts no new batch while the stores hold that many of what it makes. Empty means no limit.
+### Changed
+- Melee soldiers near an enemy building attack it by themselves when no enemy soldier is around, also when standing where you sent them. Enemy soldiers always come first.
+
 ## [0.144.6] - 2026-11-18
 <!-- version: {"title":"Enemy buildings on the Test map, melee attacks on walls","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added

@@ -1,6 +1,7 @@
 import { devProduction } from '../data/devBalance.js';
 import { TORCHES } from '../data/torches.js';
 export const TORCH_TARGET_MAX=60;
+export const STOCK_LIMIT_MAX=9999;
 import { dataName } from '../i18n/names.js';
 import { FOOD_RULES,FOOD_RESOURCE_IDS } from '../data/foodProduction.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
@@ -31,6 +32,12 @@ export class FoodProductionSystem {
   // How many Torches the stores should hold before an automatic Pitch Kiln goes back to Pitch (per kiln, 0–torchTargetMax).
   torchTarget(building){const v=this.records.get(building?.id)?.torchTarget;return Number.isInteger(v)?v:TORCHES.torchTarget;}
   setTorchTarget(buildingId,value){const record=this.records.get(buildingId),v=Math.round(Number(value));if(!record||!Number.isFinite(v)||v<0||v>TORCH_TARGET_MAX)return false;record.torchTarget=v;this.chooseRecipes();return true;}
+  // Owner 18 Nov 2026: "make up to X in the stores" – a workshop with a limit starts no new batch while the kingdom
+  // holds that many of what it makes (in stores; vehicles counted as standing vehicles). null = no limit.
+  stockLimit(building){const v=this.records.get(building?.id)?.stockLimit;return Number.isInteger(v)?v:null;}
+  setStockLimit(buildingId,value){const record=this.records.get(buildingId);if(!record)return false;if(value===null||value===''||value===undefined){delete record.stockLimit;return true;}const v=Math.round(Number(value));if(!Number.isFinite(v)||v<0||v>STOCK_LIMIT_MAX)return false;record.stockLimit=v;return true;}
+  stockHeld(resource){if(VEHICLES[resource])return [...(this.scene.vehicles?.vehicles.values()??[])].filter(v=>v.type===resource).length;return this.storage?.available?.(resource)??0;}
+  atStockLimit(building,recipe=this.recipe(building)){const limit=this.stockLimit(building);if(limit==null)return false;const [resource]=first(recipe.output);return this.stockHeld(resource)>=limit;}
   // m-nosici-trakar-pracoviste (62): how much of one input a carrier tops the input buffer up to. A Hauler with a
   // Wheelbarrow or Horse Wagon fills a food workshop (Mill, Bakery) for as many whole batches as the buffer holds, also
   // while a batch runs, so one trip is a full load; everyone else (and every non-food workshop) brings one batch
@@ -151,6 +158,7 @@ export class FoodProductionSystem {
     const recipe=record.cycle?this.cycleRecipe(record,building):this.recipe(building),outputId=`output-${building.id}`,inputId=`input-${building.id}`;
     if(worker.workTask?.kind==='produce'){
       if(!record.auto){this.scene.workerSystem.ai.cancel(worker);worker.workState='Waiting';worker.workMessage='Auto Production OFF';return;}
+      if(!record.cycle&&this.atStockLimit(building,recipe)){this.scene.workerSystem.ai.cancel(worker);worker.workState='Waiting';worker.workMessage='Stock limit reached';return;}
       // A worker waiting at the bench for a batch that cannot start because the output buffer is still full goes to
       // carry it out (the Pitch Kiln stalled here after switching recipe).
       if(!record.cycle&&this.outputResources(outputId,first(recipe.output)[0]).length&&!this.scene.workerSystem.liveWorkers().some(w=>w!==worker&&w.assignedWorkplaceId===building.id&&w.workTask?.sourceId===outputId)){this.scene.workerSystem.ai.cancel(worker);worker.aiCooldown=0;}
@@ -171,6 +179,7 @@ export class FoodProductionSystem {
       if(destination&&!this.scene.logisticsTasks?.waitForHauler(building,'output')&&this.move(worker,outputId,destination.id,resource,Math.min(outputAvailable,carryCapacity(worker,resource)),{capacityReservation:cap?.id,outputBuildingId:building.id}))return;
     }
     if(!record.auto){worker.workState='Waiting';worker.workMessage='Auto Production OFF';return;}
+    if(!record.cycle&&this.atStockLimit(building,recipe)){worker.workState='Waiting';worker.workMessage='Stock limit reached';return;}
     const input=this.storage.locations.get(inputId),missing=Object.entries(recipe.input).find(([resource,needed])=>(input.stock[resource]??0)+this.storage.incoming(inputId,resource)<needed);
     if(!record.cycle&&missing){
       const shortage=this.inputShortage(building);if(shortage){worker.workState='Waiting';worker.workMessage=`Waiting for ${shortage}`;return;}
@@ -255,6 +264,7 @@ export class FoodProductionSystem {
       if(!record.cycle){
         const [outputResource,outputAmount]=first(recipe.output),inputId=`input-${building.id}`;
         if(Object.entries(recipe.input).some(([resource,amount])=>this.storage.free(inputId,resource)<amount)||this.storage.used(this.storage.locations.get(`output-${building.id}`)))continue;
+        if(this.atStockLimit(building,recipe))continue;
         // S12: a vehicle (Wheelbarrow) is not stored; VehicleSystem rolls it out of the output buffer onto the map.
         const destination=recipe.vehicle?null:this.storage.findDestination(workers[0],outputResource,outputAmount);if(!recipe.vehicle&&!destination)continue;
         const id=`food-cycle-${building.id}-${record.nextCycle}`,capacity=recipe.vehicle?null:this.storage.reserve('capacity',destination.location.id,outputResource,outputAmount,id);if(!recipe.vehicle&&!capacity)continue;

@@ -19,6 +19,11 @@ export const UNIT_TYPES=Object.freeze({
   crossbowman:Object.freeze({equipment:Object.freeze({weapon:'crossbow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:30,attackRange:4}),trainingTime:40000,goldCost:12,wageBonus:2,requiredCombatLevel:2}),
   // Light Cavalry: sword and a tamed horse from the Stables, fast. His own look comes later (owner's art).
   light_cavalry:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'light_armor'}),mount:'horse',modifiers:Object.freeze({maxHP:50,attackBonus:30}),trainingTime:50000,goldCost:20,wageBonus:3,requiredCombatLevel:3}),
+  // Owner 18 Nov 2026: a Catapult crew (a Recruit and a finished Catapult from the Builder's Workshop) and a Military
+  // Wagon (a Recruit and a Horse Wagon with its horse). `vehicle`: the vehicle the unit takes; no Armory items.
+  // speedFactor: a Catapult rolls slowly, the Wagon at the horse's pace.
+  catapult:Object.freeze({equipment:Object.freeze({}),vehicle:'catapult',speedFactor:.55,modifiers:Object.freeze({maxHP:20}),trainingTime:20000,goldCost:5,wageBonus:1,requiredCombatLevel:1}),
+  military_wagon:Object.freeze({equipment:Object.freeze({}),vehicle:'horse_wagon',speedFactor:1.25,modifiers:Object.freeze({maxHP:10}),trainingTime:15000,goldCost:3,wageBonus:1,requiredCombatLevel:1}),
 });
 // kasarna-branci (owner 9 Nov 2026): everyone employed in a Barracks starts as a Recruit – no equipment, basic combat
 // stats (the resident's own 60 HP and 6 DPS plus `modifiers`), patrols and defends near the Barracks like a unit, and
@@ -30,6 +35,12 @@ export const START_GARRISON=Object.freeze([Object.freeze({type:'soldier',count:2
 export const UNIT_TYPE_IDS=Object.freeze(Object.keys(UNIT_TYPES));
 // A mounted unit (Light Cavalry) rides a tamed horse from the Stables: it is reserved for the training and kept by the rider.
 export const KNIGHT_SPEED=1.5;
+// Owner 18 Nov 2026: siege engines and supply. A Catapult throws one Stone every `reload` ms at an enemy building between
+// `minRange` and `range` tiles, `damage` hit points a hit, holding up to `ammo` Stones. The Military Wagon loads at a store
+// it stands near (`loadRadius`) up to `load` of each supply and hands it to units within `supplyRadius`.
+export const CATAPULT=Object.freeze({range:12,minRange:3,reload:5000,damage:60,ammo:10,cost:Object.freeze({wood:30,iron:6}),constructionTime:40000});
+export const WAGON_SUPPLY=Object.freeze({load:Object.freeze({stone:30,food:20,torch:10}),loadRadius:4,supplyRadius:6,every:1000});
+export const vehicleUnit=type=>UNIT_TYPES[type]?.vehicle??null;
 export const MILITARY_RULES=Object.freeze({guardRadius:12,retarget:600,kitCapacityPerOrder:2,followRadius:10,spreadRadius:6,crowd:3,engageRadius:5,retreatBelow:.25,retreatUntil:.5,retreatSafe:8,orderRadius:12,groupLink:5});
 // Combat 16 Nov 2026: soldier stances (worker.stance, saved; aggressive when missing). engage = fights an enemy this
 // near without an order; follow = takes the next enemy this near after his target falls; leash = gives up a chase this

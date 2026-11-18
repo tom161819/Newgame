@@ -46,14 +46,14 @@ import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
 import { TALENTS } from '../data/economy.js';
 import { validateFoodState } from './FoodStateValidation.js';
 import { validateSeasonFoodState } from './SeasonFoodStateValidation.js';
-import { seasonalCropStage } from '../data/seasons.js';
+import { seasonalCropStage,EDIBLE_RESOURCES } from '../data/seasons.js';
 import { carryCapacity,IDLE_STONE,VEHICLES,TRANSPORT_MODES } from '../data/logistics.js';
 import { repairTransportInstructions } from './TransportStateMigration.js';
 import { captureMapKnowledge } from '../game/mapMemoryObjects.js';
 import { validateMapMemory } from './MapMemoryValidation.js';
 import { FORESTRY,emptyNaturalState } from '../data/naturalResources.js';
 import { EMPLOYMENT_PROFESSIONS,PRIORITY_RANGE } from '../data/employment.js';
-import { UNIT_TYPES,legacyKit } from '../data/military.js';
+import { UNIT_TYPES,legacyKit,CATAPULT } from '../data/military.js';
 import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { validIdentity,identityKey } from '../data/names.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
@@ -63,7 +63,7 @@ import { validateResourceLedger } from './ResourceLedgerValidation.js';
 // 62 (tabulka-budov-1): workplace capacities, crop yields and Mill/Bakery recipes changed – saved workplaces, harvest
 // reservations and running batches of 61 no longer match the rules.
 import { CASTLE_LEVELS,CASTLE_MAX_LEVEL,castleLevel } from '../data/castle.js';
-export const SAVE_VERSION=64;
+export const SAVE_VERSION=65;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -573,8 +573,11 @@ function validateAtSize(input,registry){
       check(house&&d?.housing&&buildingIsComplete(house));seats.set(house.id,(seats.get(house.id)??0)+1);check(seats.get(house.id)<=(d.housing.capacity??POPULATION.houseCapacity));}
     check(base<=POPULATION.maximum);}
   part='vehicles';if(s.vehicles!==undefined){const v=s.vehicles;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='modes,nextId,vehicles');integer(v.nextId,1);array(v.vehicles);const ids=new Set(),operators=new Set(),workers=new Map(s.workers.map(w=>[w.id,w]));
-    for(const x of v.vehicles){check(x&&Object.keys(x).sort().join()==='horseId,id,operatorId,state,type,x,y'&&(x.horseId===null||x.type==='horse_wagon'&&(s.stables?.horses??[]).some(h=>h.id===x.horseId&&h.state==='harnessed'&&h.vehicleId===x.id))&&Object.hasOwn(VEHICLES,x.type)&&['parked','reserved','inUse'].includes(x.state));const m=String(x.id).match(/^vehicle-(\d+)$/);check(m&&Number(m[1])<v.nextId&&!ids.has(x.id));ids.add(x.id);
-      integer(x.x,0,COLUMNS-1);integer(x.y,0,ROWS-1);check(open(x.x,x.y));check((x.state==='parked')===(x.operatorId==null));if(x.operatorId!=null){const w=workers.get(x.operatorId);check(w?.isAlive&&w.profession==='hauler'&&!operators.has(x.operatorId));operators.add(x.operatorId);}}
+    for(const x of v.vehicles){
+      // Owner 18 Nov 2026: a Catapult (Stones in `ammo`) and a Military Wagon (`supplies`); `crew` while a soldier has it.
+      check(x&&Object.keys(x).filter(k=>!['crew','ammo','supplies'].includes(k)).sort().join()==='horseId,id,operatorId,state,type,x,y'&&(x.horseId===null||x.type==='horse_wagon'&&(s.stables?.horses??[]).some(h=>h.id===x.horseId&&h.state==='harnessed'&&h.vehicleId===x.id))&&(Object.hasOwn(VEHICLES,x.type)||x.type==='catapult')&&['parked','reserved','inUse'].includes(x.state));
+      check(x.crew===undefined||x.crew===true&&x.operatorId!=null);if(x.ammo!==undefined){check(x.type==='catapult');integer(x.ammo,0,CATAPULT.ammo);}if(x.supplies!==undefined){check(x.type==='horse_wagon'&&x.supplies&&typeof x.supplies==='object');for(const [id,n]of Object.entries(x.supplies)){check(['stone','torch',...EDIBLE_RESOURCES].includes(id));integer(n,1,1000);}}const m=String(x.id).match(/^vehicle-(\d+)$/);check(m&&Number(m[1])<v.nextId&&!ids.has(x.id));ids.add(x.id);
+      integer(x.x,0,COLUMNS-1);integer(x.y,0,ROWS-1);check(open(x.x,x.y));check((x.state==='parked')===(x.operatorId==null));if(x.operatorId!=null){const w=workers.get(x.operatorId),crewOf=(s.military?.units??[]).find(u=>u.workerId===x.operatorId)?.type??(s.military?.orders??[]).find(o=>o.workerId===x.operatorId)?.type;check(w?.isAlive&&(x.crew?w.profession==='soldier'&&UNIT_TYPES[crewOf]?.vehicle===x.type:w.profession==='hauler')&&!operators.has(x.operatorId));operators.add(x.operatorId);}}
     check(v.modes&&typeof v.modes==='object');for(const [id,mode]of Object.entries(v.modes))check(workers.has(id)&&TRANSPORT_MODES.includes(mode)&&mode!=='auto');}
   // C08 units and training orders: one per living Soldier, a known type, its exact kit; a Knight has his horse (S12).
   const st0=new Set((s.stables?.horses??[]).filter(h=>h.riderId).map(h=>h.riderId));
