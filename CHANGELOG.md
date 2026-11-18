@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.6] - 2026-11-18
+<!-- version: {"title":"Archers in sieges, fire arrows, unit roles","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Added
+- Archers and Crossbowmen (and enemy archers) lob a shot over a wall at an enemy within 4 tiles, for half the damage. An archer whose enemy stands behind a wall walks to such a place by himself.
+- Fire arrows: archers ordered at a wooden enemy building shoot it from their range until it burns. They still do not shoot at stone.
+- The Light Cavalry opens a fight with a charge after a ride of 5 tiles or more (one blow of 35 hit points before armour).
+- The Crossbowman's bolt ignores half of the enemy's armour. The Halberdier hits riders half again as hard.
+### Changed
+- Enemy soldiers wear better armour: Recruit 2 → 5, Swordsman 6 → 20, Knight 10 → 30.
+- The Halberdier's armour is 30 instead of 35.
+
 ## [0.146.5] - 2026-11-18
 <!-- version: {"title":"Attack-move, guard shifts, enemy Gate, night glow","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Added

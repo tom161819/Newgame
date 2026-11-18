@@ -240,6 +240,7 @@ export class NightThreatSystem {
     const F=NIGHT_THREATS.fires,hp=buildingHP(b),fire={id:b.id,intensity:F.startIntensity,health:hp?100*hp.hp/hp.max:100};this.fires.set(b.id,fire);this.scene.repairs?.cancel?.(b.id);
     // m-obyvatele-jmena-spanek-pohyb (42): sleepers wake and come out of a burning house.
     for(const w of this.scene.workerSystem?.sleepersIn?.(b.id)??[])this.scene.workerSystem.rest?.stop?.(w);
+    if(b.enemy){const text=t('siege.setAlight',{name:definitionFor(b,this.scene.objectRegistry).name});this.scene.setStatus?.(text);this.scene.eventFeed?.push?.(`fire:${b.id}:${this.scene.gameTime?.day??1}`,text,{target:b});this.changed();return fire;}
     this.scene.eventFeed?.push?.(`fire:${b.id}:${this.scene.gameTime?.day??1}`,t('threats.fire',{name:definitionFor(b,this.scene.objectRegistry).name}),{important:true,target:b});this.scene.dangerMarks?.mark({x:b.x+1,y:b.y+1});this.changed();return fire;
   }
   burning(b){return this.fires.has(b?.id);}
@@ -283,7 +284,7 @@ export class NightThreatSystem {
     let job=worker.firefight;
     if(job&&!this.fires.has(job.fireId)){worker.firefight=null;worker.path=[];worker.workState='Idle';worker.workMessage='';return false;}
     if(!job){
-      const fire=[...this.fires.values()].map(f=>({f,b:s.buildings.find(x=>x.id===f.id)})).filter(x=>x.b&&this.gap(x.b,worker.position)<=F.helperRange).sort((a,z)=>this.gap(a.b,worker.position)-this.gap(z.b,worker.position))[0];
+      const fire=[...this.fires.values()].map(f=>({f,b:s.buildings.find(x=>x.id===f.id)})).filter(x=>x.b&&!x.b.enemy/* nobody of ours puts out an enemy building set alight by fire arrows */&&this.gap(x.b,worker.position)<=F.helperRange).sort((a,z)=>this.gap(a.b,worker.position)-this.gap(z.b,worker.position))[0];
       if(!fire||s.workerSystem.liveSubjects().filter(w=>w.firefight?.fireId===fire.f.id).length>=F.helpers)return false;
       // Owner 17 Nov 2026: a resident busy with a task (hands free) drops it and helps; only one carrying goods does not.
       if(worker.workTask)s.workerSystem.ai?.cancel?.(worker);

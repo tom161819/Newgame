@@ -104,3 +104,52 @@ test('point 10: in a night battle the selected soldiers and everybody in a fight
   const settings=defaultLightSettings(),at={darkness:1,seconds:0},[full]=resolveLights([{type:'lantern',x:0,y:0,seed:0}],settings,at),[glow]=resolveLights([{type:'lantern',x:0,y:0,seed:0,...UNIT_GLOW}],settings,at);
   assert.ok(glow.rx<full.rx*.7&&glow.strength<full.strength*.7,'smaller and weaker than a lantern');assert.notDeepEqual(glow.color,full.color);
 });
+
+test('point 3: archers lob a shot over a wall at short range for half the damage; hunters and far shots still need a clear line',async()=>{
+  const { inAttackRange,shotFactor,LOB } = await import('../src/systems/CombatSystem.js');const { blockersBetween } = await import('../src/game/lineOfSight.js');
+  const s=scene();s.character.away=true;for(let x=40;x<=60;x++)s.map[50][x]=1;
+  assert.equal(blockersBetween(s.map,{x:50,y:48},{x:50,y:52}),1);assert.equal(blockersBetween(s.map,{x:50,y:48},{x:50,y:49}),0);
+  const [archer]=units(s,'archer',{x:50,y:52},1),[foe]=units(s,'enemy_soldier',{x:50,y:48},1),at=(u,x,y)=>{u.tile={x,y};u.position={x:x+.5,y:y+.5};u.path=[];u.nextTile=null;};
+  at(archer,50,52);at(foe,50,48);assert.equal(inAttackRange(archer,foe,s.map),true,'4 tiles, one wall between');assert.equal(shotFactor(archer,foe,s.map),LOB.damage);
+  at(foe,50,46);assert.equal(inAttackRange(archer,foe,s.map),false,'6 tiles over a wall is too far');
+  at(foe,50,48);s.map[49][50]=1;s.map[51][50]=1;assert.equal(inAttackRange(archer,foe,s.map),false,'three tiles thick is too much');s.map[49][50]=0;s.map[51][50]=0;
+  assert.equal(inAttackRange({...archer,profession:'hunter',definition:{}},foe,s.map),false,'a Hunter does not lob');
+  // An enemy archer lobs too, and the damage really is half.
+  const [bow]=units(s,'enemy_archer',{x:53,y:48},1);at(bow,53,48);const [mark]=units(s,'swordsman',{x:53,y:52},1);at(mark,53,52);assert.equal(inAttackRange(bow,mark,s.map),true);
+  const hp=foe.currentHP;s.combat.attacks.set(archer,foe);s.combat.update(1000);const over=hp-foe.currentHP;s.combat.attacks.delete(archer);
+  for(let x=40;x<=60;x++)s.map[50][x]=0;foe.currentHP=hp;s.combat.attacks.set(archer,foe);s.combat.update(1000);const clear=hp-foe.currentHP;s.combat.attacks.delete(archer);
+  assert.ok(over>0&&Math.abs(over-clear*LOB.damage)<1e-6,`${over} over the wall, ${clear} with a clear line`);
+});
+
+test('point 3: an archer whose enemy stands behind a wall walks to a place he can lob from and shoots',()=>{
+  const s=scene();s.character.away=true;for(let x=30;x<=75;x++)for(const y of [44,50])s.map[y][x]=1;for(let y=44;y<=50;y++)for(const x of [30,75])s.map[y][x]=1;
+  const [foe]=units(s,'enemy_soldier',{x:52,y:48},1),[archer]=units(s,'archer',{x:52,y:60},1);s.military.orderAttack([archer],foe);
+  until(s,()=>s.combat.attacks.get(archer)===foe&&foe.currentHP<foe.maxHP,40000);assert.ok(archer.tile.y>50,'he stayed outside the wall');assert.ok(Math.max(Math.abs(archer.tile.x-foe.tile.x),Math.abs(archer.tile.y-foe.tile.y))<=4);
+});
+
+test('point 3: archers ordered at a wooden enemy building shoot fire arrows until it burns; at stone they do not shoot',async()=>{
+  const { FIRE_ARROWS } = await import('../src/data/military.js');const { buildingHP } = await import('../src/game/buildingHealth.js');
+  const s=scene();s.character.away=true;const lit=new Set();s.nightThreats=new Proxy({flammable:b=>b.type==='house',burning:b=>lit.has(b.id),ignite:b=>{lit.add(b.id);}},{get:(o,k)=>o[k]??(()=>false)});
+  const put=(type,x,y)=>{const d=s.objectRegistry.require(type),tiles=[];for(let j=0;j<d.height;j++)for(let i=0;i<d.width;i++)tiles.push({x:x+i,y:y+j});const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,x,y,tiles};s.buildings.push(b);for(const t of tiles)s.map[t.y][t.x]=1;s.towerViews.set(b.id,s.createBuildingView(d,b));markEnemyBuilding(s,b);return b;};
+  const house=put('house',60,50),wall=put('wall',60,40),archers=units(s,'archer',{x:45,y:50},4);
+  assert.equal(s.military.siege.order(archers,wall),0,'not at stone');assert.equal(s.military.siege.order(archers,house),4);assert.deepEqual(s.military.siege.lastOrder,{melee:0,archers:4,engines:0});
+  until(s,()=>archers.every(a=>a.workMessage==='Shooting fire arrows'&&!a.nextTile&&!a.path.length)&&buildingHP(house).hp<buildingHP(house).max,40000);
+  for(const a of archers)assert.ok(Math.max(house.x-a.tile.x,a.tile.x-house.x-1,house.y-a.tile.y,a.tile.y-house.y-1)>=2,'from a distance, not at its wall');
+  until(s,()=>lit.has(house.id),FIRE_ARROWS.igniteAfter*1000);assert.ok(s.buildings.includes(house),'it burns before the arrows alone bring it down');
+  until(s,()=>!s.buildings.includes(house),60000);assert.ok(archers.every(a=>a.siegeTargetId==null),'done');
+});
+
+test('unit roles: the Crossbowman ignores half the armour, the Halberdier hits riders harder, the Light Cavalry opens with a charge after a ride',async()=>{
+  const { UNIT_TYPES } = await import('../src/data/military.js');const s=scene();s.character.away=true;
+  const [xbow]=units(s,'crossbowman',{x:40,y:50},1),[bow]=units(s,'royal_archer',{x:40,y:52},1),[halb]=units(s,'halberdier',{x:40,y:54},1),[rider]=units(s,'light_cavalry',{x:30,y:60},1),[knight]=units(s,'enemy_knight',{x:44,y:50},1);
+  assert.equal(s.combat.pierce(xbow),.5);assert.equal(s.combat.pierce(bow),0);assert.equal(s.combat.bonus(halb,rider),UNIT_TYPES.halberdier.bonusVs.mounted);assert.equal(s.combat.bonus(halb,knight),1);assert.equal(s.combat.bonus(xbow,rider),1);
+  assert.equal(knight.armor,30);assert.equal(halb.armor,30);
+  const rate=u=>{const hp=knight.currentHP=knight.maxHP;s.combat.attacks.set(u,knight);s.combat.update(1000);s.combat.attacks.delete(u);return hp-knight.currentHP;};
+  assert.ok(Math.abs(rate(xbow)-xbow.attackDPS*(xbow.damageFactor??1)*.85)<1e-6,'armour 30 counts as 15 against a bolt');assert.ok(Math.abs(rate(bow)-bow.attackDPS*(bow.damageFactor??1)*.7)<1e-6);
+  // The charge: after a ride of `run` tiles the first blow lands at once; standing next to the next enemy gives none.
+  for(const u of [xbow,bow,halb])s.workerSystem.removeWorker?.(u)??(u.isAlive=false);knight.currentHP=knight.maxHP;
+  const blows=[],charge=s.military.charge.bind(s.military);s.military.charge=(w,t)=>{const d=charge(w,t);blows.push(d);return d;};
+  s.military.orderAttack([rider],knight);until(s,()=>blows.length>0,40000);assert.ok(Math.abs(blows[0]-UNIT_TYPES.light_cavalry.charge.damage*.7)<1e-6,`a charge of ${blows[0]}`);
+  const [next]=units(s,'enemy_soldier',{x:rider.tile.x+1,y:rider.tile.y},1);assert.equal(charge(rider,next),0,'no charge without a ride');
+  rider.chargeFrom={x:rider.position.x-6,y:rider.position.y};assert.ok(charge(rider,next)>0,'a new ride gives a new charge');assert.equal(charge(halb,next),0,'only riders charge');
+});

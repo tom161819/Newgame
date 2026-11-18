@@ -108,7 +108,7 @@ export class UnitSelection {
         // Owner 18 Nov 2026: a right click on an enemy building (a wall, Tower, Gate or house of the enemy) sends the selected
         // melee soldiers to break it; archers stay where they are.
         {const siege=this.siegeAt(pointer),fighters=this.workers().filter(w=>w.profession==='soldier');
-          if(siege&&fighters.length){const n=s.military?.siege?.order(fighters,siege)??0;s.setStatus(t(n?'siege.order':'siege.noMelee',{count:n,name:buildingDefinition(siege).name}));if(this.king)s.kingOrder(pointer);this.draw();return true;}}
+          if(siege&&fighters.length){const n=s.military?.siege?.order(fighters,siege)??0,last=s.military?.siege?.lastOrder,fire=n&&last?.archers&&!last.melee&&!last.engines;s.setStatus(t(fire?'siege.orderFire':n?'siege.order':'siege.noMelee',{count:fire?last.archers:n,name:buildingDefinition(siege).name}));if(this.king)s.kingOrder(pointer);this.draw();return true;}}
         // Owner 17 Nov 2026 ("I click the Tower and the soldier goes to the meadow behind it"): a Tower or a Gate stands
         // high over its tiles, so the click is matched to the building's picture (as for the King), not only to the
         // tile under the pointer.

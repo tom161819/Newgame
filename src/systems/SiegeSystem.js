@@ -6,6 +6,7 @@ import { gridToWorld } from '../game/isometric.js';
 import { isWalkable } from '../game/map.js';
 import { isRanged } from './CombatSystem.js';
 import { rubble } from '../game/buildingDamage.js';
+import { FIRE_ARROWS } from '../data/military.js';
 
 // Owner 18 Nov 2026 ("melee units can attack walls"; Test map: "switch to the enemy and build enemy walls and
 // buildings"): a building can belong to the enemy (`building.enemy`, steel-blue tint, a closed Gate). Our melee soldiers
@@ -19,6 +20,15 @@ export const SIEGE_RULES=Object.freeze({damageShare:.5,retarget:1200,giveUpAfter
 export const isEnemyBuilding=b=>!!b?.enemy;
 export const siegeable=b=>isEnemyBuilding(b)&&buildingIsComplete(b)&&!!buildingHP(b);
 export const canSiege=w=>!!w?.isAlive&&w.profession==='soldier'&&!w.crew&&!isRanged(w)&&(w.attackDPS??0)>0;
+// Battle test 18 Nov 2026, point 3: archers and crossbowmen do not shoot at stone, but ordered at a wooden enemy
+// building they shoot fire arrows at it from their range (FIRE_ARROWS): some damage, and after a while it burns.
+export const canFireArrows=w=>!!w?.isAlive&&w.profession==='soldier'&&!w.crew&&isRanged(w)&&(w.attackDPS??0)>0;
+// Wooden: what a night fire can burn (more Wood than Stone in its cost; never walls, Towers, Gates, the Castle).
+export function burns(scene,b){
+  if(scene.nightThreats?.flammable)return !!scene.nightThreats.flammable(b);
+  const d=buildingDefinition(b);if(!buildingIsComplete(b)||['castle','tower','wall','wall_gate','gate','burnt_ruins'].includes(d.id)||d.category!=='building')return false;
+  const wood=d.cost?.wood??0;return wood>0&&wood>=(d.cost?.stone??0);
+}
 // Ground tiles touching the building (sides and corners) from which a melee soldier reaches it.
 export function siegeTiles(map,building){
   const {x,y}=building,{width,height}=buildingDefinition(building),out=[];
@@ -31,7 +41,7 @@ export function closeEnemyGate(scene,building){if(!isEnemyBuilding(building)||![
 export function markEnemyBuilding(scene,building){building.enemy=true;closeEnemyGate(scene,building);scene.towerViews?.get(building.id)?.paint?.(building,ENEMY_TINT);}
 
 export class SiegeSystem {
-  constructor(scene){this.scene=scene;this.bars=new Map();}
+  constructor(scene){this.scene=scene;this.bars=new Map();this.heat=new Map();}
   target(worker){const id=worker?.siegeTargetId;if(id==null)return null;const b=this.scene.buildings.find(x=>x.id===id);return siegeable(b)?b:null;}
   // The enemy building under the pointer (its picture or one of its tiles).
   at(x,y,tile){
@@ -53,14 +63,19 @@ export class SiegeSystem {
     for(const w of engines){this.scene.workerSystem.commands?.resume?.(w);w.siegeTargetId=building.id;}
     // A Military Wagon sent along is free to follow the Catapults with its Stones.
     for(const w of soldiers)if(w?.isAlive&&this.scene.military?.unit?.(w)?.type==='military_wagon')this.scene.workerSystem.commands?.resume?.(w);
-    const s=this.scene,melee=soldiers.filter(canSiege);if(!siegeable(building)||!melee.length)return engines.length;
+    const s=this.scene,melee=soldiers.filter(canSiege),archers=siegeable(building)&&burns(s,building)?soldiers.filter(canFireArrows):[];if(!siegeable(building)||!melee.length&&!archers.length)return engines.length;
+    for(const w of archers){
+      s.workerSystem.commands?.resume?.(w);s.military?.wallPatrol?.set?.(w,false);s.combat?.stopAttack?.(w);delete w.huntWolfId;delete w.attackArea;delete w.attackRadius;
+      w.siegeTargetId=building.id;w.siegeSpot=null;w.siegeRetarget=0;w.siegeMisses=0;w.siegeOrdered=true;delete w.siegeSkip;delete w.cutOff;
+    }
     const spots=siegeTiles(s.map,building),used=new Set();
     for(const w of melee){
       s.workerSystem.commands?.resume?.(w);s.military?.wallPatrol?.set?.(w,false);s.combat?.stopAttack?.(w);delete w.huntWolfId;delete w.attackArea;delete w.attackRadius;
       const sorted=[...spots].sort((a,b)=>Math.hypot(a.x-w.tile.x,a.y-w.tile.y)-Math.hypot(b.x-w.tile.x,b.y-w.tile.y)),free=sorted.find(p=>!used.has(`${p.x},${p.y}`));if(free)used.add(`${free.x},${free.y}`);
       w.siegeTargetId=building.id;w.siegeSpot=free??null;w.siegeRetarget=0;w.siegeMisses=0;w.siegeOrdered=true;delete w.siegeSkip;delete w.cutOff;
     }
-    return melee.length+engines.length;
+    this.lastOrder={melee:melee.length,archers:archers.length,engines:engines.length};
+    return melee.length+archers.length+engines.length;
   }
   // Owner 18 Nov 2026 (siege test): the enemy this soldier is after stands behind enemy walls with no way in – he breaks
   // through instead of standing below them: the enemy building most on his way (his distance to it plus its distance
@@ -81,8 +96,9 @@ export class SiegeSystem {
     // nobody attacks an enemy building by himself any more. A building is hit on the player's order, or broken through
     // when an enemy stands behind it with no way to him (MilitarySystem.cutOff).
     if(worker.siegeTargetId==null)return false;
-    const state=worker.commandState?.state;if(state==='MovingToHold'||state==='Holding'||!canSiege(worker)){this.stop(worker);return false;}
+    const state=worker.commandState?.state,fire=canFireArrows(worker);if(state==='MovingToHold'||state==='Holding'||!(fire||canSiege(worker))){this.stop(worker);return false;}
     const b=this.target(worker);if(!b){this.stop(worker);return false;}
+    if(fire)return this.fireArrows(worker,b,delta);
     const s=this.scene,{width,height}=buildingDefinition(b),center={x:b.x+width/2,y:b.y+height/2};
     worker.workState='Working';worker.workMessage='Attacking the wall';
     if(!worker.nextTile&&touchesBuilding(worker.tile,b)){
@@ -100,6 +116,34 @@ export class SiegeSystem {
       else worker.siegeMisses=0;
     }
     return true;
+  }
+  // An archer with a siege order on a wooden building: he walks into range and shoots fire arrows at it.
+  fireArrows(worker,b,delta){
+    const s=this.scene;if(!burns(s,b)){this.stop(worker);return false;}
+    const {width,height}=buildingDefinition(b),center={x:b.x+width/2,y:b.y+height/2},gapTo=p=>Math.max(b.x-p.x,0,p.x-(b.x+width-1),b.y-p.y,p.y-(b.y+height-1));
+    worker.workState='Working';worker.workMessage='Shooting fire arrows';
+    if(!worker.nextTile&&gapTo(worker.tile)<=worker.attackRange){
+      worker.path=[];const dx=center.x-worker.position.x,dy=center.y-worker.position.y,n=Math.hypot(dx,dy);if(n)worker.direction={x:dx/n,y:dy/n};
+      const seconds=Math.max(0,delta)/1000,amount=Math.max(0,worker.attackDPS)*(worker.damageFactor??1)*(s.combat?.damageScale?.(worker)??1)*FIRE_ARROWS.damageShare*seconds;
+      worker.arrowWait=(worker.arrowWait??0)-delta;if(worker.arrowWait<=0){worker.arrowWait=FIRE_ARROWS.every;this.drawArrow(worker,center,buildingDefinition(b));}
+      const result=damageBuilding(b,amount);this.drawBar(b);if(result?.destroyed){this.heat.delete(b.id);this.destroy(b);return true;}
+      const fires=s.nightThreats;if(fires?.ignite&&!fires.burning?.(b)){const heat=(this.heat.get(b.id)??0)+seconds;this.heat.set(b.id,heat);if(heat>=FIRE_ARROWS.igniteAfter){this.heat.delete(b.id);fires.ignite(b);}}
+      return true;
+    }
+    worker.siegeRetarget=(worker.siegeRetarget??0)-delta;
+    if(!worker.nextTile&&!worker.path?.length&&worker.siegeRetarget<=0){
+      worker.siegeRetarget=SIEGE_RULES.retarget;const r=Math.max(1,worker.attackRange-1),goals=[];
+      for(let gy=b.y-r;gy<b.y+height+r;gy++)for(let gx=b.x-r;gx<b.x+width+r;gx++)if(gapTo({x:gx,y:gy})>=1&&isWalkable(s.map,gx,gy))goals.push({x:gx,y:gy});
+      if(!goals.length||!worker.moveTo(goals)){worker.siegeMisses=(worker.siegeMisses??0)+1;if(worker.siegeMisses>=SIEGE_RULES.giveUpAfter){this.stop(worker);s.setStatus?.(t('siege.noWay',{name:buildingDefinition(b).name}));return false;}}
+      else worker.siegeMisses=0;
+    }
+    return true;
+  }
+  // A burning arrow flies from the archer to the building (a small flame; provisional, drawn by code).
+  drawArrow(worker,center,definition){
+    const s=this.scene;if(!s.add?.circle||!s.tweens?.add)return;
+    const from=gridToWorld(worker.position.x,worker.position.y),to=gridToWorld(center.x,center.y),top=(definition.visualHeight??60)*.5,dot=s.add.circle(from.x,from.y-26,2.5,0xffb347).setDepth(20001);
+    s.tweens.add({targets:dot,x:to.x,y:to.y-top,duration:320,onComplete:()=>dot.destroy()});
   }
   // The building falls: its functions go like a burnt one's, the ground under it is free again.
   destroy(b){

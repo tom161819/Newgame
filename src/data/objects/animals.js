@@ -76,10 +76,11 @@ animals.push({
 
 // Owner 17 Nov 2026: the enemy army has the same four soldiers as ours (the owner's 3D models in steel blue, look in
 // ENEMY_ANIM_LOOKS); for the Test map now, armies of other castles later.
-const ENEMY_RANKS={soldier:{name:'Enemy Recruit',look:'enemy-recruit',speed:2.6,stats:{maxHP:70,attackDPS:7,armor:2,attackRange:1}},
+// Battle test 18 Nov 2026 (balance): their armour came closer to ours (Recruit 2 → 5, Swordsman 6 → 20, Knight 10 → 30).
+const ENEMY_RANKS={soldier:{name:'Enemy Recruit',look:'enemy-recruit',speed:2.6,stats:{maxHP:70,attackDPS:7,armor:5,attackRange:1}},
   archer:{name:'Enemy Archer',look:'enemy-archer',speed:2.6,stats:{maxHP:60,attackDPS:7,armor:0,attackRange:6}},
-  swordsman:{name:'Enemy Swordsman',look:'enemy-swordsman',speed:2.5,stats:{maxHP:100,attackDPS:10,armor:6,attackRange:1}},
-  knight:{name:'Enemy Knight',look:'enemy-knight',speed:2.8,stats:{maxHP:140,attackDPS:13,armor:10,attackRange:1}}};
+  swordsman:{name:'Enemy Swordsman',look:'enemy-swordsman',speed:2.5,stats:{maxHP:100,attackDPS:10,armor:20,attackRange:1}},
+  knight:{name:'Enemy Knight',look:'enemy-knight',speed:2.8,stats:{maxHP:140,attackDPS:13,armor:30,attackRange:1}}};
 for(const [rank,r] of Object.entries(ENEMY_RANKS))animals.push({
   id:`enemy_${rank}`,name:r.name,category:'animal',sprite:'/assets/characters/peasant/peasant.svg',look:r.look,
   width:1,height:1,walkable:false,collectible:false,buildable:false,cost:{},interactions:['hunt'],

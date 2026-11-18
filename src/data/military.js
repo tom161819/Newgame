@@ -12,19 +12,23 @@ export const UNIT_TYPES=Object.freeze({
   // Light Cavalry below. A Knight from an older save gives his horse back to the Stables on load.
   knight:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'armor'}),modifiers:Object.freeze({maxHP:100,attackBonus:50,armor:10}),trainingTime:60000,goldCost:25,wageBonus:4,requiredCombatLevel:4}),
   // p70 new units. Halberdier: halberd and armour, strikes from 2 tiles (still a melee fighter, see isRanged).
-  halberdier:Object.freeze({equipment:Object.freeze({weapon:'halberd',armor:'armor'}),modifiers:Object.freeze({maxHP:60,armor:5,attackRange:1}),trainingTime:50000,goldCost:15,wageBonus:3,requiredCombatLevel:3}),
+  halberdier:Object.freeze({equipment:Object.freeze({weapon:'halberd',armor:'armor'}),modifiers:Object.freeze({maxHP:60,attackRange:1}),bonusVs:Object.freeze({mounted:1.5}),trainingTime:50000,goldCost:15,wageBonus:3,requiredCombatLevel:3}),
   // Royal Archer: a bow and the Swordsman's defence (+60 HP, armour 15) and Light Armor.
   royal_archer:Object.freeze({equipment:Object.freeze({weapon:'bow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:60,attackBonus:20,armor:15,attackRange:5}),trainingTime:45000,goldCost:14,wageBonus:2,requiredCombatLevel:3}),
   // Crossbowman: crossbow and Light Armor.
-  crossbowman:Object.freeze({equipment:Object.freeze({weapon:'crossbow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:30,attackRange:4}),trainingTime:40000,goldCost:12,wageBonus:2,requiredCombatLevel:2}),
+  crossbowman:Object.freeze({equipment:Object.freeze({weapon:'crossbow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:30,attackRange:4}),pierce:.5,trainingTime:40000,goldCost:12,wageBonus:2,requiredCombatLevel:2}),
   // Light Cavalry: sword and a tamed horse from the Stables, fast. His own look comes later (owner's art).
-  light_cavalry:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'light_armor'}),mount:'horse',modifiers:Object.freeze({maxHP:50,attackBonus:30}),trainingTime:50000,goldCost:20,wageBonus:3,requiredCombatLevel:3}),
+  light_cavalry:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'light_armor'}),mount:'horse',charge:Object.freeze({run:5,damage:35}),modifiers:Object.freeze({maxHP:50,attackBonus:30}),trainingTime:50000,goldCost:20,wageBonus:3,requiredCombatLevel:3}),
   // Owner 18 Nov 2026: a Catapult crew (a Recruit and a finished Catapult from the Builder's Workshop) and a Military
   // Wagon (a Recruit and a Horse Wagon with its horse). `vehicle`: the vehicle the unit takes; no Armory items.
   // speedFactor: a Catapult rolls slowly, the Wagon at the horse's pace.
   catapult:Object.freeze({equipment:Object.freeze({}),vehicle:'catapult',speedFactor:.55,modifiers:Object.freeze({maxHP:20}),trainingTime:20000,goldCost:5,wageBonus:1,requiredCombatLevel:1}),
   military_wagon:Object.freeze({equipment:Object.freeze({}),vehicle:'horse_wagon',speedFactor:1.25,modifiers:Object.freeze({maxHP:10}),trainingTime:15000,goldCost:3,wageBonus:1,requiredCombatLevel:1}),
 });
+// Battle test 18 Nov 2026 (unit balance, roles): `bonusVs.mounted` – damage multiplier against riders (the Halberdier,
+// whose armour came down from 35 to 30, the Swordsman's: his reach is his strength); `pierce` – share of the target's armour his shot
+// ignores (the Crossbowman); `charge` – a rider who has ridden `run` tiles since his last blow opens the next fight
+// with one blow of `damage` hit points (before armour).
 // kasarna-branci (owner 9 Nov 2026): everyone employed in a Barracks starts as a Recruit – no equipment, basic combat
 // stats (the resident's own 60 HP and 6 DPS plus `modifiers`), patrols and defends near the Barracks like a unit, and
 // earns BASE_DAILY_WAGES.recruit. With items in an Armory a Recruit trains into one of UNIT_TYPES and keeps the seat.
@@ -41,6 +45,9 @@ export const KNIGHT_SPEED=1.5;
 export const CATAPULT=Object.freeze({range:12,minRange:3,reload:5000,damage:100,ammo:10,cost:Object.freeze({wood:30,iron:6}),constructionTime:40000});
 // followRadius: a free Wagon drives after a Catapult short of Stones this near.
 export const WAGON_SUPPLY=Object.freeze({load:Object.freeze({stone:30,food:20,torch:10}),loadRadius:4,supplyRadius:6,followRadius:40,every:1000});
+// Fire arrows (battle test, point 3): archers ordered at a wooden enemy building shoot it from their range for
+// `damageShare` of their attack; after `igniteAfter` archer-seconds it catches fire. `every` ms between drawn arrows.
+export const FIRE_ARROWS=Object.freeze({damageShare:.35,igniteAfter:20,every:1100});
 export const vehicleUnit=type=>UNIT_TYPES[type]?.vehicle??null;
 export const MILITARY_RULES=Object.freeze({refugeRadius:3,retreatMax:14,dutyCheck:500,holdLeash:9,cutOffFor:5000,guardRadius:12,retarget:600,kitCapacityPerOrder:2,followRadius:10,spreadRadius:6,crowd:3,engageRadius:5,retreatBelow:.25,retreatUntil:.5,retreatSafe:8,orderRadius:12,groupLink:5});
 // Combat 16 Nov 2026: soldier stances (worker.stance, saved; aggressive when missing). engage = fights an enemy this

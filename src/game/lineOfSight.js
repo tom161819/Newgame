@@ -11,3 +11,14 @@ export function hasLineOfSight(map,from,to){
   }
   return true;
 }
+// How many blocking tiles lie strictly between the two tiles (0 = a clear line). A diagonal squeeze between two
+// blocking corners counts as one.
+export function blockersBetween(map,from,to){
+  let x=from.x,y=from.y,n=0;const dx=Math.abs(to.x-x),dy=Math.abs(to.y-y),sx=Math.sign(to.x-x),sy=Math.sign(to.y-y);
+  for(let ix=0,iy=0;ix<dx||iy<dy;){
+    const step=(0.5+ix)/dx-(0.5+iy)/dy;
+    if(dy===0||dx!==0&&step<0){x+=sx;ix++;}else if(dx===0||step>0){y+=sy;iy++;}else{if(opaque(map[y]?.[x+sx])&&opaque(map[y+sy]?.[x]))n++;x+=sx;y+=sy;ix++;iy++;}
+    if((x!==to.x||y!==to.y)&&opaque(map[y]?.[x]))n++;
+  }
+  return n;
+}

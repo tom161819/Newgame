@@ -7,7 +7,8 @@ import { buildingIsComplete } from '../game/buildings.js';
 import { recalculateStats } from './UnitStats.js';
 import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
 import { findPathToAny } from '../game/pathfinding.js';
-import { inAttackRange,isRanged,WALL_ARCHER_RANGE } from './CombatSystem.js';
+import { inAttackRange,isRanged,WALL_ARCHER_RANGE,LOB,canLob } from './CombatSystem.js';
+import { blockersBetween } from '../game/lineOfSight.js';
 import { MILITARY_RULES,PATROL,STANCES } from '../data/military.js';
 import { freeAround,awayFrom } from '../game/combatSpacing.js';
 import { SiegeSystem,siegeable,canSiege } from './SiegeSystem.js';
@@ -19,7 +20,18 @@ import { SiegeEngines } from './SiegeEngines.js';
 // (Haulers carry them from an Armory to the Barracks kit store) and game time at the Barracks. A trained unit wears
 // its items; discharge or death drops them where the unit stands and Haulers return them to an Armory.
 export class MilitarySystem {
-  constructor(scene){this.scene=scene;this.units=new Map();this.orders=new Map();this.nextOrder=1;this.wallPatrol=new WallPatrol(scene);this.siege=new SiegeSystem(scene);this.engines=new SiegeEngines(scene);}
+  constructor(scene){this.scene=scene;this.units=new Map();this.orders=new Map();this.nextOrder=1;this.wallPatrol=new WallPatrol(scene);this.siege=new SiegeSystem(scene);this.engines=new SiegeEngines(scene);
+    if(scene.combat){scene.combat.pierce=a=>this.pierce(a);scene.combat.bonus=(a,target)=>this.bonus(a,target);}}
+  // Unit roles (battle test 18 Nov 2026): the Crossbowman's bolt ignores part of the armour, the Halberdier hits riders harder.
+  spec(unit){const u=unit?.id!=null?this.units.get(unit.id):null;return u?UNIT_TYPES[u.type]:null;}
+  pierce(attacker){return this.spec(attacker)?.pierce??0;}
+  mounted(unit){return !!(this.spec(unit)?.mount||unit?.definition?.gameplay?.mounted);}
+  bonus(attacker,target){const b=this.spec(attacker)?.bonusVs;return b?.mounted&&this.mounted(target)?b.mounted:1;}
+  // A rider who has ridden far enough since his last blow opens the fight with a charge.
+  charge(worker,target){
+    const c=this.spec(worker)?.charge,from=worker.chargeFrom;if(!c||!from||Math.hypot(worker.position.x-from.x,worker.position.y-from.y)<c.run)return 0;
+    worker.chargeFrom={x:worker.position.x,y:worker.position.y};return this.scene.combat.applyDamage(target,c.damage,worker);
+  }
   get storage(){return this.scene.foodStorage;}
   barracks(id){return this.scene.buildings.find(b=>b.id===id&&b.type==='barracks'&&buildingIsComplete(b))??null;}
   // m-zalozka-vojsko: the patrol round of the settlement – walkable waypoints on a ring around all finished buildings,
@@ -110,7 +122,7 @@ export class MilitarySystem {
     const unit=this.unit(worker);if(!unit){delete worker.crew;delete worker.statModifiers.militaryEquipment;if(this.isRecruit(worker))worker.statModifiers.military={...RECRUIT.modifiers};else delete worker.statModifiers.military;recalculateStats(worker);if(worker.definition?.gameplay?.movementSpeed)worker.speed=worker.definition.gameplay.movementSpeed;return;}
     const items={};for(const id of Object.values(unit.equipment)){const item=MILITARY_ITEMS[id],mods=item.modifiers??this.scene.objectRegistry.require(item.modifiersFrom).equipment.modifiers;for(const[k,v]of Object.entries(mods))items[k]=(items[k]??0)+v;}
     worker.statModifiers.militaryEquipment=items;worker.statModifiers.military={...UNIT_TYPES[unit.type].modifiers};recalculateStats(worker);
-    worker.speed=(worker.definition?.gameplay?.movementSpeed??worker.speed)*(UNIT_TYPES[unit.type].mount?KNIGHT_SPEED:1)*(UNIT_TYPES[unit.type].speedFactor??1);worker.crew=!!UNIT_TYPES[unit.type].vehicle;
+    worker.speed=(worker.definition?.gameplay?.movementSpeed??worker.speed)*(UNIT_TYPES[unit.type].mount?KNIGHT_SPEED:1)*(UNIT_TYPES[unit.type].speedFactor??1);worker.crew=!!UNIT_TYPES[unit.type].vehicle;if(UNIT_TYPES[unit.type].charge)worker.chargeFrom??={x:worker.position.x,y:worker.position.y};
   }
   // Discharge or death: the unit's items fall where it stands; Haulers carry them back to an Armory.
   release(worker,{dead=false}={}){
@@ -171,6 +183,14 @@ export class MilitarySystem {
     if(canSiege(worker)){
       if(siege.target(worker)==null){const b=siege.breachTarget(worker,enemy);if(b)siege.breach(worker,b);}
       if(worker.siegeTargetId!=null&&siege.update(worker,delta))return true;
+    }
+    // An archer walks to a place from which he can lob a shot over the wall (short range, half damage).
+    if(canLob(worker)&&!worker.onWall){
+      worker.lobWait=(worker.lobWait??0)-delta;
+      if(worker.nextTile||worker.path.length){worker.workState='Working';worker.workMessage='Defending the kingdom';return true;}
+      if(worker.lobWait<=0){worker.lobWait=1500;const map=this.scene.map,e=enemy.tile,spots=[];
+        for(let y=e.y-LOB.range;y<=e.y+LOB.range;y++)for(let x=e.x-LOB.range;x<=e.x+LOB.range;x++)if(map[y]?.[x]===0&&blockersBetween(map,{x,y},e)<=LOB.over)spots.push({x,y});
+        if(spots.length&&worker.moveTo(spots)){worker.workState='Working';worker.workMessage='Defending the kingdom';return true;}}
     }
     worker.path=[];worker.workState='Waiting';worker.workMessage='Enemy out of reach';return true;
   }
@@ -276,7 +296,7 @@ export class MilitarySystem {
     if(ranged&&!stance.hold&&!worker.nextTile&&(worker.kiteWait??0)<=0){const close=this.nearestEnemy(worker,1.6);if(close&&this.attackers(close)>0){worker.kiteWait=2500;combat.stopAttack(worker);const to=awayFrom(this.scene,worker.tile,close.tile,3);if(to.length){worker.moveTo(to);return true;}}}
     worker.kiteWait=Math.max(0,(worker.kiteWait??0)-delta);
     const ready=!worker.nextTile&&(ranged?inAttackRange(worker,target,this.scene.map)&&combat.canTarget(worker,target):canInteractAdjacent(this.scene.map,worker,target)||worker.attackRange>1&&inAttackRange(worker,target,this.scene.map)&&combat.canTarget(worker,target));
-    if(ready){worker.path=[];combat.startAttack(worker,target);const dx=target.position.x-worker.position.x,dy=target.position.y-worker.position.y,n=Math.hypot(dx,dy);if(n)worker.direction={x:dx/n,y:dy/n};return true;}
+    if(ready){worker.path=[];combat.startAttack(worker,target);if(worker.chargeTarget!==target.id){worker.chargeTarget=target.id;this.charge(worker,target);}worker.chargeFrom={x:worker.position.x,y:worker.position.y};const dx=target.position.x-worker.position.x,dy=target.position.y-worker.position.y,n=Math.hypot(dx,dy);if(n)worker.direction={x:dx/n,y:dy/n};return true;}
     if(!ranged)combat.stopAttack(worker);
     if(stance.hold){worker.path=[];return true;}
     // A defensive soldier does not chase far from where the fight found him.

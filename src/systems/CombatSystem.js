@@ -1,6 +1,6 @@
 import { isWalkable } from '../game/map.js';
 import { clampArmor } from './UnitStats.js';
-import { hasLineOfSight } from '../game/lineOfSight.js';
+import { hasLineOfSight,blockersBetween } from '../game/lineOfSight.js';
 export { clampArmor,createCombatStats } from './UnitStats.js';
 
 // p70: a unit with a reach of 2 (the Halberdier) is still a melee fighter; shooting starts above that.
@@ -17,8 +17,20 @@ export function inAttackRange(attacker,target,map=null) {
   if(map&&attacker.attackRange<=1&&a.x!==b.x&&a.y!==b.y){
     return isWalkable(map,a.x,b.y)&&isWalkable(map,b.x,a.y);
   }
-  // Ranged attacks need a clear line between the two tiles.
-  return attacker.attackRange<=1||!map||!!attacker.onWall||hasLineOfSight(map,a,b);
+  // Ranged attacks need a clear line between the two tiles – or a short lobbed shot over a wall (LOB).
+  return attacker.attackRange<=1||!map||!!attacker.onWall||hasLineOfSight(map,a,b)||lobbed(attacker,a,b,map);
+}
+// Battle test 18 Nov 2026, point 3 ("archers do nothing in a siege"): a soldier with a bow or crossbow, and an enemy
+// archer, lobs a shot over an obstacle at most `over` tiles thick (a wall, a Gate) at a target within `range` tiles,
+// for `damage` of the normal damage. Hunters and the King still need a clear line.
+export const LOB=Object.freeze({range:4,over:2,damage:.5});
+export const canLob=unit=>unit.attackRange>2&&(unit.profession==='soldier'||!!unit.definition?.gameplay?.hostile);
+const lobbed=(attacker,a,b,map)=>canLob(attacker)&&Math.max(Math.abs(a.x-b.x),Math.abs(a.y-b.y))<=LOB.range&&blockersBetween(map,a,b)<=LOB.over;
+// Share of the damage a shot does: 1 with a clear line (or from a wall), LOB.damage when lobbed.
+export function shotFactor(attacker,target,map){
+  if(!map||attacker.attackRange<=2||attacker.onWall)return 1;
+  const a={x:Math.floor(attacker.position.x),y:Math.floor(attacker.position.y)},b={x:Math.floor(target.position.x),y:Math.floor(target.position.y)};
+  return hasLineOfSight(map,a,b)?1:LOB.damage;
 }
 
 // Integruje DPS po časových úsecích až k nejbližší smrti. Odvetný útok tak
@@ -26,6 +38,8 @@ export function inAttackRange(attacker,target,map=null) {
 export class CombatSystem {
   constructor({map=null,canFight=()=>true,regenerationRate=()=>0,canTarget=()=>true,damageScale=()=>1}={}) {
     this.map=map;this.canFight=canFight;this.canTarget=canTarget;this.regenerationRate=regenerationRate;this.damageScale=damageScale;this.attacks=new Map();this.listeners=new Map();this.dead=new WeakSet();
+    // Unit roles (MilitarySystem sets them): `pierce(attacker)` = share of the target's armour ignored, `bonus(attacker,target)` = damage multiplier.
+    this.pierce=()=>0;this.bonus=()=>1;
   }
   on(event,listener){if(!this.listeners.has(event))this.listeners.set(event,new Set());this.listeners.get(event).add(listener);return()=>this.listeners.get(event)?.delete(listener);}
   emit(event,...args){for(const listener of this.listeners.get(event)??[])listener(...args);}
@@ -57,7 +71,7 @@ export class CombatSystem {
       for(const [attacker,target]of this.attacks){
         if(!attacker.isAlive||!target.isAlive){this.stopAttack(attacker);continue;}
         if(!this.canFight(attacker)||!this.canFight(target)||!inAttackRange(attacker,target,this.map)||!this.canTarget(attacker,target))continue;
-        const rate=Math.max(0,attacker.attackDPS)*(attacker.damageFactor??1)*this.damageScale(attacker)*(1-clampArmor(target.armor)/100);
+        const rate=Math.max(0,attacker.attackDPS)*(attacker.damageFactor??1)*this.damageScale(attacker)*shotFactor(attacker,target,this.map)*this.bonus(attacker,target)*(1-clampArmor(target.armor)*(1-this.pierce(attacker))/100);
         // Domestic animals Z2: a hunting dog close to its Hunter takes the bites meant for him.
         const shield=rate>0?this.shield?.(target,attacker):null;if(shield){shield.absorb(rate*remaining);continue;}
         if(rate>0){rates.set(target,(rates.get(target)??0)+rate);if(!contributors.has(target))contributors.set(target,[]);contributors.get(target).push({attacker,rate});}
