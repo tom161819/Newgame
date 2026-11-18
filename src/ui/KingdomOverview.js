@@ -108,7 +108,7 @@ export class KingdomOverview {
     if(this.bar){this.bar.classList.toggle('collapsed',this.collapsed);this.toggle?.setAttribute('aria-expanded',String(!this.collapsed));if(this.body)this.body.hidden=this.collapsed;}
     this.render();this.place();
   }
-  update(){const now=globalThis.performance?.now?.()??Date.now();if(now>=this.nextPlace){this.nextPlace=now+200;this.place();}if(now<this.next)return;this.next=now+500;this.render();}
+  update(){const now=globalThis.performance?.now?.()??Date.now();/* Owner 18 Nov 2026 (performance test): placing reads the layout of the panels around (a forced reflow), so it runs once a second unless the window size changed. */const size=`${globalThis.innerWidth}x${globalThis.innerHeight}`;if(now>=this.nextPlace||size!==this.lastSize){this.lastSize=size;this.nextPlace=now+1000;this.place();}if(now<this.next)return;this.next=now+1000;this.render();}
   // Keeps the bar in the corner, clear of what else is there now (the building strip, a moved Notices bar, …).
   place(){
     const bar=this.bar,view=bar?.parentElement?.getBoundingClientRect?.();if(!bar||bar.hidden||!view?.width)return;

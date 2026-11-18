@@ -10,7 +10,7 @@ import { PATH_STYLE, PATH_STYLE_SEED } from '../data/pathStyle.js';
 // repaints only copy it. Level 1 is trampled grass (dark green, no soil); 2–4 are the soil levels.
 const RESOLUTION = 2; // ground px per sample, as in the Path Lab
 const MARGIN = 2; // tiles around a changed chain whose painting may change (meander, area blend, level field)
-const REBUILD_MS = 500; // at most this often the shown levels are compared and the geometry rebuilt
+const REBUILD_MS = 2000; // at most this often the shown levels are compared and the geometry rebuilt (500 until 0.146.12: performance test, owner 18 Nov 2026)
 const FRAME_BUDGET_MS = 3; // V2 tile renders per frame; the rest keep their previous look (or wait) until the next frame
 const hex = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
 const smoothstep = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };

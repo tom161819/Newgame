@@ -11,6 +11,9 @@ export class PathWearSystem {
   }
   index(tile){return tile.y*this.width+tile.x;}
   isGrass(tile){return Number.isInteger(tile.x)&&Number.isInteger(tile.y)&&this.map[tile.y]?.[tile.x]===0&&this.grassTest(tile);}
+  // Owner 18 Nov 2026 (performance test: 30 soldiers on the march wore a band of path on every order and the ground was
+  // repainted all the time): soldiers do not tread paths. They still walk faster on paths others made.
+  treads(actor){return (actor.definition?.gameplay?.tramplesTerrain??actor.definition?.category==='character')&&(actor.state==null||actor.state==='ground')&&actor.profession!=='soldier';}
   affects(actor){return (actor.definition?.gameplay?.tramplesTerrain??actor.definition?.category==='character')&&(actor.state==null||actor.state==='ground');}
   level(tile){return this.isGrass(tile)?this.levels[this.index(tile)]:0;}
   // S11: Stone Pavement is a permanent surface on this same layer. It replaces (never adds to) the trodden-path bonus
@@ -25,7 +28,7 @@ export class PathWearSystem {
     // their workplace (IdleGathering, a few tiles every few seconds) wore round patches and short straight trails there
     // within a day. Paths come from real trips; a short idle step (actor.idleStep is that route) does not wear.
     if(actor.idleStep&&actor.idleStep===actor.path)return;
-    if(!this.affects(actor)||!this.isGrass(tile))return;
+    if(!this.treads(actor)||!this.isGrass(tile))return;
     const i=this.index(tile);this.scores[i]=Math.min(Number.MAX_SAFE_INTEGER,this.scores[i]+(actor.mountedHorse?2:1));
     this.lastPassDays[i]=this.time.day;this.active.add(i);this.revision++;this.refreshLevel(i);
   }

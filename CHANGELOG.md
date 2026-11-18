@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.12] - 2026-11-18
+<!-- version: {"title":"Faster with many soldiers","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- Faster with many soldiers: soldiers no longer tread paths (they still walk faster on paths others made), and trodden paths are redrawn at most every 2 s.
+- Fog of War: soldiers walking inside ground already seen no longer make the ground and the fog edge redraw; with many people in sight the fog edge is redrawn at most 5 times a second.
+- The ground takes at most about a fifth of the time for repainting changed pieces, and with relief each repainted piece is uploaded to the graphics card once instead of twice.
+- The kingdom bar and the hover check update less often.
+
 ## [0.146.11] - 2026-11-18
 <!-- version: {"title":"Strays join the party by Hunting level","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Changed

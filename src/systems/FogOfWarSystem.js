@@ -65,9 +65,11 @@ export class FogOfWarSystem {
       this.top=Math.ceil(Math.min(...sources.map(s=>s.center.y-s.radius))-.5);
       this.right=Math.floor(Math.max(...sources.map(s=>s.center.x+s.radius))-.5)+1;
       this.bottom=Math.floor(Math.max(...sources.map(s=>s.center.y+s.radius))-.5)+1;
-      this.added=[];this.removed=[];
-      for(let i=0;i<touched.length;i++){const index=touched[i],now=coverage[index]>0;if(now&&!was[i]){this.visibleIndices.add(index);this.added.push(index);}else if(!now&&was[i]){this.visibleIndices.delete(index);this.removed.push(index);}}
-      this.revision++;
+      const added=[],removed=[];
+      for(let i=0;i<touched.length;i++){const index=touched[i],now=coverage[index]>0;if(now&&!was[i]){this.visibleIndices.add(index);added.push(index);}else if(!now&&was[i]){this.visibleIndices.delete(index);removed.push(index);}}
+      // Owner 18 Nov 2026 (performance test): a group walking inside ground already seen moves its sight circles but sees
+      // no new tile; the revision (terrain fog patches, fog edge, map memory) moves only when a tile is seen or lost.
+      if(added.length||removed.length){this.added=added;this.removed=removed;this.revision++;}
     }
     this.signature=`${this.enabled?'on':'off'}:${this.explorationEnabled}:${this.revision}:${this.memoryBrightness}`;
   }

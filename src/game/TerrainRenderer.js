@@ -32,6 +32,7 @@ const WATER_DEPTH = { [GROUND.FORD]: 0.15, [GROUND.SHALLOW]: 0.5, [GROUND.DEEP]:
 const CHUNK_SIZE = 10;
 // performance-1: already shown dirty chunks repainted a frame (continuous ground) and at most every REPAINT_EVERY_MS,
 // the least time between two repaints of one chunk, and between two path-only ground repaints.
+const TERRAIN_DUTY = 4;
 const REPAINT_PER_FRAME = 1, REPAINT_EVERY_MS = 50, REPAINT_GAP_MS = 200, GROUND_PATH_GAP_MS = 750;
 // performance-2: Fog of War patches (see applyFogPatches).
 const FOG_PATCH_EVERY_MS = 150, FOG_PATCH_BUDGET_MS = 3;
@@ -427,6 +428,12 @@ export class TerrainRenderer {
   // (x stays, y rises by the height at that point), drawn back to front; a triangle turned away from the viewer is
   // skipped (it lies behind its own hill). The lifted picture is LIFT_PAD px taller and is shown that much higher.
   // Returns the lifted texture's key, or null for a level chunk (shown as it is).
+  // Owner 18 Nov 2026 (performance test): with relief the shown picture is the lifted one, drawn from the flat canvas on
+  // the CPU, so uploading the flat picture to the GPU as well was wasted (two uploads per repainted chunk). The flat
+  // texture is uploaded only when it is shown (a level chunk, relief off).
+  lifts(){return !!this.scene.relief&&this.scene.reliefLift!==false&&typeof document!=='undefined';}
+  uploadFlat(texture){if(this.lifts())texture.flatStale=true;else{texture.flatStale=false;texture.refresh();}}
+  flushFlat(key){const [cx,cy]=key.split(',').map(Number),name=`terrain-chunk-${cx}-${cy}`;if(!this.scene.textures?.exists?.(name))return;const t=this.scene.textures.get(name);if(t.flatStale){t.flatStale=false;t.refresh();}}
   liftChunk(key,rects=null){
     const relief=this.scene.relief;if(!relief||this.scene.reliefLift===false||typeof document==='undefined')return null;
     const [cx,cy]=key.split(',').map(Number),flatKey=`terrain-chunk-${cx}-${cy}`,name=`terrain-lift-${cx}-${cy}`,textures=this.scene.textures;if(!textures.exists(flatKey))return null;
@@ -898,7 +905,7 @@ export class TerrainRenderer {
       // S11 Stone Pavement on top of ground and tracks; under Fog of War only the remembered surface is drawn.
       for(const p of paths){const paved=tile=>this.tileData(tile)[4]===1;if(!paved(p))continue;const c=tileCenter(p);context.save();context.filter=p.filter;
         drawCobbles(context,c.x-left,c.y-origin.y,{tileX:p.x,tileY:p.y,winter:p.veil>.3,edges:{N:!paved({x:p.x-1,y:p.y}),E:!paved({x:p.x,y:p.y-1}),S:!paved({x:p.x+1,y:p.y}),W:!paved({x:p.x,y:p.y+1})}});context.restore();}
-      texture.refresh();
+      this.uploadFlat(texture);
       this.paintStats.chunks++;
       this.fogDirty?.delete(`${cx},${cy}`);
       // A fog-only repaint over a stale ground picture keeps the chunk dirty: its ground repaints in its turn.
@@ -1105,7 +1112,7 @@ export class TerrainRenderer {
             context.save();diamond();context.clip();diamond();context.fill();context.restore();continue;}
           context.moveTo(px-33,py);context.lineTo(px,py-16.5);context.lineTo(px+33,py);context.lineTo(px,py+16.5);context.closePath();context.fill();}
         context.restore();}}
-      texture.refresh();const liftedPatch=this.liftChunk(key,rects);
+      this.uploadFlat(texture);const liftedPatch=this.liftChunk(key,rects);if(!liftedPatch)this.flushFlat(key);
       // Lifted, a patched rectangle lies up to the chunk's highest ground higher (and reaches a tile further each way).
       const shape=liftedPatch?this.liftShapes.get(key):null;
       this.composite?.touch(key,rects.map(r=>shape?{x:left+r.bx0-34,y:top+r.by0-Math.ceil(shape.top)-18,width:r.bw+68,height:r.bh+Math.ceil(shape.top-shape.low)+36}:{x:left+r.bx0,y:top+r.by0,width:r.bw,height:r.bh}));this.paintStats.patches=(this.paintStats.patches??0)+indices.size;
@@ -1124,6 +1131,7 @@ export class TerrainRenderer {
       const image = this.chunks.get(key)??this.chunkPool.pop() ?? this.scene.add.image(0,0,texture.key).setOrigin(0,0).setDepth(-100);
       // The picture shown is the lifted one (liftChunk); a level chunk shows its flat picture.
       const liftName=`terrain-lift-${cx}-${cy}`,lifted=texture.painted!==false||!this.scene.textures.exists(liftName)?this.liftChunk(key):liftName;
+      if(!lifted)this.flushFlat(key);
       image.setTexture(lifted??texture.key).setPosition(texture.x,texture.y-(lifted?LIFT_PAD:0)).setVisible(true);
       const shape=lifted?this.liftShapes?.get(key):null;image.tight=shape?{x:texture.x,y:Math.floor(texture.y-shape.top)-2,width:image.frame.cutWidth,height:Math.ceil(image.frame.cutHeight-LIFT_PAD+shape.top-shape.low)+4}:null;
       this.chunks.set(key,image);const done=!this.dirtyChunks.has(key);if(done||texture.painted)this.composite?.touch(key);return done||!!texture.painted;
@@ -1158,7 +1166,7 @@ export class TerrainRenderer {
     const backlog=!all&&waiting.length>BACKLOG_CHUNKS;
     for(let i=0;i<waiting.length;i++){const key=waiting[i];if(budget<=0)break;if(!all&&!backlog&&!this.groundJobActive(key)&&started-(painted.get(key)??-Infinity)<REPAINT_GAP_MS)continue;
       // A band of a half painted chunk shows nothing yet: with a backlog the same chunk gets further bands in this slice.
-      if(!paint(key)){if(backlog&&this.groundJobActive(key)&&performance.now()-started<BACKLOG_SLICE_MS){this.groundPaintsLeft=1;i--;}continue;}budget--;order.set(key,this.paintTick=(this.paintTick??0)+1);if(all)painted.delete(key);else{painted.set(key,started);this.nextFogPaint=started+(backlog?BACKLOG_EVERY_MS:REPAINT_EVERY_MS);
+      if(!paint(key)){if(backlog&&this.groundJobActive(key)&&performance.now()-started<BACKLOG_SLICE_MS){this.groundPaintsLeft=1;i--;}continue;}budget--;order.set(key,this.paintTick=(this.paintTick??0)+1);if(all)painted.delete(key);else{painted.set(key,started);/* Owner 18 Nov 2026 (performance test): a chunk repaint may take 10–60 ms on a slow machine; the next waits at least four times as long as this one took, so the ground takes at most about a fifth of the time. */const spent=performance.now()-started;this.nextFogPaint=started+Math.max(backlog?BACKLOG_EVERY_MS:REPAINT_EVERY_MS,backlog?0:spent*TERRAIN_DUTY);
       if(backlog&&performance.now()-started<BACKLOG_SLICE_MS){budget=1;this.groundPaintsLeft=1;}}}
     this.composite?.sync(this.camera??this.scene.cameras?.main);
   }
@@ -1239,7 +1247,7 @@ export class TerrainRenderer {
     for (const [key, chunk] of this.chunks) if (!neededChunks.has(key)) {
       chunk.setVisible(false); chunk.tight=null; this.chunkPool.push(chunk); this.chunks.delete(key);
       // The lifted picture of a chunk that left the view is freed (about 1 MB each); it is made again on return.
-      {const [lx,ly]=key.split(',');const flatKey=`terrain-chunk-${lx}-${ly}`,liftName=`terrain-lift-${lx}-${ly}`;if(this.scene.textures.exists(liftName)){if(this.scene.textures.exists(flatKey))chunk.setTexture(flatKey);this.scene.textures.remove(liftName);}}
+      {const [lx,ly]=key.split(',');const flatKey=`terrain-chunk-${lx}-${ly}`,liftName=`terrain-lift-${lx}-${ly}`;if(this.scene.textures.exists(liftName)){if(this.scene.textures.exists(flatKey)){this.flushFlat(key);chunk.setTexture(flatKey);}this.scene.textures.remove(liftName);}}
     }
     this.neededChunks=neededChunks;this.repaintDirty();
     this.visibleCount=visibleCount;
