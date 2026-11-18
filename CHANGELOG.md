@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.2] - 2026-11-18
+<!-- version: {"title":"Sieges with defenders inside, standing soldiers fight","type":"fix","reconstructed":false,"saveVersion":65} -->
+### Fixed
+- Soldiers no longer stand below an enemy fort while its defenders are inside. Sent at a wall, they hit it. Sent at an enemy behind closed walls, the melee soldiers break through the wall on the way and then go on after him.
+- Soldiers standing after a move order fight the enemies who come near (before, only the one being hit struck back) and then walk back to their places. The stance Hold position still keeps them where they are.
+- A Military Wagon drives after a Catapult that is running out of Stones.
+- A soldier with no free place at an enemy wall takes another wall instead of giving up.
+
 ## [0.146.1] - 2026-11-18
 <!-- version: {"title":"Attack orders before the morning rest","type":"fix","reconstructed":false,"saveVersion":65} -->
 ### Fixed

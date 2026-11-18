@@ -81,3 +81,33 @@ test('owner 18 Nov 2026: a Barracks soldier with an order does not walk to his B
   until(s,()=>{morning(s);worst=Math.max(worst,Math.hypot(crew.tile.x-fort.x,crew.tile.y-fort.y));return (buildingHP(fort)?.hp??200)<200;},200000);
   assert.ok(worst<=start+2,'the Catapult never drove away from its target');assert.equal(crew.restPhase??null,null);
 });
+
+// Owner 18 Nov 2026, the full test of battles and sieges. A closed enemy fort with its defenders inside.
+const fort=(s,x0,y0,w,h)=>{const walls=[];for(let x=x0;x<x0+w;x++){walls.push(add(s,'wall',x,y0),add(s,'wall',x,y0+h-1));}for(let y=y0+1;y<y0+h-1;y++){walls.push(add(s,'wall',x0,y),add(s,'wall',x0+w-1,y));}for(const b of walls)markEnemyBuilding(s,b);return walls;};
+const units=(s,id,at,n)=>{const before=new Set([...s.workerSystem.workers.keys(),...s.animalSystem.animals.keys()]);spawnSandboxUnits(s,id,at,n);return [...s.workerSystem.workers.values(),...s.animalSystem.animals.values()].filter(u=>!before.has(u.id));};
+const foes=s=>[...s.animalSystem.animals.values()].filter(a=>a.isAlive&&a.definition?.gameplay?.hostile);
+
+test('siege test: soldiers sent at a wall hit it although the defenders stand inside out of reach, then go in through the gap',()=>{
+  const s=workerScene(undefined,{foodProduction:true}),walls=fort(s,50,40,10,8);units(s,'enemy_soldier',{x:54,y:43},4);
+  const us=units(s,'swordsman',{x:54,y:53},6),target=walls.find(w=>w.x===54&&w.y===47);assert.equal(s.military.siege.order(us,target),6);
+  until(s,()=>(buildingHP(target)?.hp??200)<200,20000);assert.ok(us.some(w=>w.workMessage==='Attacking the wall'),'they do not wait below the wall for the men inside');
+  until(s,()=>!foes(s).length,120000);assert.ok(us.some(w=>w.isAlive));
+});
+
+test('siege test: an attack order on an enemy behind closed walls makes the melee soldiers break through; an archer waits',()=>{
+  const s=workerScene(undefined,{foodProduction:true}),walls=fort(s,50,40,10,8),inside=units(s,'enemy_soldier',{x:54,y:43},3);
+  const us=units(s,'swordsman',{x:54,y:56},5),archer=units(s,'archer',{x:54,y:58},1)[0];s.military.orderAttack([...us,archer],inside[0]);
+  until(s,()=>us.some(w=>w.siegeTargetId!=null),20000);assert.ok(us.every(w=>w.huntWolfId!=null||w.attackArea),'the attack order stays');
+  until(s,()=>walls.some(w=>!s.buildings.includes(w)),60000);until(s,()=>!foes(s).length,120000);
+  assert.equal(archer.siegeTargetId,undefined);
+});
+
+test('combat test: soldiers standing after a move order fight the enemies who come near and walk back to their places; Hold position does not move',()=>{
+  const s=workerScene(undefined,{foodProduction:true}),us=units(s,'swordsman',{x:40,y:50},6);s.workerSystem.commands.move(us,{x:48,y:50});
+  until(s,()=>us.every(w=>w.commandState.state==='Holding'),30000);const places=us.map(w=>({...w.commandState.goal}));
+  const enemies=units(s,'enemy_soldier',{x:55,y:50},6);until(s,()=>!foes(s).length,60000);
+  assert.ok(us.filter(w=>w.isAlive).length>=5,'six Swordsmen beat six enemy Recruits when all of them fight');assert.ok(enemies.every(e=>!e.isAlive));
+  until(s,()=>us.every((w,i)=>!w.isAlive||w.tile.x===places[i].x&&w.tile.y===places[i].y),30000);assert.ok(us.every(w=>!w.isAlive||w.commandState.state==='Holding'),'still on the move order');
+  const t=workerScene(undefined,{foodProduction:true}),guard=units(t,'swordsman',{x:40,y:50},1)[0];guard.stance='hold';t.workerSystem.commands.move([guard],{x:44,y:50});until(t,()=>guard.commandState.state==='Holding',20000);
+  const at={...guard.tile};units(t,'enemy_archer',{x:49,y:50},1);t.simulate(4000);assert.deepEqual(guard.tile,at,'Hold position: he stays');
+});

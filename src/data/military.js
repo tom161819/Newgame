@@ -39,9 +39,10 @@ export const KNIGHT_SPEED=1.5;
 // `minRange` and `range` tiles, `damage` hit points a hit, holding up to `ammo` Stones. The Military Wagon loads at a store
 // it stands near (`loadRadius`) up to `load` of each supply and hands it to units within `supplyRadius`.
 export const CATAPULT=Object.freeze({range:12,minRange:3,reload:5000,damage:60,ammo:10,cost:Object.freeze({wood:30,iron:6}),constructionTime:40000});
-export const WAGON_SUPPLY=Object.freeze({load:Object.freeze({stone:30,food:20,torch:10}),loadRadius:4,supplyRadius:6,every:1000});
+// followRadius: a free Wagon drives after a Catapult short of Stones this near.
+export const WAGON_SUPPLY=Object.freeze({load:Object.freeze({stone:30,food:20,torch:10}),loadRadius:4,supplyRadius:6,followRadius:40,every:1000});
 export const vehicleUnit=type=>UNIT_TYPES[type]?.vehicle??null;
-export const MILITARY_RULES=Object.freeze({dutyCheck:500,guardRadius:12,retarget:600,kitCapacityPerOrder:2,followRadius:10,spreadRadius:6,crowd:3,engageRadius:5,retreatBelow:.25,retreatUntil:.5,retreatSafe:8,orderRadius:12,groupLink:5});
+export const MILITARY_RULES=Object.freeze({dutyCheck:500,holdLeash:9,cutOffFor:5000,guardRadius:12,retarget:600,kitCapacityPerOrder:2,followRadius:10,spreadRadius:6,crowd:3,engageRadius:5,retreatBelow:.25,retreatUntil:.5,retreatSafe:8,orderRadius:12,groupLink:5});
 // Combat 16 Nov 2026: soldier stances (worker.stance, saved; aggressive when missing). engage = fights an enemy this
 // near without an order; follow = takes the next enemy this near after his target falls; leash = gives up a chase this
 // far from himself; hold = never moves to fight; retreat = steps back when badly hurt.

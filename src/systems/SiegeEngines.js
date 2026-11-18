@@ -69,7 +69,7 @@ export class SiegeEngines {
       if(move&&!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=1000;const goals=[{x:v.x,y:v.y},...[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]].map(([dx,dy])=>({x:v.x+dx,y:v.y+dy}))].filter(p=>isWalkable(this.scene.map,p.x,p.y));worker.moveTo(goals);}
       return true;
     }
-    return type==='catapult'?this.catapult(worker,v,delta,move):this.wagon(worker,v,delta);
+    return type==='catapult'?this.catapult(worker,v,delta,move):this.wagon(worker,v,delta,move);
   }
   // --- Catapult ---
   catapultTarget(worker,v){
@@ -106,15 +106,24 @@ export class SiegeEngines {
     const peak=Math.min(from.y,to.y)-120,state={p:0};s.tweens.add({targets:state,p:1,duration:900,onUpdate:()=>{const p=state.p,x=from.x+(to.x-from.x)*p,y=(1-p)*(1-p)*(from.y-30)+2*(1-p)*p*peak+p*p*(to.y-40);g.setPosition(x,y);},onComplete:()=>g.destroy()});
   }
   // --- Military Wagon ---
-  wagon(worker,v,delta){
+  wagon(worker,v,delta,move=true){
     worker.wagonWait=(worker.wagonWait??0)-delta;if(worker.wagonWait>0)return this.wagonState(worker,v);worker.wagonWait=WAGON_SUPPLY.every;
     const loaded=this.loadFromStore(worker,v,WAGON_SUPPLY.load);
+    // Owner 18 Nov 2026 (siege test: the Catapult rolled to the wall, ran out of Stones and the Wagon with thirty Stones
+    // stayed nine tiles behind): a Wagon that is not told to stand somewhere drives after the nearest Catapult that is
+    // short of Stones and out of its reach.
+    worker.wagonFollow=null;
+    if(move&&(v.supplies?.stone??0)>0&&!worker.nextTile&&!worker.path.length){
+      const near=this.crews('catapult').map(c=>({c,d:Math.hypot(c.position.x-worker.position.x,c.position.y-worker.position.y)})).filter(x=>(this.vehicleOf(x.c)?.ammo??0)<=CATAPULT.ammo/2&&x.d>WAGON_SUPPLY.supplyRadius-1&&x.d<=WAGON_SUPPLY.followRadius).sort((a,b)=>a.d-b.d)[0];
+      if(near){const c=near.c.tile,goals=[];for(let y=c.y-3;y<=c.y+3;y++)for(let x=c.x-3;x<=c.x+3;x++){const r=Math.max(Math.abs(x-c.x),Math.abs(y-c.y));if(r>=2&&isWalkable(this.scene.map,x,y))goals.push({x,y});}
+        if(goals.length&&worker.moveTo(goals))worker.wagonFollow=near.c.id;}
+    }
     // Stones for the Catapults near it.
     for(const crew of this.crews('catapult')){const c=this.vehicleOf(crew);if(!c||Math.hypot(crew.position.x-worker.position.x,crew.position.y-worker.position.y)>WAGON_SUPPLY.supplyRadius)continue;
       const n=Math.min(CATAPULT.ammo-(c.ammo??0),v.supplies?.stone??0);if(n>0){c.ammo=(c.ammo??0)+n;v.supplies.stone-=n;if(!v.supplies.stone)delete v.supplies.stone;this.vehicles.changed();}}
     worker.wagonLoading=loaded;return this.wagonState(worker,v);
   }
-  wagonState(worker,v){worker.workState='Waiting';worker.workMessage=worker.wagonLoading?'Loading supplies':'Supplying the army';return true;}
+  wagonState(worker,v){const driving=worker.nextTile||worker.path?.length;worker.workState=driving?'Traveling to Target':'Waiting';worker.workMessage=driving?'Bringing Stones to the Catapult':worker.wagonLoading?'Loading supplies':'Supplying the army';return true;}
   // Takes from a store within reach up to `targets` ({stone, food, torch}: food is any kind of food). True if it took.
   loadFromStore(worker,v,targets){
     const s=this.scene,storage=this.storage;if(!storage)return false;

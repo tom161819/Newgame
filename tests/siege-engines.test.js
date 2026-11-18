@@ -67,3 +67,11 @@ test("owner 18 Nov 2026: the Builder's Workshop orders a Catapult site beside it
   const t=workerScene(undefined,{foodProduction:true});t.sandbox=true;const shop2={id:900,type:'builder_workshop',definition:t.objectRegistry.require('builder_workshop'),x:50,y:50,tiles:[]};for(let y=50;y<53;y++)for(let x=50;x<53;x++){shop2.tiles.push({x,y});t.map[y][x]=1;}t.buildings.push(shop2);
   const r2=t.military.engines.orderCatapult(shop2);assert.ifError(r2.error);t.tick(50);assert.ok([...t.vehicles.vehicles.values()].some(v=>v.type==='catapult'),'on the Test map it stands finished');
 });
+
+test('siege test: a free Military Wagon drives after a Catapult that ran short of Stones and fills it',()=>{
+  const s=workerScene(undefined,{foodProduction:true}),target=wall(s,70,50);target.hp=100000;target.maxHP=100000;
+  spawnSandboxUnits(s,'catapult',{x:40,y:50},1);spawnSandboxUnits(s,'military_wagon',{x:38,y:52},1);
+  const crew=s.workerSystem.liveWorkers().find(w=>s.military.unit(w)?.type==='catapult'),driver=s.workerSystem.liveWorkers().find(w=>s.military.unit(w)?.type==='military_wagon'),cat=s.military.engines.vehicleOf(crew),wagon=s.military.engines.vehicleOf(driver);
+  cat.ammo=2;const stones=wagon.supplies.stone;s.military.siege.order([crew,driver],target);
+  until(s,()=>wagon.supplies.stone<stones,120000);assert.ok(Math.hypot(crew.position.x-driver.position.x,crew.position.y-driver.position.y)<=WAGON_SUPPLY.supplyRadius+1,'the Wagon came to the Catapult');assert.ok(cat.ammo>2);
+});

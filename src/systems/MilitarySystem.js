@@ -6,6 +6,7 @@ import { MILITARY_ITEMS } from '../data/militaryEquipment.js';
 import { buildingIsComplete } from '../game/buildings.js';
 import { recalculateStats } from './UnitStats.js';
 import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
+import { findPathToAny } from '../game/pathfinding.js';
 import { inAttackRange,isRanged,WALL_ARCHER_RANGE } from './CombatSystem.js';
 import { MILITARY_RULES,PATROL,STANCES } from '../data/military.js';
 import { freeAround,awayFrom } from '../game/combatSpacing.js';
@@ -156,6 +157,17 @@ export class MilitarySystem {
       else if(!UNIT_TYPES[type]?.vehicle&&canSiege(worker))on=!!this.siege.near(worker);}
     worker.dutyCheck={at:now,on};return on;
   }
+  // Is there a way on the ground to stand next to this enemy (other units aside)?
+  reachable(worker,enemy){const map=this.scene.map,goals=adjacentTiles(enemy,map);return !!goals.length&&!!findPathToAny(map,worker.nextTile??worker.tile,goals);}
+  // The enemy is cut off: break through an enemy building on the way; an archer (or with no wall to break) waits.
+  cutOff(worker,enemy,delta){
+    const siege=this.siege;this.scene.combat.stopAttack(worker);
+    if(canSiege(worker)&&worker.commandState?.state!=='Holding'){
+      if(siege.target(worker)==null){const b=siege.breachTarget(worker,enemy);if(b)siege.breach(worker,b);}
+      if(worker.siegeTargetId!=null&&siege.update(worker,delta))return true;
+    }
+    worker.path=[];worker.workState='Waiting';worker.workMessage='Enemy out of reach';return true;
+  }
   attackers(target){let n=0;for(const [a,t] of this.scene.combat?.attacks??[])if(t===target&&a.isAlive)n++;return n;}
   threat(worker){
     // m-mapa-kraje: in a scouted land the party guards itself – a soldier helps whoever of it is attacked near him.
@@ -172,11 +184,22 @@ export class MilitarySystem {
   // Wagon supplies, without moving; a melee soldier with an enemy building close and no enemy soldier near goes at it.
   holding(worker,delta){
     const unit=this.unit(worker);if(unit&&UNIT_TYPES[unit.type]?.vehicle){this.engines.update(worker,delta,{move:false});return;}
-    if(worker.stance==='hold'||this.nearestEnemy(worker,(STANCES[worker.stance]??STANCES.aggressive).engage))return;
-    const b=this.siege.near(worker);if(b)this.siege.order([worker],b);
+    if(worker.stance==='hold')return;
+    // Owner 18 Nov 2026 (combat test: eight Swordsmen standing after a move order lost to eight enemy Recruits – only the
+    // one being hit fought back): a soldier standing where he was sent fights the enemies who come near like any other
+    // soldier of his stance, does not follow them far (holdLeash) and walks back to his place when it is over. The
+    // stance Hold position keeps the old behaviour: he does not move.
+    const goal=worker.commandState?.goal??null,place=goal??{x:worker.tile.x,y:worker.tile.y};
+    if(this.updateSoldier(worker,delta,{held:place})){worker.holdAway=true;return;}
+    if(this.nearestEnemy(worker,(STANCES[worker.stance]??STANCES.aggressive).engage))return;
+    const b=this.siege.near(worker);if(b){this.siege.order([worker],b);worker.siegeOrdered=false;return;}
+    worker.holdReturn=Math.max(0,(worker.holdReturn??0)-delta);
+    if(goal&&worker.holdAway&&!worker.nextTile&&!worker.path.length&&!worker.holdReturn){
+      if(worker.tile.x===goal.x&&worker.tile.y===goal.y){worker.holdAway=false;worker.holdTries=0;}else{worker.holdReturn=1000;/* a comrade may stand on his place for a moment: a few tries */if(!worker.moveTo([goal])&&(worker.holdTries=(worker.holdTries??0)+1)>=10){worker.holdAway=false;worker.holdTries=0;}}}
   }
   // Soldier behaviour on top of patrolling. Returns true when it took over this frame.
-  updateSoldier(worker,delta){
+  // `held`: the place of a soldier standing on a move order (see `holding`); he fights from it and is led back to it.
+  updateSoldier(worker,delta,{held=null}={}){
     const order=this.order(worker),combat=this.scene.combat,unit=this.unit(worker);
     if(order?.state==='training'){combat.stopAttack(worker);worker.workState='Working';worker.workMessage='Training';
       if(!this.scene.workplaceSystem.atWorkplace(worker)&&!worker.nextTile&&!worker.path.length&&worker.aiCooldown<=0){worker.aiCooldown=1000;worker.moveTo(this.scene.workplaceSystem.goals(worker));}return true;}
@@ -197,7 +220,7 @@ export class MilitarySystem {
         if(target){combat.startAttack(worker,target);if(!worker.nextTile&&!worker.path.length){const dx=target.position.x-worker.position.x,dy=target.position.y-worker.position.y,n=Math.hypot(dx,dy);if(n)worker.direction={x:dx/n,y:dy/n};}}else if(current)combat.stopAttack(worker);}
       if(this.wallPatrol.update(worker,delta))return true;}
     // kasarna-branci: Recruits defend near their Barracks too, with their basic stats.
-    if(!(unit||this.isRecruit(worker))||worker.commandState?.state==='Holding')return false;
+    if(!(unit||this.isRecruit(worker))||worker.commandState?.state==='Holding'&&!held)return false;
     // Combat 16 Nov 2026: stances – aggressive (default: chases and fights on), defensive (fights near itself only),
     // hold (does not move; fights only what is in reach).
     const stance=STANCES[worker.stance]??STANCES.aggressive,tile=worker.position;
@@ -226,6 +249,16 @@ export class MilitarySystem {
     if(!hunted&&!combat.attacks.get(worker)){const near=this.nearestEnemy(worker,stance.hold?worker.attackRange+.5:stance.engage);if(near)hunted=near;}
     const current=combat.attacks.get(worker)?.isAlive&&combat.attacks.get(worker).definition?combat.attacks.get(worker):null;
     const target=current??(stance.hold?hunted:this.threat(worker)??hunted);if(!target)return this.siege?.update(worker,delta)??false;
+    // A soldier standing on a move order does not follow an enemy far from his place (he walks back to it).
+    if(held&&target!==current&&Math.hypot(target.position.x-held.x,target.position.y-held.y)>MILITARY_RULES.holdLeash){combat.stopAttack(worker);return false;}
+    // Owner 18 Nov 2026 (siege test: "soldiers stand below the walls doing nothing while the defenders are inside"):
+    // an enemy with no way to him (behind enemy walls) is not waited for – a melee soldier breaks through the wall on
+    // the way (or keeps hitting the wall he was sent at); with the wall down the way is looked for again.
+    const now=this.scene.gameTime?.totalElapsed??0;
+    if(worker.cutOff?.id===target.id&&target!==current&&!(inAttackRange(worker,target,this.scene.map)&&combat.canTarget(worker,target))){
+      if(now>=worker.cutOff.until&&this.reachable(worker,target))delete worker.cutOff;
+      else{if(now>=worker.cutOff.until)worker.cutOff.until=now+MILITARY_RULES.cutOffFor;return this.cutOff(worker,target,delta);}
+    }
     worker.workState='Working';worker.workMessage='Defending the kingdom';
     // Archers keep their distance: an enemy right next to one makes him step back (unless he holds).
     if(ranged&&!stance.hold&&!worker.nextTile&&(worker.kiteWait??0)<=0){const close=this.nearestEnemy(worker,1.6);if(close&&this.attackers(close)>0){worker.kiteWait=2500;combat.stopAttack(worker);const to=awayFrom(this.scene,worker.tile,close.tile,3);if(to.length){worker.moveTo(to);return true;}}}
@@ -237,7 +270,8 @@ export class MilitarySystem {
     // A defensive soldier does not chase far from where the fight found him.
     if(stance.leash&&Math.hypot(target.position.x-tile.x,target.position.y-tile.y)>stance.leash){combat.stopAttack(worker);delete worker.huntWolfId;return false;}
     worker.militaryRetarget=(worker.militaryRetarget??0)-delta;
-    if(worker.militaryRetarget<=0){worker.militaryRetarget=MILITARY_RULES.retarget;worker.moveTo(ranged?adjacentTiles(target,this.scene.map):freeAround(this.scene,target,worker));}
+    if(worker.militaryRetarget<=0){worker.militaryRetarget=MILITARY_RULES.retarget;
+      if(!worker.moveTo(ranged?adjacentTiles(target,this.scene.map):freeAround(this.scene,target,worker))&&!this.reachable(worker,target)){worker.cutOff={id:target.id,until:now+MILITARY_RULES.cutOffFor};return this.cutOff(worker,target,delta);}}
     return true;
   }
   // kasarna-branci: the wage table entry for this resident (a Recruit is paid as `recruit`, a trained unit as `soldier`).

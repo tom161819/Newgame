@@ -12,7 +12,9 @@ import { isRanged } from './CombatSystem.js';
 // (at half strength: stone takes blows badly) and at zero it falls – the way opens. Archers do not shoot at stone.
 export const ENEMY_TINT=0x9fb4ea;
 // autoRadius: a melee soldier with no enemy soldier near him attacks an enemy building this close by himself.
-export const SIEGE_RULES=Object.freeze({damageShare:.5,retarget:1200,giveUpAfter:4,autoRadius:4});
+// skipFor: a building he could not get a place at is left alone this long; breachRadius: how far a soldier looks for a
+// wall to break through to an enemy he cannot reach.
+export const SIEGE_RULES=Object.freeze({damageShare:.5,retarget:1200,giveUpAfter:4,autoRadius:4,skipFor:8000,breachRadius:40});
 export const isEnemyBuilding=b=>!!b?.enemy;
 export const siegeable=b=>isEnemyBuilding(b)&&buildingIsComplete(b)&&!!buildingHP(b);
 export const canSiege=w=>!!w?.isAlive&&w.profession==='soldier'&&!w.crew&&!isRanged(w)&&(w.attackDPS??0)>0;
@@ -38,28 +40,41 @@ export class SiegeSystem {
   // Each melee soldier gets his own place around the building where there is one; returns how many go.
   // The nearest enemy building within `radius` tiles of the soldier (measured to its footprint).
   near(worker,radius=SIEGE_RULES.autoRadius){
-    let best=null,d=Infinity;for(const b of this.scene.buildings){if(!siegeable(b))continue;const {width,height}=buildingDefinition(b),dx=Math.max(b.x-worker.tile.x,0,worker.tile.x-(b.x+width-1)),dy=Math.max(b.y-worker.tile.y,0,worker.tile.y-(b.y+height-1)),e=Math.max(dx,dy);if(e<=radius&&e<d){d=e;best=b;}}
+    const now=this.scene.gameTime?.totalElapsed??0,skip=worker.siegeSkip&&now<worker.siegeSkip.until&&now>=worker.siegeSkip.until-SIEGE_RULES.skipFor?worker.siegeSkip.id:null;
+    let best=null,d=Infinity;for(const b of this.scene.buildings){if(!siegeable(b)||b.id===skip)continue;const {width,height}=buildingDefinition(b),dx=Math.max(b.x-worker.tile.x,0,worker.tile.x-(b.x+width-1)),dy=Math.max(b.y-worker.tile.y,0,worker.tile.y-(b.y+height-1)),e=Math.max(dx,dy);if(e<=radius&&e<d){d=e;best=b;}}
     return best;
   }
   order(soldiers,building){
     // Catapult crews take the building as their target too (SiegeEngines shoots it from range).
     const engines=soldiers.filter(w=>w?.crew&&this.scene.military?.unit?.(w)?.type==='catapult'&&w.isAlive);
     for(const w of engines){this.scene.workerSystem.commands?.resume?.(w);w.siegeTargetId=building.id;}
+    // A Military Wagon sent along is free to follow the Catapults with its Stones.
+    for(const w of soldiers)if(w?.isAlive&&this.scene.military?.unit?.(w)?.type==='military_wagon')this.scene.workerSystem.commands?.resume?.(w);
     const s=this.scene,melee=soldiers.filter(canSiege);if(!siegeable(building)||!melee.length)return engines.length;
     const spots=siegeTiles(s.map,building),used=new Set();
     for(const w of melee){
       s.workerSystem.commands?.resume?.(w);s.military?.wallPatrol?.set?.(w,false);s.combat?.stopAttack?.(w);delete w.huntWolfId;delete w.attackArea;delete w.attackRadius;
       const sorted=[...spots].sort((a,b)=>Math.hypot(a.x-w.tile.x,a.y-w.tile.y)-Math.hypot(b.x-w.tile.x,b.y-w.tile.y)),free=sorted.find(p=>!used.has(`${p.x},${p.y}`));if(free)used.add(`${free.x},${free.y}`);
-      w.siegeTargetId=building.id;w.siegeSpot=free??null;w.siegeRetarget=0;w.siegeMisses=0;
+      w.siegeTargetId=building.id;w.siegeSpot=free??null;w.siegeRetarget=0;w.siegeMisses=0;w.siegeOrdered=true;delete w.siegeSkip;delete w.cutOff;
     }
     return melee.length+engines.length;
   }
-  stop(worker){delete worker.siegeTargetId;delete worker.siegeSpot;delete worker.siegeMisses;worker.siegeHit=null;}
+  // Owner 18 Nov 2026 (siege test): the enemy this soldier is after stands behind enemy walls with no way in – he breaks
+  // through instead of standing below them: the enemy building most on his way (his distance to it plus its distance
+  // to the enemy). The attack order stays; with the wall down he goes on after the enemy.
+  breachTarget(worker,enemy,radius=SIEGE_RULES.breachRadius){
+    const now=this.scene.gameTime?.totalElapsed??0,skip=worker.siegeSkip&&now<worker.siegeSkip.until&&now>=worker.siegeSkip.until-SIEGE_RULES.skipFor?worker.siegeSkip.id:null;
+    let best=null,cost=Infinity;for(const b of this.scene.buildings){if(!siegeable(b)||b.id===skip)continue;const {width,height}=buildingDefinition(b),cx=b.x+width/2-.5,cy=b.y+height/2-.5,a=Math.hypot(cx-worker.position.x,cy-worker.position.y);if(a>radius)continue;
+      const c=a+Math.hypot(cx-enemy.position.x,cy-enemy.position.y)*1.5;if(c<cost){cost=c;best=b;}}
+    return best;
+  }
+  breach(worker,building){this.scene.combat?.stopAttack?.(worker);worker.siegeTargetId=building.id;worker.siegeSpot=null;worker.siegeRetarget=0;worker.siegeMisses=0;worker.siegeOrdered=false;}
+  stop(worker){delete worker.siegeTargetId;delete worker.siegeSpot;delete worker.siegeMisses;delete worker.siegeOrdered;worker.siegeHit=null;}
   // Called by the soldier's behaviour when no enemy unit needs him; true when the siege took over this frame.
   update(worker,delta){
     // Owner 18 Nov 2026: with no enemy soldier around (the caller found none), a melee soldier near an enemy building
     // attacks it by himself; a soldier told to hold his ground does not.
-    if(worker.siegeTargetId==null){if(worker.stance==='hold'||!canSiege(worker))return false;const b=this.near(worker);if(!b)return false;this.order([worker],b);}
+    if(worker.siegeTargetId==null){if(worker.stance==='hold'||!canSiege(worker))return false;const b=this.near(worker);if(!b)return false;this.order([worker],b);worker.siegeOrdered=false;}
     const state=worker.commandState?.state;if(state==='MovingToHold'||state==='Holding'||!canSiege(worker)){this.stop(worker);return false;}
     const b=this.target(worker);if(!b){this.stop(worker);return false;}
     const s=this.scene,{width,height}=buildingDefinition(b),center={x:b.x+width/2,y:b.y+height/2};
@@ -75,7 +90,7 @@ export class SiegeSystem {
     worker.siegeRetarget=(worker.siegeRetarget??0)-delta;
     if(!worker.nextTile&&!worker.path?.length&&worker.siegeRetarget<=0){
       worker.siegeRetarget=SIEGE_RULES.retarget;const spots=siegeTiles(s.map,b),goals=worker.siegeSpot&&spots.some(p=>p.x===worker.siegeSpot.x&&p.y===worker.siegeSpot.y)?[worker.siegeSpot,...spots]:spots;
-      if(!goals.length||!worker.moveTo(goals)){worker.siegeMisses=(worker.siegeMisses??0)+1;if(worker.siegeMisses>=SIEGE_RULES.giveUpAfter){this.stop(worker);s.setStatus?.(t('siege.noWay',{name:buildingDefinition(b).name}));return false;}}
+      if(!goals.length||!worker.moveTo(goals)){worker.siegeMisses=(worker.siegeMisses??0)+1;if(worker.siegeMisses>=SIEGE_RULES.giveUpAfter){/* no free place at it (or no way): another enemy building for a while */const ordered=worker.siegeOrdered;this.stop(worker);worker.siegeSkip={id:b.id,until:(s.gameTime?.totalElapsed??0)+SIEGE_RULES.skipFor};if(ordered&&!spots.length)s.setStatus?.(t('siege.noWay',{name:buildingDefinition(b).name}));return false;}}
       else worker.siegeMisses=0;
     }
     return true;
@@ -83,7 +98,7 @@ export class SiegeSystem {
   // The building falls: its functions go like a burnt one's, the ground under it is free again.
   destroy(b){
     const s=this.scene,name=buildingDefinition(b).name,at={x:b.x,y:b.y};
-    for(const w of s.workerSystem?.liveWorkers?.()??[])if(w.siegeTargetId===b.id)this.stop(w);
+    for(const w of s.workerSystem?.liveWorkers?.()??[]){if(w.siegeTargetId===b.id)this.stop(w);delete w.cutOff;}
     this.bars.get(b.id)?.destroy?.();this.bars.delete(b.id);
     detachLostBuilding(s,b);removeBuildingShell(s,b);s.refreshWallConnections?.();s.events?.emit?.('buildings:changed');s.updateInventory?.();
     s.setStatus?.(t('siege.destroyed',{name}));s.eventFeed?.push?.(`siege:${b.id}`,t('siege.destroyed',{name}),{target:{x:at.x+1,y:at.y+1}});
