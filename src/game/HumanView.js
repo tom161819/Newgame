@@ -50,8 +50,8 @@ export class HumanView extends Phaser.GameObjects.Container {
     if(this.definition?.look){const look=this.definition.look;if(look===this.look)return;this.look=look;this.lookReady=false;if(villagerArt(look))this.lookReady=ensureLook(this.scene,look,()=>{if(this.look===look&&this.scene){this.lookReady=true;this.applyArt();}});this.applyArt();return;}
     const worker=this.getData?.('worker');if(!worker)return;
     const sex=worker.identity?(worker.identity.sex==='f'?'female':'male'):villagerSex(worker.name),profession=worker.isSubject===false?worker.profession:(worker.displayProfession??'idle');
-    // g-vojaci-grafika: a soldier wears the look of his rank (Recruits the plain soldier look).
-    const unitType=worker.profession==='soldier'?this.scene?.military?.unit?.(worker)?.type:null;
+    // g-vojaci-grafika: a soldier wears the look of his rank. Owner 18 Nov 2026: an untrained Recruit wears the Branec.
+    const unitType=worker.profession==='soldier'&&this.scene?.military?(this.scene.military.unit?.(worker)?.type??'recruit'):null;
     const look=(unitType&&militaryLook(unitType,sex,worker.id))??professionLooks(profession)?.[sex]??null;
     if(look===this.look)return;this.look=look;this.lookReady=false;
     if(look&&villagerArt(look))this.lookReady=ensureLook(this.scene,look,()=>{if(this.look===look&&this.scene){this.lookReady=true;this.applyArt();}});

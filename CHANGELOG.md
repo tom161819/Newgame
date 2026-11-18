@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.0] - 2026-11-18
+<!-- version: {"title":"New 3D soldiers: five more units","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Added
+- The Soldier, Crossbowman, Halberdier, Royal Archer and Light Cavalry have their own 3D figures from the owner's models, with walking, attack, falling and standing moves. The Crossbowman raises the crossbow to his shoulder and shoots, the Halberdier chops down with the halberd, and the Light Cavalry rides his horse, which trots, tosses its head and paws the ground.
+### Changed
+- Recruits who have not trained yet wear the Recruit figure; trained Soldiers wear the new Soldier figure.
+
 ## [0.145.1] - 2026-11-18
 <!-- version: {"title":"Blender bushes and thickets","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Changed

@@ -7,7 +7,10 @@ import { militaryLook,soldierFrame,soldierIdle,FACING_INDEX } from '../src/data/
 const pngSize=file=>{const b=readFileSync(file);return {w:b.readUInt32BE(16),h:b.readUInt32BE(20)};};
 
 test('every rank wears the owner\'s 3D soldier, for men and women alike', () => {
-  for(const [type,look] of Object.entries({soldier:'army-recruit',archer:'army-archer',swordsman:'army-swordsman',knight:'army-knight'})){
+  // Owner 18 Nov 2026: five more figures – the Soldier, Crossbowman, Halberdier, Royal Archer and Light Cavalry (with
+  // his horse); the Branec now dresses the untrained Recruits.
+  for(const [type,look] of Object.entries({recruit:'army-recruit',soldier:'army-soldier',archer:'army-archer',swordsman:'army-swordsman',knight:'army-knight',
+    crossbowman:'army-crossbowman',halberdier:'army-halberdier',royal_archer:'army-royal-archer',light_cavalry:'army-light-cavalry'})){
     assert.equal(SOLDIER_ANIM_LOOKS[type],look);assert.equal(militaryLook(type,'male','w1'),look);assert.equal(militaryLook(type,'female','w2'),look);}
 });
 
