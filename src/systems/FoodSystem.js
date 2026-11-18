@@ -30,6 +30,8 @@ export class FoodSystem {
   eat(actor=this.scene?.character??{id:'king'},{source=null}={}){
     if(!this.residents.has(actor.id))this.syncResidents();
     const record=this.residents.get(actor.id),last=record?.meals??{},day=this.time?.day??this.lastProcessedDay;
+    // Owner 18 Nov 2026 (battle test, point 11): on the Test map nobody goes hungry – a meal is always there.
+    if(this.scene?.sandbox){this.lastMeal='bread';if(record)record.meals={...last,bread:day};return true;}
     const order=EDIBLE_RESOURCES.map((id,i)=>({id,i,day:this.variety?last[id]??-Infinity:0})).sort((a,b)=>a.day-b.day||a.i-b.i);
     // Owner 18 Nov 2026: a soldier near a Military Wagon eats from its load first.
     {const id=this.scene?.military?.engines?.meal?.(actor,order.map(o=>o.id));if(id){this.bucket().consumed++;this.lastMeal=id;if(record)record.meals={...last,[id]:day};return true;}}

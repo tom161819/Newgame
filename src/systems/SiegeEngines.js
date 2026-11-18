@@ -74,10 +74,11 @@ export class SiegeEngines {
   // --- Catapult ---
   catapultTarget(worker,v){
     const s=this.scene,ordered=worker.siegeTargetId!=null?s.buildings.find(b=>b.id===worker.siegeTargetId):null;if(ordered&&siegeable(ordered))return ordered;if(worker.siegeTargetId!=null)delete worker.siegeTargetId;
-    let best=null,d=Infinity;for(const b of s.buildings){if(!siegeable(b))continue;const e=distanceToBuilding(worker.tile,b);if(e>=CATAPULT.minRange&&e<=CATAPULT.range&&e<d){d=e;best=b;}}return best;
+    // By itself it bombards only while the fight is on (an enemy unit near the building); otherwise on the player's order.
+    let best=null,d=Infinity;for(const b of s.buildings){if(!siegeable(b))continue;const e=distanceToBuilding(worker.tile,b);if(e>=CATAPULT.minRange&&e<=CATAPULT.range&&e<d&&s.military?.siege?.contested?.(b)){d=e;best=b;}}return best;
   }
   catapult(worker,v,delta,move){
-    const s=this.scene;worker.catapultReload=Math.max(0,(worker.catapultReload??0)-delta);
+    const s=this.scene;worker.catapultReload=Math.max(0,(worker.catapultReload??0)-delta);this.label(worker,v);
     this.loadFromStore(worker,v,{stone:CATAPULT.ammo});
     const b=this.catapultTarget(worker,v);if(!b){worker.workState='Waiting';worker.workMessage=v.ammo>0?'Catapult ready':'Out of stones';return true;}
     const e=distanceToBuilding(worker.tile,b),{width,height}=buildingDefinition(b),center={x:b.x+width/2,y:b.y+height/2};
@@ -87,12 +88,24 @@ export class SiegeEngines {
       worker.workState='Traveling to Target';worker.workMessage='Moving the Catapult';return true;
     }
     if(worker.nextTile)return true;worker.path=[];const dx=center.x-worker.position.x,dy=center.y-worker.position.y,n=Math.hypot(dx,dy);if(n)worker.direction={x:dx/n,y:dy/n};
-    if(!(v.ammo>0)){worker.workState='Waiting';worker.workMessage='Out of stones';return true;}
+    if(!(v.ammo>0)){worker.workState='Waiting';worker.workMessage='Out of stones';
+      // Point 4: the player is told once (per empty Catapult) and shown where.
+      if(!worker.emptyTold){worker.emptyTold=true;const text=t('siege.noStones');s.setStatus?.(text);s.eventFeed?.push?.(`engine-empty:${v.id}:${Math.floor(s.gameTime?.totalElapsed??0)}`,text,{important:true,target:{x:worker.tile.x,y:worker.tile.y}});}
+      return true;}
+    worker.emptyTold=false;
     worker.workState='Working';worker.workMessage='Bombarding';
     if(worker.catapultReload>0)return true;
     worker.catapultReload=CATAPULT.reload;v.ammo--;this.vehicles.changed();this.throwStone(worker,center);
     const result=damageBuilding(b,CATAPULT.damage);s.military?.siege?.drawBar?.(b);if(result?.destroyed)s.military.siege.destroy(b);
     return true;
+  }
+  // Point 4: the Stones left, over the Catapult (red when empty).
+  label(worker,v){
+    const s=this.scene;if(!s.add?.text)return;this.labels??=new Map();
+    for(const [id,text] of this.labels)if(!this.vehicles.vehicles.has(id)||this.vehicles.vehicles.get(id).state!=='inUse'){text.destroy();this.labels.delete(id);}
+    let text=this.labels.get(v.id);if(!text){text=s.add.text(0,0,'',{fontFamily:'sans-serif',fontSize:'11px',color:'#efe9d6',stroke:'#1b1a14',strokeThickness:3}).setOrigin(.5,1).setDepth(20002);this.labels.set(v.id,text);}
+    const p=gridToWorld(worker.position.x,worker.position.y),shown=`● ${v.ammo??0}/${CATAPULT.ammo}`;if(text.text!==shown){text.setText(shown);text.setColor((v.ammo??0)>0?'#efe9d6':'#ff8f7a');}
+    text.setPosition(p.x,p.y-62).setVisible(worker.view?.visible!==false);
   }
   // Ground from which the building is in range (not too close), nearest to the catapult first.
   firingTiles(b,worker){
@@ -113,8 +126,16 @@ export class SiegeEngines {
     // stayed nine tiles behind): a Wagon that is not told to stand somewhere drives after the nearest Catapult that is
     // short of Stones and out of its reach.
     worker.wagonFollow=null;
+    if(move&&!(v.supplies?.stone>0)&&!worker.nextTile&&!worker.path.length&&this.storage&&this.crews('catapult').some(c=>(this.vehicleOf(c)?.ammo??0)<=CATAPULT.ammo/2&&Math.hypot(c.position.x-worker.position.x,c.position.y-worker.position.y)<=WAGON_SUPPLY.followRadius)){
+      const stores=[...this.storage.locations.values()].filter(l=>this.storage.isStock(l)&&this.storage.free(l.id,'stone')>0).sort((a,b)=>Math.hypot(a.x-worker.tile.x,a.y-worker.tile.y)-Math.hypot(b.x-worker.tile.x,b.y-worker.tile.y)),store=stores[0];
+      if(store&&Math.hypot(Math.max(store.x-worker.tile.x,0,worker.tile.x-(store.x+(store.width??1)-1)),Math.max(store.y-worker.tile.y,0,worker.tile.y-(store.y+(store.height??1)-1)))>WAGON_SUPPLY.loadRadius-1){
+        const goals=[],w=store.width??1,h=store.height??1;for(let y=store.y-2;y<=store.y+h+1;y++)for(let x=store.x-2;x<=store.x+w+1;x++)if(isWalkable(this.scene.map,x,y))goals.push({x,y});
+        if(goals.length&&worker.moveTo(goals))worker.wagonFetch=true;}
+    }
+    if(worker.wagonFetch&&!worker.nextTile&&!worker.path.length)worker.wagonFetch=false;
     if(move&&(v.supplies?.stone??0)>0&&!worker.nextTile&&!worker.path.length){
       const near=this.crews('catapult').map(c=>({c,d:Math.hypot(c.position.x-worker.position.x,c.position.y-worker.position.y)})).filter(x=>(this.vehicleOf(x.c)?.ammo??0)<=CATAPULT.ammo/2&&x.d>WAGON_SUPPLY.supplyRadius-1&&x.d<=WAGON_SUPPLY.followRadius).sort((a,b)=>a.d-b.d)[0];
+      // …and with no Stones left it drives to the nearest store that has some (it loads by itself there) and comes back.
       if(near){const c=near.c.tile,goals=[];for(let y=c.y-3;y<=c.y+3;y++)for(let x=c.x-3;x<=c.x+3;x++){const r=Math.max(Math.abs(x-c.x),Math.abs(y-c.y));if(r>=2&&isWalkable(this.scene.map,x,y))goals.push({x,y});}
         if(goals.length&&worker.moveTo(goals))worker.wagonFollow=near.c.id;}
     }
@@ -123,7 +144,7 @@ export class SiegeEngines {
       const n=Math.min(CATAPULT.ammo-(c.ammo??0),v.supplies?.stone??0);if(n>0){c.ammo=(c.ammo??0)+n;v.supplies.stone-=n;if(!v.supplies.stone)delete v.supplies.stone;this.vehicles.changed();}}
     worker.wagonLoading=loaded;return this.wagonState(worker,v);
   }
-  wagonState(worker,v){const driving=worker.nextTile||worker.path?.length;worker.workState=driving?'Traveling to Target':'Waiting';worker.workMessage=driving?'Bringing Stones to the Catapult':worker.wagonLoading?'Loading supplies':'Supplying the army';return true;}
+  wagonState(worker,v){const driving=worker.nextTile||worker.path?.length;worker.workState=driving?'Traveling to Target':'Waiting';worker.workMessage=driving?(worker.wagonFetch?'Fetching Stones from the store':'Bringing Stones to the Catapult'):worker.wagonLoading?'Loading supplies':'Supplying the army';return true;}
   // Takes from a store within reach up to `targets` ({stone, food, torch}: food is any kind of food). True if it took.
   loadFromStore(worker,v,targets){
     const s=this.scene,storage=this.storage;if(!storage)return false;

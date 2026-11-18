@@ -99,9 +99,9 @@ export class WorkerSystem {
     }
     this.updateUI();
   }
-  update(delta){for(const worker of this.liveWorkers())if(worker.isSubject!==false){this.ai.update(worker,delta);syncWorkerUniform(this.scene,worker);
+  update(delta){this.scene.alarm?.update(delta);for(const worker of this.liveWorkers())if(worker.isSubject!==false){this.ai.update(worker,delta);syncWorkerUniform(this.scene,worker);
     // m-obyvatele-jmena-spanek-pohyb (42): only a resting resident standing still stays inside.
-    if(worker.sleepingIn!=null&&(worker.restPhase!=='resting'||worker.nextTile||worker.path.length))worker.sleepingIn=null;}else worker.update(delta);}
+    if(worker.sleepingIn!=null&&(worker.restPhase!=='resting'&&!worker.alarm||worker.nextTile||worker.path.length))worker.sleepingIn=null;}else worker.update(delta);}
   // (42) Residents sleeping inside a building now (House or Castle).
   sleepersIn(buildingId){return this.liveWorkers().filter(w=>w.sleepingIn===buildingId);}
   onDeath(worker){worker.manualRockId=null;this.scene.military?.release(worker,{dead:true});this.scene.vehicles?.release(worker);worker.commandState={state:'Working',goal:null};worker.diedAt??=this.scene.gameTime.totalElapsed;this.scene.workplaceSystem?.detach(worker);this.ai.cancel(worker);worker.active=false;worker.path=[];worker.nextTile=null;worker.walking=false;worker.workState='Dead';worker.workMessage='';worker.arriving=false;worker.view.destroy();this.scene.combatFeedback.remove(worker.id);this.updateUI();}

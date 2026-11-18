@@ -11,6 +11,8 @@ import { inAttackRange,isRanged,WALL_ARCHER_RANGE } from './CombatSystem.js';
 import { MILITARY_RULES,PATROL,STANCES } from '../data/military.js';
 import { freeAround,awayFrom } from '../game/combatSpacing.js';
 import { SiegeSystem,siegeable,canSiege } from './SiegeSystem.js';
+import { buildingDefinition } from '../game/buildings.js';
+const buildingGap=(b,p)=>{const d=buildingDefinition(b);return Math.max(b.x-p.x,0,p.x-(b.x+d.width-1),b.y-p.y,0,p.y-(b.y+d.height-1));};
 import { SiegeEngines } from './SiegeEngines.js';
 
 // C08: Soldiers employed in a Barracks are trained into units. Training is paid in Gold, needs the unit's real items
@@ -153,10 +155,12 @@ export class MilitarySystem {
     let on=false;for(const [a,target] of this.scene.combat?.attacks??[])if(target===worker&&a.isAlive){on=true;break;}
     on||=!!this.nearestEnemy(worker,MILITARY_RULES.guardRadius);
     if(!on&&worker.stance!=='hold'){const type=this.unit(worker)?.type;
-      if(type==='catapult')on=this.scene.buildings.some(b=>siegeable(b)&&Math.hypot(b.x-worker.tile.x,b.y-worker.tile.y)<=CATAPULT.range+2);
-      else if(!UNIT_TYPES[type]?.vehicle&&canSiege(worker))on=!!this.siege.near(worker);}
+      if(type==='catapult')on=this.scene.buildings.some(b=>siegeable(b)&&Math.hypot(b.x-worker.tile.x,b.y-worker.tile.y)<=CATAPULT.range+2&&this.siege.contested(b));
+}
     worker.dutyCheck={at:now,on};return on;
   }
+  // Where a wounded soldier falls back to: his Barracks, else the Castle.
+  refuge(worker){return this.barracks(worker.assignedWorkplaceId)??this.scene.buildings.find(b=>b.type==='castle'&&buildingIsComplete(b)&&!b.enemy)??null;}
   // Is there a way on the ground to stand next to this enemy (other units aside)?
   reachable(worker,enemy){const map=this.scene.map,goals=adjacentTiles(enemy,map);return !!goals.length&&!!findPathToAny(map,worker.nextTile??worker.tile,goals);}
   // The enemy is cut off: break through an enemy building on the way; an archer (or with no wall to break) waits.
@@ -191,8 +195,6 @@ export class MilitarySystem {
     // stance Hold position keeps the old behaviour: he does not move.
     const goal=worker.commandState?.goal??null,place=goal??{x:worker.tile.x,y:worker.tile.y};
     if(this.updateSoldier(worker,delta,{held:place})){worker.holdAway=true;return;}
-    if(this.nearestEnemy(worker,(STANCES[worker.stance]??STANCES.aggressive).engage))return;
-    const b=this.siege.near(worker);if(b){this.siege.order([worker],b);worker.siegeOrdered=false;return;}
     worker.holdReturn=Math.max(0,(worker.holdReturn??0)-delta);
     if(goal&&worker.holdAway&&!worker.nextTile&&!worker.path.length&&!worker.holdReturn){
       if(worker.tile.x===goal.x&&worker.tile.y===goal.y){worker.holdAway=false;worker.holdTries=0;}else{worker.holdReturn=1000;/* a comrade may stand on his place for a moment: a few tries */if(!worker.moveTo([goal])&&(worker.holdTries=(worker.holdTries??0)+1)>=10){worker.holdAway=false;worker.holdTries=0;}}}
@@ -227,13 +229,19 @@ export class MilitarySystem {
     // A badly hurt soldier steps back from the fight until he has healed to half (not when told to hold).
     if(worker.retreating||stance.retreat&&worker.currentHP<worker.maxHP*MILITARY_RULES.retreatBelow&&(combat.attacks.get(worker)||this.nearestEnemy(worker,3))){
       const danger=this.nearestEnemy(worker,MILITARY_RULES.retreatSafe);
-      if(worker.currentHP>=worker.maxHP*MILITARY_RULES.retreatUntil||!danger){if(worker.retreating){worker.retreating=false;worker.path=[];}}
+      // Owner 18 Nov 2026 (battle test, point 1: "the wounded run to the edge of the map with the enemy behind them"):
+      // he falls back to his Barracks or the Castle (the refuge) and no farther; there, or with no refuge after
+      // `retreatMax` tiles, he stands and fights again.
+      const refuge=danger?this.refuge(worker):null;if(danger)worker.retreatFrom??={x:worker.tile.x,y:worker.tile.y};
+      const stand=!!danger&&(refuge?buildingGap(refuge,worker.tile)<=MILITARY_RULES.refugeRadius:Math.hypot(worker.tile.x-worker.retreatFrom.x,worker.tile.y-worker.retreatFrom.y)>=MILITARY_RULES.retreatMax);
+      if(worker.currentHP>=worker.maxHP*MILITARY_RULES.retreatUntil||!danger){if(worker.retreating){worker.retreating=false;worker.path=[];}delete worker.retreatFrom;}
+      else if(stand){if(worker.retreating){worker.retreating=false;worker.path=[];}}
       else{worker.retreating=true;
         combat.stopAttack(worker);delete worker.huntWolfId;worker.workState='Retreating';worker.workMessage='Falling back';
         if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=800;
           // Back to the healthy comrades (behind them, away from the enemy), else simply away.
           const friend=this.scene.workerSystem.liveWorkers().filter(w=>w!==worker&&w.profession==='soldier'&&!w.retreating&&!w.away&&w.currentHP>=w.maxHP*.5).sort((a,b)=>Math.hypot(a.position.x-worker.position.x,a.position.y-worker.position.y)-Math.hypot(b.position.x-worker.position.x,b.position.y-worker.position.y))[0];
-          const to=friend&&Math.hypot(friend.position.x-worker.position.x,friend.position.y-worker.position.y)<15?awayFrom(this.scene,friend.tile,danger.tile,2):awayFrom(this.scene,worker.tile,danger.tile,6);if(to.length)worker.moveTo(to);}return true;}
+          const to=friend&&Math.hypot(friend.position.x-worker.position.x,friend.position.y-worker.position.y)<15?awayFrom(this.scene,friend.tile,danger.tile,2):refuge?towerNeighbors(refuge):awayFrom(this.scene,worker.tile,danger.tile,6);if(to.length&&!worker.moveTo(to)&&refuge){const away=awayFrom(this.scene,worker.tile,danger.tile,6);if(away.length)worker.moveTo(away);}}return true;}
     }
     // m-vlk-zustava: "Hunt the wolf" sends a soldier after a lurking wolf anywhere on the map until it is dead or gone.
     let hunted=null;if(worker.huntWolfId){hunted=this.scene.animalSystem?.animals?.get?.(worker.huntWolfId)??[...(this.scene.animalSystem?.animals?.values?.()??[])].find(a=>a.id===worker.huntWolfId);if(!hunted?.isAlive||hunted.active===false){delete worker.huntWolfId;hunted=null;

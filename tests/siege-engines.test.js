@@ -15,13 +15,16 @@ function building(s,type,x,y){const d=s.objectRegistry.require(type);ensureBuild
 const wall=(s,x,y)=>{const d=s.objectRegistry.require('wall'),b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type:'wall',definition:d,x,y,tiles:[{x,y}]};s.buildings.push(b);s.map[y][x]=1;s.towerViews.set(b.id,s.createBuildingView(d,b));markEnemyBuilding(s,b);return b;};
 function until(s,p,max=300000){let t=0;while(!p()&&t<max){s.tick(50);t+=50;}assert.ok(p(),`not reached after ${t} ms`);return t;}
 
-test('owner 18 Nov 2026: a melee soldier near an enemy wall attacks it by himself, an enemy soldier first',()=>{
+// Battle test 18 Nov 2026, point 6 (owner: "udělej všechny návrhy"): soldiers no longer pull enemy buildings down by
+// themselves; a wall is hit on an order (or broken through to an enemy behind it).
+test('a melee soldier near an enemy wall fights the enemy soldier; the wall he leaves alone until he is ordered',()=>{
   const s=workerScene(undefined,{foodProduction:true}),b=wall(s,60,50);
   spawnSandboxUnits(s,'swordsman',{x:60,y:53},1);const w=s.workerSystem.liveWorkers().find(w=>w.profession==='soldier');
   const raider=s.animalSystem.create(s.objectRegistry.require('raider'),{x:63,y:53});
   for(let i=0;i<20;i++)s.tick(50);assert.equal(s.combat.attacks.get(w)?.id??w.huntWolfId,raider.id,'the enemy soldier comes first');
   until(s,()=>!raider.isAlive,120000);
-  until(s,()=>w.siegeTargetId===b.id,10000);until(s,()=>!s.buildings.includes(b),120000);
+  s.simulate(6000);assert.equal(w.siegeTargetId,undefined,'he does not pull the wall down by himself');assert.equal(buildingHP(b).hp,200);
+  assert.equal(s.military.siege.order([w],b),1);until(s,()=>!s.buildings.includes(b),120000);
 });
 
 test('owner 18 Nov 2026: a Catapult site turns into a Catapult; a Recruit trains as its crew, fetches it and bombards an enemy wall',()=>{
@@ -32,10 +35,11 @@ test('owner 18 Nov 2026: a Catapult site turns into a Catapult; a Recruit trains
   s.tick(50);const v=[...s.vehicles.vehicles.values()].find(v=>v.type==='catapult');assert.ok(v,'the finished site is a Catapult now');assert.equal(s.buildings.includes(site),false);
   assert.equal(s.military.blocker(w,'catapult'),null);assert.equal(s.military.train(w,'catapult'),null);assert.equal(v.state,'reserved');assert.equal(v.crew,true);
   until(s,()=>s.military.unit(w)?.type==='catapult');until(s,()=>v.state==='inUse');
-  const target=wall(s,v.x+8,v.y);v.ammo=3;
+  const target=wall(s,v.x+8,v.y);v.ammo=3;s.simulate(8000);assert.equal(v.ammo,3,'with no enemy about it does not shoot by itself');assert.equal(s.military.siege.order([w],target),1);
   until(s,()=>(buildingHP(target)?.hp??200)<200,60000);assert.equal(v.ammo,2,'one Stone a throw');assert.equal(buildingHP(target).hp,200-CATAPULT.damage);
   const saved=validateGameState(serializeGameState(s)),restored=scene(false);loadGameState(restored,structuredClone(saved));assert.deepEqual(validateGameState(serializeGameState(restored)),saved,'crew vehicles survive Save/Load');
-  until(s,()=>v.ammo===0,60000);for(let i=0;i<200;i++)s.tick(50);assert.equal(w.workMessage,'Out of stones');
+  until(s,()=>!s.buildings.includes(target),60000);assert.equal(v.ammo,1,'two Stones bring a wall down');const next=wall(s,v.x+8,v.y+1);s.military.siege.order([w],next);
+  until(s,()=>v.ammo===0,60000);for(let i=0;i<200;i++)s.tick(50);assert.equal(w.workMessage,'Out of stones');assert.equal(w.emptyTold,true,'the player was told once');
   s.military.release(w);assert.equal(v.state,'parked');assert.equal(v.crew,undefined);
 });
 

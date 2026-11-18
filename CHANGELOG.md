@@ -5,6 +5,19 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.4] - 2026-11-18
+<!-- version: {"title":"Retreat to the Castle, alarm, Catapult supply","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Added
+- Alarm: when enemy soldiers come near, people who are not soldiers drop their work, run into their House or the Castle and hide until the enemy is gone. The event feed shows where it is.
+- The Stones a Catapult has left show over it. An empty Catapult tells you once. A Military Wagon with no Stones left fetches more from the nearest store by itself.
+### Changed
+- A badly wounded soldier falls back to his Barracks or the Castle instead of running to the edge of the map, and stands and fights there. Enemies give up a chase about 18 tiles from where they stood and walk back.
+- Soldiers no longer pull enemy buildings down by themselves after a victory. They attack a building on your order, or break through a wall when an enemy stands behind it. A Catapult shoots by itself only while enemy soldiers are near.
+### Balance
+- A Catapult's Stone takes 100 hit points (was 60): two Stones bring a wall piece down.
+### Fixed
+- On the Test map nobody goes hungry any more.
+
 ## [0.146.3] - 2026-11-18
 <!-- version: {"title":"Walls show their damage","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Added

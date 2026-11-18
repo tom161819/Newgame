@@ -28,15 +28,19 @@ export class AnimalSystem {
   reservedTiles(){return [...this.animals.values()].flatMap(a=>a.reservedTiles());}
   onAttacked(animal,attacker){
     if(!animal.active||!animal.isAlive||!attacker.isAlive||!animal.definition.gameplay.huntable)return;
+    // Owner 18 Nov 2026 (battle test, point 1): a guard remembers where he stood; he gives up a chase too far from it.
+    if(animal.definition.gameplay.guardRadius)animal.post??={x:animal.tile.x,y:animal.tile.y};animal.returning=false;
     animal.retaliationTarget=attacker;animal.path=[];animal.retaliationRepath=0;
     this.scene.combat.startAttack(animal,attacker);
   }
   guardTarget(animal){
-    const s=this.scene,r=animal.definition.gameplay.guardRadius,c=s.character,units=[...(s.workerSystem?.liveWorkers()??[]).filter(w=>w.isAlive&&!w.away),...(c?.isAlive&&!c.away?[c]:[])];
+    const s=this.scene,r=animal.definition.gameplay.guardRadius,c=s.character,units=[...(s.workerSystem?.liveWorkers()??[]).filter(w=>w.isAlive&&!w.away&&w.sleepingIn==null/* people inside a building are out of reach */),...(c?.isAlive&&!c.away?[c]:[])];
     let best=null,d=r;for(const u of units){const e=Math.hypot(u.position.x-animal.position.x,u.position.y-animal.position.y);if(e<=d){d=e;best=u;}}return best;
   }
   stopRetaliation(animal){
-    if(animal.retaliationTarget){animal.path=[];animal.wanderWait=1500;}
+    if(animal.retaliationTarget){animal.path=[];animal.wanderWait=1500;
+      // A guard with nobody left to fight walks back to where he stood.
+      const p=animal.post;if(p&&animal.definition.gameplay.guardRadius&&!animal.marching&&Math.hypot(animal.position.x-p.x,animal.position.y-p.y)>3){animal.returning=true;animal.returnWait=0;}}
     animal.retaliationTarget=null;
     this.scene.combat?.stopAttack(animal);
   }
@@ -49,10 +53,16 @@ export class AnimalSystem {
       // N3: wolves are led by the night threat system (hunting, keeping out of light, leaving at dawn).
       if(animal.definition.gameplay.nightPredator&&this.scene.nightThreats?.leadsWolf?.(animal,delta)){animal.update(delta);continue;}
       // m-mapa-kraje: bandits and mine rats attack a party member who comes close.
+      // Back to his post after a chase that led too far or ended: on the way he goes only for somebody inside his
+      // chase radius (and strikes back when hit).
+      if(animal.returning&&!animal.retaliationTarget){const p=animal.post,g=animal.definition.gameplay,foe=p?this.guardTarget(animal):null;
+        if(foe&&Math.hypot(foe.position.x-p.x,foe.position.y-p.y)<=(g.chaseRadius??g.guardRadius*2)-2){this.onAttacked(animal,foe);}
+        else if(!p||Math.hypot(animal.position.x-p.x,animal.position.y-p.y)<=2.5)animal.returning=false;
+        else{if(!animal.nextTile&&!animal.path.length){animal.returnWait=(animal.returnWait??0)-delta;if(animal.returnWait<=0){animal.returnWait=1000;if(!animal.moveTo([p,...adjacentTiles({tile:p,position:p},this.scene.map)]))animal.returning=false;}}animal.update(delta);continue;}}
       if(animal.definition.gameplay.guardRadius&&!animal.retaliationTarget){const foe=this.guardTarget(animal);if(foe)this.onAttacked(animal,foe);}
       const target=animal.retaliationTarget;
       if(target){
-        if(!target.isAlive){this.stopRetaliation(animal);}
+        if(!target.isAlive||target.sleepingIn!=null){this.stopRetaliation(animal);}
         else{
           const combat=this.scene.combat;
           if(combat.canFight(target)&&inAttackRange(animal,target,this.scene.map)){
@@ -61,6 +71,8 @@ export class AnimalSystem {
             if(length&&!animal.nextTile)animal.direction={x:dx/length,y:dy/length};
           }else{
             combat.stopAttack(animal);animal.retaliationRepath-=delta;
+            // The chase ends `chaseRadius` tiles from his post (twice the guard radius), unless somebody is hitting him.
+            {const g=animal.definition.gameplay,p=animal.post;if(g.guardRadius&&p&&!animal.marching&&Math.hypot(animal.position.x-p.x,animal.position.y-p.y)>(g.chaseRadius??g.guardRadius*2)&&![...combat.attacks].some(([a,v])=>v===animal&&a.isAlive)){this.stopRetaliation(animal);animal.returning=true;animal.returnWait=0;animal.update(delta);continue;}}
             if(animal.retaliationRepath<=0){animal.retaliationRepath=350;animal.moveTo(animal.definition.gameplay.guardRadius?freeAround(this.scene,target,animal):adjacentTiles(target,this.scene.map));}
           }
           animal.update(delta);continue;

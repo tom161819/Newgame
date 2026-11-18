@@ -15,7 +15,7 @@ export const ENEMY_TINT=0x9fb4ea;
 // autoRadius: a melee soldier with no enemy soldier near him attacks an enemy building this close by himself.
 // skipFor: a building he could not get a place at is left alone this long; breachRadius: how far a soldier looks for a
 // wall to break through to an enemy he cannot reach.
-export const SIEGE_RULES=Object.freeze({damageShare:.5,retarget:1200,giveUpAfter:4,autoRadius:4,skipFor:8000,breachRadius:40,rubbleStays:90000});
+export const SIEGE_RULES=Object.freeze({damageShare:.5,retarget:1200,giveUpAfter:4,autoRadius:4,skipFor:8000,breachRadius:40,rubbleStays:90000,contestRadius:25});
 export const isEnemyBuilding=b=>!!b?.enemy;
 export const siegeable=b=>isEnemyBuilding(b)&&buildingIsComplete(b)&&!!buildingHP(b);
 export const canSiege=w=>!!w?.isAlive&&w.profession==='soldier'&&!w.crew&&!isRanged(w)&&(w.attackDPS??0)>0;
@@ -45,6 +45,8 @@ export class SiegeSystem {
     let best=null,d=Infinity;for(const b of this.scene.buildings){if(!siegeable(b)||b.id===skip)continue;const {width,height}=buildingDefinition(b),dx=Math.max(b.x-worker.tile.x,0,worker.tile.x-(b.x+width-1)),dy=Math.max(b.y-worker.tile.y,0,worker.tile.y-(b.y+height-1)),e=Math.max(dx,dy);if(e<=radius&&e<d){d=e;best=b;}}
     return best;
   }
+  // Is the fight for this building still on: a living enemy unit within `contestRadius` tiles of it.
+  contested(b){const r=SIEGE_RULES.contestRadius;for(const a of this.scene.animalSystem?.animals.values()??[])if(a.isAlive&&a.active!==false&&a.definition?.gameplay?.hostile&&Math.hypot(a.position.x-b.x,a.position.y-b.y)<=r)return true;return false;}
   order(soldiers,building){
     // Catapult crews take the building as their target too (SiegeEngines shoots it from range).
     const engines=soldiers.filter(w=>w?.crew&&this.scene.military?.unit?.(w)?.type==='catapult'&&w.isAlive);
@@ -75,7 +77,10 @@ export class SiegeSystem {
   update(worker,delta){
     // Owner 18 Nov 2026: with no enemy soldier around (the caller found none), a melee soldier near an enemy building
     // attacks it by himself; a soldier told to hold his ground does not.
-    if(worker.siegeTargetId==null){if(worker.stance==='hold'||!canSiege(worker))return false;const b=this.near(worker);if(!b)return false;this.order([worker],b);worker.siegeOrdered=false;}
+    // Owner 18 Nov 2026 (battle test, point 6: "after the victory the soldiers pulled down the whole fort by themselves"):
+    // nobody attacks an enemy building by himself any more. A building is hit on the player's order, or broken through
+    // when an enemy stands behind it with no way to him (MilitarySystem.cutOff).
+    if(worker.siegeTargetId==null)return false;
     const state=worker.commandState?.state;if(state==='MovingToHold'||state==='Holding'||!canSiege(worker)){this.stop(worker);return false;}
     const b=this.target(worker);if(!b){this.stop(worker);return false;}
     const s=this.scene,{width,height}=buildingDefinition(b),center={x:b.x+width/2,y:b.y+height/2};

@@ -49,6 +49,8 @@ export class WorkerAI {
     // Owner 18 Nov 2026: a soldier on duty (an attack or siege order, a fight, an enemy near; MilitarySystem.onDuty) follows
     // it at once – it used to wait behind the morning rest and the walk to his Barracks, so the men walked off instead.
     if(worker.profession==='soldier'&&this.scene.military?.onDuty?.(worker)){if(worker.restPhase)this.system.rest?.stop(worker);if(this.scene.military.updateSoldier(worker,delta)){worker.update(delta);return;}}
+    // Owner 18 Nov 2026: the alarm – a resident with an enemy soldier near runs to shelter and hides (AlarmSystem).
+    if(this.scene.alarm?.lead(worker)){worker.update(delta);return;}
     if((worker.profession==='hunter'&&worker.currentHP<worker.maxHP*WORK_RULES.fleeRatio)||['Fleeing','Recovering'].includes(worker.workState)){
       this.recover(worker);worker.update(delta);return;
     }
