@@ -70,7 +70,7 @@ export function priceTable(registry,contextFor=()=>({})){return tradeableResourc
 // their inputs (Wheelbarrow 10 Wood + 2 Iron; Horse Wagon 30 Wood + 6 Iron + a horse worth 160) at the usual sell factor.
 export const VEHICLE_VALUES=Object.freeze({wheelbarrow:120,horse_wagon:520});
 export function vehicleSalePrice(type){const v=VEHICLE_VALUES[type];return v?Math.max(1,Math.round(v*TRADE_RULES.sellFactor)):null;}
-export const CARAVAN_RULES=Object.freeze({minInterval:2,maxInterval:4,stay:.75,maxWait:.25,leavingWarning:.1,speed:1.6,goldMin:100,goldMax:300,
+export const CARAVAN_RULES=Object.freeze({minInterval:2,maxInterval:4,stay:.75,maxWait:1,leavingWarning:.1,speed:1.6,goldMin:100,goldMax:300,
   // m-obchod-vylepseni (48): caravans grow richer – the top of the gold range rises from goldMax (day 1) to richGoldMax
   // by richByDay; goods grow with the gold (up to ×2). Escort: porters 0–2, guards 1–6 by the gold (none below guardFrom).
   richGoldMax:1000,richByDay:30,stockGrowth:1,porterChance:.5,maxPorters:2,guardFrom:200,goldPerGuard:170,maxGuards:6,

@@ -8,7 +8,7 @@ import { COLUMNS,ROWS } from '../game/config.js';
 // Trade F1.2 (#59): a merchant caravan with its own horse wagon. While a finished Marketplace exists, one caravan comes
 // every 2–4 game days from a walkable map edge, drives (no teleport) to a Marketplace, trades there for 0.75 of a day and
 // drives back to an edge. It is not a resident: no needs, no population, never the player's wagon. Orders (F1.3) can keep
-// it up to 0.25 of a day longer through `deliveryPending`.
+// it up to 1 day longer through `deliveryPending` (owner 19 Nov 2026, point 78; was 0.25).
 export const CARAVAN_PHASES=Object.freeze(['arriving','trading','leaving']);
 const key=t=>`${t.x},${t.y}`;
 const randomInt=(random,min,max)=>min+Math.floor(random()*(max-min+1));

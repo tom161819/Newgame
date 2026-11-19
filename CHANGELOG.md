@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.3] - 2026-11-19
+<!-- version: {"title":"Caravans wait for their order","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Changed
+- A foreign caravan with an order still to be loaded waits up to one more day instead of leaving, and leaves as soon as the order is done.
+
 ## [0.148.2] - 2026-11-19
 <!-- version: {"title":"Faster, fairly shared iron","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Changed
