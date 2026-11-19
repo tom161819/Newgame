@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "thicket-2x2-mixed-views",
+  "variantId": "thicket-2x2-mixed-views-summer-180",
+  "name": "Thicket 2×2 – Mixed (hazel, bramble, juniper), summer 180° (back-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "71358398",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 103,
+  "height": 82,
+  "anchor": {
+    "x": 54,
+    "y": 61
+  },
+  "origin": {
+    "x": 0.52427,
+    "y": 0.7439
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 54,
+    "y": 61
+  },
+  "baseOrigin": {
+    "x": 0.52427,
+    "y": 0.7439
+  },
+  "visualHeight": 61,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

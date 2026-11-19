@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "thicket-2x2-bramble-views",
+  "variantId": "thicket-2x2-bramble-views-summer-0",
+  "name": "Thicket 2×2 – Bramble, summer 0° (front-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "ea643efb",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 108,
+  "height": 67,
+  "anchor": {
+    "x": 54,
+    "y": 44
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.65672
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 54,
+    "y": 44
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.65672
+  },
+  "visualHeight": 44,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-seasons",
+  "variantId": "shrubs-seasons-hazel-autumn",
+  "name": "Hazel – autumn",
+  "category": "nature",
+  "version": 2,
+  "specHash": "6577ad49",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 48,
+  "height": 37,
+  "anchor": {
+    "x": 23,
+    "y": 35
+  },
+  "origin": {
+    "x": 0.47917,
+    "y": 0.94595
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 23,
+    "y": 35
+  },
+  "baseOrigin": {
+    "x": 0.47917,
+    "y": 0.94595
+  },
+  "visualHeight": 35,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

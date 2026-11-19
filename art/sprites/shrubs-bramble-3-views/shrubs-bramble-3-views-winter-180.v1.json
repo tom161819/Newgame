@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-bramble-3-views",
+  "variantId": "shrubs-bramble-3-views-winter-180",
+  "name": "Bramble large, winter 180° (back-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "a6ed875f",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 48,
+  "height": 33,
+  "anchor": {
+    "x": 25,
+    "y": 28
+  },
+  "origin": {
+    "x": 0.52083,
+    "y": 0.84848
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 25,
+    "y": 28
+  },
+  "baseOrigin": {
+    "x": 0.52083,
+    "y": 0.84848
+  },
+  "visualHeight": 28,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

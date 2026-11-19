@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-hazel-2-views",
+  "variantId": "shrubs-hazel-2-views-autumn-0",
+  "name": "Hazel medium, autumn 0° (front-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "2550524f",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 44,
+  "height": 43,
+  "anchor": {
+    "x": 21,
+    "y": 38
+  },
+  "origin": {
+    "x": 0.47727,
+    "y": 0.88372
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 21,
+    "y": 38
+  },
+  "baseOrigin": {
+    "x": 0.47727,
+    "y": 0.88372
+  },
+  "visualHeight": 38,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

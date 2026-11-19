@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-rosehip-3-views",
+  "variantId": "shrubs-rosehip-3-views-summer-270",
+  "name": "Rosehip large, summer 270° (back-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "ef01cb94",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 50,
+  "height": 38,
+  "anchor": {
+    "x": 24,
+    "y": 33
+  },
+  "origin": {
+    "x": 0.48,
+    "y": 0.86842
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 24,
+    "y": 33
+  },
+  "baseOrigin": {
+    "x": 0.48,
+    "y": 0.86842
+  },
+  "visualHeight": 33,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

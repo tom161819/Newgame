@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-rosehip-2-views",
+  "variantId": "shrubs-rosehip-2-views-spring-0",
+  "name": "Rosehip medium, spring 0° (front-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "a2852a4e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 42,
+  "height": 31,
+  "anchor": {
+    "x": 23,
+    "y": 26
+  },
+  "origin": {
+    "x": 0.54762,
+    "y": 0.83871
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 23,
+    "y": 26
+  },
+  "baseOrigin": {
+    "x": 0.54762,
+    "y": 0.83871
+  },
+  "visualHeight": 26,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

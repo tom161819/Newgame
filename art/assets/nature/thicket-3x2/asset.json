@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "thicket-3x2",
-  "name": "Thicket – 3×2",
+  "name": "Thicket \u2013 3\u00d72",
   "category": "nature",
   "description": "Concept for review (g-sad-pole-kere). The owner picks; phases, sizes and footprints then go to Mechaniky. One continuous growth, not copies of one bush.",
   "footprint": {
@@ -13,8 +13,8 @@
     {
       "id": "thicket-3x2-hazel",
       "name": "Hazel thicket",
-      "version": 1,
-      "notes": "Hazel with some rosehip.",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model thicket-3x2-hazel, summer, view 0\u00b0, fitted into the original 127\u00d783 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "thicket",
         "species": "hazel",
@@ -25,13 +25,18 @@
         ],
         "season": "summer",
         "seed": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "thicket-3x2-bramble",
       "name": "Bramble thicket",
-      "version": 1,
-      "notes": "Brambles and rosehip.",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model thicket-3x2-bramble, summer, view 0\u00b0, fitted into the original 118\u00d773 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "thicket",
         "species": "bramble",
@@ -42,13 +47,18 @@
         ],
         "season": "summer",
         "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "thicket-3x2-autumn",
-      "name": "Mixed thicket – autumn",
-      "version": 1,
-      "notes": "Hazel, rosehip, bramble in autumn.",
+      "name": "Mixed thicket \u2013 autumn",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model thicket-3x2-mixed, autumn, view 0\u00b0, fitted into the original 133\u00d773 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "thicket",
         "mix": [
@@ -58,13 +68,18 @@
         ],
         "season": "autumn",
         "seed": 9
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "thicket-3x2-winter",
-      "name": "Mixed thicket – winter",
-      "version": 1,
-      "notes": "Bare with snow, juniper stays green.",
+      "name": "Mixed thicket \u2013 winter",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model thicket-3x2-mixed, winter, view 0\u00b0, fitted into the original 128\u00d790 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "thicket",
         "mix": [
@@ -74,6 +89,11 @@
         ],
         "season": "winter",
         "seed": 9
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     }
   ]

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-heather-3-views",
+  "variantId": "shrubs-heather-3-views-summer-0",
+  "name": "Heather large, summer 0° (front-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "d9bdff41",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 50,
+  "height": 35,
+  "anchor": {
+    "x": 25,
+    "y": 28
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.8
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 25,
+    "y": 28
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.8
+  },
+  "visualHeight": 28,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-seasons",
+  "variantId": "shrubs-seasons-juniper-spring",
+  "name": "Juniper – spring",
+  "category": "nature",
+  "version": 2,
+  "specHash": "5faedce3",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 44,
+  "height": 43,
+  "anchor": {
+    "x": 24,
+    "y": 41
+  },
+  "origin": {
+    "x": 0.54545,
+    "y": 0.95349
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 24,
+    "y": 41
+  },
+  "baseOrigin": {
+    "x": 0.54545,
+    "y": 0.95349
+  },
+  "visualHeight": 41,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

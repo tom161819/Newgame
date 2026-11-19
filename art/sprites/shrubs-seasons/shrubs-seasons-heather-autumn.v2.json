@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-seasons",
+  "variantId": "shrubs-seasons-heather-autumn",
+  "name": "Heather – autumn",
+  "category": "nature",
+  "version": 2,
+  "specHash": "5ea3f5ca",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 47,
+  "height": 31,
+  "anchor": {
+    "x": 23,
+    "y": 24
+  },
+  "origin": {
+    "x": 0.48936,
+    "y": 0.77419
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 23,
+    "y": 24
+  },
+  "baseOrigin": {
+    "x": 0.48936,
+    "y": 0.77419
+  },
+  "visualHeight": 24,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

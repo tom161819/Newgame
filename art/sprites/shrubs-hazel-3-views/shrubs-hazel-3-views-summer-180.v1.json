@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-hazel-3-views",
+  "variantId": "shrubs-hazel-3-views-summer-180",
+  "name": "Hazel large, summer 180° (back-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "7a0256e8",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 47,
+  "height": 44,
+  "anchor": {
+    "x": 23,
+    "y": 40
+  },
+  "origin": {
+    "x": 0.48936,
+    "y": 0.90909
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 23,
+    "y": 40
+  },
+  "baseOrigin": {
+    "x": 0.48936,
+    "y": 0.90909
+  },
+  "visualHeight": 40,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

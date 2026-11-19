@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "thicket-2x2-bramble-views",
+  "variantId": "thicket-2x2-bramble-views-autumn-180",
+  "name": "Thicket 2×2 – Bramble, autumn 180° (back-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "0b3eab68",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 108,
+  "height": 69,
+  "anchor": {
+    "x": 54,
+    "y": 45
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.65217
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 54,
+    "y": 45
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.65217
+  },
+  "visualHeight": 45,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

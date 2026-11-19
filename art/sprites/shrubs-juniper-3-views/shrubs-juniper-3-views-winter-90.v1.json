@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-juniper-3-views",
+  "variantId": "shrubs-juniper-3-views-winter-90",
+  "name": "Juniper large, winter 90° (front-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "9afc596f",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 42,
+  "height": 43,
+  "anchor": {
+    "x": 18,
+    "y": 39
+  },
+  "origin": {
+    "x": 0.42857,
+    "y": 0.90698
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 18,
+    "y": 39
+  },
+  "baseOrigin": {
+    "x": 0.42857,
+    "y": 0.90698
+  },
+  "visualHeight": 39,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

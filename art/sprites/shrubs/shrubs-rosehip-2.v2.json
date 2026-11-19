@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs",
+  "variantId": "shrubs-rosehip-2",
+  "name": "Rosehip – medium",
+  "category": "nature",
+  "version": 2,
+  "specHash": "b423828d",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 44,
+  "height": 32,
+  "anchor": {
+    "x": 24,
+    "y": 28
+  },
+  "origin": {
+    "x": 0.54545,
+    "y": 0.875
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 24,
+    "y": 28
+  },
+  "baseOrigin": {
+    "x": 0.54545,
+    "y": 0.875
+  },
+  "visualHeight": 28,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

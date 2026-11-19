@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "bush-flowering-views",
+  "variantId": "bush-flowering-views-spring-90",
+  "name": "Flowering bush, spring 90° (front-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "6db21b52",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 47,
+  "height": 33,
+  "anchor": {
+    "x": 27,
+    "y": 25
+  },
+  "origin": {
+    "x": 0.57447,
+    "y": 0.75758
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 27,
+    "y": 25
+  },
+  "baseOrigin": {
+    "x": 0.57447,
+    "y": 0.75758
+  },
+  "visualHeight": 25,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

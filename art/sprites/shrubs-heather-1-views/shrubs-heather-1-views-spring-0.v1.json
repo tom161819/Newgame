@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-heather-1-views",
+  "variantId": "shrubs-heather-1-views-spring-0",
+  "name": "Heather small, spring 0° (front-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "1b59ea55",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 45,
+  "height": 34,
+  "anchor": {
+    "x": 23,
+    "y": 25
+  },
+  "origin": {
+    "x": 0.51111,
+    "y": 0.73529
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 23,
+    "y": 25
+  },
+  "baseOrigin": {
+    "x": 0.51111,
+    "y": 0.73529
+  },
+  "visualHeight": 25,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

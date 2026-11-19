@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "bush",
+  "variantId": "bush-meadow",
+  "name": "Meadow bush",
+  "category": "trees",
+  "version": 2,
+  "specHash": "c0b4ba37",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 47,
+  "height": 33,
+  "anchor": {
+    "x": 19,
+    "y": 27
+  },
+  "origin": {
+    "x": 0.40426,
+    "y": 0.81818
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 19,
+    "y": 27
+  },
+  "baseOrigin": {
+    "x": 0.40426,
+    "y": 0.81818
+  },
+  "visualHeight": 27,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

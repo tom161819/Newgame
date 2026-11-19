@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "thicket-2x2-mixed-views",
+  "variantId": "thicket-2x2-mixed-views-spring-270",
+  "name": "Thicket 2×2 – Mixed (hazel, bramble, juniper), spring 270° (back-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "29be9cd0",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 109,
+  "height": 77,
+  "anchor": {
+    "x": 51,
+    "y": 55
+  },
+  "origin": {
+    "x": 0.46789,
+    "y": 0.71429
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 51,
+    "y": 55
+  },
+  "baseOrigin": {
+    "x": 0.46789,
+    "y": 0.71429
+  },
+  "visualHeight": 55,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

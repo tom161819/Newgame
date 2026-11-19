@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "bush-scrub-views",
+  "variantId": "bush-scrub-views-winter-180",
+  "name": "Scrub, winter 180° (back-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "ad8c1482",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 36,
+  "height": 33,
+  "anchor": {
+    "x": 17,
+    "y": 26
+  },
+  "origin": {
+    "x": 0.47222,
+    "y": 0.78788
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 17,
+    "y": 26
+  },
+  "baseOrigin": {
+    "x": 0.47222,
+    "y": 0.78788
+  },
+  "visualHeight": 26,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

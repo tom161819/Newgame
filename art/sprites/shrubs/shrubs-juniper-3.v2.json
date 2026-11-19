@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs",
+  "variantId": "shrubs-juniper-3",
+  "name": "Juniper – large",
+  "category": "nature",
+  "version": 2,
+  "specHash": "443d64a4",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 44,
+  "height": 48,
+  "anchor": {
+    "x": 20,
+    "y": 45
+  },
+  "origin": {
+    "x": 0.45455,
+    "y": 0.9375
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 20,
+    "y": 45
+  },
+  "baseOrigin": {
+    "x": 0.45455,
+    "y": 0.9375
+  },
+  "visualHeight": 45,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-seasons",
+  "variantId": "shrubs-seasons-rosehip-autumn",
+  "name": "Rosehip – autumn",
+  "category": "nature",
+  "version": 2,
+  "specHash": "e88c7e6f",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 45,
+  "height": 32,
+  "anchor": {
+    "x": 24,
+    "y": 29
+  },
+  "origin": {
+    "x": 0.53333,
+    "y": 0.90625
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 24,
+    "y": 29
+  },
+  "baseOrigin": {
+    "x": 0.53333,
+    "y": 0.90625
+  },
+  "visualHeight": 29,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

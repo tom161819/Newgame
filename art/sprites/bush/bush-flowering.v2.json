@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "bush",
+  "variantId": "bush-flowering",
+  "name": "Flowering bush",
+  "category": "trees",
+  "version": 2,
+  "specHash": "6db459e9",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 48,
+  "height": 35,
+  "anchor": {
+    "x": 22,
+    "y": 27
+  },
+  "origin": {
+    "x": 0.45833,
+    "y": 0.77143
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 22,
+    "y": 27
+  },
+  "baseOrigin": {
+    "x": 0.45833,
+    "y": 0.77143
+  },
+  "visualHeight": 27,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

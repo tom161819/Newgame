@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "thicket-3x2-mixed-views",
+  "variantId": "thicket-3x2-mixed-views-autumn-180",
+  "name": "Thicket 3×2 – Mixed (hazel, bramble, juniper), autumn 180° (back-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "0b3eab68",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 133,
+  "height": 103,
+  "anchor": {
+    "x": 64,
+    "y": 72
+  },
+  "origin": {
+    "x": 0.4812,
+    "y": 0.69903
+  },
+  "footprint": {
+    "width": 3,
+    "height": 2
+  },
+  "base": {
+    "x": 64,
+    "y": 72
+  },
+  "baseOrigin": {
+    "x": 0.4812,
+    "y": 0.69903
+  },
+  "visualHeight": 72,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

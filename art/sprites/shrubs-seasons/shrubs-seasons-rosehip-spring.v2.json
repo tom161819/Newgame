@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-seasons",
+  "variantId": "shrubs-seasons-rosehip-spring",
+  "name": "Rosehip – spring",
+  "category": "nature",
+  "version": 2,
+  "specHash": "bfc1c84c",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 45,
+  "height": 32,
+  "anchor": {
+    "x": 25,
+    "y": 29
+  },
+  "origin": {
+    "x": 0.55556,
+    "y": 0.90625
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 25,
+    "y": 29
+  },
+  "baseOrigin": {
+    "x": 0.55556,
+    "y": 0.90625
+  },
+  "visualHeight": 29,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

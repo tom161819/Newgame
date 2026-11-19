@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-hazel-3-views",
+  "variantId": "shrubs-hazel-3-views-winter-270",
+  "name": "Hazel large, winter 270° (back-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "e14e9878",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 44,
+  "height": 42,
+  "anchor": {
+    "x": 20,
+    "y": 38
+  },
+  "origin": {
+    "x": 0.45455,
+    "y": 0.90476
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 20,
+    "y": 38
+  },
+  "baseOrigin": {
+    "x": 0.45455,
+    "y": 0.90476
+  },
+  "visualHeight": 38,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

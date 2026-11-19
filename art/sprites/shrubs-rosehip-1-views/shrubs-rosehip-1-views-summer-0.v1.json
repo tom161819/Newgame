@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-rosehip-1-views",
+  "variantId": "shrubs-rosehip-1-views-summer-0",
+  "name": "Rosehip small, summer 0° (front-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "39d6d3b8",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 38,
+  "height": 28,
+  "anchor": {
+    "x": 19,
+    "y": 24
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.85714
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 19,
+    "y": 24
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.85714
+  },
+  "visualHeight": 24,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

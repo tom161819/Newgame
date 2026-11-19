@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "thicket-3x2",
+  "variantId": "thicket-3x2-bramble",
+  "name": "Bramble thicket",
+  "category": "nature",
+  "version": 2,
+  "specHash": "ea6afac0",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 118,
+  "height": 73,
+  "anchor": {
+    "x": 61,
+    "y": 46
+  },
+  "origin": {
+    "x": 0.51695,
+    "y": 0.63014
+  },
+  "footprint": {
+    "width": 3,
+    "height": 2
+  },
+  "base": {
+    "x": 61,
+    "y": 46
+  },
+  "baseOrigin": {
+    "x": 0.51695,
+    "y": 0.63014
+  },
+  "visualHeight": 46,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

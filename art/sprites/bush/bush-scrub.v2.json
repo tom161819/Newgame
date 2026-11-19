@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "bush",
+  "variantId": "bush-scrub",
+  "name": "Dry scrub",
+  "category": "trees",
+  "version": 2,
+  "specHash": "ad8e5319",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 40,
+  "height": 30,
+  "anchor": {
+    "x": 20,
+    "y": 28
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.93333
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 20,
+    "y": 28
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.93333
+  },
+  "visualHeight": 28,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

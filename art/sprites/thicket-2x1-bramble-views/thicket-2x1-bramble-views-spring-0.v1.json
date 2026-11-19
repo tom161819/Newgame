@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "thicket-2x1-bramble-views",
+  "variantId": "thicket-2x1-bramble-views-spring-0",
+  "name": "Thicket 2×1 – Bramble, spring 0° (front-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "7b363763",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 77,
+  "height": 52,
+  "anchor": {
+    "x": 36,
+    "y": 35
+  },
+  "origin": {
+    "x": 0.46753,
+    "y": 0.67308
+  },
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "base": {
+    "x": 36,
+    "y": 35
+  },
+  "baseOrigin": {
+    "x": 0.46753,
+    "y": 0.67308
+  },
+  "visualHeight": 35,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

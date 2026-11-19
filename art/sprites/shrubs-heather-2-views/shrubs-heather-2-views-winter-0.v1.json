@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-heather-2-views",
+  "variantId": "shrubs-heather-2-views-winter-0",
+  "name": "Heather medium, winter 0° (front-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "af7f4c0b",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 54,
+  "height": 32,
+  "anchor": {
+    "x": 27,
+    "y": 26
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.8125
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 27,
+    "y": 26
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.8125
+  },
+  "visualHeight": 26,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

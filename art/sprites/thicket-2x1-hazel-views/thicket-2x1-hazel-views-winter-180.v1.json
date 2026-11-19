@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "thicket-2x1-hazel-views",
+  "variantId": "thicket-2x1-hazel-views-winter-180",
+  "name": "Thicket 2×1 – Hazel, winter 180° (back-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "6c7258ed",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 73,
+  "height": 65,
+  "anchor": {
+    "x": 32,
+    "y": 50
+  },
+  "origin": {
+    "x": 0.43836,
+    "y": 0.76923
+  },
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "base": {
+    "x": 32,
+    "y": 50
+  },
+  "baseOrigin": {
+    "x": 0.43836,
+    "y": 0.76923
+  },
+  "visualHeight": 50,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-bramble-3-views",
+  "variantId": "shrubs-bramble-3-views-autumn-90",
+  "name": "Bramble large, autumn 90° (front-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "ed7f1786",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 44,
+  "height": 30,
+  "anchor": {
+    "x": 24,
+    "y": 25
+  },
+  "origin": {
+    "x": 0.54545,
+    "y": 0.83333
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 24,
+    "y": 25
+  },
+  "baseOrigin": {
+    "x": 0.54545,
+    "y": 0.83333
+  },
+  "visualHeight": 25,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

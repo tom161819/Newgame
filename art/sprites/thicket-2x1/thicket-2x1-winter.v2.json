@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "thicket-2x1",
+  "variantId": "thicket-2x1-winter",
+  "name": "Mixed thicket – winter",
+  "category": "nature",
+  "version": 2,
+  "specHash": "6c6e8756",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 78,
+  "height": 64,
+  "anchor": {
+    "x": 43,
+    "y": 50
+  },
+  "origin": {
+    "x": 0.55128,
+    "y": 0.78125
+  },
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "base": {
+    "x": 43,
+    "y": 50
+  },
+  "baseOrigin": {
+    "x": 0.55128,
+    "y": 0.78125
+  },
+  "visualHeight": 50,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

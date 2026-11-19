@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-rosehip-2-views",
+  "variantId": "shrubs-rosehip-2-views-summer-180",
+  "name": "Rosehip medium, summer 180° (back-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "b42143f6",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 41,
+  "height": 32,
+  "anchor": {
+    "x": 18,
+    "y": 28
+  },
+  "origin": {
+    "x": 0.43902,
+    "y": 0.875
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 18,
+    "y": 28
+  },
+  "baseOrigin": {
+    "x": 0.43902,
+    "y": 0.875
+  },
+  "visualHeight": 28,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

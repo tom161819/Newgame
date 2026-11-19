@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "bush-berry-views",
+  "variantId": "bush-berry-views-winter-90",
+  "name": "Berry bush, winter 90° (front-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "0fe03e7e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 41,
+  "height": 35,
+  "anchor": {
+    "x": 21,
+    "y": 30
+  },
+  "origin": {
+    "x": 0.5122,
+    "y": 0.85714
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 21,
+    "y": 30
+  },
+  "baseOrigin": {
+    "x": 0.5122,
+    "y": 0.85714
+  },
+  "visualHeight": 30,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

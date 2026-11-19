@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "bush-berry-views",
+  "variantId": "bush-berry-views-autumn-180",
+  "name": "Berry bush, autumn 180° (back-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "0fe03e7e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 39,
+  "height": 34,
+  "anchor": {
+    "x": 21,
+    "y": 28
+  },
+  "origin": {
+    "x": 0.53846,
+    "y": 0.82353
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 21,
+    "y": 28
+  },
+  "baseOrigin": {
+    "x": 0.53846,
+    "y": 0.82353
+  },
+  "visualHeight": 28,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

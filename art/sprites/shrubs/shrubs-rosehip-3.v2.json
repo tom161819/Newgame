@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs",
+  "variantId": "shrubs-rosehip-3",
+  "name": "Rosehip – large",
+  "category": "nature",
+  "version": 2,
+  "specHash": "eefb0fcf",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 45,
+  "height": 35,
+  "anchor": {
+    "x": 21,
+    "y": 30
+  },
+  "origin": {
+    "x": 0.46667,
+    "y": 0.85714
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 21,
+    "y": 30
+  },
+  "baseOrigin": {
+    "x": 0.46667,
+    "y": 0.85714
+  },
+  "visualHeight": 30,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

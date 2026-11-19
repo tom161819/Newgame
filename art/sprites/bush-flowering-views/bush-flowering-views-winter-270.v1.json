@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "bush-flowering-views",
+  "variantId": "bush-flowering-views-winter-270",
+  "name": "Flowering bush, winter 270° (back-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "ae04ab82",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 47,
+  "height": 38,
+  "anchor": {
+    "x": 20,
+    "y": 31
+  },
+  "origin": {
+    "x": 0.42553,
+    "y": 0.81579
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 20,
+    "y": 31
+  },
+  "baseOrigin": {
+    "x": 0.42553,
+    "y": 0.81579
+  },
+  "visualHeight": 31,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

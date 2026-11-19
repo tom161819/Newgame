@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs",
+  "variantId": "shrubs-hazel-3",
+  "name": "Hazel – large",
+  "category": "nature",
+  "version": 2,
+  "specHash": "79fa0823",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 54,
+  "height": 45,
+  "anchor": {
+    "x": 28,
+    "y": 42
+  },
+  "origin": {
+    "x": 0.51852,
+    "y": 0.93333
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 28,
+    "y": 42
+  },
+  "baseOrigin": {
+    "x": 0.51852,
+    "y": 0.93333
+  },
+  "visualHeight": 42,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

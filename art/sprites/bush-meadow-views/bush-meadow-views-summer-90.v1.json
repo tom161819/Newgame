@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "bush-meadow-views",
+  "variantId": "bush-meadow-views-summer-90",
+  "name": "Meadow bush, summer 90° (front-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "c0bb75fc",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 45,
+  "height": 30,
+  "anchor": {
+    "x": 23,
+    "y": 23
+  },
+  "origin": {
+    "x": 0.51111,
+    "y": 0.76667
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 23,
+    "y": 23
+  },
+  "baseOrigin": {
+    "x": 0.51111,
+    "y": 0.76667
+  },
+  "visualHeight": 23,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

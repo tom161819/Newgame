@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "thicket-3x2-mixed-views",
+  "variantId": "thicket-3x2-mixed-views-winter-90",
+  "name": "Thicket 3×2 – Mixed (hazel, bramble, juniper), winter 90° (front-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "6c7258ed",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 129,
+  "height": 100,
+  "anchor": {
+    "x": 67,
+    "y": 72
+  },
+  "origin": {
+    "x": 0.51938,
+    "y": 0.72
+  },
+  "footprint": {
+    "width": 3,
+    "height": 2
+  },
+  "base": {
+    "x": 67,
+    "y": 72
+  },
+  "baseOrigin": {
+    "x": 0.51938,
+    "y": 0.72
+  },
+  "visualHeight": 72,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}
