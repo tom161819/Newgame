@@ -1401,3 +1401,10 @@ body.sandbox-tool canvas { cursor:crosshair !important; }
 
 .stock-limit-row { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:4px 0; } .stock-limit-row label { display:flex; gap:6px; align-items:center; } .stock-limit-row input { width:5.5em; } .stock-limit-row small { opacity:.8; }
 .builder-workshop-engines { margin-top:8px; padding-top:6px; border-top:1px solid rgba(227,197,122,.25); }
+
+/* Owner 19 Nov 2026 (73): the in-game Yes / No question (confirmAsk.js). */
+.confirm-ask { max-width:min(420px, 92vw); padding:16px 18px; border:1px solid var(--line, #79704b); border-radius:8px; background:var(--glass, rgb(30 35 25 / .96)); color:var(--ink, #ede5c9); font:14px/1.4 var(--font-ui, system-ui); }
+.confirm-ask::backdrop { background:#0006; }
+.confirm-ask p { margin:0 0 14px; }
+.confirm-ask-actions { display:flex; justify-content:flex-end; gap:8px; }
+.confirm-ask-actions button { min-width:90px; }

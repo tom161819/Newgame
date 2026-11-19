@@ -11,6 +11,7 @@ import { setSquad,squadMembers } from './armySquads.js';
 import { JOBS } from '../data/jobs.js';
 import { GEAR_ICONS,gearOf } from './gearIcons.js';
 import { KIND_ICONS,lookPicture } from './unitPictures.js';
+import { confirmAsk } from './confirmAsk.js';
 
 const DOUBLE_CLICK_MS=400;
 // Owner 17 Nov 2026: the orders are icons; hovering shows the name and what it does.
@@ -37,6 +38,8 @@ export class UnitSelection {
     // Battle test 18 Nov 2026, point 8: attack-move – armed with this button (or Ctrl held with the right click), the next
     // move order makes the soldiers fight every enemy they meet on the way and then go on.
     this.attackMove=false;this.attackButton=document.createElement('button');this.attackButton.type='button';this.attackButton.dataset.unitCommand='attackMove';this.attackButton.addEventListener('click',()=>{this.attackMove=!this.attackMove;this.signature=null;this.draw();});this.stance.append(this.attackButton);
+    // Owner 19 Nov 2026 (73): dismiss the chosen soldiers, after a question.
+    this.dismissButton=document.createElement('button');this.dismissButton.type='button';this.dismissButton.dataset.unitCommand='dismiss';this.dismissButton.addEventListener('click',()=>this.askDismiss());this.stance.append(this.dismissButton);
     this.panel.append(this.stance);
     // Owner 17 Nov 2026: the formation the chosen men take when sent somewhere (holding the right button shows it and
     // turns it with the mouse).
@@ -88,6 +91,12 @@ export class UnitSelection {
   workers(){return [...this.ids].map(id=>this.scene.workerSystem.workers.get(id)).filter(w=>this.scene.workerSystem.commands.selectable(w));}
   // m-kral-vyber (point 52): the King is selected like the others (click or drag) and ordered with the right button.
   set(workers){this.king=workers.includes(this.scene.character)&&this.scene.character.isAlive&&!this.scene.character.away;this.ids=new Set(workers.filter(w=>this.scene.workerSystem.commands.selectable(w)).map(w=>w.id));this.draw();}
+  async askDismiss(){
+    const soldiers=this.workers().filter(w=>w.profession==='soldier');if(!soldiers.length||this.asking)return;this.asking=true;
+    try{const ok=await confirmAsk(t('command.dismissAsk',{count:soldiers.length}),{yes:t('command.dismissYes'),no:t('common.cancel')});
+      if(!ok)return;const n=this.scene.military?.dismiss?.(soldiers)??0;this.scene.setStatus?.(t('command.dismissed',{count:n}));this.ids=new Set([...this.ids].filter(id=>!soldiers.some(w=>w.id===id&&w.profession!=='soldier')));this.signature=null;this.draw();}
+    finally{this.asking=false;}
+  }
   // Takes one kind (or the King) out of the selection.
   dropKind(kind){if(kind==='king'){this.king=false;this.draw();return;}const rest=this.workers().filter(w=>this.kindOf(w)!==kind);if(!rest.length&&!this.king){this.clear();return;}this.ids=new Set(rest.map(w=>w.id));this.draw();}
   clear(){this.ids.clear();this.king=false;this.anchor=null;this.draw();}
@@ -204,7 +213,7 @@ export class UnitSelection {
       this.buttons.inspect.disabled=workers.length!==1;
       {const soldiers=workers.filter(w=>w.profession==='soldier');this.stance.hidden=!soldiers.length;if(soldiers.length){const now=new Set(soldiers.map(w=>w.stance??'aggressive'));
         for(const [id,b] of Object.entries(this.stanceButtons)){iconButton(b,STANCE_ICONS[id],t(`army.stance.${id}`),t(`army.stance.${id}Tip`));b.classList.toggle('on',now.size===1&&now.has(id));}
-        iconButton(this.attackButton,'🏹➜',t('command.attackMove'),t('command.attackMoveTip'));this.attackButton.classList.toggle('on',this.attackMove);}
+        iconButton(this.attackButton,'🏹➜',t('command.attackMove'),t('command.attackMoveTip'));iconButton(this.dismissButton,'🚪',t('command.dismiss'),t('command.dismissTip'));this.attackButton.classList.toggle('on',this.attackMove);}
         this.formationBar.hidden=workers.length<2;for(const [id,b] of Object.entries(this.formationButtons)){iconButton(b,FORMATION_ICONS[id],t(`army.formation.${id}`),`${t(`army.formation.${id}Tip`)} ${t('command.formationHint')}`);b.classList.toggle('on',this.formation===id);}}if(!this.panel.hidden)this.placeAboveBar();
       const haulers=workers.filter(w=>w.profession==='hauler');this.haul.hidden=haulers.length<2;
       if(!this.haul.hidden){const option=(v,text)=>{const o=document.createElement('option');o.value=v;o.textContent=text;return o;};

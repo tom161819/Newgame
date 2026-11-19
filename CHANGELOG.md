@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.10] - 2026-11-19
+<!-- version: {"title":"Dismiss soldiers","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- Chosen soldiers can be dismissed with the door button in the selection bar. The game asks first; dismissed soldiers become ordinary residents and their kit goes back to the store.
+
 ## [0.148.9] - 2026-11-19
 <!-- version: {"title":"Soundtrack","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Added
