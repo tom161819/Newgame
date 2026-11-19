@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.8] - 2026-11-19
+<!-- version: {"title":"Neighbouring maps round the minimap","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- Small squares round the minimap for the neighbouring maps: "?" or what was found there, the hours left while your party marches, and with a level 3 Castle and Barracks a click opens the party window.
+
 ## [0.148.7] - 2026-11-19
 <!-- version: {"title":"Party meets at the Barracks","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Changed

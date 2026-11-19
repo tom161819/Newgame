@@ -578,6 +578,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .minimap canvas { position:absolute; left:50%; top:50%; width:var(--minimap-size); height:var(--minimap-size); margin:calc(var(--minimap-size) / -2) 0 0 calc(var(--minimap-size) / -2); transform:scaleY(.5) rotate(45deg); image-rendering:pixelated; border:1px solid #b99a53; }
 @media(max-width:760px){ .minimap { --minimap-size:calc(105px * var(--minimap-scale, 1)); } }
 /* Request 55: + / − in the minimap's top-right corner change its on-screen size (Minimap.js MINIMAP_SIZES). */
+/* Owner 19 Nov 2026 (82): a small square for each neighbouring map, just outside the diamond's tips and edge middles. */
+.minimap-zone { position:absolute; z-index:1; left:calc(50% + var(--zx) * (25% + 7px) - 9px); top:calc(50% + var(--zy) * (25% + 5px) - 9px); width:18px; height:18px; min-height:0; padding:0; display:grid; place-items:center; border:1px solid var(--line, #79704b); border-radius:4px; background:var(--glass, rgb(30 35 25 / .86)); color:var(--ink, #ede5c9); font:700 9px/1 var(--font-ui, system-ui); cursor:pointer; white-space:nowrap; overflow:hidden; }
+.minimap-zone.found { font-size:11px; }
+.minimap-zone.marching { border-color:var(--gold, #e3c57a); color:var(--gold, #e3c57a); width:auto; min-width:18px; padding:0 2px; }
+.minimap-zone.there { border-color:#8fd16a; }
+.minimap-zone:hover:not(:disabled) { border-color:var(--gold, #e3c57a); }
+.minimap-zone:disabled { opacity:.55; cursor:default; }
 .minimap-size { position:absolute; top:0; right:0; z-index:1; display:flex; gap:3px; }
 .minimap-size button { width:20px; height:20px; min-height:0; padding:0; display:grid; place-items:center; border:1px solid var(--line, #79704b); border-radius:5px; background:var(--glass, rgb(30 35 25 / .86)); color:var(--ink, #ede5c9); font:700 13px/1 var(--font-ui, system-ui); cursor:pointer; }
 .minimap-size button:hover:not(:disabled) { border-color:var(--gold, #e3c57a); color:var(--gold, #e3c57a); }
