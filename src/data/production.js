@@ -4,7 +4,8 @@ import { FOOD_RECIPES } from './foodProduction.js';
 export const PRODUCTION_RECIPES=Object.freeze({
   ...FOOD_RECIPES,
   // m-palivo-vyroba (38): all its Wood is fuel; owner 13 Nov: one more (3 Ore + 3 Wood → 1 Iron, was 2 Wood).
-  smelter:Object.freeze({input:Object.freeze({iron_ore:3,wood:3}),fuel:Object.freeze({wood:3}),output:Object.freeze({iron:1}),duration:40000,skill:'smelting',xp:10,
+  // Owner 19 Nov 2026 (75, "zvýšit produkci železa"): 2 Ore + 2 Wood → 1 Iron in 25 s (was 3 + 3 in 40 s).
+  smelter:Object.freeze({input:Object.freeze({iron_ore:2,wood:2}),fuel:Object.freeze({wood:2}),output:Object.freeze({iron:1}),duration:25000,skill:'smelting',xp:10,
     inputSources:Object.freeze({iron_ore:'Smelting',wood:'Smelting Fuel'}),outputSource:'Smelter Production'}),
   // Military workshops (C07): balance lives here and may change.
   // S12: a Wheelbarrow is a vehicle: the finished one leaves the output buffer as a real object beside the workshop.
@@ -45,7 +46,7 @@ const past=(input,output,duration)=>Object.freeze({input:Object.freeze(input),ou
 export const RECIPE_HISTORY=Object.freeze({
   mill:Object.freeze([past({wheat:4},{flour:3},30000)]),
   bakery:Object.freeze([past({flour:1},{bread:6},30000),past({flour:2},{bread:5},30000),past({flour:2},{bread:4},30000)]),
-  smelter:Object.freeze([past({iron_ore:3,wood:2},{iron:1},40000)]),
+  smelter:Object.freeze([past({iron_ore:3,wood:3},{iron:1},40000),past({iron_ore:3,wood:2},{iron:1},40000)]),
   'pitch_kiln:pitch':Object.freeze([past({wood:2},{pitch:1},30000)]),
   'pitch_kiln:torches':Object.freeze([past({wood:1,pitch:1},{torch:3},20000)]),
 });

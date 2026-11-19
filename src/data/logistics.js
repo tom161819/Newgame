@@ -1,5 +1,5 @@
 import { FOOD_RESOURCE_IDS } from './foodProduction.js';
-export const LOGISTICS_RULES=Object.freeze({starterCapacity:300,legacyStarterCapacity:40,warehouseCapacity:200,yardCapacity:400,outputPileCapacity:20,loadUnits:40,planningInterval:500});
+export const LOGISTICS_RULES=Object.freeze({starterCapacity:300,legacyStarterCapacity:40,warehouseCapacity:200,yardCapacity:400,outputPileCapacity:20,loadUnits:40,planningInterval:500,inputWaitScale:120000});
 // m-sklady-materialu-koncept (21, 49): one open Material Yard holds the raw building materials; a Warehouse no longer
 // takes them. Producers (Quarry, Iron Mine, Lumberjack Hut) drop output on a small pile by their building for Haulers.
 export const YARD_RESOURCES=Object.freeze(['wood','stone','iron_ore','iron']);

@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.2] - 2026-11-19
+<!-- version: {"title":"Faster, fairly shared iron","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Changed
+- Iron is faster: the Iron Mine digs one Ore in 10 s and the Smelter makes 1 Iron from 2 Ore + 2 Wood in 25 s. A workshop that has waited longer for an input now gets it first, not only the nearest one.
+
 ## [0.148.1] - 2026-11-19
 <!-- version: {"title":"Training without a combat level","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Changed

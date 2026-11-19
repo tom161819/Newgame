@@ -22,7 +22,8 @@ export const MINING_WORK=Object.freeze({
   quarry:Object.freeze({resource:'stone',depositType:'stone_deposit',duration:12000,xp:5,overlap:true}),
   // m-dul-na-lozisku (owner, 12 Nov): an Iron Mine stands over its deposit like a Quarry. Mines built before beside a
   // deposit keep working it (building.miningMode 'adjacent', within range).
-  iron_mine:Object.freeze({resource:'iron_ore',depositType:'iron_deposit',duration:20000,xp:8,range:4,overlap:true}),
+  // Owner 19 Nov 2026 (75): a miner digs one Ore in 10 s (was 20 s).
+  iron_mine:Object.freeze({resource:'iron_ore',depositType:'iron_deposit',duration:10000,xp:8,range:4,overlap:true}),
 });
 export const resourceBlocks=object=>object.natural?.kind==='tree'?object.natural.stage===3:!object.definition.walkable;
 
