@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.147.0] - 2026-11-19
+<!-- version: {"title":"Analog tax slider","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Changed
+- Kingdom policy: the tax slider moves smoothly from 0 to 1.50 Gold per resident (steps of 0.05) instead of five fixed levels; Happiness changes gradually between the old levels, and the name and icon show the nearest one.
+
+### Fixed
+- Kingdom policy: moving the tax slider updates the Gold per resident, the daily total and the Happiness straight away (marked "from tomorrow" until the change takes effect).
+
 ## [0.146.20] - 2026-11-19
 <!-- version: {"title":"Diagonal walls","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Added

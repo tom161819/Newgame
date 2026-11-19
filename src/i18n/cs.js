@@ -374,7 +374,7 @@ export default {
   'status.noWallAccess':'Na tuhle hradbu nevede žádná brána ani věž.',
   "policy.card":"Politika království","employment.card":"Zaměstnání",'policy.feast':'Uspořádat hostinu','policy.feastCost':'{food} jídla a {gold} zlata: +15 spokojenosti na 2 dny.','policy.feastRunning':'Hostina: zbývá {days} dne.','policy.feastNo.cooldown':{one:'Možná za {days} den.',few:'Možná za {days} dny.',other:'Možná za {days} dní.'},'policy.feastNo.food':'Málo jídla (potřeba {food} porcí).','policy.feastNo.gold':'Málo zlata (potřeba {gold}).','policy.feastNo.noResidents':'Nemá kdo hodovat.','policy.feastNotice':'Království pořádá hostinu!','ledger.Feast':'Hostina',
   'needs.feastLine':'Hostina: spokojenost {value} (zbývá {days} dne)',
-  'policy.cancel':'Zrušit','policy.overview':'Přehled království','policy.fromTomorrow':'Od zítřka: {changes}.','policy.pendingTax':'daně {tax}','policy.pendingRations':'příděly {rations}',
+  'policy.cancel':'Zrušit','policy.overview':'Přehled království','policy.fromTomorrow':'Od zítřka: {changes}.','policy.pendingTax':'daně {tax} zlata','policy.pendingRations':'příděly {rations}',
   'policy.goldBalance':'Zlato za den: hrad {castle}, daně {taxes}, obchod {trade}, mzdy {wages} = {total}.','policy.goldTomorrow':'Od zítřka: {total}.',
   'policy.foodBalance':'Jídlo za den: vyrobeno {produced}, snědeno {eaten} ({net}); zásoby vydrží {days} dní při těchto přídělech.',
   'policy.happinessForecast':'Spokojenost {now} → {next} za {days} den/dny.','policy.happinessSteady':'Spokojenost {now}: vliv politiky je ustálený.','policy.happinessNone':'Zatím žádní obyvatelé.',
@@ -383,6 +383,7 @@ export default {
   'policy.tax.none':'Bez daní','policy.tax.low':'Nízké','policy.tax.normal':'Běžné','policy.tax.high':'Vysoké','policy.tax.very_high':'Velmi vysoké',
   'policy.rations.small':'Malé (½ porce denně)','policy.rations.normal':'Běžné (1 porce denně)','policy.rations.generous':'Štědré (1½ porce denně)',
   'policy.taxEffect':'{each} zlata za obyvatele každé ráno: {total} zlata/den od {count} obyvatel. Spokojenost {happiness}.',
+  'policy.taxEffectTomorrow':'Od zítřka {each} zlata za obyvatele každé ráno: {total} zlata/den od {count} obyvatel. Spokojenost {happiness}.',
   'policy.rationsEffect':'Každý obyvatel sní {portions} porce denně; potřeba jídla je {base} % + 5 % za každý druh jídla snědený za poslední 3 dny (nejvýš 100 %).','ledger.Taxes':'Daně',
   'needs.policyLine':'Politika království: spokojenost {value}','needs.strikeLine':'Stávkuje: do práce se vrátí při spokojenosti 50.','needs.leavingLine':'Odchází z království.','needs.riskLine':'Nespokojený {days} den/dny: stávka po 2 dnech pod 35, odchod po 2 dnech pod 25.',
   // m-kral-odmeny-xp: body dovedností krále z královských úkolů.

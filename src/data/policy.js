@@ -13,7 +13,24 @@ export const RATIONS=Object.freeze({
 // Before #68 Generous added +5 to the policy Happiness effect; saves from then may still hold an effect up to +5 above
 // the tax effect (it then moves back to the target like any policy change). Only the save validator uses it.
 export const LEGACY_RATIONS_EFFECT=5;
-export const DEFAULT_POLICY=Object.freeze({tax:'normal',rations:'normal'});
+// Owner 19 Nov 2026: "udělej ten slider posuvný analogově, ne jen pár úrovní". The tax is a number: Gold per resident
+// each morning, from 0 to 1.5 in steps of 0.05. TAX_RATES stay as named anchors: Happiness runs linearly between them,
+// and the nearest one gives the slider its name and icon.
+export const TAX_RANGE=Object.freeze({min:0,max:1.5,step:.05});
+const TAX_ANCHORS=Object.entries(TAX_RATES).map(([level,r])=>({level,...r})).sort((a,b)=>a.perResident-b.perResident);
+export function normalizeTax(value){
+  const v=typeof value==='string'&&Object.hasOwn(TAX_RATES,value)?TAX_RATES[value].perResident:value;if(typeof v!=='number'||!Number.isFinite(v))return null;
+  return Math.round(Math.round(Math.min(TAX_RANGE.max,Math.max(TAX_RANGE.min,v))/TAX_RANGE.step)*TAX_RANGE.step*100)/100;
+}
+export const validTax=value=>typeof value==='number'&&Number.isFinite(value)&&value>=TAX_RANGE.min-1e-9&&value<=TAX_RANGE.max+1e-9&&Math.abs(value/TAX_RANGE.step-Math.round(value/TAX_RANGE.step))<1e-6;
+export function taxHappiness(rate){
+  const a=TAX_ANCHORS;if(rate<=a[0].perResident)return a[0].happiness;
+  for(let i=1;i<a.length;i++)if(rate<=a[i].perResident){const f=(rate-a[i-1].perResident)/(a[i].perResident-a[i-1].perResident);return a[i-1].happiness+f*(a[i].happiness-a[i-1].happiness);}
+  return a.at(-1).happiness;
+}
+// The named level nearest to a rate (ties go to the lower one): the slider's name and icon, and the "high taxes" rule.
+export function taxLevel(rate){let best=TAX_ANCHORS[0];for(const a of TAX_ANCHORS)if(Math.abs(a.perResident-rate)<Math.abs(best.perResident-rate)-1e-9)best=a;return best.level;}
+export const DEFAULT_POLICY=Object.freeze({tax:TAX_RATES.normal.perResident,rations:'normal'});
 // Policy v2 P1: a new policy takes effect the next morning, and its Happiness effect moves towards the new value by
 // `effectPerDay` points per game day (smoothly during the day), in both directions.
 export const POLICY_RULES=Object.freeze({effectPerDay:5,tradeAverageDays:3,

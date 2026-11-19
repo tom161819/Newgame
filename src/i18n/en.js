@@ -373,7 +373,7 @@ export default {
   'status.noWallAccess':'This wall has no Gate or Tower to climb up from.',
   "policy.card":"Kingdom Policy","employment.card":"Employments",'policy.feast':'Hold a feast','policy.feastCost':'{food} food and {gold} Gold: +15 Happiness for 2 days.','policy.feastRunning':'Feast: {days} days left.','policy.feastNo.cooldown':{one:'Available in {days} day.',other:'Available in {days} days.'},'policy.feastNo.food':'Not enough food ({food} portions needed).','policy.feastNo.gold':'Not enough Gold ({gold} needed).','policy.feastNo.noResidents':'No residents to feast.','policy.feastNotice':'The kingdom holds a feast!','ledger.Feast':'Feast',
   'needs.feastLine':'Feast: Happiness {value} ({days} days left)',
-  'policy.cancel':'Cancel','policy.overview':'Kingdom overview','policy.fromTomorrow':'From tomorrow: {changes}.','policy.pendingTax':'{tax} taxes','policy.pendingRations':'{rations} rations',
+  'policy.cancel':'Cancel','policy.overview':'Kingdom overview','policy.fromTomorrow':'From tomorrow: {changes}.','policy.pendingTax':'taxes {tax} Gold','policy.pendingRations':'{rations} rations',
   'policy.goldBalance':'Gold per day: Castle {castle}, taxes {taxes}, trade {trade}, wages {wages} = {total}.','policy.goldTomorrow':'From tomorrow: {total}.',
   'policy.foodBalance':'Food per day: {produced} made, {eaten} eaten ({net}); stores last {days} days at these rations.',
   'policy.happinessForecast':'Happiness {now} → {next} over {days} day(s).','policy.happinessSteady':'Happiness {now}: the policy effect is steady.','policy.happinessNone':'No residents yet.',
@@ -382,6 +382,7 @@ export default {
   'policy.tax.none':'No taxes','policy.tax.low':'Low','policy.tax.normal':'Normal','policy.tax.high':'High','policy.tax.very_high':'Very high',
   'policy.rations.small':'Small (½ portion a day)','policy.rations.normal':'Normal (1 portion a day)','policy.rations.generous':'Generous (1½ portions a day)',
   'policy.taxEffect':'{each} Gold per resident each morning: {total} Gold/day from {count} residents. Happiness {happiness}.',
+  'policy.taxEffectTomorrow':'From tomorrow {each} Gold per resident each morning: {total} Gold/day from {count} residents. Happiness {happiness}.',
   'policy.rationsEffect':'Each resident eats {portions} portions a day; the Food need is {base} % + 5 % for each kind of food eaten in the last 3 days (at most 100 %).','ledger.Taxes':'Taxes',
   'needs.policyLine':'Kingdom policy: Happiness {value}','needs.strikeLine':'On strike: works again at Happiness 50.','needs.leavingLine':'Leaving the kingdom.','needs.riskLine':'Unhappy for {days} day(s): strikes after 2 days below 35, leaves after 2 days below 25.',
   // m-kral-odmeny-xp: King skill points from Royal tasks.

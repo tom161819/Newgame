@@ -5,7 +5,9 @@ import assert from 'node:assert/strict';
 // Granary has the same rations slider. `slide` moves a slider the way the arrow keys do (one level at a time).
 const LEVELS={'#policy-tax':['none','low','normal','high','very_high'],'#policy-rations':['small','normal','generous'],'#granary-rations':['small','normal','generous']};
 const level=(page,sel)=>page.locator(sel).getAttribute('data-level');
-async function slide(page,sel,target){await page.locator(sel).focus();for(let i=0;i<6&&await level(page,sel)!==target;i++){const now=LEVELS[sel].indexOf(await level(page,sel));await page.keyboard.press(LEVELS[sel].indexOf(target)>now?'ArrowRight':'ArrowLeft');}assert.equal(await level(page,sel),target);}
+// Owner 19 Nov 2026: the tax slider is analog (0–1.5 Gold in steps of 0.05); for it `slide` jumps to the level's rate.
+const TAX_RATE={none:0,low:.25,normal:.5,high:1,very_high:1.5};
+async function slide(page,sel,target){if(sel==='#policy-tax'){await page.locator(sel).evaluate((e,v)=>{e.value=String(v);e.dispatchEvent(new Event('input',{bubbles:true}));},TAX_RATE[target]);assert.equal(await level(page,sel),target);return;}await page.locator(sel).focus();for(let i=0;i<6&&await level(page,sel)!==target;i++){const now=LEVELS[sel].indexOf(await level(page,sel));await page.keyboard.press(LEVELS[sel].indexOf(target)>now?'ArrowRight':'ArrowLeft');}assert.equal(await level(page,sel),target);}
 export async function policySmoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);
   try{
@@ -18,17 +20,19 @@ export async function policySmoke(context,url,instrument){
     await slide(page,'#policy-tax','high');await slide(page,'#policy-rations','generous');
     assert.equal(await page.locator('#employment-panel .policy-slider-tax .policy-icon').getAttribute('data-icon'),'tax:high','a heap of gold');
     // Policy v2 P1: the choice waits for the morning; the panel says so and offers Cancel.
-    await page.locator('#policy-pending:not([hidden])').waitFor();assert.match(await page.locator('#policy-pending-text').textContent(),/From tomorrow: High taxes, Generous .* rations\./);
-    assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.policy.tax),'normal');assert.equal(await level(page,'#policy-tax'),'high','the slider shows the pending level');
+    await page.locator('#policy-pending:not([hidden])').waitFor();assert.match(await page.locator('#policy-pending-text').textContent(),/From tomorrow: taxes 1\.00 Gold, Generous .* rations\./);
+    assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.policy.tax),.5);assert.match(await page.locator('#policy-tax-effect').textContent(),/^From tomorrow 1\.00 Gold per resident.*Happiness −10/,'the line follows the slider at once');assert.equal(await level(page,'#policy-tax'),'high','the slider shows the pending level');
     assert.match(await page.locator('#policy-gold').textContent(),/Gold per day: Castle .* = .*From tomorrow: /);assert.match(await page.locator('#policy-food').textContent(),/Food per day: /);
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.gameTime.update(s.gameTime.dayDuration-s.gameTime.elapsed+1);});
     const state=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;return {tax:s.policy.tax,rations:s.policy.rations,pending:s.policy.pending,taxes:s.policy.dailyTaxes(),residents:s.policy.residents().length,income:s.wageSystem.overview().income,castle:s.production.dailyIncome().gold??0,effect:s.policy.happiness(),target:s.policy.target()};});
-    assert.deepEqual([state.tax,state.rations,state.pending],['high','generous',null]);assert.equal(state.taxes,state.residents*1);assert.equal(state.income,state.castle+state.taxes);
+    assert.deepEqual([state.tax,state.rations,state.pending],[1,'generous',null]);assert.equal(state.taxes,state.residents*1);assert.equal(state.income,state.castle+state.taxes);
     // #68: rations no longer change Happiness (they set the Food need), so the target is the tax effect alone.
     assert.ok(state.effect>-1&&state.effect<=0&&state.target===-10,'the Happiness effect moves gradually');
     await page.waitForTimeout(1200);
     assert.match(await page.locator('#policy-tax-effect').textContent(),/1\.00 Gold per resident.*Happiness −10/);assert.match(await page.locator('#policy-rations-effect').textContent(),/1\.2 portions a day; the Food need is 80 %/);
     assert.equal(await page.locator('#policy-pending').isHidden(),true);assert.match(await page.locator('#policy-happiness').textContent(),/Happiness \d+/);
+    // Analog: the arrow key moves the tax by 0.05 and the line follows (0.55 Gold, between Normal 0 and High −10).
+    await page.locator('#policy-tax').focus();await page.keyboard.press('ArrowLeft');await page.keyboard.press('ArrowLeft');assert.match(await page.locator('#policy-tax-effect').textContent(),/^From tomorrow 0\.90 Gold per resident.*Happiness −8/);await page.locator('#policy-cancel').click();
     await slide(page,'#policy-tax','none');await page.locator('#policy-cancel').click();assert.equal(await page.locator('#policy-pending').isHidden(),true);
     // Very high taxes show the big chest of gold; then back.
     await slide(page,'#policy-tax','very_high');assert.equal(await page.locator('#employment-panel .policy-slider-tax .policy-icon').getAttribute('data-icon'),'tax:very_high');await page.locator('#policy-cancel').click();

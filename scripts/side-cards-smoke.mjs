@@ -22,7 +22,7 @@ export async function sideCardsSmoke(context,url,instrument){
       if(process.env.SMOKE_SHOTS&&style==='studio'){await page.locator('#policy-tab').click();await page.screenshot({path:`${process.env.SMOKE_SHOTS}/side-cards-policy.png`});await page.locator('#policy-tab').click();}
     }
     // A tax change in the card shows in the Castle panel's slider (the same policy), and Cancel in either clears it.
-    await page.locator('#policy-tab').click();const card=page.locator('#policy-card .policy-slider-tax input');await card.focus();await page.keyboard.press('ArrowRight');
+    await page.locator('#policy-tab').click();const card=page.locator('#policy-card .policy-slider-tax input');await card.focus();for(let i=0;i<6;i++)await page.keyboard.press('ArrowRight');
     assert.equal(await card.getAttribute('data-level'),'high');await page.locator('#policy-card [data-policy="pending"]:not([hidden])').waitFor();
     await page.locator('#employment-tab').click();assert.equal(await page.locator('#policy-tax').getAttribute('data-level'),'high','the Castle panel shows the card\'s choice');
     // A priority change in the Employments card is the Castle window's own control.
