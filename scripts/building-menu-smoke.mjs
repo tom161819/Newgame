@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { BUILDING_MENU_ORDER } from '../src/data/buildingCategories.js';
 const frames=page=>page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
 async function horizontalStripSmoke(page){
   // Desktop: the open menu is a low horizontal strip with several cards side by side, reachable by buttons, wheel and keyboard.
@@ -34,7 +35,9 @@ export async function buildingMenuSmoke(page){
   if(!await page.locator('#building-categories').count())return;
   const definitions=await page.evaluate(()=>window.__game.registry.get('application').scene.objectRegistry.buildables().map(d=>({id:d.id,category:d.buildingCategory,menuOrder:d.menuOrder})));
   // #132: menuOrder sorts buildings inside their category; in All each category keeps its slots.
-  const menuOrder=list=>{const out=list.slice(),slots=new Map();list.forEach((d,i)=>{if(!slots.has(d.category))slots.set(d.category,[]);slots.get(d.category).push(i);});for(const idx of slots.values()){const sorted=idx.map(i=>list[i]).sort((a,b)=>(a.menuOrder??Number.MAX_SAFE_INTEGER)-(b.menuOrder??Number.MAX_SAFE_INTEGER));idx.forEach((i,j)=>{out[i]=sorted[j];});}return out;};
+  // Owner 15 Nov 2026 (63): BUILDING_MENU_ORDER lists the order inside a category first.
+  const listed=d=>{const i=BUILDING_MENU_ORDER[d.category]?.indexOf(d.id)??-1;return i<0?Number.MAX_SAFE_INTEGER:i;};
+  const menuOrder=list=>{const out=list.slice(),slots=new Map();list.forEach((d,i)=>{if(!slots.has(d.category))slots.set(d.category,[]);slots.get(d.category).push(i);});for(const idx of slots.values()){const sorted=idx.map(i=>list[i]).sort((a,b)=>listed(a)-listed(b)||(a.menuOrder??Number.MAX_SAFE_INTEGER)-(b.menuOrder??Number.MAX_SAFE_INTEGER));idx.forEach((i,j)=>{out[i]=sorted[j];});}return out;};
   await page.locator('#buildings-tab').click();await horizontalStripSmoke(page);
   const categories=await page.locator('[data-building-category]').evaluateAll(tabs=>tabs.map(t=>t.dataset.buildingCategory));
   assert.deepEqual(categories,['all','defense','housing','food','industry','logistics','infrastructure']);
