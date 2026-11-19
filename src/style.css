@@ -1310,6 +1310,21 @@ html .tutorial-arrow.big:not(.offscreen) { width:120px; height:76px; clip-path:n
 .world-zone-label { display:grid; place-items:center; gap:1px; transform:rotate(-45deg); }
 .world-zone-label b { font-size:22px; } .world-zone-label small { font-size:10px; } .world-zone-label em { font-size:10px; color:var(--gold, #e3c57a); }
 .world-soldiers { display:flex; flex-wrap:wrap; gap:4px 12px; justify-content:center; max-height:140px; overflow:auto; margin:6px 0; }
+/* Owner 19 Nov 2026: soldiers by class – slider "6 of 10", an arrow opens the names with a tick and a state icon. */
+.world-dialog .world-soldiers { max-height:none; overflow:visible; }
+.world-classes { display:grid; gap:4px; width:100%; max-height:260px; overflow:auto; text-align:left; }
+.world-class { border:1px solid var(--line-soft,#91835b55); border-radius:6px; padding:4px 8px; background:rgb(0 0 0 / .12); }
+.world-class-head { display:grid; grid-template-columns:22px minmax(0,1fr) minmax(90px,150px) 64px; align-items:center; gap:8px; }
+.world-class-toggle { width:22px; height:22px; padding:0; border:0; background:none; box-shadow:none; color:var(--gold,#f0d78b); font-size:14px; line-height:1; }
+.world-class-name { font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.world-class-slider { width:100%; accent-color:var(--gold,#e0b84f); }
+.world-class-count { font-variant-numeric:tabular-nums; text-align:right; color:var(--muted,#cdbf9c); font-size:12px; }
+.world-class-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:2px 12px; padding:4px 0 2px 30px; }
+.world-class-list[hidden] { display:none; }
+.world-soldier { display:flex; align-items:center; gap:6px; min-width:0; }
+.world-soldier-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.world-soldier-state { cursor:help; font-size:13px; }
+.world-all { justify-self:center; }
 .world-warn, .world-locked, .world-error { font-size:12px; color:#e9b46a; } .world-error { color:#ef8a7a; }
 .world-send, .world-close { margin:4px; }
 /* m-mapa-kraje step 2: playing a zone with the party */

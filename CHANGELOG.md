@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.17] - 2026-11-19
+<!-- version: {"title":"Party picked by soldier class","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- World window: the party is picked by soldier class – a slider per class (e.g. 6 of 10) and an arrow that opens the soldiers by name, each with an icon of what he is doing (text on hover).
+
 ## [0.146.16] - 2026-11-19
 <!-- version: {"title":"No more black squares on the map","type":"fix","reconstructed":false,"saveVersion":65} -->
 ### Fixed
