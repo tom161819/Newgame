@@ -23,7 +23,7 @@ export async function worldEditorSmoke(context, url, instrument) {
     await page.locator('#world-editor:not([hidden])').waitFor(); await waitDraw(page, 0);
     assert.equal(await page.locator('#main-menu').isHidden(), true, 'a full screen, not a window over the menu');
     const box = await page.locator('#world-editor').boundingBox(); assert.ok(box.width >= 1400 && box.height >= 950, 'fills the window');
-    assert.equal(await page.locator('.we-tabs [role=tab]').count(), 8);
+    assert.equal(await page.locator('.we-tabs [role=tab]').count(), 9, 'eight tabs and Terrain (generator 6)');
     // Both previews have content (not one flat colour).
     const variety = sel => page.locator(sel).evaluate(c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, set = new Set(); for (let i = 0; i < d.length; i += 4 * 97) set.add(`${d[i] >> 4},${d[i + 1] >> 4},${d[i + 2] >> 4}`); return set.size; });
     assert.ok(await variety('#we-map') > 8, 'map preview drawn'); assert.ok(await variety('#we-iso') > 20, 'iso preview drawn');
@@ -31,7 +31,7 @@ export async function worldEditorSmoke(context, url, instrument) {
 
     // Sliders change the code; a ground-look slider on the River look tab.
     let n = await drawn(page); await tab(page, 'land'); await setRange(page, 'we-forest', 8); await waitDraw(page, n);
-    assert.match(await page.locator('#we-code').inputValue(), /^MKW5-155515558555-[0-9A-Z]+$/);
+    assert.match(await page.locator('#we-code').inputValue(), /^MKW6-1555155585555555-[0-9A-Z]+$/);
     await tab(page, 'river'); await setRange(page, 'we-reedBeds', 2);
     await tab(page, 'saved'); await page.locator('#we-preset-name').fill('Smoke world'); await page.locator('#we-preset-save').click();
     assert.match(await page.locator('#we-status').textContent(), /Saved “Smoke world”/);
@@ -47,12 +47,12 @@ export async function worldEditorSmoke(context, url, instrument) {
 
     // ↺ resets one tab only.
     await tab(page, 'land'); await page.locator('[data-reset-tab="land"]').click();
-    assert.match(await page.locator('#we-code').inputValue(), /^MKW5-155515555555-/); await tab(page, 'river'); assert.equal(await page.locator('input[name="we-reedBeds"]').inputValue(), '2', 'other tabs keep their values');
+    assert.match(await page.locator('#we-code').inputValue(), /^MKW6-1555155555555555-/); await tab(page, 'river'); assert.equal(await page.locator('input[name="we-reedBeds"]').inputValue(), '2', 'other tabs keep their values');
     // Default asks first; Cancel changes nothing; Reset restores everything, presets stay.
     await tab(page, 'water'); await setRange(page, 'we-lakes', 3); await page.locator('#we-default').click(); await page.locator('.we-confirm').waitFor();
-    await page.locator('#we-default-no').click(); assert.match(await page.locator('#we-code').inputValue(), /^MKW5-155535555555-/);
+    await page.locator('#we-default-no').click(); assert.match(await page.locator('#we-code').inputValue(), /^MKW6-1555355555555555-/);
     await page.locator('#we-default').click(); await page.locator('#we-default-yes').click();
-    assert.match(await page.locator('#we-code').inputValue(), /^MKW5-155515555555-/); await tab(page, 'river');
+    assert.match(await page.locator('#we-code').inputValue(), /^MKW6-1555155555555555-/); await tab(page, 'river');
     assert.notEqual(await page.locator('input[name="we-reedBeds"]').inputValue(), '2', 'ground look back at the game default');
     await tab(page, 'saved'); assert.equal(await page.locator('[data-preset="Smoke world"]').count(), 1, 'Default keeps presets');
 
@@ -86,6 +86,6 @@ export async function worldEditorSmoke(context, url, instrument) {
     assert.equal(started.ground, JSON.parse(preview) && JSON.stringify(JSON.parse(preview).ground), 'the game ground is the preview ground');
     assert.equal(started.look?.reedBeds, 2, 'the ground look is stored in the save');
     assert.deepEqual(errors, []);
-    console.log('PASS World Editor: button under Load Game, full screen with 8 tabs, map + iso preview, presets and last settings survive a reload, New Game offers them, ↺ and Default (confirmed, presets kept), full storage message, Start game = preview map with the ground look saved');
+    console.log('PASS World Editor: button under Load Game, full screen with 9 tabs, map + iso preview, presets and last settings survive a reload, New Game offers them, ↺ and Default (confirmed, presets kept), full storage message, Start game = preview map with the ground look saved');
   } finally { await own.close(); }
 }

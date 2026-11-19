@@ -24,7 +24,7 @@ export async function flowerNoiseSmoke(context, url, instrument) {
     await setRange(page, 'we-flowerContrast', 6); await page.locator('#we-back').click(); await page.goto(url);
 
     // A game in summer, zoomed out over the meadows.
-    await page.locator('#new-game:not([disabled])').click(); await page.locator('#setup-world-code').evaluate(e => { e.value = 'MKW5-155515555555-1'; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }); await page.locator('#start-game').click();
+    await page.locator('#new-game:not([disabled])').click(); await page.locator('#setup-world-code').evaluate(e => { e.value = 'MKW6-1555155555555555-1'; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }); await page.locator('#start-game').click();
     await page.waitForFunction(() => window.__game?.registry.get('application').scene?.terrain);
     await page.locator('#help-dialog').waitFor({ timeout: 10000 }).catch(() => {});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const look = await page.evaluate(`(() => { const s = ${app}.scene; s.dayNight.ambientAlpha = () => 0; s.worldCamera.following = false; s.fog?.setEnabled?.(false); s.terrain.setSeason('Summer');

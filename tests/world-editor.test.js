@@ -11,7 +11,7 @@ const memoryStorage = ({ full = false } = {}) => { const data = new Map(); retur
 const blocked = { getItem() { throw new Error('SecurityError'); }, setItem() { throw new Error('SecurityError'); } };
 
 test('world editor: save, load and delete a named preset (mock localStorage)', () => {
-  const storage = memoryStorage(), state = { levels: [2, 7, 5, 5, 0, 0, 5, 5, 8, 5, 5, 5], seed: 12345, ground: { reedBeds: 2, flowersSmall: 0.1 } };
+  const storage = memoryStorage(), state = { levels: [2, 7, 5, 5, 0, 0, 5, 5, 8, 5, 5, 5, 3, 7, 5, 5], seed: 12345, ground: { reedBeds: 2, flowersSmall: 0.1 } };
   assert.deepEqual(readPresets(storage), []);
   const saved = savePreset(storage, '  River land  ', state, new Date('2026-11-08T10:00:00Z'));
   assert.equal(saved.ok, true);
@@ -41,7 +41,7 @@ test('world editor: storage full or blocked is reported, never thrown', () => {
 test('world editor: Default gives the default world code and the game ground look', () => {
   const state = defaultEditorState(parseInt('7KQ9X2', 36));
   assert.deepEqual(state.levels, defaultWorldLevels()); assert.equal(state.ground, null);
-  assert.equal(editorWorldCode(state), `MKW${WORLD_GENERATOR_VERSION}-155515555555-7KQ9X2`);
+  assert.equal(editorWorldCode(state), `MKW${WORLD_GENERATOR_VERSION}-1555155555555555-7KQ9X2`);
   const look = defaultGroundLook();
   for (const s of GROUND_LOOK_SETTINGS) assert.equal(look[s.key], groundStyle.settings[s.key] ?? GAME_GROUND_SETTINGS[s.key], s.key);
   assert.equal(groundLookDiff(look), null, 'the default look is no override');
@@ -96,4 +96,10 @@ test('world editor: the ground look is an optional, validated save field (no SAV
     assert.deepEqual(validateGameState(JSON.parse(JSON.stringify(saved))).groundLook, { reedBeds: 1.8, patchSize: 30 }, 'round trip');
     for (const bad of [{ reedBeds: 50 }, { nope: 1 }, 'text', []]) assert.throws(() => validateGameState({ ...saved, groundLook: bad }), JSON.stringify(bad));
   } finally { setGroundOverride(null); }
+});
+
+test('world editor: a preset saved before generator 6 (12 levels) is kept, its terrain at the defaults', async () => {
+  const { PRESETS_KEY } = await import('../src/data/worldEditorStore.js');const storage = memoryStorage();
+  storage.setItem(PRESETS_KEY, JSON.stringify([{ name: 'Old', levels: [2, 7, 5, 5, 0, 0, 5, 5, 8, 5, 5, 5], seed: 7, ground: null, at: '2026-11-08T10:00:00.000Z' }]));
+  const [old] = readPresets(storage);assert.equal(old?.name, 'Old');assert.deepEqual(old.levels, [2, 7, 5, 5, 0, 0, 5, 5, 8, 5, 5, 5, 5, 5, 5, 5]);
 });

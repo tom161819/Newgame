@@ -5,7 +5,7 @@ import { clickWorld } from './building-menu-smoke.mjs';
 // the Castle has a free Iron Mine spot beside it; the Iron Mine's build mode names why a spot is invalid (Unexplored,
 // On the deposit, Rock, Out of deposit range) and a valid spot is green; a blueprint placed on unexplored ground that
 // turns out blocked is cancelled into Notices (reason, camera link), not only the status line.
-const CODE='MKW5-155515555555-SU24BGPY';
+const CODE='MKW6-1555155555555555-SU24BGPY';
 const world=t=>({x:6400/2+(t.x-t.y)*32,y:128+(t.x+t.y+1)*16});
 // The build-mode status for the Iron Mine (or another tool) with its footprint anchored at `tile`, by a real mouse move.
 async function hover(page,tile){

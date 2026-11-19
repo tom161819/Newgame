@@ -15,7 +15,7 @@ async function boxes(page,selectors){
 async function start(page,url){
   // A muted category keeps the Notices bar on screen even before the first notice (NoticesPanel.render).
   await page.goto(url);await page.evaluate(keys=>{for(const k of keys)localStorage.removeItem(k);localStorage.setItem('newgame.notices.muted','["construction"]');},KEYS);
-  await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
+  await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW6-1555155555555555-1');await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingdomOverview);
   await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
 }

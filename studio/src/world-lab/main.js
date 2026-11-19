@@ -28,7 +28,7 @@ function h(tag, attrs = {}, ...children) {
 const readDraft = () => { try { return JSON.parse(localStorage.getItem(STORAGE) ?? 'null'); } catch { return null; } };
 const saved = readDraft();
 const state = {
-  levels: Array.isArray(saved?.levels) && saved.levels.length === WORLD_SETTINGS.length ? saved.levels : [...DEFAULT_WORLD_LEVELS],
+  levels: Array.isArray(saved?.levels) && saved.levels.length === WORLD_SETTINGS.length ? saved.levels : Array.isArray(saved?.levels) && saved.levels.length === WORLD_SETTINGS.length - 4 ? [...saved.levels, ...DEFAULT_WORLD_LEVELS.slice(-4)] : [...DEFAULT_WORLD_LEVELS],
   seed: Number.isSafeInteger(saved?.seed) ? saved.seed : randomSeed(),
   overlay: 'none', focus: { x: PLAYER_START.x, y: PLAYER_START.y }, world: null, report: null,
   ground: { mode: saved?.ground?.mode === 'tiles' ? 'tiles' : 'continuous', settings: { ...structuredClone(GROUND_DEFAULTS), ...(saved?.ground?.settings ?? {}) } },
@@ -144,7 +144,8 @@ function renderSettings(full = true) {
   const group = (name, label) => h('label', { class: 'wl-field' }, h('span', {}, label), h('select', { 'data-preset': name, onchange: e => { state.levels = applyPresets(state.levels, { [name]: e.target.value }); renderSettings(); scheduleRegenerate(); } },
     ...Object.keys(WORLD_PRESETS[name]).map(k => h('option', { value: k, selected: presets[name] === k }, k[0].toUpperCase() + k.slice(1))), presets[name] === 'custom' ? h('option', { value: 'custom', selected: true, disabled: true }, 'Custom') : null));
   $('#wl-presets').replaceChildren(group('water', 'Water'), group('desert', 'Desert'), group('forest', 'Forest'));
-  if (full) $('#wl-settings').replaceChildren(...WORLD_SETTINGS.map(settingRow));
+  // Generator 6: the four terrain settings have their own panel here (#wl-height-settings), so not twice.
+  if (full) $('#wl-settings').replaceChildren(...WORLD_SETTINGS.map((s, i) => s.height ? null : settingRow(s, i)).filter(Boolean));
   else for (const [i, s] of WORLD_SETTINGS.entries()) { const row = $(`#wl-settings [data-setting="${s.key}"]`)?.closest('.wl-setting'); if (row) { row.classList.toggle('changed', state.levels[i] !== DEFAULT_WORLD_LEVELS[i]); row.querySelector('b').textContent = ` ${state.levels[i]}`; } }
   $('#wl-seed').value = state.seed.toString(36).toUpperCase();
 }

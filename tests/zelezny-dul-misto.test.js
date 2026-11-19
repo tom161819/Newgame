@@ -46,7 +46,7 @@ function mineSpots(s,deposit){
 }
 
 test('generator 5: the nearest Iron Deposit has an Iron Mine spot beside it in every world (sweep), mostly unchanged',()=>{
-  assert.equal(WORLD_GENERATOR_VERSION,5);let added=0;
+  assert.ok(WORLD_GENERATOR_VERSION>=5,'generator 5 and later (6: m-teren-vyska part 3)');let added=0;
   for(const [seed,trees] of [...Array.from({length:40},(_,i)=>[1000+i*7919,false]),...Array.from({length:6},(_,i)=>[parseInt('SU24BGPY',36)+i,true])]){
     const {s,result}=newWorld(seed,{trees}),d=nearestIron(s);assert.ok(d,`seed ${seed}: an Iron Deposit`);assert.equal(result.deposit,d,`seed ${seed}: the result is the nearest`);
     assert.ok(result.site,`seed ${seed}: a site`);const spots=mineSpots(s,d);assert.ok(spots.length,`seed ${seed}: a valid Iron Mine spot beside the nearest deposit`);
@@ -57,7 +57,7 @@ test('generator 5: the nearest Iron Deposit has an Iron Mine spot beside it in e
 
 test('the reported world MKW…-SU24BGPY: the nearest Iron Deposit (18 tiles) already had free spots; the generator keeps it',()=>{
   const {s,result}=newWorld(parseInt('SU24BGPY',36));assert.equal(result.added,false);const d=nearestIron(s),c=castleCentre(s);
-  const far=Math.hypot(d.x+1-c.x,d.y+1-c.y);assert.ok(far>14&&far<24,'about 18 tiles from the Castle (the level 1 Castle is 4 × 4, its centre moved a little)');assert.ok(mineSpots(s,d).length>=1);
+  const far=Math.hypot(d.x+1-c.x,d.y+1-c.y);/* Generator 6 (rocks lean to hills) makes another world of this seed: its nearest Iron Deposit is ~28 tiles away (18 in generator 5). */assert.ok(far>14&&far<32,'within reach of the Castle');assert.ok(mineSpots(s,d).length>=1);
 });
 
 test('a nearest Iron Deposit walled in by rock gets a new Iron Deposit with a free spot nearer to the Castle',()=>{

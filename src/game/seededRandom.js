@@ -12,4 +12,4 @@ export function worldRandom(seed,part){
   return random;
 }
 // A factory of named streams for one world: streams('river'), streams('trees')…
-export function worldStreams(seed){const cache=new Map();return part=>{if(!cache.has(part))cache.set(part,worldRandom(seed,part));return cache.get(part);};}
+export function worldStreams(seed){const cache=new Map(),streams=part=>{if(!cache.has(part))cache.set(part,worldRandom(seed,part));return cache.get(part);};streams.seed=seed;return streams;}

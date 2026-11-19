@@ -46,7 +46,7 @@ import { IssueIcons } from './IssueIcons.js';
 import { MaterialYardView,MaterialPiles } from './MaterialPiles.js';
 import { SideCards } from '../ui/SideCards.js';
 import { ArmyPanel } from '../ui/ArmyPanel.js';
-import { decodeWorldCode,randomWorldCode,defaultWorldLevels,settingsFromLevels } from '../data/worldCode.js';
+import { decodeWorldCode,randomWorldCode,defaultWorldLevels,settingsFromLevels,fullLevels,heightLevelsOf } from '../data/worldCode.js';
 import { buildRelief,setRelief,sightBonus } from './terrainRelief.js';
 import { worldStreams } from './seededRandom.js';
 import { FORESTRY as WORLD_FORESTRY,grandTiles } from '../data/naturalResources.js';
@@ -260,7 +260,7 @@ export class GameScene extends Phaser.Scene {
     // stream per part; a loaded game keeps its saved world and its code.
     if(!this.loadState&&!this.gameSettings.worldCode)this.gameSettings=gameSettings({...this.gameSettings,worldCode:randomWorldCode()});
     const worldCode=this.gameSettings.worldCode?decodeWorldCode(this.gameSettings.worldCode,this.loadState?{current:null}:undefined):null;
-    this.worldLevels=worldCode?.levels??defaultWorldLevels();this.worldSeed=worldCode?.seed??0;this.worldRandom=worldCode?worldStreams(worldCode.seed):()=>Math.random;
+    this.worldLevels=worldCode?fullLevels(worldCode.levels):defaultWorldLevels();this.worldSeed=worldCode?.seed??0;this.worldRandom=worldCode?worldStreams(worldCode.seed):()=>Math.random;
     const world=this.loadState?{terrain:this.loadState.terrain.map(row=>[...row]),ground:this.loadState.ground?importGround(this.loadState.ground):emptyGround(),bushes:importBushes(this.loadState.bushes??[]),
       zones:this.loadState.grassZones?importZones(this.loadState.grassZones):emptyZones(),reeds:importReeds(this.loadState.reeds),natureGroups:importNatureGroups(this.loadState.natureGroups)}:generateWorld(Math.random,{levels:this.worldLevels,streams:this.worldRandom});
     // m-mapa-kraje: a bandit camp, ruins, a mine, or the mine's inside (zoneFeatures.js) before the world is drawn.
@@ -271,7 +271,7 @@ export class GameScene extends Phaser.Scene {
     // 'off' (the browser smokes, which click by the flat projection; also a way out on a weak machine).
     // The address ?lift=off / ?lift=on sets and remembers it (like ?renderer=).
     let liftOn=true;try{const asked=new URLSearchParams(globalThis.location?.search??'').get('lift');if(asked==='off'||asked==='on')globalThis.localStorage?.setItem('newgame.terrainLift',asked);liftOn=globalThis.localStorage?.getItem('newgame.terrainLift')!=='off';}catch{}
-    this.reliefLift=liftOn;this.relief=setRelief(buildRelief(world.ground,this.worldSeed),{lift:liftOn});this.bushes=world.bushes;this.grassZones=world.zones;this.reeds=world.reeds;
+    this.reliefLift=liftOn;this.relief=setRelief(buildRelief(world.ground,this.worldSeed,heightLevelsOf(this.worldLevels)),{lift:liftOn});this.bushes=world.bushes;this.grassZones=world.zones;this.reeds=world.reeds;
     // velke-prirodni-objekty: thickets and rock groups drawn as one object over their bushes and rock tiles.
     this.natureGroups=world.natureGroups??[];
     // Generator 2's weights for where forests and ore deposits grow (new games only; not saved).

@@ -5,7 +5,7 @@ import { placeBlueprint } from './building-menu-smoke.mjs';
 // set young) gets the "nothing to fell" notice; automatic employment sends nobody there; a click on the notice pans the
 // camera to the hut and opens its window with the young trees and the next mature tree; a mature tree ends the notice.
 // The Dev tool's "Forest and wood" slider changes the value and it survives Save → Load.
-const CODE='MKW5-155515555555-SU24BGPY';
+const CODE='MKW6-1555155555555555-SU24BGPY';
 export async function woodcutterTreesSmoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);
   try{

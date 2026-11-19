@@ -9,7 +9,11 @@
 // edges, large 3 × 3 Stone and Iron Deposits (one ordinary deposit of each fewer).
 // Generator 5 (m-zelezny-dul-misto, playtest 0.83.0 #5): the Iron Deposit nearest to the Castle has a free Iron Mine spot
 // beside it (MineralSystem.ensureIronMine; an Iron Deposit with one is added when it has none).
-export const WORLD_GENERATOR_VERSION=5;
+// Generator 6 (m-teren-vyska part 3): four terrain settings at the end (hilliness, hill height, plains, bank slope – the
+// World Lab's height sliders, terrainHeight.js) and rock outcrops lean towards hills and slopes. Codes of generator 5
+// and older have 12 digits; their hills use the default terrain levels.
+import { HEIGHT_SETTINGS,DEFAULT_HEIGHT_LEVELS } from '../game/terrainHeight.js';
+export const WORLD_GENERATOR_VERSION=6;
 export const WORLD_SEED_MAX=36**8-1;
 // key: id used in code and Studio; max: highest level; default: today's world; scale: level → multiplier (or value).
 const linear=(at0,at5,at9)=>level=>level<=5?at0+(at5-at0)*level/5:at5+(at9-at5)*(level-5)/4;
@@ -26,15 +30,23 @@ export const WORLD_SETTINGS=Object.freeze([
   {key:'rocks',name:'Rocks',max:9,default:5,value:linear(.2,1,1.8),describe:l=>`${Math.round(65*linear(.2,1,1.8)(l))} outcrops`},
   {key:'bushes',name:'Bushes',max:9,default:5,value:linear(0,1,2),describe:l=>`${Math.round(26*linear(0,1,2)(l))} clusters`},
   {key:'grassScale',name:'Grass zone scale',max:9,default:5,value:linear(.5,1,1.8),describe:l=>`×${linear(.5,1,1.8)(l).toFixed(2)} zone size`},
+  // Generator 6: the terrain (height) settings, `height:true`.
+  ...HEIGHT_SETTINGS.map(s=>({key:s.key,name:s.name,max:s.max,default:s.default,height:true,describe:s.describe})),
 ]);
+// Number of digits in a code of this generator version.
+export const settingsCount=generator=>generator>=6?WORLD_SETTINGS.length:WORLD_SETTINGS.length-HEIGHT_SETTINGS.length;
+// The terrain levels of a world (older codes have none: the default terrain).
+export const heightLevelsOf=levels=>Object.fromEntries(HEIGHT_SETTINGS.map(s=>{const i=WORLD_SETTINGS.findIndex(w=>w.key===s.key),l=levels?.[i];return [s.key,Number.isInteger(l)?l:DEFAULT_HEIGHT_LEVELS[s.key]];}));
+// Levels of an older code filled up to the current number of settings (terrain at its defaults).
+export const fullLevels=levels=>WORLD_SETTINGS.map((s,i)=>Number.isInteger(levels?.[i])?levels[i]:s.height?DEFAULT_HEIGHT_LEVELS[s.key]:s.default);
 // Owner-approved defaults (world:sync from the Studio may change them; keep one digit per setting).
-export const DEFAULT_WORLD_LEVELS=Object.freeze([1,5,5,5,1,5,5,5,5,5,5,5]);
+export const DEFAULT_WORLD_LEVELS=Object.freeze([1,5,5,5,1,5,5,5,5,5,5,5,5,5,5,5]);
 export const defaultWorldLevels=()=>[...DEFAULT_WORLD_LEVELS];
 export class WorldCodeError extends Error{constructor(reason,message){super(message);this.reason=reason;}}
-export function validLevels(levels){return Array.isArray(levels)&&levels.length===WORLD_SETTINGS.length&&levels.every((l,i)=>Number.isInteger(l)&&l>=0&&l<=WORLD_SETTINGS[i].max);}
+export function validLevels(levels,generator=WORLD_GENERATOR_VERSION){return Array.isArray(levels)&&levels.length===settingsCount(generator)&&levels.every((l,i)=>Number.isInteger(l)&&l>=0&&l<=WORLD_SETTINGS[i].max);}
 export function encodeWorldCode({generator=WORLD_GENERATOR_VERSION,levels=defaultWorldLevels(),seed}){
   if(!Number.isSafeInteger(generator)||generator<1)throw new WorldCodeError('invalid','Invalid world code');
-  if(!validLevels(levels)||!Number.isSafeInteger(seed)||seed<0||seed>WORLD_SEED_MAX)throw new WorldCodeError('invalid','Invalid world code');
+  if(!validLevels(levels,generator)||!Number.isSafeInteger(seed)||seed<0||seed>WORLD_SEED_MAX)throw new WorldCodeError('invalid','Invalid world code');
   return `MKW${generator}-${levels.join('')}-${seed.toString(36).toUpperCase()}`;
 }
 // Accepts lower case and surrounding spaces. Throws WorldCodeError: 'invalid' or 'generator' (another version).
@@ -45,7 +57,7 @@ export function decodeWorldCode(code,{current=WORLD_GENERATOR_VERSION}={}){
   const generator=Number(match[1]);
   if(current!==null&&generator!==current)throw new WorldCodeError('generator',`This world code is for generator version ${generator}; this build uses version ${current}.`);
   const levels=[...match[2]].map(Number),seed=parseInt(match[3],36);
-  if(!validLevels(levels)||!Number.isSafeInteger(seed)||seed>WORLD_SEED_MAX)throw new WorldCodeError('invalid','Invalid world code');
+  if(!validLevels(levels,generator)||!Number.isSafeInteger(seed)||seed>WORLD_SEED_MAX)throw new WorldCodeError('invalid','Invalid world code');
   return {generator,levels,seed};
 }
 export const randomSeed=(random=Math.random)=>Math.floor(random()*(WORLD_SEED_MAX+1));
@@ -55,7 +67,7 @@ export function settingsFromLevels(levels=defaultWorldLevels()){
   if(!validLevels(levels))throw new WorldCodeError('invalid','Invalid world code');
   const v=key=>{const i=WORLD_SETTINGS.findIndex(s=>s.key===key);return WORLD_SETTINGS[i].value?WORLD_SETTINGS[i].value(levels[i]):levels[i];};
   return {rivers:v('rivers'),riverWidth:v('riverWidth'),meanders:v('meanders'),fordSpacing:v('fords'),lakes:v('lakes'),desert:v('desert'),
-    sandyBanks:v('sandyBanks'),bankVegetation:v('bankVegetation'),forest:v('forest'),rocks:v('rocks'),bushes:v('bushes'),grassScale:v('grassScale')};
+    sandyBanks:v('sandyBanks'),bankVegetation:v('bankVegetation'),forest:v('forest'),rocks:v('rocks'),bushes:v('bushes'),grassScale:v('grassScale'),height:heightLevelsOf(levels)};
 }
 // The simple New Game choices and the levels they set (Water: rivers, river width, lakes; Desert; Forest).
 export const WORLD_PRESETS=Object.freeze({

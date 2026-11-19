@@ -20,6 +20,8 @@ const LOOK = group => GROUND_LOOK_SETTINGS.filter(s => (s.group ?? 'ground') ===
 export const EDITOR_TABS = Object.freeze([
   { id: 'water', gen: ['rivers', 'riverWidth', 'meanders', 'fords', 'lakes', 'sandyBanks', 'bankVegetation'] },
   { id: 'land', gen: ['desert', 'forest', 'rocks', 'bushes', 'grassScale'] },
+  // m-teren-vyska part 3 (step 4): the terrain (height) sliders of generator 6.
+  { id: 'terrain', gen: ['hilliness', 'hillHeight', 'plains', 'bankSlope'] },
   { id: 'ground', look: LOOK('ground') },
   { id: 'plants', look: LOOK('plants') },
   { id: 'stones', look: LOOK('stones') },

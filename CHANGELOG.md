@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.0] - 2026-11-19
+<!-- version: {"title":"Terrain sliders and rocks on hills","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- New Game and the World Editor have terrain sliders: Hilliness, Hill height, Plains and Bank slope (the World Editor's new Terrain tab). They are part of the world code (generator 6, 16 digits).
+### Changed
+- Rock outcrops lean towards hills and slopes in new worlds.
+- Saved games and World Editor presets from before keep their worlds; their hills stay as they were.
+
 ## [0.147.2] - 2026-11-19
 <!-- version: {"title":"Fog edge on hills drawn faster","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Changed

@@ -15,7 +15,7 @@ export async function tipsHudSmoke(context,url,instrument){
   try{
     await page.goto(url);saved=await page.evaluate(()=>Object.fromEntries(['newgame.language','newgame.tipsSeen','newgame.tips','newgame.notices.collapsed'].map(k=>[k,localStorage.getItem(k)])));
     await page.evaluate(()=>{localStorage.setItem('newgame.language','cs');localStorage.removeItem('newgame.tipsSeen');localStorage.setItem('newgame.tips','on');localStorage.setItem('newgame.notices.collapsed','1');});await page.reload();
-    await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
+    await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW6-1555155555555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.tutorial);
     await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     // Shot 03 (the other tips are marked seen so none follows once the night tip folds away): the night tip points at the day part in the top bar.
