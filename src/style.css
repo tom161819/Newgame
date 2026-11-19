@@ -1281,8 +1281,19 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 .castle-upgrade h3 { margin:0; font-size:15px; }
 .castle-upgrade-error { margin:0; color:#e6b062; font-size:12px; }
 
-/* Owner 15 Nov 2026: the start guide (Wiki, Getting started) uses a big arrow. */
-html .tutorial-arrow.big:not(.offscreen) { width:84px; height:54px; }
+/* Owner 15 Nov 2026: the start guide (Wiki, Getting started) uses a big arrow.
+   Owner 19 Nov 2026: bigger and easy to see on the light top bar too (gold with a light halo and a dark outline, the
+   same in every pointer theme); the place it points at lights up with a glowing box, and both blink together
+   (tutorial-blink, BLINK_MS in TutorialGuide.js, phase set by syncBlink). The bubble is bigger and brighter. */
+html .tutorial-arrow.big:not(.offscreen) { width:120px; height:76px; clip-path:none; -webkit-mask:none; mask:none; background:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgNzYiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZjNhOCIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjZmZjZjNhIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZTA4YTEyIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTYgMjYgSDcwIFY4IEwxMTQgMzggTDcwIDY4IFY1MCBINiBaIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmY2ZDAiIHN0cm9rZS13aWR0aD0iMTAiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNNiAyNiBINzAgVjggTDExNCAzOCBMNzAgNjggVjUwIEg2IFoiIGZpbGw9InVybCgjZykiIHN0cm9rZT0iIzNiMjMwNCIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTEyIDMxIEg3NCBWMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZmJlNiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii43Ii8+PC9zdmc+") center / contain no-repeat; filter:drop-shadow(0 0 10px #ffc83dcc) drop-shadow(0 3px 4px #000a); animation:tutorial-blink 1.2s ease-in-out infinite; }
+.tutorial-spot { position:fixed; z-index:45; pointer-events:none; box-sizing:border-box; border:3px solid #ffd54a; border-radius:10px; background:rgb(255 210 70 / .38); box-shadow:0 0 0 2px #3b2304, 0 0 22px 6px rgb(255 200 60 / .85); animation:tutorial-blink 1.2s ease-in-out infinite; }
+.tutorial-spot[hidden] { display:none; }
+@keyframes tutorial-blink { 0%,100% { opacity:1; } 50% { opacity:.28; } }
+.tutorial-bubble.big { padding:16px 20px 14px; border-width:2px; box-shadow:0 0 0 1px #3b2304, 0 0 26px 4px rgb(255 200 60 / .55), 0 10px 32px #000c; }
+.tutorial-bubble.big .tutorial-count { font-size:12px; }
+.tutorial-bubble.big .tutorial-text { margin:6px 0 14px; font-size:18px; line-height:1.4; font-weight:600; }
+.tutorial-bubble.big .tutorial-actions button { padding:6px 14px; font-size:14px; }
+@media (prefers-reduced-motion:reduce){ html .tutorial-arrow.big, .tutorial-spot { animation:none; } }
 /* Owner 15 Nov 2026: the Haulers box is one line; its details open above it on hover or focus. */
 .population-haulers { position:relative; padding:4px 8px; }
 .population-haulers .employment-row { margin:0; }

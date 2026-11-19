@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.14] - 2026-11-19
+<!-- version: {"title":"Clearer start guide arrow","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- Start guide: a much bigger, high-contrast arrow; the button it points at glows and blinks together with the arrow; the hint text is bigger and sits in the open map instead of the top bar.
+
 ## [0.146.13] - 2026-11-19
 <!-- version: {"title":"Soldier class on hover","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Changed
