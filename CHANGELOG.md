@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.9] - 2026-11-19
+<!-- version: {"title":"Soundtrack","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- A medieval-style soundtrack (provisional, composed by the game itself). Settings → Music sets its volume; 0 turns it off. It starts with your first click or key.
+
 ## [0.148.8] - 2026-11-19
 <!-- version: {"title":"Neighbouring maps round the minimap","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Added
