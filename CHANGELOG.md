@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.15] - 2026-11-19
+<!-- version: {"title":"Waiting goods notice after a day","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- The notice that goods wait at a workshop while the Haulers carry other things now comes after a whole day (was 2 hours).
+
 ## [0.146.14] - 2026-11-19
 <!-- version: {"title":"Clearer start guide arrow","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Changed

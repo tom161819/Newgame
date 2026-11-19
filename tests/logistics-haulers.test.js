@@ -95,12 +95,12 @@ test('m-nosic-priorita (owner, 12 Nov): a Hauler set to carry Wood first takes W
   assert.equal(matchesHaulPriority({resource:'flour',destinationId:'input-5'},{kind:'inputs'}),true);assert.equal(matchesHaulPriority({resource:'bread',sourceId:'output-5'},{kind:'outputs'}),true);assert.equal(matchesHaulPriority({resource:'bread',sourceId:'output-5'},{kind:'food'}),true);
 });
 
-test('m-nosic-priorita (5): goods left in a producer pile for 2 game hours while Haulers carry other things raise a notice; taking them clears it',async()=>{
+test('m-nosic-priorita (5), owner 19 Nov 2026: goods left in a producer pile for a game day while Haulers carry other things raise a notice; taking them clears it',async()=>{
   const { DAY_DURATION } = await import('../src/systems/GameTimeSystem.js');
   const s=scene(),hut=building(s,'lumberjack_hut',56,45),pile=`pile-${hut.id}`;s.buildings.find(b=>b.id===hut.id).constructionComplete=true;
   assert.ok(s.foodStorage.locations.get(pile),'the hut has a pile');assert.equal(s.foodStorage.deposit(pile,'wood',3),true);
   const { ProductionDiagnostics } = await import('../src/systems/ProductionDiagnostics.js');const d=s.diagnostics??new ProductionDiagnostics(s);d.residents=p=>p==='hauler'?[{}]:[];const issues=()=>d.storageIssues().filter(i=>i.reason==='pileWaiting');
-  assert.equal(issues().length,0,'not at once');s.gameTime.totalElapsed+=DAY_DURATION/24*2+1;
+  assert.equal(issues().length,0,'not at once');s.gameTime.totalElapsed+=DAY_DURATION/24*2+1;assert.equal(issues().length,0,'not after 2 hours');s.gameTime.totalElapsed+=DAY_DURATION;
   const [issue]=issues();assert.ok(issue);assert.equal(issue.entityId,hut.id);assert.equal(issue.params.resource,'wood');
   s.foodStorage.take?.(pile,'wood',3)??(s.foodStorage.locations.get(pile).stock.wood=0);assert.equal(issues().length,0,'gone with the goods');
 });
