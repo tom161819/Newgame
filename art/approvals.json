@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-14T18:01:06.458Z",
+  "updatedAt": "2026-11-19T18:11:26.659Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -7715,6 +7715,27 @@
           "status": "approved",
           "updatedAt": "2026-11-14T21:15:00.000Z",
           "version": 2
+        }
+      }
+    },
+    "wall-diagonal": {
+      "preferred": null,
+      "variants": {
+        "wall-diagonal-se": {
+          "status": "review",
+          "version": 6,
+          "specHash": "7cfc4d36",
+          "note": "",
+          "updatedAt": "2026-11-19T18:11:10.315Z",
+          "history": []
+        },
+        "wall-diagonal-ne": {
+          "status": "review",
+          "version": 6,
+          "specHash": "cd439fc3",
+          "note": "",
+          "updatedAt": "2026-11-19T18:11:26.659Z",
+          "history": []
         }
       }
     }
