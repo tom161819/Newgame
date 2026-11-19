@@ -38,7 +38,7 @@ export function renderMilitary(scene,building,root,employees){
   const m=scene.military;root.hidden=!m||building.type!=='barracks';if(root.hidden){if(root._autoHire?.parentElement&&root._autoHire.parentElement!==root)root._autoHire.remove();return;}
   const cards=UNIT_TYPE_IDS.map(type=>{
     const spec=UNIT_TYPES[type],kit=unitKit(type),kits=Math.min(...Object.entries(kit).map(([id,n])=>Math.floor(m.available(id)/n))),card=element('li','unit-type-card');card.dataset.unitType=type;
-    card.append(unitCardHead(scene,root,type,kit),...(Object.keys(kit).length?[element('span','',t('military.kit',{list:itemList(scene,kit)}))]:[]),element('span','',t('military.cost',{gold:spec.goldCost,seconds:spec.trainingTime/1000,level:spec.requiredCombatLevel})),
+    card.append(unitCardHead(scene,root,type,kit),...(Object.keys(kit).length?[element('span','',t('military.kit',{list:itemList(scene,kit)}))]:[]),element('span','',t('military.cost',{gold:spec.goldCost,seconds:spec.trainingTime/1000})),
       ...(Object.keys(kit).length?[element('span','',t('military.kits',{count:kits}))]:[]),...(spec.vehicle?[element('span','',t(`military.vehicle.${spec.vehicle}`,{count:[...(scene.vehicles?.vehicles.values()??[])].filter(v=>v.type===spec.vehicle&&v.state==='parked'&&!v.crew).length}))]:[]),...(spec.mount?[element('span','',t('military.horses',{count:scene.stables?[...scene.stables.horses.values()].filter(h=>h.state==='stabled').length:0}))]:[]));
     const missing=m.supplyBlocker(type);card.dataset.blocked=missing??'';if(missing)card.append(element('span','unit-type-blocked',militaryBlockedText(scene,missing,type)));
     return card;

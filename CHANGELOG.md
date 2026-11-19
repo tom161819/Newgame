@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.1] - 2026-11-19
+<!-- version: {"title":"Training without a combat level","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Changed
+- Training a unit no longer needs a combat level: any recruit can become any unit with the kit from the Armory (and a horse for the Light Cavalry).
+
 ## [0.148.0] - 2026-11-19
 <!-- version: {"title":"Terrain sliders and rocks on hills","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Added

@@ -67,7 +67,6 @@ export class MilitarySystem {
     if(spec.vehicle&&!this.engines.free(spec.vehicle))return `vehicle_${spec.vehicle}`;
     if(this.unit(worker))return 'trained';
     if(!this.isRecruit(worker)||!this.barracks(worker.assignedWorkplaceId))return 'notSoldier';if(this.order(worker))return 'training';
-    if((worker.skills.combat?.level??1)<spec.requiredCombatLevel)return 'skill';
     return this.supplyBlocker(type);
   }
   // m-vojaci-chyba (owner point 87): what the kingdom lacks for this unit type, whoever trains: an Armory, the unit's

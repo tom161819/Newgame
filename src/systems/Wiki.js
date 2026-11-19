@@ -154,7 +154,6 @@ export function buildWikiPages(registry,t,{has=key=>t(key)!==key}={}){
       if(m.armor||u.equipment?.armor)facts.push([t('wiki.fact.armor'),String((m.armor??0)+(u.equipment?.armor?30:0))]);
       facts.push([t('wiki.fact.range'),t('wiki.tiles',{n:m.attackRange??1,count:m.attackRange??1})]);
       if(u.trainingTime)facts.push([t('wiki.fact.training'),t('wiki.training',{n:seconds(u.trainingTime),gold:u.goldCost})]);
-      if(u.requiredCombatLevel)facts.push([t('wiki.fact.combatLevel'),String(u.requiredCombatLevel)]);
       facts.push([t('wiki.fact.wage'),t('wiki.perDay',{n:key==='recruit'?BASE_DAILY_WAGES.recruit:BASE_DAILY_WAGES.soldier+(u.wageBonus??0)})]);
       if(key==='recruit')facts.push([t('wiki.fact.guard'),t('wiki.tiles',{n:MILITARY_RULES.guardRadius,count:MILITARY_RULES.guardRadius})]);
     }

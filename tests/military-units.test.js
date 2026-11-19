@@ -30,13 +30,13 @@ test('unit types from central data: Soldier and Swordsman differ, the Archer sho
   assert.deepEqual(UNIT_TYPE_IDS,['soldier','swordsman','archer','knight','halberdier','royal_archer','crossbowman','light_cavalry','catapult','military_wagon']);
   const {soldier:a,swordsman:b,archer:c,knight:k,light_cavalry:l}=UNIT_TYPES;
   assert.deepEqual([a.equipment,b.equipment,c.equipment,k.equipment],[{weapon:'sword'},{weapon:'sword',armor:'light_armor'},{weapon:'bow'},{weapon:'sword',armor:'armor'}]);
-  assert.ok(b.modifiers.maxHP>a.modifiers.maxHP&&b.modifiers.armor>0&&b.trainingTime>a.trainingTime&&b.goldCost>a.goldCost&&b.requiredCombatLevel>a.requiredCombatLevel,'the Swordsman is the stronger, dearer infantry');
+  assert.ok(b.modifiers.maxHP>a.modifiers.maxHP&&b.modifiers.armor>0&&b.trainingTime>a.trainingTime&&b.goldCost>a.goldCost&&b.requiredCombatLevel===undefined,'the Swordsman is the stronger, dearer infantry');
   assert.equal(c.modifiers.attackRange,8);assert.equal(k.mount,undefined);assert.equal(l.mount,'horse');
   assert.deepEqual(unitKit('knight'),{sword:1,armor:1});
   const {s,barracks}=kingdom(),w=soldier(s,barracks,{x:50,y:56},9);
   assert.equal(s.military.blocker(w,'light_cavalry'),'horse');assert.equal(s.military.train(w,'light_cavalry'),'horse');assert.equal(s.military.orders.size,0);
   assert.equal(s.military.blocker(w,'knight'),null);assert.equal(s.military.blocker(w,'swordsman'),null);
-  const novice=soldier(s,barracks,{x:51,y:56},1);assert.equal(s.military.blocker(novice,'swordsman'),'skill');
+  const novice=soldier(s,barracks,{x:51,y:56},1);assert.equal(s.military.blocker(novice,'swordsman'),null,'owner 19 Nov 2026: no combat level needed');assert.equal(s.military.blocker(novice,'knight'),null);
   const civilian=s.workerSystem.create({x:52,y:56});assert.equal(s.military.blocker(civilian,'soldier'),'notSoldier');
 });
 
