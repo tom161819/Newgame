@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.19] - 2026-11-19
+<!-- version: {"title":"Weavers fetch their own Flax","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- Weaver: weavers fetch Flax from the store themselves right away instead of waiting up to half a day for a Hauler.
+
 ## [0.146.18] - 2026-11-19
 <!-- version: {"title":"Barracks window v2","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Changed

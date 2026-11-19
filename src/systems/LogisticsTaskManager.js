@@ -143,7 +143,7 @@ export class LogisticsTaskManager {
     if(task.progressMs>=IDLE_STONE.pickupDuration){this.scene.collectResource(task.targetId,worker.tile,worker);ai.cancel(worker);worker.workState='Searching for Work';}
   }
   waitForHauler(building,kind){
-    if(buildingDefinition(building).selfSupplied)return false;
+    const definition=buildingDefinition(building);if(definition.selfSupplied||kind==='input'&&definition.fetchesOwnInputs)return false;
     const record=this.scene.foodProduction.records.get(building.id),now=this.scene.gameTime.totalElapsed,key=`${building.id}:${kind}`;
     let wait=this.producerWaits.get(key);if(!wait||wait.cycle!==record.nextCycle){wait={cycle:record.nextCycle,since:now,checkedAt:-Infinity,available:false};this.producerWaits.set(key,wait);}
     const limit=kind==='input'?PRODUCER_WAIT.inputDays*(this.scene.gameTime.dayDuration??120000):PRODUCER_WAIT.outputMs;if(now-wait.since>=limit)return false;

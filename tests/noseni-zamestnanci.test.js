@@ -23,3 +23,9 @@ test('noseni: a Hauler carries twice what another worker carries',()=>{
   assert.equal(HAULER_LOAD_FACTOR,2);
   for(const r of ['stone','wood','wheat','iron_ore'])assert.equal(carryCapacity({profession:'hauler'},r),2*carryCapacity({profession:'miller'},r),r);
 });
+// Owner 19 Nov 2026: "zaměstnanci tkalcovny ať si chodí sami pro len do skladu" – no wait for a Hauler for inputs.
+test('noseni: weavers fetch Flax themselves at once; outputs still wait a moment for a Hauler',()=>{
+  const m=fake(),weaver={id:7,type:'weaver',definition:objectRegistry.require('weaver')},wait=kind=>LogisticsTaskManager.prototype.waitForHauler.call(m,weaver,kind);
+  assert.equal(wait('input'),false,'input: goes himself');assert.equal(wait('output'),true,'output: Hauler first');
+  const tailor={id:7,type:'tailor',definition:objectRegistry.require('tailor')};assert.equal(LogisticsTaskManager.prototype.waitForHauler.call(fake(),tailor,'input'),true,'tailor unchanged');
+});

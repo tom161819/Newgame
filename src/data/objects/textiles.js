@@ -7,7 +7,7 @@ import { FOOD_RULES } from '../foodProduction.js';
 // Both workshops are drawn procedurally until their Studio art is approved.
 const workshop=(id,name,cost,time,description,{czechName,buildingCategory})=>({id,name,czechName,category:'building',buildingCategory,sprite:`/assets/buildings/${id}/${id}.svg`,
   width:2,height:2,walkable:false,collectible:false,buildable:true,cost,constructionTime:time,recommendsCompletedBuildings:id==='weaver'?['flax_field']:['weaver'],
-  workplace:WORKPLACES[id],recipe:PRODUCTION_RECIPES[id],autoEmployment:true,bufferCapacity:FOOD_RULES.bufferCapacity,
+  workplace:WORKPLACES[id],recipe:PRODUCTION_RECIPES[id],autoEmployment:true,...(id==='weaver'?{fetchesOwnInputs:true/* owner 19 Nov: weavers fetch Flax from the store themselves, no wait for a Hauler */}:{}),bufferCapacity:FOOD_RULES.bufferCapacity,
   interactions:['manage_workers'],description,renderMode:'procedural',renderer:'food_building',origin:{x:.5,y:.9},visualHeight:96,depth:{offset:0},
   shadow:{baked:true,x:8,y:-12,width:100,height:36,color:0x30291c,alpha:.3}});
 
