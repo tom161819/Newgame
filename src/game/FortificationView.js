@@ -2,7 +2,10 @@ import Phaser from 'phaser';
 import { gridToWorld,tilePolygon } from './isometric.js';
 import { towerBase,buildingDepth,buildingDefinition } from './buildings.js';
 import { isWall,wallIndex,connectionsFor } from './walls.js';
-import { APPROVED_WALL_ART } from '../data/objects/approvedArt.js';
+import { APPROVED_WALL_ART,DIAGONAL_WALL_ART } from '../data/objects/approvedArt.js';
+import { tileCenter } from './isometric.js';
+// Every wall picture: the kit (block and parapets, on the tile's front corner) and the diagonal pieces (tile centre).
+const WALL_ART=Object.freeze({...APPROVED_WALL_ART,...DIAGONAL_WALL_ART});
 import { splitPixels } from './wallShadows.js';
 import { assetURL } from '../systems/AssetManager.js';
 import { damageStage,damagedTexture,rubble } from './buildingDamage.js';
@@ -15,17 +18,18 @@ const bodyKey=piece=>`${wallKey(piece)}:body`,shadowKey=piece=>`${wallKey(piece)
 // #147: every kit piece bakes its shadow in (near-black, semi-transparent pixels). Split once into a body and a
 // shadow texture; shadows go to one ground layer under all walls, so a wall never darkens its neighbour.
 function splitWallArt(scene){
-  for(const piece of Object.keys(APPROVED_WALL_ART)){
+  for(const piece of Object.keys(WALL_ART)){
     if(scene.textures.exists(bodyKey(piece))||!scene.textures.exists(wallKey(piece)))continue;
     const source=scene.textures.get(wallKey(piece)).getSourceImage(),w=source.width,h=source.height,body=scene.textures.createCanvas(bodyKey(piece),w,h),shadow=scene.textures.createCanvas(shadowKey(piece),w,h);
-    const context=body.getContext();context.drawImage(source,0,0);const data=context.getImageData(0,0,w,h),shade=shadow.getContext().createImageData(w,h);
+    const context=body.getContext();context.drawImage(source,0,0);
+    const data=context.getImageData(0,0,w,h),shade=shadow.getContext().createImageData(w,h);
     shade.data.set(splitPixels(data.data));context.putImageData(data,0,0);shadow.getContext().putImageData(shade,0,0);body.refresh();shadow.refresh();
   }
 }
-const wallArtReady=scene=>{const pieces=Object.keys(APPROVED_WALL_ART);if(!pieces.every(piece=>scene.textures?.exists(wallKey(piece))))return false;splitWallArt(scene);return pieces.every(piece=>scene.textures.exists(bodyKey(piece)));};
+const wallArtReady=scene=>{const pieces=Object.keys(WALL_ART);if(!pieces.every(piece=>scene.textures?.exists(wallKey(piece))))return false;splitWallArt(scene);return pieces.every(piece=>scene.textures.exists(bodyKey(piece)));};
 function ensureWallArt(scene){
   if(scene.__wallArtRequested||!scene.load)return;scene.__wallArtRequested=true;let queued=0;
-  for(const [piece,art]of Object.entries(APPROVED_WALL_ART))if(!scene.textures.exists(wallKey(piece))){scene.load.image(wallKey(piece),assetURL(art.sprite,scene.assets?.baseURL??import.meta.env?.BASE_URL??'/'));queued++;}
+  for(const [piece,art]of Object.entries(WALL_ART))if(!scene.textures.exists(wallKey(piece))){scene.load.image(wallKey(piece),assetURL(art.sprite,scene.assets?.baseURL??import.meta.env?.BASE_URL??'/'));queued++;}
   if(!queued)return;
   scene.load.once('complete',()=>{for(const view of liveWalls)if(view.scene===scene&&view.building)view.paint(view.building,view.tint);});
   if(!scene.load.isLoading())scene.load.start();
@@ -94,16 +98,18 @@ export class FortificationView {
   // front of units on the wall walk, exactly like the procedural layers.
   paintArt(building,links,depth,tint,stage=0){
     const use=isWall(building)&&wallArtReady(this.scene);
-    for(const [piece,art]of Object.entries(APPROVED_WALL_ART)){
+    for(const [piece,art]of Object.entries(WALL_ART)){
+      // m-hradby-diagonala: a tile of a diagonal run shows its one diagonal piece and nothing else.
       // From stage 2 the top of the block is broken off, so the parapets on it are gone.
-      const show=use&&(piece==='block'||!links[piece]&&stage<2);
+      const run=building.diagonal,elbow=building.elbow&&`elbow-${building.elbow}` in DIAGONAL_WALL_ART?building.elbow:null/* an elbow without approved art stays a plain block */,diagonal=piece in DIAGONAL_WALL_ART;
+      const show=use&&(run?piece===run:elbow?piece===`elbow-${elbow}`:!diagonal&&(piece==='block'||!links[piece]&&stage<2)),at=diagonal?tileCenter(building):this.base;
       // Remember which pieces belong to the wall: culling hides and shows the whole view later.
       this.artShown[piece]=show;
       if(!show){this.art[piece]?.setVisible(false);this.shadows[piece]?.setVisible(false);continue;}
       const front=piece==='S'||piece==='E',image=this.art[piece]??=this.scene.add.image(0,0,bodyKey(piece)),shadow=this.shadows[piece]??=this.scene.add.image(0,0,shadowKey(piece));
       const key=damagedTexture(this.scene,bodyKey(piece),stage,building.id??0);if(image.texture?.key!==key)image.setTexture(key);
-      image.setOrigin(art.origin.x,art.origin.y).setPosition(this.base.x,this.base.y).setDepth(this.preview?(front?10002:10001):front?depth+.3:depth).setVisible(this.back.visible).setAlpha(this.back.alpha);
-      shadow.setOrigin(art.origin.x,art.origin.y).setPosition(this.base.x,this.base.y).setDepth(this.preview?10000:WALL_SHADOW_DEPTH).setVisible(this.back.visible).setAlpha(this.back.alpha);
+      image.setOrigin(art.origin.x,art.origin.y).setPosition(at.x,at.y).setDepth(this.preview?(front?10002:10001):front?depth+.3:depth).setVisible(this.back.visible).setAlpha(this.back.alpha);
+      shadow.setOrigin(art.origin.x,art.origin.y).setPosition(at.x,at.y).setDepth(this.preview?10000:WALL_SHADOW_DEPTH).setVisible(this.back.visible).setAlpha(this.back.alpha);
       if(tint==null)image.clearTint();else image.setTint(tint);
     }
     this.afterPaint?.();

@@ -9,19 +9,38 @@ export const isWallAccess=(building,buildings)=>isWall(building)&&(buildingDefin
 export const wallIndex=(buildings,includeUnfinished=false)=>new Map(buildings.filter(b=>isWall(b)&&(includeUnfinished||buildingIsComplete(b))).map(b=>[tileKey(b),b]));
 
 // m-hradby-8-smeru (owner 14 Nov 2026): a dragged wall line goes in eight directions. Straight along the tile rows as
-// before; when the drag is closer to a diagonal (more than 26.6° off a row), the line runs as steps – one tile along x,
-// one along y – so the pieces still join side by side: the wall walk continues and nobody slips through.
+// before; when the drag is closer to a diagonal (more than 26.6° off a row), the line runs diagonally.
+// m-hradby-diagonala (owner 14–15 Nov 2026, point 41): a diagonal line is only the diagonal tiles – no steps. The
+// tiles touch at their corners; each is drawn as a diagonal piece, so the run is one straight wall. Nobody slips
+// between them (a unit never cuts a corner between two blocked tiles) and the wall walk continues across the corner.
 export function wallLine(start,end){
   const dx=end.x-start.x,dy=end.y-start.y,ax=Math.abs(dx),ay=Math.abs(dy),tiles=[];
   if(Math.min(ax,ay)*2>Math.max(ax,ay)){
     const n=Math.round((ax+ay)/2),sx=Math.sign(dx),sy=Math.sign(dy);
-    for(let i=0;i<=n;i++){tiles.push({x:start.x+i*sx,y:start.y+i*sy});if(i<n)tiles.push({x:start.x+(i+1)*sx,y:start.y+i*sy});}
+    for(let i=0;i<=n;i++)tiles.push({x:start.x+i*sx,y:start.y+i*sy});
     return tiles;
   }
   const horizontal=ax>=ay,length=horizontal?ax:ay,step=Math.sign(horizontal?dx:dy);
   for(let i=0;i<=length;i++)tiles.push({x:start.x+(horizontal?i*step:0),y:start.y+(horizontal?0:i*step)});
   return tiles;
 }
+export const WALL_DIAGONALS=Object.freeze([{name:'SE',x:1,y:1},{name:'NW',x:-1,y:-1},{name:'NE',x:1,y:-1},{name:'SW',x:-1,y:1}]);
+// How a wall tile joins a diagonal run (owner 15 Nov 2026: smooth joints, merlons only on the outer edges).
+// A diagonal link is a wall on a corner neighbour with both tiles between free (otherwise the corner is already filled).
+// - {diagonal:'se'|'ne'}: a tile in the middle of a run – nothing beside it, links on two opposite corners.
+// - {elbow:'NE'|'SE'|'SW'|'NW'}: one link – the block with half a band towards that corner (end of a run, at a straight
+//   wall or free).
+// - null: a plain block (no link, or a shape the pieces do not cover: two links that are not a straight run).
+// `solid`: keys of other fortification tiles (towers, the castle) that count as walls beside it.
+export function wallShape(index,building,solid=null){
+  const at=(dx,dy)=>tileKey({x:building.x+dx,y:building.y+dy}),has=(dx,dy)=>index.has(at(dx,dy))||!!solid?.has(at(dx,dy));
+  const beside=WALL_DIRECTIONS.filter(d=>has(d.x,d.y)),links=WALL_DIAGONALS.filter(d=>index.has(at(d.x,d.y))&&!has(d.x,0)&&!has(0,d.y));
+  if(!beside.length&&links.length===2&&links[0].x===-links[1].x&&links[0].y===-links[1].y)return {diagonal:links[0].x===links[0].y?'se':'ne'};
+  // m-hradby-diagonala v5: an elbow also says whether the sides across from the band are open (the mitre is cut there).
+  if(links.length===1){const d=links[0],open=(dx,dy)=>!has(dx,dy)?1:0;return {elbow:`${d.name}-${open(0,-d.y)}${open(-d.x,0)}`};}
+  return null;
+}
+export const diagonalRun=(index,building,solid=null)=>wallShape(index,building,solid)?.diagonal??null;
 
 export function connectionsFor(index,building){
   return Object.fromEntries(WALL_DIRECTIONS.map(d=>[d.name,index.has(tileKey({x:building.x+d.x,y:building.y+d.y}))]));
@@ -67,7 +86,8 @@ function roofTree(buildings,start){
   if(index.has(first)){parents.set(first,null);distances.set(first,0);queue.push(first);}
   for(let i=0;i<queue.length;i++){
     const key=queue[i],building=index.get(key);if(!building)continue;
-    for(const d of WALL_DIRECTIONS){const next=tileKey({x:building.x+d.x,y:building.y+d.y});
+    // m-hradby-diagonala: the wall walk also continues across the corner of two diagonal wall tiles.
+    for(const d of [...WALL_DIRECTIONS,...WALL_DIAGONALS]){const next=tileKey({x:building.x+d.x,y:building.y+d.y});
       if(index.has(next)&&!parents.has(next)){parents.set(next,key);distances.set(next,distances.get(key)+1);queue.push(next);}
     }
   }

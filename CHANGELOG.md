@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.20] - 2026-11-19
+<!-- version: {"title":"Diagonal walls","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Added
+- Diagonal walls: a wall dragged diagonally is one straight line instead of steps, as thick as a straight wall, with merlons along both edges and mitred joints where it meets a straight wall.
+
 ## [0.146.19] - 2026-11-19
 <!-- version: {"title":"Weavers fetch their own Flax","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Changed
