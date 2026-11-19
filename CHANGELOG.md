@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.13] - 2026-11-19
+<!-- version: {"title":"Soldier class on hover","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- Hovering a soldier shows his class – Recruit, Soldier, Archer, Swordsman, Knight… – instead of the generic "Soldier".
+
 ## [0.146.12] - 2026-11-18
 <!-- version: {"title":"Faster with many soldiers","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Changed

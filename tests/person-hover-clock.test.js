@@ -14,3 +14,11 @@ test('owner 9 Nov 2026: the hover label names the occupation and its level, not 
   assert.match(personHover({name:'Jan',profession:'idle',experience:{level:2}}).role,/2/);
   assert.match(personHover({name:'Král',experience:{level:5}},{king:true}).role,/King · lvl 5/);
 });
+test('owner 19 Nov 2026: hovering a soldier names his class (Recruit, Archer…), not the generic Soldier',async()=>{
+  const { militaryRank }=await import('../src/ui/militaryPanel.js');
+  const scene={military:{unit:w=>w.id===2?{type:'archer'}:null}};
+  const recruit={id:1,name:'Filip Paleček',profession:'soldier',skills:{combat:{level:1}}},archer={id:2,name:'Jan',profession:'soldier',skills:{combat:{level:4}}};
+  assert.match(personHover(recruit,{role:militaryRank(scene,recruit)}).role,/^Recruit · lvl/);
+  assert.match(personHover(archer,{role:militaryRank(scene,archer)}).role,/^Archer · lvl/);
+  assert.doesNotMatch(personHover(archer,{role:militaryRank(scene,archer)}).role,/Soldier/);
+});

@@ -12,6 +12,7 @@ import { castleRules } from '../data/castle.js';
 import { buildLinks,drawBuildLinks,linksEnabled } from './buildLinks.js';
 import { clockMinutes,formatClock } from '../data/dayNight.js';
 import { personHover } from '../ui/personHover.js';
+import { militaryRank } from '../ui/militaryPanel.js';
 import { TutorialGuide } from '../ui/TutorialGuide.js';
 import { SpeedControls } from '../ui/SpeedControls.js';
 import { FOOD_OUTLOOK,foodDays } from '../data/foodOutlook.js';
@@ -499,7 +500,7 @@ export class GameScene extends Phaser.Scene {
       const allowed=!!b&&buildingTooltipAllowed({dragging:!!pointer.isDown||!!this.unitSelection?.dragging,selected:selectedBuildingIds(this).has(b.id),touch:!!pointer.wasTouch||!!globalThis.matchMedia?.('(hover: none)').matches});
       this.storePreview?.hoverBuilding(b,rect.left+pointer.x*rect.width/this.scale.width,rect.top+pointer.y*rect.height/this.scale.height,{allowed});}
     if(hoverHit?.kind==='human'){
-      const unit=hoverHit.object;tooltip.hidden=false;this.personTooltip(tooltip,personHover(unit,{king:unit===this.character}));
+      const unit=hoverHit.object;tooltip.hidden=false;this.personTooltip(tooltip,personHover(unit,{king:unit===this.character,role:unit!==this.character&&unit.profession==='soldier'?militaryRank(this,unit):null}));
       const rect=this.game.canvas.getBoundingClientRect();tooltip.style.left=`${Math.min(window.innerWidth-150,rect.left+pointer.x*rect.width/this.scale.width+14)}px`;tooltip.style.top=`${Math.max(4,rect.top+pointer.y*rect.height/this.scale.height-32)}px`;return;
     }
     // Owner 9 Nov 2026: a child shows its name and "Child" as its occupation.
