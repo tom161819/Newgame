@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.13] - 2026-11-19
+<!-- version: {"title":"Loading screen","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- A loading screen when a game starts or loads: the map opens once its pictures have loaded instead of filling in bit by bit.
+
 ## [0.148.12] - 2026-11-19
 <!-- version: {"title":"Space flattens buildings","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Added

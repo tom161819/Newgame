@@ -1408,3 +1408,11 @@ body.sandbox-tool canvas { cursor:crosshair !important; }
 .confirm-ask p { margin:0 0 14px; }
 .confirm-ask-actions { display:flex; justify-content:flex-end; gap:8px; }
 .confirm-ask-actions button { min-width:90px; }
+
+/* Owner 19 Nov 2026 (74): the loading screen over the game until the first view is ready (LoadingScreen.js). */
+.loading-screen { position:fixed; inset:0; z-index:1000; pointer-events:none; display:grid; place-content:center; gap:14px; text-align:center; background:radial-gradient(circle at 50% 40%, #2b3424, #10140d 70%); color:var(--ink, #ede5c9); font:15px/1.4 var(--font-ui, system-ui); }
+.loading-screen[hidden] { display:none; }
+.loading-screen h2 { margin:0; font:600 34px/1.1 var(--font-title, Georgia, serif); letter-spacing:.06em; color:var(--gold, #e3c57a); }
+.loading-screen p { margin:0; opacity:.85; }
+.loading-bar { width:min(360px, 70vw); height:8px; border:1px solid var(--line, #79704b); border-radius:5px; overflow:hidden; background:#0008; }
+.loading-bar span { display:block; height:100%; width:5%; background:linear-gradient(90deg, #a8843f, #f0d78b); transition:width .25s; }
