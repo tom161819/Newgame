@@ -10,16 +10,12 @@ import { blockingDialog } from './dockedPanels.js';
 import { setSquad,squadMembers } from './armySquads.js';
 import { JOBS } from '../data/jobs.js';
 import { GEAR_ICONS,gearOf } from './gearIcons.js';
+import { KIND_ICONS,lookPicture } from './unitPictures.js';
 
 const DOUBLE_CLICK_MS=400;
-import { APPROVED_VILLAGER_ART,walkKey } from '../data/objects/approvedArt.js';
-import { SOLDIER_ANIM_ART } from '../data/soldierAnimArt.js';
-import { FISHER_WALK_ART } from '../data/fisherWalkArt.js';
 // Owner 17 Nov 2026: the orders are icons; hovering shows the name and what it does.
 const COMMAND_ICONS=Object.freeze({hold:'📍',resume:'↩️',inspect:'🔍',clear:'✖'}),STANCE_ICONS=Object.freeze({aggressive:'⚔️',defensive:'🛡️',hold:'✋'});
-const lookArt=look=>APPROVED_VILLAGER_ART[look]??SOLDIER_ANIM_ART[look]??FISHER_WALK_ART[look]??null;
 function iconButton(button,icon,name,tip){if(button.textContent!==icon)button.textContent=icon;button.dataset.tipTitle=name;button.dataset.tip=tip??'';button.setAttribute('aria-label',tip?`${name}: ${tip}`:name);button.classList.add('unit-icon-command');button.removeAttribute?.('title');}
-const KIND_ICONS=Object.freeze({king:'👑','soldier:soldier':'🛡️','soldier:swordsman':'⚔️','soldier:archer':'🏹','soldier:knight':'🛡️','soldier:light_cavalry':'🐎','soldier:catapult':'🪨','soldier:military_wagon':'🛒','soldier:halberdier':'🔱','soldier:royal_archer':'🏹','soldier:crossbowman':'🎯','soldier:recruit':'🪖',hauler:'📦',builder:'🔨',woodcutter:'🪓',miner:'⛏️',hunter:'🦌',fisher:'🎣',farmer:'🌾',idle:'💤'});
 export const isEnemy=animal=>animal?.type==='wolf'||!!animal?.definition?.gameplay?.hostile;
 const ATTACK_CURSOR=`url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g stroke="#1b1a14" stroke-width="1.2" stroke-linejoin="round"><path d="M4 3l3 0 14 14-3 3L4 6z" fill="#dfe3e6"/><path d="M28 3l-3 0-14 14 3 3L28 6z" fill="#c9ced2"/><path d="M15 21l5-5 3 3-5 5z" fill="#b8892f"/><path d="M17 21l-5-5-3 3 5 5z" fill="#b8892f"/><path d="M21 22l3-3 5 6-3 3z" fill="#6b4a2a"/><path d="M11 22l-3-3-5 6 3 3z" fill="#6b4a2a"/></g></svg>')}") 16 16, crosshair`;
 // Screen-space drag rectangle; selected rings and order markers are projected
@@ -84,11 +80,7 @@ export class UnitSelection {
   }
   // The standing picture of a kind (its first chosen man's look, facing the viewer), cut from the loaded sheet.
   kindPicture(kind,workers){
-    const s=this.scene,w=kind==='king'?null:workers.find(u=>this.kindOf(u)===kind),look=w?.view?.look,art=look?lookArt(look):null,key=look?walkKey(look):null;
-    if(!art?.walk||!s?.textures?.exists?.(key))return null;const cache=this.pictures??=new Map();if(cache.has(look))return cache.get(look);
-    try{const frame=s.textures.getFrame(key,0),src=frame?.source?.image;if(!src)return null;const W=36,H=50,ax=Math.round(art.walk.origin.x*art.walk.frameWidth),ay=Math.round(art.walk.origin.y*art.walk.frameHeight);
-      const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
-      const z=1/(art.walk.scale??1);ctx.imageSmoothingEnabled=z>1;ctx.drawImage(src,frame.cutX+ax-W*z/2,frame.cutY+ay-(H-3)*z,W*z,H*z,0,0,W,H);const url=canvas.toDataURL();cache.set(look,url);return url;}catch{return null;}
+    const w=kind==='king'?null:workers.find(u=>this.kindOf(u)===kind);return lookPicture(this.scene,w?.view?.look);
   }
   // The weapon and armour of a kind (from one of its men).
   kindGear(kind,workers){if(!kind.startsWith('soldier:'))return [];const w=workers.find(u=>this.kindOf(u)===kind);return gearOf(this.scene.military?.unit?.(w)?.equipment);}

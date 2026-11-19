@@ -2,8 +2,8 @@ import { t } from '../i18n/index.js';
 import { SCOUTING,scoutTypeById } from '../data/scouting.js';
 import { armyRows } from './ArmyPanel.js';
 
-// What a soldier is doing, as an icon (its text on hover): patrol, guard, walls (wall walk and towers), hunting a wolf.
-export const ORDER_ICONS=Object.freeze({patrol:'👣',guard:'🛡️',walls:'🏰',hunt:'🐺'});
+import { ORDER_ICONS } from './unitPictures.js';
+export { ORDER_ICONS };
 // Pure: the soldiers (armyRows) by class, in the army panel's rank order; inside a class the free ones (on patrol) first.
 const ORDER_RANK={patrol:0,guard:1,walls:2,hunt:3};
 export function worldClasses(rows){

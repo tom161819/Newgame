@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.18] - 2026-11-19
+<!-- version: {"title":"Barracks window v2","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- Barracks window: training cards show each class's picture and weapon / armour icons; "Recruit automatically" is a highlighted slider; housed soldiers are a folded compact list with name, class, level and what they are doing.
+
 ## [0.146.17] - 2026-11-19
 <!-- version: {"title":"Party picked by soldier class","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Changed

@@ -1237,6 +1237,28 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 .barracks-auto-hire { display:flex; flex-direction:column; gap:2px; margin:4px 0 8px; font-size:12px; }
 .barracks-auto-hire input[type=range] { appearance:auto; width:100%; height:18px; border:0; background:none; accent-color:#c9a85a; margin:0; }
 .barracks-auto-hire input[type=range]::before { content:none; }
+/* Owner 19 Nov 2026: "Recruit automatically" is the main control of the Barracks – a framed, larger slider. */
+.barracks-auto-hire { gap:6px; margin:6px 0 12px; padding:10px 12px; border:1px solid #c9a85a; border-radius:8px; background:linear-gradient(180deg,rgb(201 168 90 / .18),rgb(201 168 90 / .06)); box-shadow:inset 0 0 0 1px rgb(0 0 0 / .25); }
+.barracks-auto-hire .barracks-auto-hire-text { font-size:15px; font-weight:700; color:var(--gold,#f0d78b); letter-spacing:.01em; }
+.barracks-auto-hire input[type=range] { height:24px; accent-color:#e0b84f; }
+/* Training cards: the class picture and weapon / armour icons like the selection bar. */
+.unit-card-head { display:flex; align-items:flex-end; gap:6px; margin-bottom:2px; }
+.unit-card-pic { flex:0 0 36px; height:50px; display:flex; align-items:center; justify-content:center; font-size:24px; border-radius:6px; background:rgb(0 0 0 / .18); overflow:hidden; }
+.unit-card-pic img { width:36px; height:50px; image-rendering:auto; }
+.unit-card-title { display:flex; flex-direction:column; gap:3px; min-width:0; }
+.unit-card-gear { display:flex; gap:4px; color:var(--gold,#e8cf86); }
+.unit-card-gear i { display:inline-flex; width:20px; height:20px; align-items:center; justify-content:center; border-radius:4px; background:rgb(0 0 0 / .28); font-style:normal; cursor:help; }
+/* The housed soldiers: a closed section with one compact line each. */
+.barracks-roster { margin:8px 0; border:1px solid rgba(120,90,50,.45); border-radius:6px; padding:4px 8px; }
+.barracks-roster > summary { cursor:pointer; font-weight:600; padding:4px 0; }
+.barracks-roster[hidden] { display:none; }
+#workplace-workers.barracks-roster-list { gap:0; margin:2px 0 4px; }
+.barracks-roster-row { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) 44px minmax(0,1.3fr) 26px; align-items:center; gap:8px; padding:3px 4px; border-top:1px solid rgb(255 255 255 / .06); font-size:13px; }
+.barracks-roster-name, .barracks-roster-class { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.barracks-roster-class, .barracks-roster-level { color:var(--muted,#cdbf9c); }
+.barracks-roster-level { font-variant-numeric:tabular-nums; }
+.barracks-roster-state { display:flex; align-items:center; gap:4px; min-width:0; white-space:nowrap; overflow:hidden; cursor:help; }
+.barracks-roster-remove { width:24px; height:24px; min-height:0; padding:0; font-size:12px; line-height:1; }
 .market-auto-table, #marketplace-prices, #marketplace-status { font-variant-numeric: tabular-nums; }
 .own-store { margin:6px 0; } .own-store h3 { margin:0 0 4px; font-size:13px; }
 .own-store-location { margin:4px 0; font-size:12px; font-variant-numeric:tabular-nums; }
