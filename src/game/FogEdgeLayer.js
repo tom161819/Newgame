@@ -10,7 +10,7 @@ import { VISIBILITY, FOG_STYLE } from '../systems/FogOfWarSystem.js';
 // Canvas renderer (the default, often without a GPU) pays per covered pixel for a rotated or sub-pixel image, so there the
 // mask is projected once per change into a screen-sized cache that is blitted 1:1 at whole pixels every frame.
 // Mask pixels per tile by the size of the region (fine near the King, coarse when zoomed far out).
-export const FOG_EDGE=Object.freeze({width:1.5,strength:1,resolution:4,levels:Object.freeze([[3000,4],[Infinity,2]]),margin:3,quantum:4,rebuildMs:0,busySources:12,busyRebuildMs:200,pad:96,depth:-60,memoryGrey:110,get maxTiles(){return COLUMNS+8;}});
+export const FOG_EDGE=Object.freeze({width:1.5,strength:1,resolution:4,levels:Object.freeze([[3000,4],[Infinity,2]]),margin:3,quantum:4,rebuildMs:0,merge:true,liftMerge:.1,busySources:12,busyRebuildMs:200,pad:96,depth:-60,memoryGrey:110,get maxTiles(){return COLUMNS+8;}});
 const smooth=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
 
 // Pure mask: alpha 0..1 per pixel over a grid rectangle (row-major, columns*resolution wide). `visible(x,y)` is the
@@ -140,17 +140,26 @@ export class FogEdgeLayer {
       const tx0=Math.floor(m.left+c.x/k),ty0=Math.floor(m.top+c.y/k),tx1=Math.ceil(m.left+(c.x+c.width)/k),ty1=Math.ceil(m.top+(c.y+c.height)/k),data=this.pixels.data,CW=this.canvas.width,dark=[];
       const has=(tx,ty)=>{const u=(tx-m.left)*k,v=(ty-m.top)*k;if(u<0||v<0||u+k>m.W||v+k>m.H)return false;for(let j=0;j<k;j++){let i=((v+j)*CW+u)*4+3;for(let n=0;n<k;n++,i+=4)if(data[i])return true;}return false;};
       for(let ty=ty0;ty<ty1;ty++)for(let tx=tx0;tx<tx1;tx++)if(has(tx,ty))dark.push([tx,ty]);
-      const order=(p,q)=>p[0]+p[1]-q[0]-q[1]||p[0]-q[0],lay=(tx,ty,reach)=>{
-        const u0=Math.max(c.x,(tx-reach-m.left)*k),v0=Math.max(c.y,(ty-reach-m.top)*k),u1=Math.min(c.x+c.width,(tx+1+reach-m.left)*k),v1=Math.min(c.y+c.height,(ty+1+reach-m.top)*k);if(u1<=u0||v1<=v0)return;
-        ctx.save();ctx.setTransform(32*z/k,16*z/k,-32*z/k,16*z/k,e-bx,f-by-projectionLift(tx+.5,ty+.5)*z);ctx.beginPath();ctx.rect(u0,v0,u1-u0,v1-v0);ctx.clip();
+      // Performance (owner 19 Nov 2026, test claude/test-vykonu-0.146.md): every dark tile was laid twice on its own (about
+      // 400 clipped draws for one edge). Tiles next to each other in a row whose lift differs by less than LIFT_MERGE px
+      // are laid as one piece with their mean lift.
+      const order=(p,q)=>p[0]+p[1]-q[0]-q[1]||p[0]-q[0],lifted=new Map(dark.map(([tx,ty])=>[`${tx},${ty}`,projectionLift(tx+.5,ty+.5)*z]));
+      const runs=list=>{const out=[];for(const [tx,ty] of [...list].sort((p,q)=>p[1]-q[1]||p[0]-q[0])){const h=lifted.get(`${tx},${ty}`),last=out.at(-1);if(FOG_EDGE.merge&&!this.noMerge&&last&&last.ty===ty&&last.tx1===tx&&Math.abs(h-last.min)<=FOG_EDGE.liftMerge&&Math.abs(h-last.max)<=FOG_EDGE.liftMerge){last.tx1=tx+1;last.sum+=h;last.n++;last.min=Math.min(last.min,h);last.max=Math.max(last.max,h);}else out.push({tx,tx1:tx+1,ty,sum:h,n:1,min:h,max:h});}return out;};
+      const lay=(tx,ty,reach,tx1=tx+1,lift=projectionLift(tx+.5,ty+.5)*z)=>{
+        const u0=Math.max(c.x,(tx-reach-m.left)*k),v0=Math.max(c.y,(ty-reach-m.top)*k),u1=Math.min(c.x+c.width,(tx1+reach-m.left)*k),v1=Math.min(c.y+c.height,(ty+1+reach-m.top)*k);if(u1<=u0||v1<=v0)return;
+        ctx.save();ctx.setTransform(32*z/k,16*z/k,-32*z/k,16*z/k,e-bx,f-by-lift);ctx.beginPath();ctx.rect(u0,v0,u1-u0,v1-v0);ctx.clip();
         // The picture is drawn one mask pixel wider than the clip: its own soft outline must not fall on the clip's edge,
         // or the two half coverages multiply and leave a lighter hairline along every piece.
         // 'copy' inside a soft clip first clears with the edge coverage and then draws with it again, which leaves the
         // edge pixels lighter – a hairline round every piece. Wiping (destination-out) and adding (lighter) with the
         // same coverage puts back exactly what belongs there.
         const a0=Math.max(0,u0-1),b0=Math.max(0,v0-1),a1=Math.min(m.W,u1+1),b1=Math.min(m.H,v1+1);ctx.globalCompositeOperation='destination-out';ctx.fillStyle='#000';ctx.fillRect(a0,b0,a1-a0,b1-b0);ctx.globalCompositeOperation='lighter';ctx.drawImage(this.canvas,a0,b0,a1-a0,b1-b0,a0,b0,a1-a0,b1-b0);ctx.restore();};
-      for(const [tx,ty] of dark.sort(order))lay(tx,ty,1);
-      for(const [tx,ty] of dark)lay(tx,ty,.5/k);
+      // The overlap pass only closes gaps between neighbours lifted differently: a tile whose dark neighbours all sit
+      // within LIFT_MERGE px of it needs none (on gentle ground that is most of them).
+      const fast=FOG_EDGE.merge&&!this.noMerge,steep=([tx,ty])=>{const h=lifted.get(`${tx},${ty}`);for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const n=lifted.get(`${tx+dx},${ty+dy}`);if(n!==undefined&&Math.abs(n-h)>FOG_EDGE.liftMerge)return true;}return false;};
+      const overlap=(fast?dark.filter(steep):dark).sort(order),pieces=runs(dark);this.stats.pieces=pieces.length+overlap.length;this.stats.darkTiles=dark.length;
+      for(const [tx,ty] of overlap)lay(tx,ty,1);
+      for(const r of pieces)lay(r.tx,r.ty,.5/k,r.tx1,r.sum/r.n);
     }
     ctx.setTransform(1,0,0,1,0,0);
     this.texture.refresh();this.used=[bw,bh];this.cache={...base,x:ox+bx/z,y:oy+by/z};

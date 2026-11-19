@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.147.2] - 2026-11-19
+<!-- version: {"title":"Fog edge on hills drawn faster","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Changed
+- The Fog of War edge on hilly ground is drawn about a fifth faster (fewer separate pieces; the picture is the same).
+
 ## [0.147.1] - 2026-11-19
 <!-- version: {"title":"Diagonal wall sites and remembered diagonal walls","type":"fix","reconstructed":false,"saveVersion":66} -->
 ### Fixed
