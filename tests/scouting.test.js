@@ -9,7 +9,7 @@ function soldier(id,x=50,y=50){return {id,name:id,profession:'soldier',isAlive:t
 function world({level=3,barracks=true,soldiers=3}={}){
   const workers=new Map(Array.from({length:soldiers},(_,i)=>[`s${i}`,soldier(`s${i}`)]));const feed=[];
   const scene={map:Array.from({length:100},()=>Array(100).fill(0)),gameSettings:{worldCode:'ABC'},gameTime:{totalElapsed:0,dayDuration:24000,day:3},
-    buildings:[{id:'c',type:'castle',level},...(barracks?[{id:'b',type:'barracks'}]:[])],
+    buildings:[{id:'c',type:'castle',level},...(barracks?[{id:'b',type:'barracks',x:47,y:47,tiles:[0,1,2].flatMap(dy=>[0,1,2].map(dx=>({x:47+dx,y:47+dy})))}]:[])],
     workerSystem:{workers,liveWorkers:()=>[...workers.values()]},eventFeed:{push:(id,text)=>feed.push(text)}};
   return {scene,workers,feed,s:new ScoutingSystem(scene)};
 }
@@ -25,6 +25,7 @@ test('a party leaves, finds the zone, comes back',()=>{
   const {scene,workers,feed,s}=world();
   assert.ok(s.send('e',['s0','s1']).party);assert.ok(s.send('w',['s2']).error,'one party at a time');
   assert.equal(s.soldiers().length,1);
+  s.update();assert.equal(s.gathering,null,'everyone already stands at the Barracks');
   const a=workers.get('s0');assert.ok(s.updateSoldier(a));assert.ok(a.goal.length);
   scene.gameTime.totalElapsed=SCOUTING.leaveHours*1000+1;s.update();assert.equal(s.party.phase,'away');assert.ok(a.away);
   const saved=JSON.parse(JSON.stringify(s.exportState()));assert.ok(validScouting(saved,{workerIds:new Set(workers.keys())}));
@@ -84,4 +85,16 @@ test('owner 16 Nov 2026: bandit camp, ruins and mine shape the land; the mine ha
   assert.equal(shapeZoneWorld(world(),{type:'forest',id:'e'},random),null);
   assert.ok(validScouting({zones:{e:{type:'ruins',day:1,taken:['zone-0'],cleared:true}},party:null},{workerIds:new Set()}));
   assert.ok(!validScouting({zones:{e:{type:'ruins',day:1,taken:['x']}},party:null},{workerIds:new Set()}));
+});
+
+// Owner 19 Nov 2026 (81): the party first meets at the Barracks and only then walks to the edge together.
+test('the party meets at the Barracks before it walks to the map edge',()=>{
+  const {scene,workers,feed,s}=world();const far=workers.get('s1');far.tile={x:80,y:20};
+  assert.ok(s.send('e',['s0','s1']).party);assert.equal(s.gathering.barracksId,'b');
+  assert.ok(s.updateSoldier(far));assert.ok(far.goal.every(g=>Math.max(Math.abs(g.x-48),Math.abs(g.y-48))<=2),'he walks to the Barracks, not to the edge');
+  scene.gameTime.totalElapsed=1000;s.update();assert.ok(s.gathering,'still waiting for him');assert.equal(s.party.phase,'leaving');
+  far.tile={x:51,y:49};far.goal=null;scene.gameTime.totalElapsed=2000;s.update();assert.equal(s.gathering,null);assert.equal(s.party.since,2000);assert.ok(feed.some(t=>t.includes('Barracks')||t.includes('Kasáren')));
+  s.updateSoldier(far);assert.deepEqual(far.goal,s.edgeGoals('e'));
+  const w2=world();w2.workers.get('s0').tile={x:5,y:5};w2.s.send('n',['s0']);w2.scene.gameTime.totalElapsed=SCOUTING.gatherHours*1000+1;w2.s.update();assert.equal(w2.s.gathering,null,'nobody waits for ever');
+  const w3=world();w3.s.send('n',['s0']);const saved=JSON.parse(JSON.stringify(w3.s.exportState()));assert.ok(validScouting(saved,{workerIds:new Set(w3.workers.keys())}));const r=new ScoutingSystem(w3.scene);r.importState(saved);assert.equal(r.gathering,null);
 });

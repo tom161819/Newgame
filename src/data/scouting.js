@@ -5,6 +5,8 @@
 export const SCOUTING=Object.freeze({
   castleLevel:3,building:'barracks',
   travelDays:.5,leaveHours:3,edgeReach:2,
+  // Owner 19 Nov 2026 (81): the party meets at the Barracks first (within gatherReach tiles), at most gatherHours.
+  gatherHours:3,gatherReach:3,
   // Named by where they lie on screen (the grid's north-west corner is the top of the screen).
   zones:Object.freeze([
     {id:'n',dx:-1,dy:-1},{id:'ne',dx:0,dy:-1},{id:'e',dx:1,dy:-1},{id:'se',dx:1,dy:0},
