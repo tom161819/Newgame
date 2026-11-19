@@ -98,3 +98,19 @@ test('the party meets at the Barracks before it walks to the map edge',()=>{
   const w2=world();w2.workers.get('s0').tile={x:5,y:5};w2.s.send('n',['s0']);w2.scene.gameTime.totalElapsed=SCOUTING.gatherHours*1000+1;w2.s.update();assert.equal(w2.s.gathering,null,'nobody waits for ever');
   const w3=world();w3.s.send('n',['s0']);const saved=JSON.parse(JSON.stringify(w3.s.exportState()));assert.ok(validScouting(saved,{workerIds:new Set(w3.workers.keys())}));const r=new ScoutingSystem(w3.scene);r.importState(saved);assert.equal(r.gathering,null);
 });
+
+// Owner 19 Nov 2026 (83): a party in a zone can go on to a neighbouring zone, from home or from the zone map.
+test('a party there goes on to a neighbouring zone; a second visit keeps what was taken',async()=>{
+  const { zoneNeighbours }=await import('../src/data/scouting.js');
+  assert.deepEqual(zoneNeighbours('n').sort(),['ne','nw']);assert.deepEqual(zoneNeighbours('ne').sort(),['e','n']);assert.deepEqual(zoneNeighbours('x'),[]);
+  const {scene,feed,s}=world();s.send('ne',['s0']);s.update();scene.gameTime.totalElapsed=SCOUTING.leaveHours*1000+1;s.update();scene.gameTime.totalElapsed=s.party.at;s.update();assert.equal(s.party.phase,'there');
+  s.zones.e={type:'forest',day:1,taken:['zone-0']};
+  assert.equal(s.moveOn('s'),false,'not a neighbour');assert.ok(s.moveOn('e'));assert.equal(s.party.zone,'e');assert.equal(s.party.phase,'away');assert.equal(s.party.at,scene.gameTime.totalElapsed+SCOUTING.travelDays*24000);
+  assert.ok(validScouting(JSON.parse(JSON.stringify(s.exportState())),{workerIds:new Set(['s0','s1','s2'])}));
+  scene.gameTime.totalElapsed=s.party.at;s.update();assert.equal(s.party.phase,'there');assert.deepEqual(s.zones.e.taken,['zone-0']);assert.ok(feed.some(t=>/goes on|pokračuje/.test(t)));
+  const { homeAfterZone,zoneStart }=await import('../src/game/zoneMode.js');
+  const home={gameSettings:{worldCode:'MKW5-155515555555-ABC',dayLengthSeconds:600},time:{totalElapsed:5000},workers:[{id:'s0',currentHP:50}],scouting:{zones:{e:{type:'iron',day:2}},party:{zone:'e',ids:['s0'],phase:'there',since:0,at:9}}};
+  const zone={...zoneStart(home).zone,soldiers:[{id:'s0',isAlive:true,currentHP:40,maxHP:60}],taken:[],loot:{gold:0}};
+  const back=homeAfterZone({zone,inventory:{count:()=>0},gameTime:{exportState:()=>({totalElapsed:9})},character:{}},{next:'se'});
+  assert.deepEqual([back.home.scouting.party.zone,back.home.scouting.party.phase,back.home.scouting.party.at],['se','away',5000+300000]);assert.ok(validScouting(back.home.scouting,{workerIds:new Set(['s0'])}));
+});

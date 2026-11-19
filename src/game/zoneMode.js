@@ -113,6 +113,7 @@ export function setupZone(scene){
   const button=(id,text,fn)=>{const b=document.createElement('button');b.type='button';b.id=id;b.textContent=text;b.addEventListener('click',fn);return b;},app=()=>scene.game.registry.get('application');
   if(scene.zoneFeature?.kind==='mine'){z.enterButton=button('zone-enter',t('zone.enterMine'),()=>app()?.enterMine());z.enterButton.disabled=true;actions.append(z.enterButton);}
   if(z.dungeon)actions.append(button('zone-exit',t('zone.leaveMine'),()=>app()?.leaveMine()));
+  actions.append(button('zone-on',t('zone.moveOn'),()=>scene.worldPanel?.open()));
   actions.append(button('zone-home',t('zone.sendHome'),()=>app()?.leaveZone()));
   banner.append(label,actions);document.body.append(banner);z.banner=banner;z.label=label;refreshBanner(scene);
   scene.events.once('shutdown',()=>{banner.remove();document.body.classList.remove('in-zone');});
@@ -156,7 +157,7 @@ export function updateZone(scene){
 }
 function chestTakenByKing(scene){const g=Math.floor(scene.inventory?.count?.('gold')??0);if(g===scene.zone.lastGold)return false;scene.zone.lastGold=g;for(const chest of scene.zone.chests??[])if(chest.looted&&!scene.zone.taken.includes(chest.zoneKey))scene.zone.taken.push(chest.zoneKey);return true;}
 // The home state with the party on its way back: their health and experience, the loot and what the land remembers.
-export function homeAfterZone(scene){
+export function homeAfterZone(scene,{next=null}={}){
   const z=collectParty(scene),home=structuredClone(z.home),fallen=new Set(z.fallen);
   for(const r of home.workers??[]){const rec=z.records[r.id];if(!rec)continue;r.currentHP=rec.currentHP;if(rec.experience)r.experience=structuredClone(rec.experience);if(rec.stance)r.stance=rec.stance;else delete r.stance;}
   const p=home.scouting.party,place=home.scouting.zones[p.zone];
@@ -169,6 +170,8 @@ export function homeAfterZone(scene){
   // Point 68: what the wagon still carries comes home (torches burnt on the way are gone).
   if(p.wagonId!=null&&z.cargo)p.cargo=structuredClone(z.cargo);
   if(!p.ids.length&&!p.king)home.scouting.party=null;
+  // Owner 19 Nov 2026 (83): or it goes on to a neighbouring map (home is shown meanwhile, the party on the road).
+  else if(next)Object.assign(p,{zone:next,phase:'away',since:home.time.totalElapsed,at:home.time.totalElapsed+SCOUTING.travelDays*home.gameSettings.dayLengthSeconds*1000});
   else Object.assign(p,{phase:'returning',at:home.time.totalElapsed+SCOUTING.travelDays*home.gameSettings.dayLengthSeconds*1000});
   return {home,fallen:[...fallen]};
 }

@@ -30,6 +30,8 @@ export function zoneType(worldCode,zoneId){
   for(const type of SCOUTING.types){if(roll<type.weight)return type.id;roll-=type.weight;}return SCOUTING.types[0].id;
 }
 export const zoneById=id=>SCOUTING.zones.find(z=>z.id===id)??null;
+// Owner 19 Nov 2026 (83): the maps next to a zone (the next one each way round the home map: one side step in the 3 × 3 grid).
+export const zoneNeighbours=id=>{const z=zoneById(id);return z?SCOUTING.zones.filter(o=>o.id!==z.id&&Math.abs(o.dx-z.dx)+Math.abs(o.dy-z.dy)===1).map(o=>o.id):[];};
 export const scoutTypeById=id=>SCOUTING.types.find(t=>t.id===id)??null;
 // The map-edge point a party leaves from towards a zone (grid tiles; the screen's top is the grid's north-west corner).
 export function zoneEdge(zone,width,height){

@@ -1,5 +1,5 @@
 import { t } from '../i18n/index.js';
-import { SCOUTING,scoutTypeById } from '../data/scouting.js';
+import { SCOUTING,scoutTypeById,zoneNeighbours } from '../data/scouting.js';
 import { armyRows } from './ArmyPanel.js';
 
 import { ORDER_ICONS } from './unitPictures.js';
@@ -56,7 +56,11 @@ export class WorldPanel {
         if(!this.scene.zone){const play=this.el('button','world-play',t('scouting.play'));play.type='button';play.addEventListener('click',()=>{this.close();app?.enterZone();});row.append(play);
           const back=this.el('button','world-back',t('scouting.sendHome'));back.type='button';back.addEventListener('click',()=>this.scene.scouting.sendHome());row.append(back);}
         else{const back=this.el('button','world-back',t('zone.sendHome'));back.type='button';back.addEventListener('click',()=>{this.close();app?.leaveZone();});row.append(back);}
-        d.append(row);}
+        // Owner 19 Nov 2026 (83): on to a neighbouring map.
+        const on=this.el('div','world-actions world-move-on');on.append(this.el('span','',t('scouting.moveOnTo')));
+        for(const id of zoneNeighbours(party.zone)){const found=s.zones[id],type=found&&scoutTypeById(found.type),b=this.el('button','world-on',`${type?type.icon:'?'} ${t(`scouting.zone.${id}`)}`);b.type='button';b.dataset.moveOn=id;
+          b.addEventListener('click',()=>{if(this.scene.zone){this.close();app?.leaveZone(id);}else{this.scene.scouting.moveOn(id);this.render();}});on.append(b);}
+        d.append(row,on);}
     }else if(!block){
       const soldiers=s.soldiers();
       if(!this.selected)d.append(this.el('p','world-hint',t('scouting.pickZone')));

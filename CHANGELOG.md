@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.11] - 2026-11-19
+<!-- version: {"title":"Party goes on to the next map","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- A scouting party on another map can go on to a neighbouring map instead of only going home (World window, or the button on the zone map).
+
 ## [0.148.10] - 2026-11-19
 <!-- version: {"title":"Dismiss soldiers","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Added

@@ -119,8 +119,8 @@ export class GameApplication {
   enterMine(){const scene=this.scene;if(!scene?.zone||scene.zone.dungeon)return false;const next=nextMap(scene,{dungeon:true});this.start(null,next.settings,next.zone);return true;}
   leaveMine(){const scene=this.scene;if(!scene?.zone?.dungeon)return false;const next=nextMap(scene,{dungeon:false});this.start(null,next.settings,next.zone);return true;}
   // Back home: the saved home state with the party on its way back.
-  leaveZone(){
-    const scene=this.scene;if(!scene?.zone)return false;const {home,fallen}=homeAfterZone(scene);let state,checked=true;
+  leaveZone(next=null){
+    const scene=this.scene;if(!scene?.zone)return false;const {home,fallen}=homeAfterZone(scene,{next});let state,checked=true;
     try{state=validateGameState(home);}catch(error){console.error('Zone return check failed:',error);checked=false;state=validateGameState(scene.zone.home);}
     this.pendingFallen=checked?fallen:[];this.start(state);if(fallen.length)this.notify(t('zone.fallen',{count:fallen.length}));return true;
   }

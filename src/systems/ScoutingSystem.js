@@ -1,5 +1,5 @@
 import { t } from '../i18n/index.js';
-import { SCOUTING,zoneType,zoneById,zoneEdge,scoutTypeById } from '../data/scouting.js';
+import { SCOUTING,zoneType,zoneById,zoneEdge,scoutTypeById,zoneNeighbours } from '../data/scouting.js';
 import { buildingIsComplete } from '../game/buildingState.js';
 import { towerNeighbors } from '../game/buildings.js';
 import { castleLevel } from '../data/castle.js';
@@ -87,13 +87,17 @@ export class ScoutingSystem {
       Object.assign(p,{phase:'away',at:now+SCOUTING.travelDays*day});this.changed();return;
     }
     if(p.phase==='away'&&now>=p.at){
-      const type=zoneType(this.worldCode(),p.zone);this.zones[p.zone]={type,day:s.gameTime.day};
+      const type=zoneType(this.worldCode(),p.zone);this.zones[p.zone]={...this.zones[p.zone],type,day:s.gameTime.day};/* (83) a second visit keeps what was taken there */
       s.eventFeed?.push?.(`scouting-found:${p.since}`,t('scouting.found',{zone:t(`scouting.zone.${p.zone}`),found:`${scoutTypeById(type)?.icon??''} ${t(`scouting.type.${type}`)}`}),{important:true});
       // Owner 16 Nov 2026: the party stays there until it is sent home (or you switch to it and play the zone).
       Object.assign(p,{phase:'there',at:now});this.changed();return;
     }
     if(p.phase==='returning'&&now>=p.at)this.home();
   }
+  // Owner 19 Nov 2026 (83): the party that is in a zone goes on to a neighbouring one (the same time on the road).
+  moveOn(zoneId){const p=this.party;if(p?.phase!=='there'||!zoneNeighbours(p.zone).includes(zoneId))return false;const now=this.scene.gameTime.totalElapsed;
+    Object.assign(p,{zone:zoneId,phase:'away',since:now,at:now+SCOUTING.travelDays*this.scene.gameTime.dayDuration});
+    this.scene.eventFeed?.push?.(`scouting-on:${now}`,t('scouting.movedOn',{zone:t(`scouting.zone.${zoneId}`)}),{});this.changed();return true;}
   // Send the party that is in a zone back home (half a day on the road).
   sendHome(){const p=this.party;if(p?.phase!=='there')return false;Object.assign(p,{phase:'returning',at:this.scene.gameTime.totalElapsed+SCOUTING.travelDays*this.scene.gameTime.dayDuration});this.scene.eventFeed?.push?.(`scouting-back:${p.since}`,t('scouting.sentHome'),{});this.changed();return true;}
   // The goods leave the stores when the party sets off (like the own caravan).
