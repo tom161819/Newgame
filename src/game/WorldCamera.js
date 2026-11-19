@@ -35,7 +35,9 @@ export class WorldCamera {
     this.recenter = () => this.follow();
     scene.input.on('wheel', this.wheel);
     this.edgeMove=e=>{this.edge={x:e.clientX,y:e.clientY};};this.edgeLeave=()=>{this.edge=null;};globalThis.addEventListener?.('mousemove',this.edgeMove);globalThis.document?.addEventListener?.('mouseleave',this.edgeLeave);globalThis.addEventListener?.('blur',this.edgeLeave);
-    scene.input.keyboard.on('keydown-SPACE', this.recenter);
+    // Owner 19 Nov 2026 (84): Space flattens the buildings now; C brings the camera back to the King.
+    this.flatten=()=>{const el=globalThis.document?.activeElement;if(el&&/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(el.tagName))el.blur?.();scene.flatBuildings?.toggle();};
+    scene.input.keyboard.on('keydown-C', this.recenter);scene.input.keyboard.on('keydown-SPACE', this.flatten);
     // Owner 15 Nov 2026: K selects the King (then the right button sends him).
     this.selectKing=()=>{const s=this.scene,el=globalThis.document?.activeElement;if(el&&/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))return;if(s.gameOver||!s.character?.isAlive||!s.unitSelection)return;s.unitSelection.set([s.character]);s.setStatus?.(t('status.kingSelected'));};
     scene.input.keyboard.on('keydown-K', this.selectKing);
@@ -119,7 +121,7 @@ export class WorldCamera {
     this.scene.input.off('wheel', this.wheel);
     globalThis.removeEventListener?.('keydown',this.fullscreenKey);this.fullscreenButton?.removeEventListener('click',this.fullscreen);
     globalThis.removeEventListener?.('mousemove',this.edgeMove);globalThis.document?.removeEventListener?.('mouseleave',this.edgeLeave);globalThis.removeEventListener?.('blur',this.edgeLeave);
-    this.scene.input.keyboard.off('keydown-SPACE', this.recenter);this.scene.input.keyboard.off('keydown-K', this.selectKing);
+    this.scene.input.keyboard.off('keydown-C', this.recenter);this.scene.input.keyboard.off('keydown-SPACE', this.flatten);this.scene.input.keyboard.off('keydown-K', this.selectKing);
     document.querySelector('#follow-king').removeEventListener('click', this.recenter);
   }
 }

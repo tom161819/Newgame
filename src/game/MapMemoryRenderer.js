@@ -66,7 +66,7 @@ export class MapMemoryRenderer {
       if(point.x+padding<camera.x||point.x-padding>camera.right||point.y+padding<camera.y||point.y-(d.visualHeight??64)-padding>camera.bottom)continue;
       needed.add(key);let record=this.views.get(key);
       if(record?.entry!==entry||record.brightness!==fog.memoryBrightness){record?.view.destroy();record={entry,brightness:fog.memoryBrightness,view:this.create(entry)};this.views.set(key,record);}
-      record.view.setVisible(true);if(lit!==undefined){record.view.setAlpha?.(1-lit);record.faded=true;}else if(record.faded){record.view.setAlpha?.(1);record.faded=false;}
+      record.view.setVisible(!(entry.kind==='building'&&this.scene.flatBuildings?.on));/* (84) */if(lit!==undefined){record.view.setAlpha?.(1-lit);record.faded=true;}else if(record.faded){record.view.setAlpha?.(1);record.faded=false;}
       // m-vytezeny-dul-ctverecky (63): a remembered finished building shows its footprint only while placing.
       if(entry.kind==='building')applyFootprint(record.view,footprintShown({complete:!entry.visual.construction||entry.visual.construction.state==='complete',buildMode:!!this.scene.buildMode}));
     }

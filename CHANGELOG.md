@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.12] - 2026-11-19
+<!-- version: {"title":"Space flattens buildings","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- Space flattens the buildings to their ground plans, so whatever stands behind them can be clicked and placing is clearer; Space again shows them.
+
+### Changed
+- The camera returns to the King with C (Space now flattens the buildings).
+
 ## [0.148.11] - 2026-11-19
 <!-- version: {"title":"Party goes on to the next map","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Added
