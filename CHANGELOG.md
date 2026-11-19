@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.146.16] - 2026-11-19
+<!-- version: {"title":"No more black squares on the map","type":"fix","reconstructed":false,"saveVersion":65} -->
+### Fixed
+- Black squares on the map: Wood, Ore, Iron, Flour and Bread lying on the ground are drawn again.
+
 ## [0.146.15] - 2026-11-19
 <!-- version: {"title":"Waiting goods notice after a day","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Changed
