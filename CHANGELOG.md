@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.6] - 2026-11-19
+<!-- version: {"title":"Caravans on the minimap","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- Caravans show on the minimap as a small cart that moves with them: a foreign merchant in orange, your own caravan in blue.
+
 ## [0.148.5] - 2026-11-19
 <!-- version: {"title":"Buildings open in fog","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Changed
