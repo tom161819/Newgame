@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.5] - 2026-11-19
+<!-- version: {"title":"Buildings open in fog","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Changed
+- Your own buildings and blueprints can be clicked and their windows stay open even in fog.
+
 ## [0.148.4] - 2026-11-19
 <!-- version: {"title":"Nobody stuck under a blueprint","type":"fix","reconstructed":false,"saveVersion":66} -->
 ### Fixed

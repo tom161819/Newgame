@@ -68,6 +68,7 @@ import { t } from '../i18n/index.js';
 import { localized } from '../i18n/names.js';
 import Phaser from 'phaser';
 import { COLUMNS, ROWS, PLAYER_START, isWalkable, tileCenter } from './map.js';
+import { buildingReachable } from './fogReach.js';
 import { setMapSize,mapArea } from './config.js';
 import { generateWorld, mapFromWorld, emptyGround, importGround, importBushes, emptyZones, importZones, importReeds } from './worldGeneration.js';
 import { importNatureGroups, pruneNatureGroups, exportNatureGroups, thicketTiles } from './natureGroups.js';
@@ -713,7 +714,9 @@ export class GameScene extends Phaser.Scene {
   selectableHumans(){return this.workerSystem?.liveWorkers()??[];}
   // m-budovy-klik-mimo-dohled (owner, 12 Nov): the King always knows his own buildings, so one on explored ground (grey
   // fog) opens like one in sight; animals, loot and strangers in the fog stay out of reach.
-  buildingReachable(building){const f=this.fog;if(!f?.enabled||f.isVisibleObject(building))return true;if(building.unverified)return true;const w=f.width;return !!f.explored&&(building.tiles??[]).some(t=>f.explored[t.y*w+t.x]);}
+  // Owner 19 Nov 2026 (80): an own building or blueprint opens in any fog, also its window stays open; an enemy one
+  // still needs explored ground.
+  buildingReachable(building){return buildingReachable(this.fog,building);}
   towerAtPoint(x,y,tile) {
     return [...this.buildings].filter(building=>this.buildingReachable(building)).sort((a,b)=>towerBase(b).y-towerBase(a).y).find(building=>this.towerViews.get(building.id).contains(x,y)||building.tiles.some(part=>tileKey(part)===tileKey(tile)));
   }

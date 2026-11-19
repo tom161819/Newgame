@@ -1,3 +1,4 @@
+import { buildingReachable } from '../game/fogReach.js';
 import { localized,workMessageLabel } from '../i18n/names.js';
 import { TORCH_TARGET_MAX } from '../systems/FoodProductionSystem.js';
 import { t } from '../i18n/index.js';
@@ -85,7 +86,7 @@ export class WorkplacePanel {
   refresh(){
     if(this.pressing)return;
     if(!this.dialog.open||!this.building)return;
-    const s=this.scene,b=this.building;if(!s.buildings.includes(b)||!(s.buildingReachable?.(b)??s.fog.isVisibleObject(b))){this.close();return;}
+    const s=this.scene,b=this.building;if(!s.buildings.includes(b)||!buildingReachable(s.fog,b)){this.close();return;}
     this.renderOwnStore(b);
     const spec=buildingDefinition(b),summary=s.workplaceSystem.summary(b),employees=s.workplaceSystem.employees(b),candidates=s.workerSystem.liveSubjects();
     const plots=b.type==='farmhouse'?s.farmingSystem?.plotSummary(b):null;this.farmCount.hidden=!plots;if(plots)this.farmCount.textContent=t('farmPlots.count',plots);

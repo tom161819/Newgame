@@ -1,3 +1,4 @@
+import { buildingReachable } from '../game/fogReach.js';
 import { t } from '../i18n/index.js';
 import { buildingDefinition } from '../game/buildings.js';
 import { constructionPhase,CONSTRUCTION_RULES } from '../data/construction.js';
@@ -17,7 +18,7 @@ export class ConstructionUI {
   }
   open(site){this.site=site;this.restored=false;this.scene.setGalleryInput(false);this.dialog.showModal();this.refresh();}
   refresh(){
-    if(!this.dialog.open)return;const s=this.scene,site=this.site;if(!site||!s.constructionSystem.sites.has(site.id)||!s.fog.isVisibleObject(site)){this.close();return;}
+    if(!this.dialog.open)return;const s=this.scene,site=this.site;if(!site||!s.constructionSystem.sites.has(site.id)||!buildingReachable(s.fog,site)){this.close();return;}
     const crop=!!buildingDefinition(site).crop,c=site.construction,system=s.constructionSystem,active=system.activeBuilders(site),estimate=system.estimatedSeconds(site),king=system.assignments.get('king'),kingHere=king?.siteId===site.id;
     document.querySelector('#construction-name').textContent=buildingDefinition(site).name;
     document.querySelector('#construction-percentage').textContent=`${c.progress.toFixed(1)} % · ${t(`construction.phase.${constructionPhase(site)}`)}`;document.querySelector('#construction-progress').value=c.progress;
