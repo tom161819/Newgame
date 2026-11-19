@@ -113,3 +113,13 @@ export function planRoofExit(map,buildings,start,order,options){
   }
   return best;
 }
+
+// m-hradby-diagonala: links and shape of every wall tile. Finished walls take both from finished walls only (the wall
+// walk); a wall under construction takes its shape from the whole planned line, so the site already shows its diagonal
+// piece (owner's handover 19 Nov 2026: sites were drawn as blocks). Towers, gates and the castle beside a wall keep it a block.
+export function wallLayout(buildings){
+  const finished=wallIndex(buildings),planned=wallIndex(buildings,true),key=tileKey;
+  const solid=new Set();for(const b of buildings)if(['tower','gate','castle'].includes(b.type)&&!finished.has(key(b)))for(const tile of b.tiles??[])solid.add(key(tile));
+  const walls=[...planned.values()].map(building=>({building,connections:connectionsFor(finished,building),shape:building.type==='wall'?wallShape(finished.get(key(building))===building?finished:planned,building,solid):null}));
+  return {finished,walls};
+}

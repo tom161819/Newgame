@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.147.1] - 2026-11-19
+<!-- version: {"title":"Diagonal wall sites and remembered diagonal walls","type":"fix","reconstructed":false,"saveVersion":66} -->
+### Fixed
+- A diagonal Stone Wall under construction already shows its diagonal pieces instead of blocks.
+- The remembered map (under the Fog of War) keeps diagonal walls diagonal.
+
 ## [0.147.0] - 2026-11-19
 <!-- version: {"title":"Analog tax slider","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Changed

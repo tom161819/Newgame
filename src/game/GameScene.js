@@ -118,7 +118,7 @@ import { DevBalancePanel } from '../ui/DevBalancePanel.js';
 import { installPanelDismiss,closeOpenPanels } from '../ui/PanelDismiss.js';
 import { FortificationView } from './FortificationView.js';
 import { TowerDoors } from './TowerDoors.js';
-import { wallLine,wallLinePlan,placeWallLine,wallIndex,connectionsFor,connectedWalls,isWall,gateAxis,turnGate,wallShape } from './walls.js';
+import { wallLine,wallLinePlan,placeWallLine,wallIndex,connectionsFor,connectedWalls,isWall,gateAxis,turnGate,wallShape,wallLayout } from './walls.js';
 import { replaceWalls } from './wallReplacement.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
 import { CombatFeedback } from '../ui/CombatFeedback.js';
@@ -819,11 +819,9 @@ export class GameScene extends Phaser.Scene {
     else this.cancelBuilding(message);
   }
   refreshWallConnections(){
-    this.wallMap=wallIndex(this.buildings);
-    // m-hradby-diagonala: towers, gates and the castle beside a wall keep it a block (not a diagonal piece).
-    const solid=new Set();for(const b of this.buildings)if(['tower','gate','castle'].includes(b.type)&&!this.wallMap.has(tileKey(b)))for(const tile of b.tiles??[])solid.add(tileKey(tile));
-    for(const building of this.wallMap.values()){
-      const connections=connectionsFor(this.wallMap,building),shape=building.type==='wall'?wallShape(this.wallMap,building,solid):null,key=JSON.stringify(connections)+JSON.stringify(shape);
+    const layout=wallLayout(this.buildings);this.wallMap=layout.finished;
+    for(const {building,connections,shape} of layout.walls){
+      const key=JSON.stringify(connections)+JSON.stringify(shape);
       if(key!==building.connectionKey){building.connections=connections;building.connectionKey=key;if(shape?.diagonal)building.diagonal=shape.diagonal;else delete building.diagonal;if(shape?.elbow)building.elbow=shape.elbow;else delete building.elbow;this.towerViews.get(building.id)?.paint(building,building.enemy?ENEMY_TINT:null);}
     }
   }
