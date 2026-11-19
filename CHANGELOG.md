@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.4] - 2026-11-19
+<!-- version: {"title":"Nobody stuck under a blueprint","type":"fix","reconstructed":false,"saveVersion":66} -->
+### Fixed
+- Soldiers holding a place under a new blueprint now move beside it and keep holding there, and a resident shut inside a blueprint finds a way out, so building can start.
+
 ## [0.148.3] - 2026-11-19
 <!-- version: {"title":"Caravans wait for their order","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Changed
