@@ -354,11 +354,11 @@ try{
       const point={x:s.map.length*32+(x-y)*32,y:128+(x+y+1)*16-4};if([...s.resources.values()].some(v=>v.getData('definition').tree&&v.containsPoint(point.x,point.y)))continue;
       if(!s.character.command({kind:'move',goal:t,silent:true}))continue;
       s.character.stopForBuilding();s.addResource(s.objectRegistry.require('stone'),t);
-      s.worldCamera.following=false;s.cameras.main.setZoom(.9).centerOn(point.x,point.y);s.cameras.main.preRender();return point;
+      s.unitSelection.set([s.character]);s.worldCamera.following=false;s.cameras.main.setZoom(.9).centerOn(point.x,point.y);s.cameras.main.preRender();return point;
     }throw Error('No reachable smoke-test stone site.');
   });
   const camera=await page.evaluate(()=>{const c=window.__game.registry.get('application').scene.cameras.main;return{x:c.scrollX+c.width/2,y:c.scrollY+c.height/2,w:c.width,h:c.height,z:c.zoom};}),bounds=await page.locator('canvas:not(.minimap-canvas):not(.world-preview):not(.we-map):not(.we-iso)').boundingBox();
-  await page.mouse.click(bounds.x+((point.x-camera.x)*camera.z+camera.w/2)*bounds.width/camera.w,bounds.y+((point.y-camera.y)*camera.z+camera.h/2)*bounds.height/camera.h);
+  await page.mouse.click(bounds.x+((point.x-camera.x)*camera.z+camera.w/2)*bounds.width/camera.w,bounds.y+((point.y-camera.y)*camera.z+camera.h/2)*bounds.height/camera.h,{button:'right'}); // the left click only selects the King; he is sent with the right button
   await page.waitForFunction(()=>window.__game.registry.get('application').scene.character.cargo?.amount===1,null,{timeout:20000});
   const waiting=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;return {tile:s.character.tile,task:s.kingLogistics.task,stock:s.inventory.count('stone')};});
   assert.equal(waiting.task,null);assert.equal(waiting.stock,0);await page.waitForTimeout(1200);
