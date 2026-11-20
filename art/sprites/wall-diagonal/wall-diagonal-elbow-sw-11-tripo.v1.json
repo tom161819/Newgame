@@ -38,14 +38,6 @@
   "gameLights": [],
   "modelHeight": 2.075,
   "lights": [],
-  "x2": {
-    "width": 445,
-    "height": 348,
-    "anchor": {
-      "x": 193,
-      "y": 250
-    }
-  },
   "render": {
     "engine": "CYCLES",
     "blender": "5.3.0",

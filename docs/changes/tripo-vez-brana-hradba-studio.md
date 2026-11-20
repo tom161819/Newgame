@@ -25,6 +25,8 @@ takes it after approval.
     redone too) – the same recipes in the Tripo stone.
 
 ## Implementation decisions
+- The Studio page holds at most 512 files and one script at most 16 MB, so the diagonal `*-tripo` pieces have no 2x file
+  (the Studio shows their 1x picture at 2×); the inline limit stays 24 KB.
 - The GLB files (78 and 44 MB) are not in the repo; `baked.glb` names them, the PNG renders are committed.
 - The Tripo texture atlas is fragmented, so the wall stone is taken from a straight render of the tower face instead.
 - Walls keep the approved recipes (size, wall walk, merlons), only the stone changes, so every joint stays as it is.
