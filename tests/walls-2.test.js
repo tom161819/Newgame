@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { workerScene,ensureBuildingPrerequisites } from './helpers/workerScene.js';
 import { placeBuilding,placementError,wallsReplacedBy,buildingTiles } from '../src/game/buildings.js';
-import { placeWallLine,wallIndex,gateAxis,gateAxisLocked,turnGate,isWallAccess } from '../src/game/walls.js';
+import { placeWallLine,wallIndex,gateAxis,gateAxisLocked,turnGate,isWallAccess,wallLayout } from '../src/game/walls.js';
 import { replaceWalls } from '../src/game/wallReplacement.js';
 import { ObjectRegistry,objectRegistry } from '../src/systems/ObjectRegistry.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
@@ -71,12 +71,16 @@ test('the King standing on a finished segment blocks its replacement; without a 
   assert.deepEqual(wallsReplacedBy(s.buildings,buildingTiles({x:61,y:50},s.objectRegistry.require('house')),s.objectRegistry.require('house')),[]);
 });
 
-test('R turns a lone Gate; on a wall run the wall decides and R does nothing; the axis is saved',()=>{
+test('R turns a lone Gate; on a wall run the wall decides; the axis is saved',()=>{
   const s=scene();walls(s,row(60,50,3),{planned:false});
   const index=wallIndex(s.buildings,true),gd=s.objectRegistry.require('gate'),at=(x,y)=>({x,y,definition:gd});
   assert.deepEqual(turnGate(index,at(70,70),'y'),{axis:'x',locked:false});assert.deepEqual(turnGate(index,at(70,70),'x'),{axis:'y',locked:false});
   assert.deepEqual(turnGate(index,at(63,49),'y'),{axis:'y',locked:true},'east–west wall beside the Gate');
-  assert.equal(gateAxisLocked(index,at(61,51)),true,'a wall to the north decides too');
+  // Owner 20 Nov 2026: a wall running past a side (parallel to it) does not decide; one leading away from the side does.
+  assert.equal(gateAxisLocked(index,at(61,51)),false,'the east–west run passes along the north side');
+  assert.equal(gateAxisLocked(index,at(60,51)),false,'nor when it ends past the corner');
+  const tee=wallIndex([...s.buildings,{type:'wall',x:61,y:49,id:-1,construction:{state:'complete'}}],true);
+  assert.equal(gateAxis(tee,at(63,49)),'x');
   const lone=place(s,'gate',{x:70,y:70},{fields:{gateAxis:'x'}});assert.ifError(lone.error);
   assert.equal(lone.building.gateAxis,'x');assert.equal(gateAxis(wallIndex(s.buildings,true),lone.building),'x');
   assert.equal(gateAxis(wallIndex(s.buildings,true),{x:80,y:80}),'y','older Gates without an axis keep the old look');
@@ -101,4 +105,12 @@ test('a Well may stand anywhere buildable: far from every house and on a worn pa
   const house=s.buildings.find(b=>b.type==='house');assert.ok(Math.hypot(90-house.x,90-house.y)>20);assert.equal(at(90,90),null,'far from every house');
   s.pathWear.levels[s.pathWear.index({x:88,y:88})]=3;s.pathWear.setPaved({x:86,y:86},true);assert.equal(at(88,88),null);assert.equal(at(86,86),null);
   assert.ok(placementError(s.map,{x:88,y:88},context,[],s.objectRegistry.require('swing_tree'),s.buildings),'other decorations still avoid paths');
+});
+
+test('a wall meeting a finished Gate on its wall side runs into it; on the passage side it keeps its end',()=>{
+  const s=scene();walls(s,row(60,50,2),{planned:false});walls(s,[{x:64,y:50},{x:62,y:52}],{planned:false});
+  const gate=place(s,'gate',{x:62,y:50},{fields:{gateAxis:'x'}});assert.ifError(gate.error);gate.building.construction.state='complete';
+  const links=b=>wallLayout(s.buildings).walls.find(w=>w.building.x===b.x&&w.building.y===b.y).connections;
+  assert.equal(links({x:61,y:50}).E,true,'west wall joins the Gate');assert.equal(links({x:64,y:50}).W,true,'east wall joins the Gate');
+  assert.equal(links({x:62,y:52}).N,false,'a wall at the gateway keeps its end');
 });

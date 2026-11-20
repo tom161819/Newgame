@@ -562,7 +562,7 @@ export class GameScene extends Phaser.Scene {
       const provisional=isProvisional(this.fog,buildingTiles(goal,this.selectedBuilding)),known=provisional?mineSpotError(this,goal,this.selectedBuilding,knownPlacementError(this,goal,this.selectedBuilding))??provisionalMineError(this,goal,this.selectedBuilding):null;
       if(known){this.previewKey=null;this.updateBuildingPreview();this.setStatus(known);return;}
       // m-staveni-zdi-studna (59): a Gate or Tower over Stone Wall segments replaces them; a Gate keeps the axis it was placed with.
-      const fields=['wall_gate','gate'].includes(this.selectedBuilding.id)?{gateAxis:gateAxis(wallIndex(this.buildings,true),{...goal,definition:this.selectedBuilding,gateAxis:this.gateAxis})}:this.selectedBuilding.id==='tower'&&this.towerFacing?{facing:this.towerFacing}:null;
+      const fields=['wall_gate','gate'].includes(this.selectedBuilding.id)?{gateAxis:this.gatePlacementAxis(goal)}:this.selectedBuilding.id==='tower'&&this.towerFacing?{facing:this.towerFacing}:null;
       // Test map (owner 16 Nov 2026): every building is free and stands finished at once.
       if(this.sandbox&&placeSandboxBuilding(this,goal,fields,pointer))return;
       const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.placementReserved(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding,reserveMaterials:true,provisional,fields,replaceWalls:(walls,building)=>replaceWalls(this,walls,building)});
@@ -711,9 +711,16 @@ export class GameScene extends Phaser.Scene {
     // m-vez-otaceni (owner, 12 Nov): R turns a Tower by 90° too (4 facings; shown mirrored until four views exist).
     if(this.buildMode&&this.selectedBuilding?.id==='tower'){this.towerFacing=((this.towerFacing??0)+1)%4;this.previewKey=null;this.updateBuildingPreview();return true;}
     if(!this.buildMode||!['wall_gate','gate'].includes(this.selectedBuilding?.id))return false;
-    const turn=turnGate(wallIndex(this.buildings,true),this.previewAnchor&&{...this.previewAnchor,definition:this.selectedBuilding},this.gateAxis);
-    if(turn.locked){this.setStatus(t('status.gateFollowsWall'));return true;}
-    this.gateAxis=turn.axis;this.previewKey=null;this.updateBuildingPreview();return true;
+    // Owner 20 Nov 2026: R always turns the Gate. Where the wall run decides the axis, R turns it against the run for
+    // this spot only (moving on to another tile gives the run back its say); elsewhere it turns the remembered axis.
+    const anchor=this.previewAnchor,turn=turnGate(wallIndex(this.buildings,true),anchor&&{...anchor,definition:this.selectedBuilding},this.gateAxis);
+    if(turn.locked){const at=tileKey(anchor);this.gateFlipAt=this.gateFlipAt===at?null:at;}else{this.gateAxis=turn.axis;this.gateFlipAt=null;}
+    this.previewKey=null;this.updateBuildingPreview();return true;
+  }
+  // The axis the Gate under the pointer is shown and built with (preview and click agree).
+  gatePlacementAxis(anchor,definition=this.selectedBuilding){
+    const axis=gateAxis(wallIndex(this.buildings,true),{...anchor,definition,gateAxis:this.gateAxis});
+    return this.gateFlipAt!=null&&this.gateFlipAt===tileKey(anchor)?(axis==='x'?'y':'x'):axis;
   }
   selectableHumans(){return this.workerSystem?.liveWorkers()??[];}
   // m-budovy-klik-mimo-dohled (owner, 12 Nov): the King always knows his own buildings, so one on explored ground (grey
@@ -775,7 +782,7 @@ export class GameScene extends Phaser.Scene {
     const moved=definition.relocateFrom!=null?this.buildings.find(b=>b.id===definition.relocateFrom):null;
     const error=moved?relocationError(this,moved,anchor):mineSpotError(this,anchor,definition,provisional?knownPlacementError(this,anchor,definition):placementError(this.map,anchor,this.resourceOccupancy,this.placementReserved(),definition,this.buildings,this.buildingUnlocks))
       ??(provisional?provisionalMineError(this,anchor,definition):null)??(!this.inventory.canAfford(definition.cost)?t('status.noFunds'):null);
-    const gate=['wall_gate','gate'].includes(definition.id)?gateAxis(wallIndex(this.buildings,true),{...anchor,definition,gateAxis:this.gateAxis}):null;
+    const gate=['wall_gate','gate'].includes(definition.id)?this.gatePlacementAxis(anchor,definition):null;
     const facing=definition.id==='tower'?(this.towerFacing??0):null,key=`${tileKey(anchor)}:${provisional}:${error}:${gate}:${facing}`;
     if(key!==this.previewKey){
       this.preview.paint({x:anchor.x,y:anchor.y,type:definition.id,definition,tiles:buildingTiles(anchor,definition)},error?0xf27777:provisional?0xe3c46b:0x71dba6);

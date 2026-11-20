@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.4] - 2026-11-20
+<!-- version: {"title":"Gate turns with R","type":"fix","reconstructed":false,"saveVersion":67} -->
+### Fixed
+- R always turns the Gate being placed, also on a wall; the Gate is built the way the blueprint showed it.
+- A wall running past the side of a Gate no longer decides which way the Gate faces; only a wall leading away from a side does.
+- A wall that meets a Gate on its wall side runs into it, without end merlons sticking out at the joint.
+
 ## [0.149.3] - 2026-11-20
 <!-- version: {"title":"Flat view: people on the ground","type":"fix","reconstructed":false,"saveVersion":67} -->
 ### Fixed

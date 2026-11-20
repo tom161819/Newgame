@@ -52,7 +52,11 @@ export function connectionsFor(index,building){
 export function gateAxis(index,building){
   // m-brana-2x2: a 2 × 2 Gate looks at the walls along its four sides.
   const size=(building.definition??buildingDefinition(building))?.width??1;
-  if(size>1){const has=(x,y)=>index.has(tileKey({x,y}));let ew=false,ns=false;for(let i=0;i<size;i++){if(has(building.x-1,building.y+i)||has(building.x+size,building.y+i))ew=true;if(has(building.x+i,building.y-1)||has(building.x+i,building.y+size))ns=true;}
+  // Owner 20 Nov 2026: only a wall that leads away from a side joins there; a wall running past the side (parallel to it)
+  // does not turn the Gate.
+  if(size>1){const has=(x,y)=>index.has(tileKey({x,y})),x0=building.x,y0=building.y;let ew=false,ns=false;
+    const joinsX=(x,y,away)=>has(x,y)&&(has(x+away,y)||!has(x,y-1)&&!has(x,y+1)),joinsY=(x,y,away)=>has(x,y)&&(has(x,y+away)||!has(x-1,y)&&!has(x+1,y));
+    for(let i=0;i<size;i++){if(joinsX(x0-1,y0+i,-1)||joinsX(x0+size,y0+i,1))ew=true;if(joinsY(x0+i,y0-1,-1)||joinsY(x0+i,y0+size,1))ns=true;}
     if(ew&&!ns)return 'x';if(ns&&!ew)return 'y';return building.gateAxis==='x'?'x':'y';}
   const n=connectionsFor(index,building),ew=n.E||n.W,ns=n.N||n.S;
   if(ew&&!ns)return 'x';if(ns&&!ew)return 'y';return building.gateAxis==='x'?'x':'y';
@@ -122,6 +126,9 @@ export function planRoofExit(map,buildings,start,order,options){
 export function wallLayout(buildings){
   const finished=wallIndex(buildings),planned=wallIndex(buildings,true),key=tileKey;
   const solid=new Set();for(const b of buildings)if(['tower','gate','castle'].includes(b.type)&&!finished.has(key(b)))for(const tile of b.tiles??[])solid.add(key(tile));
-  const walls=[...planned.values()].map(building=>({building,connections:connectionsFor(finished,building),shape:building.type==='wall'?wallShape(finished.get(key(building))===building?finished:planned,building,solid):null}));
+  // Owner 20 Nov 2026: a wall that meets a Gate on one of its wall sides runs into it (no end merlons sticking out there).
+  const gateSide=new Map();for(const b of buildings)if(b.type==='gate'&&buildingIsComplete(b))for(const tile of b.tiles??[])gateSide.set(key(tile),b.gateAxis==='x'?'EW':'NS');
+  const joined=building=>{const links=connectionsFor(finished,building);for(const d of WALL_DIRECTIONS)if(!links[d.name]&&gateSide.get(key({x:building.x+d.x,y:building.y+d.y}))?.includes(d.name))links[d.name]=true;return links;};
+  const walls=[...planned.values()].map(building=>({building,connections:joined(building),shape:building.type==='wall'?wallShape(finished.get(key(building))===building?finished:planned,building,solid):null}));
   return {finished,walls};
 }
