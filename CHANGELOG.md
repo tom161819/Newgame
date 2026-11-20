@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.9] - 2026-11-20
+<!-- version: {"title":"Knight combat moves","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Changed
+- Knights fight with an overhead chop, a slash, a thrust and a shield bash, raise their shield to block and hold their guard; each fighter mixes them in his own rhythm.
+
 ## [0.149.8] - 2026-11-20
 <!-- version: {"title":"Tripo Tower, Gate and walls","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Changed

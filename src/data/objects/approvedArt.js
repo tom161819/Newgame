@@ -159,8 +159,21 @@ export function soldierIdle(anim,state,delta,random=Math.random){
   state.col=extra[Math.floor(random()*extra.length)];state.left=900+random()*1800;return state.col;
 }
 // m-vojaci-3d: the frame of an animated soldier sheet: attacking, walking or standing.
-export function soldierFrame(anim,k,{walkedMs=0,walkFps=10,moving=false,attackMs=0,attacking=false,idleCol=anim.idle}={}){
-  const col=attacking?anim.attack[Math.floor(attackMs*anim.attackFps/1000)%anim.attack.length]:moving?anim.walk[Math.floor(walkedMs*walkFps/1000)%anim.walk.length]:idleCol;return k*anim.columns+col;}
+export function soldierFrame(anim,k,{walkedMs=0,walkFps=10,moving=false,attackMs=0,attacking=false,idleCol=anim.idle,seed=0}={}){
+  const col=attacking?combatColumn(anim,attackMs,seed):moving?anim.walk[Math.floor(walkedMs*walkFps/1000)%anim.walk.length]:idleCol;return k*anim.columns+col;}
+// Owner 20 Nov 2026 ("víc druhů útoků, obranu, nastavení štítu… ať to vypadá víc jako boj"): a figure with several
+// attacks and a block plays one move per slot – a random attack (60 %), the shield block (30 %) or a held guard (10 %) –
+// chosen from its seed and the slot number, so neighbours in a melee do not swing in step. Others loop their one attack.
+export const COMBAT_MOVES=Object.freeze({attack:.6,block:.3});
+const mix=(a,b)=>{let h=(a*2654435761^b*1597334677)>>>0;h^=h>>>15;h=Math.imul(h,2246822519)>>>0;h^=h>>>13;return (h>>>0)/4294967296;};
+export function combatColumn(anim,attackMs,seed=0){
+  if(!anim.attacks?.length||!anim.block?.length)return anim.attack[Math.floor(attackMs*anim.attackFps/1000)%anim.attack.length];
+  const length=anim.attack.length,fps=anim.attackFps,slot=Math.floor(attackMs*fps/1000/length),frame=Math.floor(attackMs*fps/1000)%length;
+  const roll=slot===0?0:mix(seed,slot);// the first move of a fight is always a strike
+  if(roll<COMBAT_MOVES.attack){const moves=anim.attacks,move=moves[Math.floor(mix(seed+7,slot)*moves.length)%moves.length];return move[Math.min(frame,move.length-1)];}
+  if(roll<COMBAT_MOVES.attack+COMBAT_MOVES.block)return anim.block[Math.min(frame,anim.block.length-1)];
+  return anim.block[Math.min(1,anim.block.length-1)];// guard: shield half up, waiting
+}
 export const walkKey=look=>`villager-walk:${look}`;
 // A look whose walk sheet has loaded walks frame by frame; without one (missing or failed file) it keeps the facing image.
 export function hasWalk(scene,look){return !!APPROVED_VILLAGER_ART[look]?.walk&&!!scene?.textures?.exists?.(walkKey(look));}

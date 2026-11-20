@@ -169,7 +169,39 @@ def fidget(i):
   elif i == 4: rot(f'upper_arm.{weapon}', -14); rot(f'forearm.{weapon}', -26)  # shifts the weapon in the hand
   elif i == 5: rot('spine', -4); rot('head', -9); rot('upper_arm.R', -4, Y); rot('upper_arm.L', 4, Y)  # straightens his back
 
+# Owner 20 Nov 2026 ("víc druhů útoků, obranu, nastavení štítu"): with --combat a sword-and-shield figure also gets an
+# overhead chop, a thrust, a shield bash and a shield block; the game mixes them in a fight instead of one looping slash.
+OVERHEAD = [(-70, -40, -2), (-150, -35, -6), (-178, -15, -8), (-120, -5, 8), (-45, -5, 16), (-25, -15, 8)]  # upper, fore, lean
+THRUST = [(-25, -95, -4, -10), (5, -115, -8, -18), (-55, -60, 2, -6), (-88, -6, 12, 8), (-85, -4, 14, 10), (-45, -45, 4, 0)]  # upper, fore, lean, twist
+BASH = [(-25, -70, -4, 10), (-40, -55, 0, 18), (-75, -25, 8, 24), (-78, -18, 12, 26), (-45, -45, 4, 12), (-28, -62, 0, 4)]  # shield upper, fore, lean, twist
+BLOCK = [0.45, 0.9, 1.0, 1.0, 0.6]  # how far the shield is up (5 frames: the Knight's sheet must stay under 4096 px)
+
+def lunge(f):
+  rot('thigh.L', -22 * f); rot('shin.L', 16 * f); rot('thigh.R', 14 * f); lift(-.035 * f)
+
+def overhead(i):
+  rest(); up, fore, lean = OVERHEAD[i]; rot('upper_arm.R', up); rot('forearm.R', fore); rot('spine', lean); guard_left()
+  if i >= 3: lunge(1 if i < 5 else .5)
+
+def thrust(i):
+  rest(); up, fore, lean, twist = THRUST[i]; rot('upper_arm.R', up); rot('forearm.R', fore); rot('hand.R', -40 if i < 2 else 0)
+  rot('spine', lean); rot('spine', twist, Z); guard_left()
+  if i >= 3: lunge(1 if i < 5 else .5)
+
+def bash(i):
+  rest(); up, fore, lean, twist = BASH[i]; rot('upper_arm.L', up); rot('forearm.L', fore); rot('upper_arm.L', 10, Y)
+  rot('spine', lean); rot('spine', twist, Z); rot('upper_arm.R', -25); rot('forearm.R', -55)
+  if i >= 2: lunge(1 if i < 4 else .5)
+
+def block(i):
+  rest(); f = BLOCK[i]
+  rot('upper_arm.L', -62 * f); rot('forearm.L', -58 * f); rot('upper_arm.L', 14 * f, Y)  # shield up in front of the face
+  rot('upper_arm.R', -30 * f); rot('forearm.R', -75 * f)  # sword cocked back, ready
+  rot('spine', 6 * f); rot('head', -6 * f); rot('thigh.L', -12 * f); rot('shin.L', 14 * f); rot('shin.R', 8 * f); lift(-.025 * f)
+
 frames = [('idle', 0, rest)] + [('walk', i, walk) for i in range(8)] + [('attack', i, attack) for i in range(6)] + [('die', i, die) for i in range(4)] + [('idle', i, fidget) for i in range(1, 6)]
+if '--combat' in args and kind == 'sword':
+  frames += [('attack2', i, overhead) for i in range(6)] + [('attack3', i, thrust) for i in range(6)] + [('attack4', i, bash) for i in range(6)] + [('block', i, block) for i in range(5)]
 os.makedirs(out, exist_ok=True)
 for k in range(8):
   if only is not None and k != only: continue

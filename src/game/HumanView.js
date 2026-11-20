@@ -18,7 +18,7 @@ import { ensureLook,lookKey } from './lookLoader.js';
 // Pohled poddaného používá stejných osm logických směrů jako král.
 export class HumanView extends Phaser.GameObjects.Container {
   constructor(scene,x,y,definition){
-    super(scene,x,y);scene.add.existing(this);this.definition=definition;this.phase=0;this.facing='S';
+    super(scene,x,y);scene.add.existing(this);this.definition=definition;this.phase=0;this.facing='S';this.combatSeed=Math.floor(Math.random()*1e9);
     this.shadow=scene.add.ellipse(0,1,23,10,0x26301e,.25);
     this.leftLeg=scene.add.rectangle(-3,-5,4,11,0x454334);this.rightLeg=scene.add.rectangle(3,-5,4,11,0x454334);
     this.body=scene.add.graphics();this.arms=[scene.add.rectangle(-7,-21,4,14,COLORS.armSkin),scene.add.rectangle(7,-21,4,14,COLORS.armSkin)];
@@ -45,7 +45,7 @@ export class HumanView extends Phaser.GameObjects.Container {
     for(const part of [this.shadow,this.leftLeg,this.rightLeg,this.body,...this.arms])part.setVisible(!on);
     if(!on){this.art.setVisible(false);return;}
     const art=villagerArt(this.look);this.tool.setVisible(false);this.weapon.setVisible(false);
-    if(art.anim&&hasWalk(this.scene,this.look)){const frame=soldierFrame(art.anim,k,{walkedMs:this.walked??0,walkFps:art.walk.fps,moving:!!this.isWalking,attackMs:this.attackMs??0,attacking:!!this.attacking,idleCol:this.idleCol??art.anim.idle}),key=walkKey(this.look);
+    if(art.anim&&hasWalk(this.scene,this.look)){const frame=soldierFrame(art.anim,k,{walkedMs:this.walked??0,walkFps:art.walk.fps,moving:!!this.isWalking,attackMs:this.attackMs??0,attacking:!!this.attacking,idleCol:this.idleCol??art.anim.idle,seed:this.combatSeed}),key=walkKey(this.look);
       if(this.artFrame!==`${key}:${frame}`){this.artFrame=`${key}:${frame}`;this.art.setTexture(key,frame).setOrigin(art.walk.origin.x,art.walk.origin.y).setScale(art.walk.scale??1);}this.art.setVisible(true);return;}
     if(hasWalk(this.scene,this.look)){const frame=walkFrame(k,this.walked??0,art.walk.fps,!!this.isWalking),key=walkKey(this.look);
       if(this.artFrame!==`${key}:${frame}`){this.artFrame=`${key}:${frame}`;this.art.setTexture(key,frame).setOrigin(art.walk.origin.x,art.walk.origin.y).setScale(art.walk.scale??1);}this.art.setVisible(true);return;}
