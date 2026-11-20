@@ -199,9 +199,35 @@ def block(i):
   rot('upper_arm.R', -30 * f); rot('forearm.R', -75 * f)  # sword cocked back, ready
   rot('spine', 6 * f); rot('head', -6 * f); rot('thigh.L', -12 * f); rot('shin.L', 14 * f); rot('shin.R', 8 * f); lift(-.025 * f)
 
+# Owner 20 Nov 2026 (halberdier): the halberd gets a two-handed thrust, a low sweep and a guard with the shaft held across
+# the body (no shield). Rows: upper, fore, staff tilt (forward from upright), lean, twist.
+H_THRUST = [(-20, -45, 60, 0, -10), (-8, -75, 80, -6, -22), (-62, -18, 80, 10, 6), (-75, -5, 78, 14, 10), (-35, -40, 60, 4, 0)]
+H_SWEEP = [(-40, -40, 50, 0, -30), (-45, -38, 62, -2, -45), (-50, -30, 72, 4, -20), (-55, -25, 75, 8, 15), (-50, -30, 70, 6, 35)]
+H_BLOCK = [0.5, 1.0, 1.0]  # 37 columns in all: the long shaft makes wide frames and the sheet must stay under 4096 px
+
+def hpose(up, fore, tilt, lean, twist):
+  rot('upper_arm.R', up); rot('forearm.R', fore); rot('hand.R', tilt - up - fore)
+  rot('upper_arm.L', up - 10); rot('forearm.L', fore - 20); rot('spine', lean); rot('spine', twist, Z)
+
+def h_thrust(i):
+  rest(); hpose(*H_THRUST[i])
+  if i >= 2: lunge(1 if i < 4 else .5)
+
+def h_sweep(i):
+  rest(); hpose(*H_SWEEP[i])
+  if 2 <= i <= 4: lunge(.7)
+
+def h_block(i):
+  rest(); f = H_BLOCK[i]
+  rot('upper_arm.R', -55 * f); rot('forearm.R', -50 * f); rot('hand.R', 105 * f, X); rot('hand.R', -65 * f, Y)
+  rot('upper_arm.L', -50 * f); rot('forearm.L', -70 * f); rot('upper_arm.L', 10 * f, Y)
+  rot('spine', 5 * f); rot('head', -6 * f); rot('thigh.L', -12 * f); rot('shin.L', 14 * f); rot('shin.R', 8 * f); lift(-.025 * f)
+
 frames = [('idle', 0, rest)] + [('walk', i, walk) for i in range(8)] + [('attack', i, attack) for i in range(6)] + [('die', i, die) for i in range(4)] + [('idle', i, fidget) for i in range(1, 6)]
 if '--combat' in args and kind == 'sword':
   frames += [('attack2', i, overhead) for i in range(6)] + [('attack3', i, thrust) for i in range(6)] + [('attack4', i, bash) for i in range(6)] + [('block', i, block) for i in range(5)]
+if '--combat' in args and kind == 'halberd':
+  frames += [('attack2', i, h_thrust) for i in range(5)] + [('attack3', i, h_sweep) for i in range(5)] + [('block', i, h_block) for i in range(3)]
 os.makedirs(out, exist_ok=True)
 for k in range(8):
   if only is not None and k != only: continue

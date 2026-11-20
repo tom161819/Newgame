@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.10] - 2026-11-20
+<!-- version: {"title":"Tripo Halberdier","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Changed
+- The Halberdier is the owner's new Tripo model: he chops, thrusts and sweeps with the halberd and holds it across his body to guard.
+
 ## [0.149.9] - 2026-11-20
 <!-- version: {"title":"Knight combat moves","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Changed

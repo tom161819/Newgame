@@ -62,4 +62,5 @@ test('owner 20 Nov 2026: a sword-and-shield figure mixes attacks, blocks and a g
   assert.ok(COMBAT_MOVES.attack+COMBAT_MOVES.block<1);
   const { SOLDIER_ANIM_ART } = await import('../src/data/soldierAnimArt.js');
   for(const look of ['army-knight','enemy-knight']){const a=SOLDIER_ANIM_ART[look].anim;assert.equal(a.attacks.length,4,look);assert.equal(a.block.length,5,look);assert.ok(a.attacks.every(m=>m.length===6&&m.every(c=>c<a.columns)));}
+  {const a=SOLDIER_ANIM_ART['army-halberdier'].anim;assert.equal(a.columns,37);assert.equal(a.attacks.length,3);assert.equal(a.block.length,3);assert.ok(a.attacks.every(m=>m.length>=5&&m.every(c=>c<a.columns)));}
 });
