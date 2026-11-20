@@ -259,15 +259,16 @@ export class MilitarySystem {
     // hold (does not move; fights only what is in reach).
     const stance=STANCES[worker.stance]??STANCES.aggressive,tile=worker.position;
     // A badly hurt soldier steps back from the fight until he has healed to half (not when told to hold).
-    if(worker.retreating||stance.retreat&&worker.currentHP<worker.maxHP*MILITARY_RULES.retreatBelow&&(combat.attacks.get(worker)||this.nearestEnemy(worker,3))){
+    // Owner 20 Nov 2026: a soldier who lost heart (morale, MoraleSystem) falls back the same way until he rallies.
+    if(worker.retreating||worker.routed||stance.retreat&&worker.currentHP<worker.maxHP*MILITARY_RULES.retreatBelow&&(combat.attacks.get(worker)||this.nearestEnemy(worker,3))){
       const danger=this.nearestEnemy(worker,MILITARY_RULES.retreatSafe);
       // Owner 18 Nov 2026 (battle test, point 1: "the wounded run to the edge of the map with the enemy behind them"):
       // he falls back to his Barracks or the Castle (the refuge) and no farther; there, or with no refuge after
       // `retreatMax` tiles, he stands and fights again.
       const refuge=danger?this.refuge(worker):null;if(danger)worker.retreatFrom??={x:worker.tile.x,y:worker.tile.y};
       const stand=!!danger&&(refuge?buildingGap(refuge,worker.tile)<=MILITARY_RULES.refugeRadius:Math.hypot(worker.tile.x-worker.retreatFrom.x,worker.tile.y-worker.retreatFrom.y)>=MILITARY_RULES.retreatMax);
-      if(worker.currentHP>=worker.maxHP*MILITARY_RULES.retreatUntil||!danger){if(worker.retreating){worker.retreating=false;worker.path=[];}delete worker.retreatFrom;}
-      else if(stand){if(worker.retreating){worker.retreating=false;worker.path=[];}}
+      if(!worker.routed&&worker.currentHP>=worker.maxHP*MILITARY_RULES.retreatUntil||!danger){if(worker.retreating){worker.retreating=false;worker.path=[];}delete worker.retreatFrom;}
+      else if(stand&&!worker.routed){if(worker.retreating){worker.retreating=false;worker.path=[];}}
       else{worker.retreating=true;
         combat.stopAttack(worker);delete worker.huntWolfId;worker.workState='Retreating';worker.workMessage='Falling back';
         if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=800;

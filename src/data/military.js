@@ -76,3 +76,13 @@ export const PATROL=Object.freeze({margin:2,step:4,minBuildings:3,reach:3});
 // player raises it with a slider up to the Barracks' places). Placed by hand a soldier may go above it.
 export const BARRACKS_AUTO_HIRE_DEFAULT=4;
 export const barracksAutoHire=(building,capacity)=>Math.max(0,Math.min(capacity,Number.isInteger(building?.autoHire)?building.autoHire:BARRACKS_AUTO_HIRE_DEFAULT));
+
+// Owner 20 Nov 2026 ("zpracuj postupně všechny ty návrhy", point: flank and rear attacks). A blow into the side of a
+// fighter (his face turned to someone else) does `side` times the damage, into his back `rear` times.
+export const FLANK=Object.freeze({side:1.25,rear:1.5,sideCos:.3,rearCos:-.5});
+// Morale (same request). Every soldier on both sides has 0–100. A comrade falling within `deathRadius` costs `death`,
+// fighting while badly hurt (under half his hit points) `wounded` a second, facing twice as many enemies as friends
+// within `crowdRadius` `outnumbered` a second. A leader (our Knight or the King, the enemy Knight) within
+// `leaderRadius` halves the losses. Out of the fight he recovers `calm` a second, beside a leader `steady` even in it.
+// Under `rout` he flees (ours to the Barracks or Castle, enemies away from us) and fights again from `rally`.
+export const MORALE=Object.freeze({max:100,death:14,deathRadius:6,wounded:4,outnumbered:3,crowdRadius:5,leaderRadius:6,leaderFactor:.5,calm:5,steady:1.5,enemyRadius:6,rout:20,rally:55,holdFactor:.5});

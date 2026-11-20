@@ -79,7 +79,7 @@ export class CombatFeedback {
     for(const animal of [king,...s.animalSystem.animals.values(),...(s.workerSystem?.liveWorkers()??[])]){
       const view=animal===king?s.player:animal.view;
       const fighting=s.combat.attacks.has(animal)||targets.has(animal);
-      const visible=animal.isAlive&&!animal.mounted&&view.visible&&(animal.currentHP<animal.maxHP-1e-9||fighting||animal===king&&!!s.unitSelection?.king);
+      const visible=animal.isAlive&&!animal.mounted&&view.visible&&(animal.currentHP<animal.maxHP-1e-9||fighting||animal.routed||(animal.morale??100)<99.5||animal===king&&!!s.unitSelection?.king);
       let bar=this.bars.get(animal.id);
       if(!visible){bar?.setVisible(false);continue;}
       if(!bar){bar=s.add.graphics();this.bars.set(animal.id,bar);}
@@ -90,6 +90,9 @@ export class CombatFeedback {
       // Combat test 16 Nov 2026: enemies (wolves, bandits, rats) have a red bar, our people a green one.
       const enemy=animal.type==='wolf'||!!animal.definition?.gameplay?.hostile;
       bar.fillStyle(enemy?0xd8503a:0x85aa64);bar.fillRect(-17,-1,34*animal.currentHP/animal.maxHP,5);
+      // Owner 20 Nov 2026: a soldier's morale is a thin gold line under his bar once it drops; a fleeing one has a white flag.
+      if(animal.morale!=null&&animal.morale<99.5){bar.fillStyle(0x231f18,.9);bar.fillRect(-18,5,36,4);bar.fillStyle(animal.routed?0xe8e2cf:0xe0b64a);bar.fillRect(-17,6,34*Math.max(0,animal.morale)/100,2);}
+      if(animal.routed){bar.lineStyle(1.5,0x3b2f22,1);bar.lineBetween(21,7,21,-10);bar.fillStyle(0xf2eee0,1);bar.fillTriangle(21,-10,31,-6,21,-2);}
     }
   }
   remove(id){this.bars.get(id)?.destroy();this.bars.delete(id);}

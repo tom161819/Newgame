@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.13] - 2026-11-20
+<!-- version: {"title":"Flank attacks and morale","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Blows into the side of a fighter do 25 % more damage, into his back 50 % more.
+- Morale: soldiers on both sides lose heart when comrades fall around them, when badly hurt or heavily outnumbered, and flee under a white flag until they rally. A Knight or the King nearby halves the losses.
+
 ## [0.149.12] - 2026-11-20
 <!-- version: {"title":"Men stand on Tower and Gate decks","type":"fix","reconstructed":false,"saveVersion":67} -->
 ### Fixed

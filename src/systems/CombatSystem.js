@@ -1,6 +1,7 @@
 import { isWalkable } from '../game/map.js';
 import { clampArmor } from './UnitStats.js';
 import { hasLineOfSight,blockersBetween } from '../game/lineOfSight.js';
+import { flankFactor,facingOf } from './MoraleSystem.js';
 export { clampArmor,createCombatStats } from './UnitStats.js';
 
 // p70: a unit with a reach of 2 (the Halberdier) is still a melee fighter; shooting starts above that.
@@ -42,6 +43,8 @@ export class CombatSystem {
     this.map=map;this.canFight=canFight;this.canTarget=canTarget;this.regenerationRate=regenerationRate;this.damageScale=damageScale;this.attacks=new Map();this.listeners=new Map();this.dead=new WeakSet();
     // Unit roles (MilitarySystem sets them): `pierce(attacker)` = share of the target's armour ignored, `bonus(attacker,target)` = damage multiplier.
     this.pierce=()=>0;this.bonus=()=>1;
+    // Owner 20 Nov 2026: a blow into the side or the back of a fighter lands harder (FLANK, MoraleSystem.js).
+    this.flank=(attacker,target)=>flankFactor(attacker,target,facingOf(target,this));
   }
   on(event,listener){if(!this.listeners.has(event))this.listeners.set(event,new Set());this.listeners.get(event).add(listener);return()=>this.listeners.get(event)?.delete(listener);}
   emit(event,...args){for(const listener of this.listeners.get(event)??[])listener(...args);}
@@ -73,7 +76,7 @@ export class CombatSystem {
       for(const [attacker,target]of this.attacks){
         if(!attacker.isAlive||!target.isAlive){this.stopAttack(attacker);continue;}
         if(!this.canFight(attacker)||!this.canFight(target)||!inAttackRange(attacker,target,this.map)||!this.canTarget(attacker,target))continue;
-        const rate=Math.max(0,attacker.attackDPS)*(attacker.damageFactor??1)*this.damageScale(attacker)*shotFactor(attacker,target,this.map)*this.bonus(attacker,target)*(1-clampArmor(target.armor)*(1-this.pierce(attacker))/100);
+        const rate=Math.max(0,attacker.attackDPS)*(attacker.damageFactor??1)*this.damageScale(attacker)*shotFactor(attacker,target,this.map)*this.bonus(attacker,target)*this.flank(attacker,target)*(1-clampArmor(target.armor)*(1-this.pierce(attacker))/100);
         // Domestic animals Z2: a hunting dog close to its Hunter takes the bites meant for him.
         const shield=rate>0?this.shield?.(target,attacker):null;if(shield){shield.absorb(rate*remaining);continue;}
         if(rate>0){rates.set(target,(rates.get(target)??0)+rate);if(!contributors.has(target))contributors.set(target,[]);contributors.get(target).push({attacker,rate});}
