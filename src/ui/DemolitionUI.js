@@ -8,6 +8,7 @@ import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { canRelocate,relocationDefinition } from '../game/relocation.js';
 import { buildingDemolitionRefund } from '../data/demolition.js';
 import { buildingName } from '../game/depletedMine.js';
+import { BALLISTA } from '../data/military.js';
 const text=(node,value)=>{if(node.textContent!==value)node.textContent=value;};
 export class DemolitionUI {
   constructor(scene){
@@ -18,7 +19,10 @@ export class DemolitionUI {
     this.rebuild=element('button');this.rebuild.id='ruins-rebuild';this.rebuild.type='button';this.rebuildNote=element('p','ruins-rebuild-note');
     // Owner 15 Nov 2026 (59): Move the building for half a new one's materials.
     this.move=element('button');this.move.id='relocation-start';this.move.type='button';this.moveNote=element('p','relocation-note');
-    this.section.append(this.rebuildNote,this.rebuild,this.heading,this.refund,this.status,this.progress,this.start,this.cancel,this.move,this.moveNote);
+    // Owner 20 Nov 2026 (defence list, point 4): a Tower can get a ballista.
+    this.ballista=element('button');this.ballista.id='tower-ballista';this.ballista.type='button';this.ballistaNote=element('p','tower-ballista-note');
+    this.ballista.addEventListener('click',()=>{const b=this.building(this.buildingId),result=scene.fortDefenses?.mount(b);scene.setStatus(result?.error??t('defense.ballistaMounted'));this.refresh();});
+    this.section.append(this.ballistaNote,this.ballista,this.rebuildNote,this.rebuild,this.heading,this.refund,this.status,this.progress,this.start,this.cancel,this.move,this.moveNote);
     this.move.addEventListener('click',()=>{const b=this.building(this.buildingId);if(!b)return;if(this.host?.open)this.host.close();if(this.dialog.open)this.dialog.close();scene.startRelocation(b);});
     this.inspect.addEventListener('click',()=>this.openSelected(),options);
     this.dialog.addEventListener('click',event=>{if(!event.target.closest('[data-castle-upgrade]'))return;const result=clickCastleUpgrade(scene);if(result.done){const castle=scene.buildings.find(b=>b.type==='castle');this.select(castle);this.openSelected();}else this.openSelected();},options);document.querySelector('#close-building-detail').addEventListener('click',()=>this.dialog.close(),options);
@@ -63,6 +67,8 @@ export class DemolitionUI {
     // m-trosky-znovu: Burnt Ruins offer the burnt building again for its full price.
     {const from=b.type==='burnt_ruins'&&b.burntFrom?this.scene.objectRegistry.require(b.burntFrom):null,show=!!from?.buildable&&!record;this.rebuild.hidden=this.rebuildNote.hidden=!show;
       if(show){const cost=Object.entries(from.cost).map(([id,n])=>countName(this.scene.objectRegistry.require(id),n)).join(', '),can=this.scene.inventory.canAfford(from.cost);text(this.rebuild,t('ruins.rebuild',{name:from.name}));text(this.rebuildNote,t(can?'ruins.rebuildCost':'ruins.rebuildCostMissing',{cost}));this.rebuild.disabled=!can;}}
+    {const show=b.type==='tower'&&!b.enemy&&buildingIsComplete(b);this.ballista.hidden=!show||!!b.ballista;this.ballistaNote.hidden=!show;
+      if(show){text(this.ballista,t('defense.mountBallista',{cost:formatCost(BALLISTA.cost,this.scene.objectRegistry)}));this.ballista.disabled=!this.scene.sandbox&&!this.scene.inventory.canAfford(BALLISTA.cost);text(this.ballistaNote,t(b.ballista?'defense.ballistaNote':'defense.ballistaOffer'));}}
     this.progress.setAttribute('aria-label',t('demolition.title'));
     text(this.heading,t('demolition.title'));text(this.refund,t('demolition.refund',{refund:this.refundLabel(b)}));text(this.start,t('demolition.start'));text(this.cancel,t('demolition.cancel'));
     this.start.hidden=!!record||b.type==='starter_stockpile';this.start.disabled=!!reason;this.cancel.hidden=!record;this.progress.hidden=!record;this.progress.value=record?.progress??0;

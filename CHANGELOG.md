@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.16] - 2026-11-21
+<!-- version: {"title":"Boiling pitch and Tower ballista","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Boiling pitch: a soldier of ours on a Gate or Tower pours pitch on the enemies at its foot (45 damage, armour does not help), for one Pitch from the stores every 12 seconds.
+- Ballista: a Tower can get a ballista in its window (20 Wood, 4 Iron). While a soldier stands on the Tower it shoots heavy bolts up to 14 tiles, rams and riders first.
+
 ## [0.149.15] - 2026-11-21
 <!-- version: {"title":"Battering Ram and ladders","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added

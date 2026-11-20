@@ -94,3 +94,9 @@ export const FLANK=Object.freeze({side:1.25,rear:1.5,sideCos:.3,rearCos:-.5});
 // `leaderRadius` halves the losses. Out of the fight he recovers `calm` a second, beside a leader `steady` even in it.
 // Under `rout` he flees (ours to the Barracks or Castle, enemies away from us) and fights again from `rally`.
 export const MORALE=Object.freeze({max:100,death:14,deathRadius:6,wounded:4,outnumbered:3,crowdRadius:5,leaderRadius:6,leaderFactor:.5,calm:5,steady:1.5,enemyRadius:6,rout:20,rally:55,holdFactor:.5});
+// Owner 20 Nov 2026 (defence list, point 4). Boiling pitch: one of ours up on our Gate or Tower pours a pot on every
+// enemy touching it (`damage`, armour does not help) every `reload` ms, for one Pitch from the stores.
+// Ballista: a Tower with a mounted ballista (`cost`, bought in the Tower's window) shoots while one of ours is up on it:
+// a bolt every `reload` ms at the nearest enemy within `range` (rams and riders first), `damage`, half the armour ignored.
+export const BOILING_PITCH=Object.freeze({damage:45,reload:12000,pitch:1,fortTypes:Object.freeze(['gate','tower','wall_gate'])});
+export const BALLISTA=Object.freeze({range:14,reload:6000,damage:60,pierce:.5,cost:Object.freeze({wood:20,iron:4})});

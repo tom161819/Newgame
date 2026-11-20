@@ -88,6 +88,7 @@ import { AlarmSystem } from '../systems/AlarmSystem.js';
 import { EnemyGates } from '../systems/EnemyGates.js';
 import { EnemyArmy } from '../systems/EnemyArmy.js';
 import { MoraleSystem } from '../systems/MoraleSystem.js';
+import { FortDefenses } from '../systems/FortDefenses.js';
 import { defenseSpeed } from './defenseWorks.js';
 import { levelDefinition, placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors,entryTiles,sideTiles,DOOR_SIDES, buildingDefinition,buildingDepth,buildingIsComplete, definitionFor } from './buildings.js';
 import { edgeLight,fadeStep } from './sightFade.js';
@@ -375,7 +376,7 @@ export class GameScene extends Phaser.Scene {
     this.constructionSystem=new ConstructionSystem(this,{onProgress:site=>this.towerViews.get(site.id)?.updateProgress?.(site),
       onComplete:site=>{this.towerViews.get(site.id)?.destroy();if(buildingDefinition(site).pavement){this.towerViews.delete(site.id);this.terrain.invalidateArea([site]);this.updateInventory();this.constructionUI?.refresh();return;}this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.built',{name:buildingDefinition(site).name}));this.completionFlash?.flash(site);},
       onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);if(this.mapMemory?.objects.delete(`building:${site.id}`))this.mapMemory.revision++;this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.siteCancelled'));}});
-    this.demolition=new DemolitionSystem(this,{complete:(building,refund)=>{const done=finishDemolition(this,building,refund);if(done)completeRelocation(this,building);return done;}});this.repairs=new RepairSystem(this);this.alarm=new AlarmSystem(this);this.enemyGates=new EnemyGates(this);this.enemyArmy=new EnemyArmy(this);this.morale=new MoraleSystem(this);
+    this.demolition=new DemolitionSystem(this,{complete:(building,refund)=>{const done=finishDemolition(this,building,refund);if(done)completeRelocation(this,building);return done;}});this.repairs=new RepairSystem(this);this.alarm=new AlarmSystem(this);this.enemyGates=new EnemyGates(this);this.enemyArmy=new EnemyArmy(this);this.morale=new MoraleSystem(this);this.fortDefenses=new FortDefenses(this);
     this.constructionUI=new ConstructionUI(this);
     this.foodProduction=new FoodProductionSystem(this);this.military=new MilitarySystem(this);if(!this.loadState&&!this.zone&&!this.sandbox&&this.gameSettings.startingGarrison)this.military.enlistStartingGarrison(this.worldRandom('villagers'));this.vehicles=new VehicleSystem(this);this.stables=new StableSystem(this);this.needs=new NeedsSystem(this);this.kingdomHappiness=new KingdomHappinessIndicator(this);this.vehicleViews=new VehicleViews(this);this.caravans=new CaravanSystem(this);this.trade=new TradeSystem(this);this.scouting=new ScoutingSystem(this);this.caravanViews=new CaravanViews(this);this.employment=new EmploymentSystem(this,{enabled:this.gameSettings.autoEmployment});this.diagnostics=new ProductionDiagnostics(this);this.employmentPanel=new EmploymentPanel(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.kingCargoControl=new KingCargoControl(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
     this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);this.farmConnections=new FarmConnections(this);
@@ -997,7 +998,7 @@ export class GameScene extends Phaser.Scene {
     if(this.gameOver)return null;
     this.constructionSystem.update(delta);this.demolition.update(delta);this.repairs.update(delta);
     this.farmingSystem.update(delta);
-    this.foodProduction.update(delta);this.military.update(delta);this.morale?.update(delta);this.enemyArmy?.update?.();this.vehicles.update();this.stables.update(delta);this.caravans.update(delta);this.trade.update();this.scouting.update();if(this.zone)updateZone(this);this.conquest?.update(delta);this.caravanViews.update();this.vehicleViews.update();this.employment.update();this.diagnostics.update();
+    this.foodProduction.update(delta);this.military.update(delta);this.morale?.update(delta);this.enemyArmy?.update?.();this.fortDefenses?.update(delta);this.vehicles.update();this.stables.update(delta);this.caravans.update(delta);this.trade.update();this.scouting.update();if(this.zone)updateZone(this);this.conquest?.update(delta);this.caravanViews.update();this.vehicleViews.update();this.employment.update();this.diagnostics.update();
     this.regeneration.update(delta,[this.character,...this.animalSystem.animals.values(),...this.workerSystem.liveWorkers()],covered);
     this.combatFeedback.update(activeDelta);this.foodSystem.update(activeDelta);
     this.experienceFeedback.update(activeDelta);
