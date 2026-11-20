@@ -54,7 +54,7 @@ export function loadGameState(scene,input){
     if(data.stoneCollection)worker.stoneCollection=structuredClone(data.stoneCollection);
     if(data.haulPriority)worker.haulPriority=structuredClone(data.haulPriority);
     if(Number.isInteger(data.squad))worker.squad=data.squad;
-    if(data.stance==='defensive'||data.stance==='hold')worker.stance=data.stance;
+    if(['defensive','hold','shieldwall','hedgehog'].includes(data.stance))worker.stance=data.stance;
     if(data.wallPatrol===true)worker.wallPatrol={phase:'toWall'};else if(data.wallPatrol?.post)worker.wallPatrol={phase:'toWall',post:{...data.wallPatrol.post}};
     worker.workplaceReached=data.workplaceReached??false;worker.restPhase=data.restPhase??null;worker.tendTorches=!!data.tendTorches;worker.clearingLoan=!!data.clearingLoan;worker.cargo=structuredClone(data.cargo??null);worker.pendingWorkRewards=structuredClone(data.pendingWorkRewards??[]);
     worker.commandState=structuredClone(data.commandState);worker.workTask=structuredClone(data.workTask);worker.active=worker.isAlive;

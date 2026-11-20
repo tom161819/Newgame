@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.17] - 2026-11-21
+<!-- version: {"title":"Shield wall, Hedgehog and terrain","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Battle orders for chosen soldiers. Shield wall: arrows do 40 % and blows 80 % of their damage, but the soldiers strike back weaker. Hedgehog: riders do half damage and take double, and a charge breaks on the points. Both stand like Hold.
+- Terrain: archers shooting down from higher ground do 20 % more damage; a target among trees takes 30 % less from arrows.
+
 ## [0.149.16] - 2026-11-21
 <!-- version: {"title":"Boiling pitch and Tower ballista","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added

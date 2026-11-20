@@ -69,7 +69,17 @@ export const STANCES=Object.freeze({
   aggressive:Object.freeze({engage:5,follow:10,leash:0,hold:false,retreat:true}),
   defensive:Object.freeze({engage:3,follow:4,leash:6,hold:false,retreat:true}),
   hold:Object.freeze({engage:0,follow:0,leash:0,hold:true,retreat:false}),
+  // Owner 20 Nov 2026 (defence list, point 5): two battle orders that stand like Hold. Shield wall: shields up – arrows do
+  // `ranged`, blows `melee` of their damage, they strike back with `own`. Hedgehog: weapons out against riders – a rider
+  // does `vsRider` to them and takes `riderBonus` from them; a charge into it breaks on the points (BATTLE_ORDERS).
+  shieldwall:Object.freeze({engage:0,follow:0,leash:0,hold:true,retreat:false}),
+  hedgehog:Object.freeze({engage:0,follow:0,leash:0,hold:true,retreat:false}),
 });
+export const BATTLE_ORDERS=Object.freeze({shieldwall:Object.freeze({ranged:.4,melee:.8,own:.7}),hedgehog:Object.freeze({vsRider:.5,riderBonus:2,chargeBack:20})});
+export const holdsGround=unit=>!!STANCES[unit?.stance]?.hold;
+// Terrain (same point): an archer standing `highStep` (relief height) above his target shoots `highDamage` harder; a target
+// standing among trees (a tree or bush within 1 tile) takes `forestCover` of arrow damage.
+export const TERRAIN_COMBAT=Object.freeze({highStep:1,highDamage:1.2,forestCover:.7});
 // The items one unit type needs, as {itemId: count}.
 // p71: units trained before Light Armor joined their kit keep the kit they got (validation and Save/Load accept it).
 export const legacyKit=type=>{const e=UNIT_TYPES[type]?.equipment;return e?.armor==='light_armor'&&type!=='crossbowman'?{[e.weapon]:1}:null;};

@@ -14,7 +14,7 @@ test('combat 16 Nov 2026: melee fighters spread around a target',()=>{
   assert.ok(isHostile({type:'wolf'})&&isHostile({definition:{gameplay:{hostile:true}}})&&!isHostile({type:'horse',definition:{gameplay:{}}}));
 });
 test('combat 16 Nov 2026: stances and retreat rules',()=>{
-  assert.deepEqual(Object.keys(STANCES),['aggressive','defensive','hold']);
+  assert.deepEqual(Object.keys(STANCES),['aggressive','defensive','hold','shieldwall','hedgehog']);
   assert.ok(STANCES.hold.hold&&!STANCES.hold.retreat&&STANCES.defensive.engage<STANCES.aggressive.engage);
   assert.ok(MILITARY_RULES.retreatBelow<MILITARY_RULES.retreatUntil);
 });

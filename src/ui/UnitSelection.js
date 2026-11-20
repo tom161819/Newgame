@@ -1,3 +1,4 @@
+import { STANCES } from '../data/military.js';
 import { buildingIsComplete,buildingDefinition } from '../game/buildings.js';
 import { isWall } from '../game/walls.js';
 import { t,language } from '../i18n/index.js';
@@ -15,7 +16,7 @@ import { confirmAsk } from './confirmAsk.js';
 
 const DOUBLE_CLICK_MS=400;
 // Owner 17 Nov 2026: the orders are icons; hovering shows the name and what it does.
-const COMMAND_ICONS=Object.freeze({hold:'📍',resume:'↩️',inspect:'🔍',clear:'✖'}),STANCE_ICONS=Object.freeze({aggressive:'⚔️',defensive:'🛡️',hold:'✋'});
+const COMMAND_ICONS=Object.freeze({hold:'📍',resume:'↩️',inspect:'🔍',clear:'✖'}),STANCE_ICONS=Object.freeze({aggressive:'⚔️',defensive:'🛡️',hold:'✋',shieldwall:'🧱',hedgehog:'🦔'});
 function iconButton(button,icon,name,tip){if(button.textContent!==icon)button.textContent=icon;button.dataset.tipTitle=name;button.dataset.tip=tip??'';button.setAttribute('aria-label',tip?`${name}: ${tip}`:name);button.classList.add('unit-icon-command');button.removeAttribute?.('title');}
 export const isEnemy=animal=>animal?.type==='wolf'||!!animal?.definition?.gameplay?.hostile;
 const ATTACK_CURSOR=`url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g stroke="#1b1a14" stroke-width="1.2" stroke-linejoin="round"><path d="M4 3l3 0 14 14-3 3L4 6z" fill="#dfe3e6"/><path d="M28 3l-3 0-14 14 3 3L28 6z" fill="#c9ced2"/><path d="M15 21l5-5 3 3-5 5z" fill="#b8892f"/><path d="M17 21l-5-5-3 3 5 5z" fill="#b8892f"/><path d="M21 22l3-3 5 6-3 3z" fill="#6b4a2a"/><path d="M11 22l-3-3-5 6 3 3z" fill="#6b4a2a"/></g></svg>')}") 16 16, crosshair`;
@@ -34,7 +35,7 @@ export class UnitSelection {
     this.haul.addEventListener('change',()=>{const p=haulPriorityFromValue(this.haul.value);for(const w of this.workers())if(w.profession==='hauler')setHaulPriority(w,p);this.signature=null;this.draw();});
     // Combat 16 Nov 2026: the stance of the chosen soldiers (aggressive, defensive, hold).
     this.stance=document.createElement('span');this.stance.className='unit-stance';this.stance.hidden=true;this.stanceButtons={};
-    for(const id of ['aggressive','defensive','hold']){const b=document.createElement('button');b.type='button';b.dataset.stance=id;b.addEventListener('click',()=>{for(const w of this.workers())if(w.profession==='soldier'){if(id==='aggressive')delete w.stance;else w.stance=id;if(id==='hold'){w.path=[];delete w.huntWolfId;}}this.signature=null;this.draw();});this.stance.append(b);this.stanceButtons[id]=b;}
+    for(const id of ['aggressive','defensive','hold','shieldwall','hedgehog']){const b=document.createElement('button');b.type='button';b.dataset.stance=id;b.addEventListener('click',()=>{for(const w of this.workers())if(w.profession==='soldier'){if(id==='aggressive')delete w.stance;else w.stance=id;if(STANCES[id]?.hold){w.path=[];delete w.huntWolfId;}}this.signature=null;this.draw();});this.stance.append(b);this.stanceButtons[id]=b;}
     // Battle test 18 Nov 2026, point 8: attack-move – armed with this button (or Ctrl held with the right click), the next
     // move order makes the soldiers fight every enemy they meet on the way and then go on.
     this.attackMove=false;this.attackButton=document.createElement('button');this.attackButton.type='button';this.attackButton.dataset.unitCommand='attackMove';this.attackButton.addEventListener('click',()=>{this.attackMove=!this.attackMove;this.signature=null;this.draw();});this.stance.append(this.attackButton);

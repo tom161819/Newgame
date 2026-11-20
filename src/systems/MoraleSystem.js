@@ -1,5 +1,5 @@
 import { t } from '../i18n/index.js';
-import { MORALE,FLANK } from '../data/military.js';
+import { MORALE,FLANK,STANCES } from '../data/military.js';
 import { awayFrom } from '../game/combatSpacing.js';
 
 // Owner 20 Nov 2026 ("zpracuj postupně všechny ty návrhy" – morale and flank attacks). Runtime only: morale is not
@@ -26,7 +26,7 @@ export class MoraleSystem{
   friends(unit){return this.side(unit)==='enemy'?this.enemies():this.ours();}
   foes(unit){return this.side(unit)==='enemy'?[...this.ours(),...(this.scene.character?.isAlive&&!this.scene.character.away?[this.scene.character]:[])]:this.enemies();}
   led(unit){const s=this.scene,list=this.side(unit)==='ours'&&s.character?.isAlive&&!s.character.away?[...this.ours(),s.character]:this.friends(unit);return list.some(f=>f!==unit&&this.isLeader(f)&&dist(f,unit)<=MORALE.leaderRadius);}
-  factor(unit){return (this.led(unit)?MORALE.leaderFactor:1)*(unit.stance==='hold'?MORALE.holdFactor:1);}
+  factor(unit){return (this.led(unit)?MORALE.leaderFactor:1)*(STANCES[unit.stance]?.hold?MORALE.holdFactor:1);}
   morale(unit){return unit.morale??MORALE.max;}
   lose(unit,amount){if(!(amount>0))return;const before=this.morale(unit);unit.morale=Math.max(0,before-amount*this.factor(unit));if(!unit.routed&&unit.morale<MORALE.rout)this.rout(unit);}
   onDeath(unit){const side=this.side(unit);if(!side)return;for(const f of this.friends(unit))if(f!==unit&&dist(f,unit)<=MORALE.deathRadius)this.lose(f,MORALE.death);}

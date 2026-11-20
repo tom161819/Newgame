@@ -9,7 +9,7 @@ import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
 import { findPathToAny } from '../game/pathfinding.js';
 import { inAttackRange,isRanged,WALL_ARCHER_RANGE,LOB,canLob } from './CombatSystem.js';
 import { blockersBetween } from '../game/lineOfSight.js';
-import { MILITARY_RULES,PATROL,STANCES } from '../data/military.js';
+import { MILITARY_RULES,PATROL,STANCES,BATTLE_ORDERS,holdsGround,TERRAIN_COMBAT } from '../data/military.js';
 import { freeAround,awayFrom } from '../game/combatSpacing.js';
 import { SiegeSystem,siegeable,canSiege } from './SiegeSystem.js';
 import { buildingDefinition } from '../game/buildings.js';
@@ -26,13 +26,30 @@ export class MilitarySystem {
   spec(unit){const u=unit?.id!=null?this.units.get(unit.id):null;return u?UNIT_TYPES[u.type]:null;}
   pierce(attacker){return this.spec(attacker)?.pierce??0;}
   mounted(unit){return !!(this.spec(unit)?.mount||unit?.definition?.gameplay?.mounted);}
-  bonus(attacker,target){const b=this.spec(attacker)?.bonusVs;return (b?.mounted&&this.mounted(target)?b.mounted:1)*(isRanged(attacker)&&this.roofed(target)?RAM.arrowShare:1);}
+  bonus(attacker,target){const b=this.spec(attacker)?.bonusVs;return (b?.mounted&&this.mounted(target)?b.mounted:1)*(isRanged(attacker)&&this.roofed(target)?RAM.arrowShare:1)*this.orderFactor(attacker,target)*this.terrainFactor(attacker,target);}
+  // Owner 20 Nov 2026 (defence list, point 5): the battle orders Shield wall and Hedgehog.
+  orderFactor(attacker,target){
+    const ranged=isRanged(attacker),wall=BATTLE_ORDERS.shieldwall,hog=BATTLE_ORDERS.hedgehog;let f=1;
+    if(target?.stance==='shieldwall')f*=ranged?wall.ranged:wall.melee;if(attacker?.stance==='shieldwall')f*=wall.own;
+    if(target?.stance==='hedgehog'&&this.mounted(attacker))f*=hog.vsRider;if(attacker?.stance==='hedgehog'&&this.mounted(target))f*=hog.riderBonus;
+    return f;
+  }
+  // …and the ground: an archer above his target shoots harder; trees around the target soak up arrows.
+  terrainFactor(attacker,target){
+    if(!isRanged(attacker)||!target?.position)return 1;const s=this.scene,r=s.relief,h=r?.tiles?(x,y)=>r.tiles[y*r.width+x]??0:null,a=attacker.position,t=target.position;let f=1;
+    if(h&&!attacker.onWall&&h(Math.floor(a.x),Math.floor(a.y))-h(Math.floor(t.x),Math.floor(t.y))>=TERRAIN_COMBAT.highStep)f*=TERRAIN_COMBAT.highDamage;
+    if(this.underTrees(t))f*=TERRAIN_COMBAT.forestCover;return f;
+  }
+  underTrees(p){const occ=this.scene.resourceOccupancy;if(!occ?.has)return false;const x=Math.floor(p.x),y=Math.floor(p.y);for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const r=this.scene.resources?.get?.(`${x+dx},${y+dy}`),id=r?.getData?.('objectId')??r?.getData?.('object')?.type;if(id&&/tree|oak|pine|spruce|birch|bush/.test(id))return true;}return false;}
   // Owner 20 Nov 2026: the crew of a Battering Ram (ours or the enemy's) is under its roof – arrows hardly hurt it.
   roofed(unit){return this.spec(unit)?.vehicle==='ram'||!!unit?.definition?.gameplay?.ram;}
   // A rider who has ridden far enough since his last blow opens the fight with a charge.
   charge(worker,target){
     const c=this.spec(worker)?.charge,from=worker.chargeFrom;if(!c||!from||Math.hypot(worker.position.x-from.x,worker.position.y-from.y)<c.run)return 0;
-    worker.chargeFrom={x:worker.position.x,y:worker.position.y};return this.scene.combat.applyDamage(target,c.damage,worker);
+    worker.chargeFrom={x:worker.position.x,y:worker.position.y};
+    // A charge into a Hedgehog breaks on the points: the rider is hurt instead.
+    if(target?.stance==='hedgehog'){this.scene.combat.applyEffectiveDamage(worker,BATTLE_ORDERS.hedgehog.chargeBack,false,target);return 0;}
+    return this.scene.combat.applyDamage(target,c.damage,worker);
   }
   get storage(){return this.scene.foodStorage;}
   barracks(id){return this.scene.buildings.find(b=>b.id===id&&b.type==='barracks'&&buildingIsComplete(b))??null;}
@@ -176,7 +193,7 @@ export class MilitarySystem {
     const now=this.scene.gameTime?.totalElapsed??0,last=worker.dutyCheck;if(last&&now>=last.at&&now-last.at<MILITARY_RULES.dutyCheck)return last.on;
     let on=false;for(const [a,target] of this.scene.combat?.attacks??[])if(target===worker&&a.isAlive){on=true;break;}
     on||=!!this.nearestEnemy(worker,MILITARY_RULES.guardRadius);
-    if(!on&&worker.stance!=='hold'){const type=this.unit(worker)?.type;
+    if(!on&&!holdsGround(worker)){const type=this.unit(worker)?.type;
       if(type==='catapult')on=this.scene.buildings.some(b=>siegeable(b)&&Math.hypot(b.x-worker.tile.x,b.y-worker.tile.y)<=CATAPULT.range+2&&this.siege.contested(b));
       if(type==='ram')on=this.scene.buildings.some(b=>siegeable(b)&&Math.hypot(b.x-worker.tile.x,b.y-worker.tile.y)<=14&&this.siege.contested(b));
 }
@@ -221,7 +238,7 @@ export class MilitarySystem {
   // Wagon supplies, without moving; a melee soldier with an enemy building close and no enemy soldier near goes at it.
   holding(worker,delta){
     const unit=this.unit(worker);if(unit&&UNIT_TYPES[unit.type]?.vehicle){this.engines.update(worker,delta,{move:false});return;}
-    if(worker.stance==='hold')return;
+    if(holdsGround(worker))return;
     // Owner 18 Nov 2026 (combat test: eight Swordsmen standing after a move order lost to eight enemy Recruits – only the
     // one being hit fought back): a soldier standing where he was sent fights the enemies who come near like any other
     // soldier of his stance, does not follow them far (holdLeash) and walks back to his place when it is over. The
@@ -233,7 +250,7 @@ export class MilitarySystem {
       if(worker.tile.x===goal.x&&worker.tile.y===goal.y){worker.holdAway=false;worker.holdTries=0;}else{worker.holdReturn=1000;/* a comrade may stand on his place for a moment: a few tries */if(!worker.moveTo([goal])&&(worker.holdTries=(worker.holdTries??0)+1)>=10){worker.holdAway=false;worker.holdTries=0;}}}
   }
   // Attack-move: on the way to where he was sent he fights like his stance says (true while he does).
-  advance(worker,delta){const unit=this.unit(worker);if(worker.stance==='hold'||unit&&UNIT_TYPES[unit.type]?.vehicle)return false;return this.updateSoldier(worker,delta,{held:{x:worker.tile.x,y:worker.tile.y}});}
+  advance(worker,delta){const unit=this.unit(worker);if(holdsGround(worker)||unit&&UNIT_TYPES[unit.type]?.vehicle)return false;return this.updateSoldier(worker,delta,{held:{x:worker.tile.x,y:worker.tile.y}});}
   // Soldier behaviour on top of patrolling. Returns true when it took over this frame.
   // `held`: the place of a soldier standing on a move order (see `holding`); he fights from it and is led back to it.
   updateSoldier(worker,delta,{held=null}={}){
