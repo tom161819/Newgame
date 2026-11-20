@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.7] - 2026-11-20
+<!-- version: {"title":"Tripo Knight","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Changed
+- The Knight (ours and the enemy's) is the owner's new Tripo model, with its own walk, sword attack, fall and stand-still moves.
+
 ## [0.149.6] - 2026-11-20
 <!-- version: {"title":"Studio: Tripo Tower, Gate and walls","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added
