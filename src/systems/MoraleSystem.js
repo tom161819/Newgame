@@ -4,7 +4,7 @@ import { awayFrom } from '../game/combatSpacing.js';
 
 // Owner 20 Nov 2026 ("zpracuj postupně všechny ty návrhy" – morale and flank attacks). Runtime only: morale is not
 // saved (a loaded game starts every soldier at full morale).
-export const isEnemySoldier=unit=>!!unit?.definition?.gameplay?.hostile&&!unit.definition.gameplay.nightPredator&&unit.type!=='wolf';
+export const isEnemySoldier=unit=>!!unit?.definition?.gameplay?.hostile&&!unit.definition.gameplay.nightPredator&&!unit.definition.gameplay.ram&&unit.type!=='wolf';
 const dist=(a,b)=>Math.hypot(a.position.x-b.position.x,a.position.y-b.position.y);
 
 // How much harder a blow lands from the side or behind: the target faces the one he fights (or the way he walks).

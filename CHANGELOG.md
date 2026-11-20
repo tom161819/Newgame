@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.15] - 2026-11-21
+<!-- version: {"title":"Battering Ram and ladders","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Battering Ram: Builders build it at the Builder's Workshop and a Recruit trains as its crew. It breaks enemy Gates and walls close up, and arrows hardly hurt it. The enemy army can bring its own ram.
+- Ladders: enemy Recruits and Swordsmen raise ladders against our walls and climb over. A soldier of ours on the wall nearby throws the ladder down.
+
 ## [0.149.14] - 2026-11-21
 <!-- version: {"title":"Stakes and Moat","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added

@@ -89,7 +89,20 @@ for(const [rank,r] of Object.entries(ENEMY_RANKS))animals.push({
   description:'A soldier of an enemy army in steel blue. Attacks anyone of the kingdom who comes close.',
   renderMode:'procedural',renderer:'enemy-soldier',origin:{x:.5,y:.92},visualHeight:48,
   visual:{hitArea:{x:-13,y:-44,width:26,height:39},healthBarOffset:48},depth:{offset:.1},
-  gameplay:{movementSpeed:r.speed,initialCount:0,behavior:'wander',huntable:true,meatDrop:0,wanderRadius:r.crown?1:2,guardRadius:r.guard??9,zoneOnly:true,hostile:true},
+  gameplay:{movementSpeed:r.speed,initialCount:0,behavior:'wander',huntable:true,meatDrop:0,wanderRadius:r.crown?1:2,guardRadius:r.guard??9,zoneOnly:true,hostile:true,...(['soldier','swordsman'].includes(rank)?{ladder:true}:{})},
   stats:{...r.stats},
+  animations:{mode:'procedural',states:['idle','walk'],directions:['N','NE','E','SE','S','SW','W','NW']},
+});
+// Owner 20 Nov 2026 (defence list, point 3): the enemy's Battering Ram – a crew under a roof pushing a log on wheels. It
+// marches with the army and breaks Gates and walls (EnemyArmy), never fights people; arrows hardly hurt it (RAM).
+// Provisional drawing in code (RamView) until the owner's model.
+animals.push({
+  id:'enemy_ram',name:'Enemy Battering Ram',category:'animal',sprite:'/assets/resources/horse_wagon/horse_wagon.svg',
+  width:1,height:1,walkable:false,collectible:false,buildable:false,cost:{},interactions:['hunt'],
+  description:'An enemy battering ram. It breaks Gates and walls; arrows hardly hurt its crew and it cannot cross a Moat.',
+  renderMode:'procedural',renderer:'enemy-ram',origin:{x:.5,y:.92},visualHeight:44,
+  visual:{hitArea:{x:-30,y:-40,width:60,height:42},healthBarOffset:50},depth:{offset:.1},
+  gameplay:{movementSpeed:1.3,initialCount:0,behavior:'wander',huntable:true,meatDrop:0,wanderRadius:1,zoneOnly:true,hostile:true,ram:true,wheels:true},
+  stats:{maxHP:420,attackDPS:0,armor:40,attackRange:1},
   animations:{mode:'procedural',states:['idle','walk'],directions:['N','NE','E','SE','S','SW','W','NW']},
 });

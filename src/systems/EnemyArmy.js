@@ -5,6 +5,7 @@ import { gridToWorld,tileCenter } from '../game/isometric.js';
 import { isWalkable } from '../game/map.js';
 import { inAttackRange } from './CombatSystem.js';
 import { siegeTiles,touchesBuilding } from './SiegeSystem.js';
+import { RAM,LADDER } from '../data/military.js';
 
 // Battle test 18 Nov 2026, point 2 ("the enemies are passive"): an enemy army with an order. On the Test map the
 // button "Enemy attacks" sends every enemy soldier on the ground against the kingdom (`animal.marching`): they march on
@@ -36,9 +37,13 @@ export class EnemyArmy{
   // Called by AnimalSystem for a marching enemy; true when it led him this frame.
   lead(animal,delta){
     const sys=this.scene.animalSystem;animal.returning=false;
-    if(animal.retaliationTarget?.isAlive)return false;
-    const foe=sys.guardTarget(animal);if(foe){sys.onAttacked(animal,foe);return false;}
     const melee=(animal.attackRange??1)<=2,s=this.scene;
+    // Owner 20 Nov 2026: a melee soldier does not stand below an archer up on our wall – he marches on (and takes the
+    // ladder over the wall). Before, he stood there hitting at nobody.
+    if(melee&&animal.retaliationTarget?.onWall)sys.stopRetaliation(animal);
+    if(animal.retaliationTarget?.isAlive)return false;
+    if(animal.definition?.gameplay?.ram){animal.retaliationTarget=null;}
+    else{const foe=sys.guardTarget(animal);if(foe&&!(melee&&foe.onWall)){sys.onAttacked(animal,foe);return false;}}
     // A building in the way (or at the Castle): melee soldiers break it.
     let b=animal.armyBuilding!=null?s.buildings.find(x=>x.id===animal.armyBuilding):null;if(b&&!ours(b)){animal.armyBuilding=null;b=null;}
     if(b&&melee){
@@ -63,12 +68,42 @@ export class EnemyArmy{
   }
   hit(animal,b,delta){
     const s=this.scene,{width,height}=buildingDefinition(b),dx=b.x+width/2-animal.position.x,dy=b.y+height/2-animal.position.y,n=Math.hypot(dx,dy);if(n)animal.direction={x:dx/n,y:dy/n};
-    let amount=Math.max(0,animal.attackDPS)*(b.type==='castle'?ENEMY_ARMY.castleShare:ENEMY_ARMY.buildingShare)*Math.max(0,delta)/1000;
+    // Owner 20 Nov 2026: a ram strikes Gates and walls hard (RAM); a soldier with a ladder goes over a wall instead.
+    if(animal.definition?.gameplay?.ladder&&b.type==='wall'&&this.ladder(animal,b,delta))return;
+    let amount=animal.definition?.gameplay?.ram?RAM.damage*1000/RAM.reload*(RAM.fortTypes.includes(b.type)?1:RAM.otherShare)*(b.type==='castle'?ENEMY_ARMY.castleShare:1)*Math.max(0,delta)/1000
+      :Math.max(0,animal.attackDPS)*(b.type==='castle'?ENEMY_ARMY.castleShare:ENEMY_ARMY.buildingShare)*Math.max(0,delta)/1000;
     if(b.type==='castle'){const hp=buildingHP(b),floor=hp.max*ENEMY_ARMY.castleFloor;amount=Math.min(amount,Math.max(0,hp.hp-floor));if(amount<=0){animal.armyBuilding=null;return;}}
     const result=damageBuilding(b,amount);s.repairs?.cancel?.(b.id);s.military?.siege?.drawBar?.(b);
     if(!b.underAttackTold){b.underAttackTold=true;s.eventFeed?.push?.(`army-hit:${b.id}`,t('army.buildingAttacked',{name:buildingDefinition(b).name}),{important:true,target:{x:b.x+1,y:b.y+1}});}
     if(result?.destroyed){animal.armyBuilding=null;s.military?.siege?.destroy?.(b,{ours:true});}
   }
+  // --- ladders (owner 20 Nov 2026, defence list point 3) ---------------------------------------------------------
+  // A soldier at our wall raises a ladder against it (LADDER.raise), climbs (LADDER.climb) and comes down on the other
+  // side. One of ours up on the wall within LADDER.guard tiles throws the ladder down after LADDER.push: the climber
+  // falls (LADDER.fall damage) and has to start again. Only straight across a wall tile with free ground behind it.
+  ladder(animal,wall,delta){
+    const s=this.scene,e=animal.tile,dx=wall.x-e.x,dy=wall.y-e.y;if(Math.abs(dx)+Math.abs(dy)!==1)return false;
+    const over={x:wall.x+dx,y:wall.y+dy};if(!isWalkable(s.map,over.x,over.y))return false;
+    const l=animal.ladderState??={wall:wall.id,time:0,pushed:0};if(l.wall!==wall.id){l.wall=wall.id;l.time=0;l.pushed=0;}
+    l.time+=delta;this.drawLadder(animal,wall,Math.max(0,Math.min(1,l.time/LADDER.raise)));
+    const guard=(s.workerSystem?.liveWorkers?.()??[]).some(w=>w.onWall&&w.isAlive&&Math.hypot(w.position.x-wall.x-.5,w.position.y-wall.y-.5)<=LADDER.guard);
+    l.pushed=guard?l.pushed+delta:0;
+    if(l.pushed>=LADDER.push){s.combat?.applyDamage?.(animal,LADDER.fall,null);l.time=-LADDER.again;l.pushed=0;this.dropLadder(animal);s.morale?.say?.(animal,t('army.ladderDown'),'#ffd27a');return true;}
+    if(l.time<LADDER.raise+LADDER.climb)return true;
+    // Over the top: down on the other side; the march goes on from there.
+    this.dropLadder(animal);delete animal.ladderState;animal.position={x:over.x+.5,y:over.y+.5};animal.tile={...over};animal.nextTile=null;animal.path=[];animal.armyBuilding=null;animal.armyRepath=0;
+    if(!wall.ladderTold){wall.ladderTold=true;s.eventFeed?.push?.(`army-ladder:${wall.id}`,t('army.overTheWall'),{important:true,target:{...over}});}
+    return true;
+  }
+  drawLadder(animal,wall,raised){
+    const s=this.scene;if(!s.add?.graphics)return;this.ladders??=new Map();let g=this.ladders.get(animal.id);if(!g){g=s.add.graphics();this.ladders.set(animal.id,g);}
+    const foot=gridToWorld(animal.position.x,animal.position.y),top=tileCenter(wall),h=(buildingDefinition(wall).visual?.wallHeight??68)*raised,tx=foot.x+(top.x-foot.x)*.55*raised,ty=foot.y+(top.y-foot.y)*.55*raised-h;
+    const nx=(ty-foot.y),ny=-(tx-foot.x),n=Math.hypot(nx,ny)||1,o={x:nx/n*4,y:ny/n*4};
+    g.clear().setDepth(buildingDepth(wall)+.6);g.lineStyle(2.5,0x7a5233,1);g.lineBetween(foot.x-o.x,foot.y-o.y,tx-o.x,ty-o.y);g.lineBetween(foot.x+o.x,foot.y+o.y,tx+o.x,ty+o.y);
+    g.lineStyle(1.5,0x5a3c22,1);for(let i=1;i<8;i++){const p=i/8;g.lineBetween(foot.x-o.x+(tx-foot.x)*p,foot.y-o.y+(ty-foot.y)*p,foot.x+o.x+(tx-foot.x)*p,foot.y+o.y+(ty-foot.y)*p);}
+  }
+  dropLadder(animal){const g=this.ladders?.get(animal.id);if(g){g.destroy();this.ladders.delete(animal.id);}}
+  update(){if(!this.ladders)return;for(const [id,g] of this.ladders){const a=this.scene.animalSystem?.animals?.get?.(id);if(!a?.isAlive||!a.ladderState||a.armyBuilding==null){g.destroy();this.ladders.delete(id);if(a)delete a.ladderState;}}}
   // --- archers on their own walls ----------------------------------------------------------------------------------
   // Puts an enemy archer up on an enemy wall, Tower or Gate at this tile; true when he went up.
   mount(animal,building,tile){

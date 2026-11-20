@@ -1,12 +1,12 @@
 import { t } from '../i18n/index.js';
-import { UNIT_TYPES,CATAPULT,WAGON_SUPPLY,vehicleUnit } from '../data/military.js';
+import { UNIT_TYPES,CATAPULT,RAM,WAGON_SUPPLY,vehicleUnit } from '../data/military.js';
 import { EDIBLE_RESOURCES } from '../data/seasons.js';
 import { buildingDefinition,buildingIsComplete,placeBuilding } from '../game/buildings.js';
 import { removeBuildingShell } from '../game/buildingRemoval.js';
 import { damageBuilding } from '../game/buildingHealth.js';
 import { gridToWorld } from '../game/isometric.js';
 import { isWalkable } from '../game/map.js';
-import { siegeable } from './SiegeSystem.js';
+import { siegeable,siegeTiles,touchesBuilding } from './SiegeSystem.js';
 
 // Owner 18 Nov 2026: siege engines and army supply.
 // - Catapult: Builders build it on a site beside a Builder's Workshop (catapult_site); finished, it stands there as a
@@ -33,13 +33,16 @@ export class SiegeEngines {
     const s=this.scene,system=this.vehicles;if(!system)return null;
     return [...system.vehicles.values()].find(v=>v.type===type&&v.state==='parked'&&!v.crew&&(type!=='horse_wagon'||system.usable(v))&&!s.scouting?.holds?.(v)&&v.id!==s.trade?.expedition?.state?.wagonId)??null;
   }
-  reserve(worker,type){const v=this.free(type);if(!v)return null;v.state='reserved';v.operatorId=worker.id;v.crew=true;if(type==='catapult')v.ammo??=0;else v.supplies??={};this.vehicles.changed();return v;}
+  reserve(worker,type){const v=this.free(type);if(!v)return null;v.state='reserved';v.operatorId=worker.id;v.crew=true;if(type==='catapult')v.ammo??=0;else if(type!=='ram')v.supplies??={};this.vehicles.changed();return v;}
   // Discharge, death or a cancelled training: the vehicle stays where it is (or where the crew stood) for the next crew;
   // a Wagon's load and a Catapult's Stones stay on it.
   release(worker){const v=this.vehicleOf(worker);if(!v)return null;if(v.state==='inUse'){v.x=worker.tile.x;v.y=worker.tile.y;}v.state='parked';v.operatorId=null;delete v.crew;this.vehicles.changed();return v;}
   // Builder's Workshop: a Catapult site on free ground beside it, built by Builders like any building.
-  orderCatapult(workshop){
-    const s=this.scene,d=s.objectRegistry.require('catapult_site');if(!workshop||!buildingIsComplete(workshop))return {error:t('siege.noWorkshop')};
+  orderCatapult(workshop){return this.orderEngine(workshop,'catapult_site');}
+  // Owner 20 Nov 2026: the Battering Ram is ordered the same way (ram_site).
+  orderRam(workshop){return this.orderEngine(workshop,'ram_site');}
+  orderEngine(workshop,site){
+    const s=this.scene,d=s.objectRegistry.require(site);if(!workshop||!buildingIsComplete(workshop))return {error:t('siege.noWorkshop')};
     if(!s.sandbox&&!s.inventory.canAfford?.(d.cost))return {error:t('status.noFunds')};
     const w=buildingDefinition(workshop),reserved=s.placementReserved?.()??[],free={pay:()=>true,canAfford:()=>true,storage:null};
     for(let r=1;r<=8;r++)for(let y=workshop.y-r-1;y<=workshop.y+w.height+r-1;y++)for(let x=workshop.x-r-1;x<=workshop.x+w.width+r-1;x++){
@@ -58,19 +61,40 @@ export class SiegeEngines {
     for(const b of [...s.buildings]){const d=buildingDefinition(b);if(!d.becomesVehicle||!buildingIsComplete(b))continue;
       const tiles=removeBuildingShell(s,b);if(!tiles)continue;const tile=tiles.find(p=>isWalkable(s.map,p.x,p.y)&&this.vehicles.free(p))??tiles[0];
       const v=this.vehicles.create(d.becomesVehicle,tile);if(d.becomesVehicle==='catapult')v.ammo=0;
-      s.events?.emit?.('buildings:changed');s.eventFeed?.push?.(`engine:${v.id}`,t('siege.catapultReady'),{target:{x:tile.x,y:tile.y}});s.setStatus?.(t('siege.catapultReady'));}
+      s.events?.emit?.('buildings:changed');const ready=t(d.becomesVehicle==='ram'?'siege.ramReady':'siege.catapultReady');s.eventFeed?.push?.(`engine:${v.id}`,ready,{target:{x:tile.x,y:tile.y}});s.setStatus?.(ready);}
   }
   // Every frame for a crew (instead of fighting). `move` false while the player holds the unit in place.
   update(worker,delta,{move=true}={}){
     const v=this.vehicleOf(worker),type=this.scene.military?.unit?.(worker)?.type;if(!v){worker.workState='Waiting';worker.workMessage='Without a vehicle';return true;}
     if(v.state==='reserved'){
       if(Math.max(Math.abs(worker.tile.x-v.x),Math.abs(worker.tile.y-v.y))<=1&&!worker.nextTile){worker.path=[];v.state='inUse';this.vehicles.changed();return true;}
-      worker.workState='Traveling to Target';worker.workMessage=v.type==='catapult'?'Fetching the Catapult':'Fetching the Wagon';
+      worker.workState='Traveling to Target';worker.workMessage=v.type==='catapult'?'Fetching the Catapult':v.type==='ram'?'Fetching the Ram':'Fetching the Wagon';
       if(move&&!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=1000;const goals=[{x:v.x,y:v.y},...[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]].map(([dx,dy])=>({x:v.x+dx,y:v.y+dy}))].filter(p=>isWalkable(this.scene.map,p.x,p.y));worker.moveTo(goals);}
       return true;
     }
-    return type==='catapult'?this.catapult(worker,v,delta,move):this.wagon(worker,v,delta,move);
+    return type==='catapult'?this.catapult(worker,v,delta,move):type==='ram'?this.ram(worker,v,delta,move):this.wagon(worker,v,delta,move);
   }
+  // --- Battering Ram (owner 20 Nov 2026, defence list point 3) ---
+  // Its target: the ordered building, else (while the fight is on) the nearest enemy Gate or wall within 12 tiles.
+  ramTarget(worker){
+    const s=this.scene,ordered=worker.siegeTargetId!=null?s.buildings.find(b=>b.id===worker.siegeTargetId):null;if(ordered&&siegeable(ordered))return ordered;if(worker.siegeTargetId!=null)delete worker.siegeTargetId;
+    let best=null,d=Infinity;for(const b of s.buildings){if(!siegeable(b)||!RAM.fortTypes.includes(b.type))continue;const e=distanceToBuilding(worker.tile,b)-(['gate','wall_gate'].includes(b.type)?3:0);if(e<=12&&e<d&&s.military?.siege?.contested?.(b)){d=e;best=b;}}return best;
+  }
+  ram(worker,v,delta,move){
+    const s=this.scene;worker.ramReload=Math.max(0,(worker.ramReload??0)-delta);
+    const b=this.ramTarget(worker);if(!b){worker.workState='Waiting';worker.workMessage='Ram ready';return true;}
+    if(!touchesBuilding(worker.tile,b)||worker.nextTile){
+      if(move&&!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=1200;const goals=siegeTiles(s.map,b).sort((a,c)=>Math.hypot(a.x-worker.tile.x,a.y-worker.tile.y)-Math.hypot(c.x-worker.tile.x,c.y-worker.tile.y)).slice(0,24);
+        if(!goals.length||!worker.moveTo(goals)){delete worker.siegeTargetId;s.setStatus?.(t('siege.noWay',{name:buildingDefinition(b).name}));}}
+      worker.workState='Traveling to Target';worker.workMessage='Rolling the Ram';return true;
+    }
+    worker.path=[];const {width,height}=buildingDefinition(b),dx=b.x+width/2-worker.position.x,dy=b.y+height/2-worker.position.y,n=Math.hypot(dx,dy);if(n)worker.direction={x:dx/n,y:dy/n};
+    worker.workState='Working';worker.workMessage='Ramming';if(worker.ramReload>0)return true;worker.ramReload=RAM.reload;
+    const result=damageBuilding(b,RAM.damage*(RAM.fortTypes.includes(b.type)?1:RAM.otherShare));this.thud(worker);s.military?.siege?.drawBar?.(b);if(result?.destroyed)s.military.siege.destroy(b);
+    return true;
+  }
+  // A short shake of the view when the ram strikes (no art needed).
+  thud(worker){const v=worker.view,s=this.scene;if(!v||!s.tweens?.add)return;const x=v.x;s.tweens.add({targets:v,x:x+(worker.direction?.x??0)*6,duration:120,yoyo:true,onComplete:()=>{v.x=x;}});}
   // --- Catapult ---
   catapultTarget(worker,v){
     const s=this.scene,ordered=worker.siegeTargetId!=null?s.buildings.find(b=>b.id===worker.siegeTargetId):null;if(ordered&&siegeable(ordered))return ordered;if(worker.siegeTargetId!=null)delete worker.siegeTargetId;
@@ -174,6 +198,6 @@ export class SiegeEngines {
   // Test map: a crew put down with its vehicle at once, full of Stones / supplies.
   sandboxCrew(worker,type){
     const spec=UNIT_TYPES[type];if(!spec?.vehicle||!this.vehicles)return null;const v=this.vehicles.create(spec.vehicle,worker.tile);v.state='inUse';v.operatorId=worker.id;v.crew=true;
-    if(type==='catapult')v.ammo=CATAPULT.ammo;else v.supplies={stone:WAGON_SUPPLY.load.stone,bread:WAGON_SUPPLY.load.food,torch:WAGON_SUPPLY.load.torch};this.vehicles.changed();return v;
+    if(type==='catapult')v.ammo=CATAPULT.ammo;else if(type!=='ram')v.supplies={stone:WAGON_SUPPLY.load.stone,bread:WAGON_SUPPLY.load.food,torch:WAGON_SUPPLY.load.torch};this.vehicles.changed();return v;
   }
 }

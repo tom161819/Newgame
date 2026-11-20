@@ -1,7 +1,7 @@
 import { t } from '../i18n/index.js';
 import { towerNeighbors } from '../game/buildings.js';
 import { WallPatrol,WALL_PATROL } from './WallPatrol.js';
-import { UNIT_TYPES,unitKit,KNIGHT_SPEED,START_GARRISON,RECRUIT,CATAPULT } from '../data/military.js';
+import { UNIT_TYPES,unitKit,KNIGHT_SPEED,START_GARRISON,RECRUIT,CATAPULT,RAM } from '../data/military.js';
 import { MILITARY_ITEMS } from '../data/militaryEquipment.js';
 import { buildingIsComplete } from '../game/buildings.js';
 import { recalculateStats } from './UnitStats.js';
@@ -26,7 +26,9 @@ export class MilitarySystem {
   spec(unit){const u=unit?.id!=null?this.units.get(unit.id):null;return u?UNIT_TYPES[u.type]:null;}
   pierce(attacker){return this.spec(attacker)?.pierce??0;}
   mounted(unit){return !!(this.spec(unit)?.mount||unit?.definition?.gameplay?.mounted);}
-  bonus(attacker,target){const b=this.spec(attacker)?.bonusVs;return b?.mounted&&this.mounted(target)?b.mounted:1;}
+  bonus(attacker,target){const b=this.spec(attacker)?.bonusVs;return (b?.mounted&&this.mounted(target)?b.mounted:1)*(isRanged(attacker)&&this.roofed(target)?RAM.arrowShare:1);}
+  // Owner 20 Nov 2026: the crew of a Battering Ram (ours or the enemy's) is under its roof – arrows hardly hurt it.
+  roofed(unit){return this.spec(unit)?.vehicle==='ram'||!!unit?.definition?.gameplay?.ram;}
   // A rider who has ridden far enough since his last blow opens the fight with a charge.
   charge(worker,target){
     const c=this.spec(worker)?.charge,from=worker.chargeFrom;if(!c||!from||Math.hypot(worker.position.x-from.x,worker.position.y-from.y)<c.run)return 0;
@@ -176,6 +178,7 @@ export class MilitarySystem {
     on||=!!this.nearestEnemy(worker,MILITARY_RULES.guardRadius);
     if(!on&&worker.stance!=='hold'){const type=this.unit(worker)?.type;
       if(type==='catapult')on=this.scene.buildings.some(b=>siegeable(b)&&Math.hypot(b.x-worker.tile.x,b.y-worker.tile.y)<=CATAPULT.range+2&&this.siege.contested(b));
+      if(type==='ram')on=this.scene.buildings.some(b=>siegeable(b)&&Math.hypot(b.x-worker.tile.x,b.y-worker.tile.y)<=14&&this.siege.contested(b));
 }
     worker.dutyCheck={at:now,on};return on;
   }

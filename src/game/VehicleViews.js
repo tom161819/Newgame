@@ -29,7 +29,24 @@ function catapultTexture(scene){
   for(const x of [18,52]){g.fillStyle(0x5a4a3a);g.fillCircle(x,48,7);g.lineStyle(1.5,0x2e241a);g.strokeCircle(x,48,7);g.lineBetween(x-5,48,x+5,48);}
   g.generateTexture(CATAPULT,72,58);g.destroy();return CATAPULT;
 }
-const textureFor=(scene,type)=>type==='horse_wagon'?wagonTexture(scene):type==='catapult'?catapultTexture(scene):texture(scene);
+// Owner 20 Nov 2026 (defence list, point 3): Battering Ram (procedural until the owner's model): a log with an iron head
+// hanging under a plank roof on four wheels.
+const RAM_KEY='vehicle-ram';
+export function ramTexture(scene,tint=null){
+  const key=tint?`${RAM_KEY}:${tint}`:RAM_KEY;// tint: only the pennantif(scene.textures.exists(key))return key;
+  const g=scene.make.graphics({x:0,y:0,add:false}),T=c=>c;
+  g.fillStyle(0x2e241a,.3);g.fillEllipse(38,50,66,10);
+  g.fillStyle(T(0x5a3c22));g.fillRect(14,24,4,20);g.fillRect(56,24,4,20);
+  g.fillStyle(T(0x7a5233));g.fillPoints([{x:6,y:26},{x:36,y:8},{x:68,y:26},{x:62,y:30},{x:36,y:15},{x:12,y:30}],true);g.lineStyle(1.5,0x3b2616);g.strokePoints([{x:6,y:26},{x:36,y:8},{x:68,y:26},{x:62,y:30},{x:36,y:15},{x:12,y:30}],true);
+  g.lineStyle(1,0x3b2616,.7);for(const x of [18,26,46,54])g.lineBetween(x,30-Math.abs(36-x)*.6,x+2,26-Math.abs(36-x)*.6);
+  g.lineStyle(7,T(0x8a5e36));g.lineBetween(8,36,62,36);g.fillStyle(T(0x55585c));g.fillRect(2,31,9,10);g.lineStyle(1,0x2e2c27);g.strokeRect(2,31,9,10);
+  g.lineStyle(1.5,0x3b2616);g.lineBetween(24,30,26,34);g.lineBetween(48,30,46,34);
+  for(const x of [16,58]){g.fillStyle(0x5a4a3a);g.fillCircle(x,46,6);g.lineStyle(1.5,0x2e241a);g.strokeCircle(x,46,6);g.lineBetween(x-4,46,x+4,46);}
+  // The army's pennant on the roof ridge: red for ours, the given colour (steel blue) for the enemy's.
+  g.lineStyle(1.5,0x3b2616);g.lineBetween(36,9,36,0);g.fillStyle(tint??0x9b2b25);g.fillTriangle(36,0,46,3,36,6);
+  g.generateTexture(key,72,56);g.destroy();return key;
+}
+const textureFor=(scene,type)=>type==='horse_wagon'?wagonTexture(scene):type==='catapult'?catapultTexture(scene):type==='ram'?ramTexture(scene):texture(scene);
 function texture(scene){
   if(scene.textures.exists(KEY))return KEY;
   const g=scene.make.graphics({x:0,y:0,add:false});

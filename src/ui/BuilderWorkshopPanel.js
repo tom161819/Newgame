@@ -31,9 +31,10 @@ export class BuilderWorkshopPanel {
   renderEngines(b){
     const s=this.scene;if(!s.military?.engines)return;let box=this.dialog.querySelector('#builder-workshop-engines');
     if(!box){box=element('section','builder-workshop-engines');box.id='builder-workshop-engines';const text=element('p','builder-workshop-engines-text'),button=element('button','',t('siege.orderCatapult',{cost:formatCost(s.objectRegistry.require('catapult_site').cost,s.objectRegistry)}));button.type='button';button.id='order-catapult';
-      button.addEventListener('click',()=>{const result=s.military.engines.orderCatapult(this.building);s.setStatus(result.error??t('siege.catapultOrdered'));this.render();},{signal:this.controller.signal});box.append(text,button);document.querySelector('#builder-workshop-kingdom').after(box);}
-    const building=s.military.engines.sites(b).length,ready=[...(s.vehicles?.vehicles.values()??[])].filter(v=>v.type==='catapult'&&v.state==='parked').length;
-    box.querySelector('p').textContent=t('siege.catapultStatus',{building,ready});
+      button.addEventListener('click',()=>{const result=s.military.engines.orderCatapult(this.building);s.setStatus(result.error??t('siege.catapultOrdered'));this.render();},{signal:this.controller.signal});const ram=element('button','',t('siege.orderRam',{cost:formatCost(s.objectRegistry.require('ram_site').cost,s.objectRegistry)}));ram.type='button';ram.id='order-ram';
+      ram.addEventListener('click',()=>{const result=s.military.engines.orderRam(this.building);s.setStatus(result.error??t('siege.ramOrdered'));this.render();},{signal:this.controller.signal});box.append(text,button,ram);document.querySelector('#builder-workshop-kingdom').after(box);}
+    const sites=s.military.engines.sites(b),parked=type=>[...(s.vehicles?.vehicles.values()??[])].filter(v=>v.type===type&&v.state==='parked').length,building=sites.filter(x=>x.type==='catapult_site').length,ready=parked('catapult');
+    box.querySelector('p').textContent=`${t('siege.catapultStatus',{building,ready})} ${t('siege.ramStatus',{building:sites.filter(x=>x.type==='ram_site').length,ready:parked('ram')})}`;
   }
   open(building){
     this.building=building;this.render();

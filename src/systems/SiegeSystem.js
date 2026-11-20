@@ -59,7 +59,7 @@ export class SiegeSystem {
   contested(b){const r=SIEGE_RULES.contestRadius;for(const a of this.scene.animalSystem?.animals.values()??[])if(a.isAlive&&a.active!==false&&a.definition?.gameplay?.hostile&&Math.hypot(a.position.x-b.x,a.position.y-b.y)<=r)return true;return false;}
   order(soldiers,building){
     // Catapult crews take the building as their target too (SiegeEngines shoots it from range).
-    const engines=soldiers.filter(w=>w?.crew&&this.scene.military?.unit?.(w)?.type==='catapult'&&w.isAlive);
+    const engines=soldiers.filter(w=>w?.crew&&['catapult','ram'].includes(this.scene.military?.unit?.(w)?.type)&&w.isAlive);
     for(const w of engines){this.scene.workerSystem.commands?.resume?.(w);w.siegeTargetId=building.id;}
     // A Military Wagon sent along is free to follow the Catapults with its Stones.
     for(const w of soldiers)if(w?.isAlive&&this.scene.military?.unit?.(w)?.type==='military_wagon')this.scene.workerSystem.commands?.resume?.(w);

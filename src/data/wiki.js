@@ -45,6 +45,7 @@ export const WIKI_ENTRIES=Object.freeze([
   entry('unit:crossbowman','units',['building:barracks','building:bowyer','resource:crossbow','resource:light_armor']),
   entry('unit:light_cavalry','units',['building:barracks','building:stables','resource:sword','unit:knight']),
   entry('unit:catapult','units',['building:barracks','building:builder_workshop','resource:stone','unit:military_wagon']),
+  entry('unit:ram','units',['building:barracks','building:builder_workshop','building:moat','unit:catapult']),
   entry('unit:military_wagon','units',['building:barracks','building:wheelwright_workshop','resource:horse_wagon','unit:catapult']),
   entry('unit:caravan','units',['building:marketplace','topic:trade','system:expedition']),
   entry('animal:rabbit','animals',['building:hunting_lodge','resource:meat']),

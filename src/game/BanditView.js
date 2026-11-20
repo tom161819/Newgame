@@ -1,3 +1,4 @@
+import { ramTexture } from './VehicleViews.js';
 import { DIRECTION_POSES } from './directions.js';
 import { HumanView } from './HumanView.js';
 const BANDIT=Object.freeze({tunic:0x34342e,sash:0x4f6b2e,hood:0x1f1f1c,legs:0x23231f,weapon:0x6d4c2c,mask:true,helmet:false});
@@ -23,3 +24,15 @@ export class BanditView extends HumanView {
 }
 
 export class RaiderView extends BanditView { get palette(){return RAIDER;} }
+// Owner 20 Nov 2026 (defence list, point 3): the enemy's Battering Ram (provisional, the same drawing as ours in the
+// enemy's steel blue tint), facing the way it rolls.
+export class RamView extends HumanView {
+  updateLook(){}
+  paint(){
+    for(const p of [this.leftLeg,this.rightLeg,...(this.arms??[])])p?.setVisible(false);this.body?.clear();
+    if(!this.ram){this.ram=this.scene.add.image(0,0,ramTexture(this.scene,0x3f6fb0)).setOrigin(.5,.85);this.add(this.ram);}
+    const pose=DIRECTION_POSES[this.facing];this.ram.setFlipX((pose?.screenX??0)>0);this.shadow?.setVisible(false);if(this.art)this.art.setVisible(false);
+  }
+  applyArt(){}
+  setAttackPose(){}
+}

@@ -6,7 +6,7 @@ import { FOOD_RULES } from '../foodProduction.js';
 // Wheelbarrow becomes a vehicle object on the map (VehicleSystem); Haulers take one and carry five times as much.
 // No Asset Studio art is approved yet: the workshop uses the procedural workplace renderer as a marked fallback.
 import { STABLE_RULES } from '../stables.js';
-import { CATAPULT } from '../military.js';
+import { CATAPULT,RAM } from '../military.js';
 export const vehicleDefinitions=[
   {id:'stables',name:'Stables',category:'building',buildingCategory:'logistics',sprite:'/assets/buildings/stables/stables-shelter.v1.png',
     width:6,height:8,legacyFootprint:{width:5,height:5}/* owner 14 Nov 2026: the approved Stables with a paddock are 6 wide and 8 deep (48 tiles); Stables of older saves stay 5 × 5 */,walkable:false,collectible:false,buildable:true,cost:{wood:20},constructionTime:45000,
@@ -32,6 +32,15 @@ export const vehicleDefinitions=[
     sprite:'/assets/resources/horse_wagon/horse_wagon.svg',width:1,height:1,walkable:true,collectible:false,buildable:false,cost:{},interactions:[],
     renderMode:'procedural',origin:{x:.5,y:.8},visualHeight:50,depth:{offset:.08},
     description:'A siege engine that throws Stones at enemy walls and buildings from afar. Needs a crew trained in a Barracks and Stones.'},
+  // Owner 20 Nov 2026 (defence list, point 3): a battering ram, built like the Catapult; provisional drawing in code.
+  {id:'ram_site',name:'Battering Ram (building)',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/wheelwright_workshop/wheelwright_workshop.svg',width:2,height:2,walkable:false,collectible:false,buildable:false,
+    cost:{...RAM.cost},constructionTime:RAM.constructionTime,becomesVehicle:'ram',interactions:[],
+    renderMode:'procedural',renderer:'workplace',origin:{x:.5,y:.9},visualHeight:60,depth:{offset:0},
+    description:"Builders put together a Battering Ram beside their Workshop. When it is finished it rolls out for a crew from the Barracks."},
+  {id:'ram',name:'Battering Ram',inventoryLabel:'Battering Rams',quantityNames:['Battering Ram','Battering Rams','Battering Rams'],inventoryOrder:22,category:'resource',resourceCategory:'vehicle',
+    sprite:'/assets/resources/horse_wagon/horse_wagon.svg',width:1,height:1,walkable:true,collectible:false,buildable:false,cost:{},interactions:[],
+    renderMode:'procedural',origin:{x:.5,y:.8},visualHeight:40,depth:{offset:.08},
+    description:'A roofed log on wheels that breaks Gates and walls. Arrows hardly hurt its crew; it cannot cross a Moat.'},
   {id:'horse_wagon',name:'Horse Wagon',inventoryLabel:'Horse Wagons',quantityNames:['Horse Wagon','Horse Wagons','Horse Wagons'],inventoryOrder:20,category:'resource',resourceCategory:'vehicle',
     sprite:'/assets/resources/horse_wagon/horse_wagon.svg',width:1,height:1,walkable:true,collectible:true,buildable:false,cost:{},interactions:[],
     renderMode:'procedural',origin:{x:.5,y:.7},visualHeight:40,depth:{offset:.08},

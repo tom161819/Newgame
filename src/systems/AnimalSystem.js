@@ -28,6 +28,7 @@ export class AnimalSystem {
   reservedTiles(){return [...this.animals.values()].flatMap(a=>a.reservedTiles());}
   onAttacked(animal,attacker){
     if(!animal.active||!animal.isAlive||!attacker.isAlive||!animal.definition.gameplay.huntable)return;
+    if(animal.definition.gameplay.ram)return;// a Battering Ram never fights people
     // Owner 18 Nov 2026 (battle test, point 1): a guard remembers where he stood; he gives up a chase too far from it.
     if(animal.definition.gameplay.guardRadius)animal.post??={x:animal.tile.x,y:animal.tile.y};animal.returning=false;
     animal.retaliationTarget=attacker;animal.path=[];animal.retaliationRepath=0;

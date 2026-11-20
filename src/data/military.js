@@ -25,6 +25,8 @@ export const UNIT_TYPES=Object.freeze({
   // Wagon (a Recruit and a Horse Wagon with its horse). `vehicle`: the vehicle the unit takes; no Armory items.
   // speedFactor: a Catapult rolls slowly, the Wagon at the horse's pace.
   catapult:Object.freeze({equipment:Object.freeze({}),vehicle:'catapult',speedFactor:.55,modifiers:Object.freeze({maxHP:20}),trainingTime:20000,goldCost:5,wageBonus:1}),
+  // Owner 20 Nov 2026 (defence list, point 3): a battering ram crew – a Recruit with a finished Ram from the Builder's Workshop.
+  ram:Object.freeze({equipment:Object.freeze({}),vehicle:'ram',speedFactor:.5,modifiers:Object.freeze({maxHP:90,armor:25}),trainingTime:20000,goldCost:5,wageBonus:1}),
   military_wagon:Object.freeze({equipment:Object.freeze({}),vehicle:'horse_wagon',speedFactor:1.25,modifiers:Object.freeze({maxHP:10}),trainingTime:15000,goldCost:3,wageBonus:1}),
 });
 // Battle test 18 Nov 2026 (unit balance, roles): `bonusVs.mounted` – damage multiplier against riders (the Halberdier,
@@ -47,6 +49,12 @@ export const KNIGHT_SPEED=1.5;
 // Owner 18 Nov 2026: all long-range units shoot 50 % further – Archer and Royal Archer 6 → 9 tiles, Crossbowman 5 → 7.5,
 // enemy archers 6 → 9, the Catapult 12 → 18 (and the lobbed shot over a wall 4 → 6, CombatSystem LOB).
 export const CATAPULT=Object.freeze({range:18,minRange:3,reload:5000,damage:100,ammo:10,cost:Object.freeze({wood:30,iron:6}),constructionTime:40000});
+// Owner 20 Nov 2026 (defence list, point 3): the battering ram. Its crew rolls it to an enemy Gate, wall, Tower or building
+// and strikes it every `reload` ms for `damage` (Gates and walls; `otherShare` of it for other buildings). Under its roof
+// arrows and bolts do only `arrowShare` of their damage. It never fights people. A Moat stops it (wheels).
+export const RAM=Object.freeze({reload:2500,damage:70,otherShare:.5,arrowShare:.25,cost:Object.freeze({wood:40,iron:4}),constructionTime:35000,fortTypes:Object.freeze(['gate','wall_gate','wall','tower'])});
+// Owner 20 Nov 2026 (defence list, point 3): ladders of enemy Recruits and Swordsmen (EnemyArmy.ladder), in ms and tiles.
+export const LADDER=Object.freeze({raise:4000,climb:2500,push:2000,guard:2.5,fall:20,again:2500});
 // followRadius: a free Wagon drives after a Catapult short of Stones this near.
 export const WAGON_SUPPLY=Object.freeze({load:Object.freeze({stone:30,food:20,torch:10}),loadRadius:4,supplyRadius:6,followRadius:40,every:1000});
 // Fire arrows (battle test, point 3): archers ordered at a wooden enemy building shoot it from their range for

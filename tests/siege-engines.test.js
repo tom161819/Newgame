@@ -79,3 +79,27 @@ test('siege test: a free Military Wagon drives after a Catapult that ran short o
   cat.ammo=2;const stones=wagon.supplies.stone;s.military.siege.order([crew,driver],target);
   until(s,()=>wagon.supplies.stone<stones,120000);assert.ok(Math.hypot(crew.position.x-driver.position.x,crew.position.y-driver.position.y)<=WAGON_SUPPLY.supplyRadius+1,'the Wagon came to the Catapult');assert.ok(cat.ammo>2);
 });
+
+// Owner 20 Nov 2026 (defence list, point 3): the Battering Ram.
+test('owner 20 Nov 2026: a Battering Ram crew rolls it to an enemy Gate or wall and breaks it; arrows hardly hurt the crew',async()=>{
+  const { RAM }=await import('../src/data/military.js');
+  const s=workerScene(undefined,{foodProduction:true}),b=wall(s,60,50);assert.equal(spawnSandboxUnits(s,'ram',{x:60,y:56},1),1);
+  const crew=s.workerSystem.liveWorkers().find(w=>s.military.unit(w)?.type==='ram');assert.ok(s.military.engines.vehicleOf(crew),'the crew has its ram');
+  assert.equal(s.military.siege.order([crew],b),1,'the ram takes the order');
+  const hp=buildingHP(b).hp;until(s,()=>buildingHP(b)?.hp<hp||!s.buildings.includes(b),60000);
+  const t=until(s,()=>!s.buildings.includes(b),60000);assert.ok(t<=Math.ceil(hp/RAM.damage)*RAM.reload+RAM.reload,'a stone wall falls in a few blows');
+  const archer={attackRange:9,id:'x'};assert.equal(s.military.bonus(archer,crew),RAM.arrowShare,'arrows do a quarter');
+  const ram=s.animalSystem.create(s.objectRegistry.require('enemy_ram'),{x:70,y:60});assert.equal(s.military.bonus(archer,ram),RAM.arrowShare,'the enemy ram too');
+});
+
+test('owner 20 Nov 2026: an enemy soldier raises a ladder at our wall and climbs over; one of ours up on the wall throws it down',async()=>{
+  const { LADDER }=await import('../src/data/military.js');const { EnemyArmy }=await import('../src/systems/EnemyArmy.js');
+  const s=workerScene(undefined,{foodProduction:true});s.enemyArmy=new EnemyArmy(s);
+  const d=s.objectRegistry.require('wall'),w={id:900,type:'wall',definition:d,x:60,y:50,tiles:[{x:60,y:50}],construction:{state:'complete'}};s.buildings.push(w);s.map[50][60]=1;
+  const foe=s.animalSystem.create(s.objectRegistry.require('enemy_soldier'),{x:60,y:51});foe.armyBuilding=w.id;
+  for(let t=0;t<LADDER.raise+LADDER.climb+100;t+=100)s.enemyArmy.hit(foe,w,100);
+  assert.deepEqual(foe.tile,{x:60,y:49},'over the wall, on the other side');
+  const foe2=s.animalSystem.create(s.objectRegistry.require('enemy_soldier'),{x:60,y:51}),guard=s.workerSystem.create({x:61,y:50});guard.onWall=w;guard.position={x:60.5,y:50.5};
+  const hp=foe2.currentHP;for(let t=0;t<LADDER.push+100;t+=100)s.enemyArmy.hit(foe2,w,100);
+  assert.ok(foe2.currentHP<hp,'he fell');assert.deepEqual(foe2.tile,{x:60,y:51},'still outside');
+});
