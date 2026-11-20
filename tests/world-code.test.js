@@ -14,16 +14,20 @@ const snapshot=w=>JSON.stringify({terrain:w.terrain,ground:exportGround(w.ground
 const seeded=seed=>{let n=seed;return ()=>((n=Math.imul(n,1664525)+1013904223>>>0)/2**32);};
 
 test('world code: MKW<generator>-<levels>-<seed base36>, round trip, lower case accepted', () => {
-  assert.equal(WORLD_GENERATOR_VERSION,5,'m-zelezny-dul-misto: generator 5 (a free Iron Mine spot beside the nearest Iron Deposit)');assert.equal(WORLD_SETTINGS.length,12);
-  const code=encodeWorldCode({levels:defaultWorldLevels(),seed:parseInt('7KQ9X2',36)});assert.equal(code,'MKW5-155515555555-7KQ9X2');
-  assert.deepEqual(decodeWorldCode(` ${code.toLowerCase()} `),{generator:5,levels:defaultWorldLevels(),seed:parseInt('7KQ9X2',36)});
+  assert.equal(WORLD_GENERATOR_VERSION,6,'m-teren-vyska part 3: generator 6 (four terrain settings, rocks lean to hills)');assert.equal(WORLD_SETTINGS.length,16);
+  const code=encodeWorldCode({levels:defaultWorldLevels(),seed:parseInt('7KQ9X2',36)});assert.equal(code,'MKW6-1555155555555555-7KQ9X2');
+  assert.deepEqual(decodeWorldCode(` ${code.toLowerCase()} `),{generator:6,levels:defaultWorldLevels(),seed:parseInt('7KQ9X2',36)});
   assert.equal(decodeWorldCode(encodeWorldCode({seed:WORLD_SEED_MAX})).seed,WORLD_SEED_MAX);assert.equal(decodeWorldCode(encodeWorldCode({seed:0})).seed,0);
-  for(const bad of ['','MKW4','MKW5-15551555555-A','MKW5-155515555555-','MKW5-355515555555-A','MKW5-155545555555-A','MKW5-155515555555-123456789','XYZ3-155515555555-A',42,null])
+  for(const bad of ['','MKW4','MKW6-155515555555555-A','MKW6-1555155555555555-','MKW6-3555155555555555-A','MKW6-1555455555555555-A','MKW6-1555155555555555-123456789','XYZ3-155515555555-A','MKW6-155515555555-A',42,null])
     assert.throws(()=>decodeWorldCode(bad),e=>e.reason==='invalid'&&e.message==='Invalid world code',String(bad));
-  assert.throws(()=>decodeWorldCode('MKW1-155515555555-A'),e=>e.reason==='generator'&&e.message==='This world code is for generator version 1; this build uses version 5.');
+  assert.throws(()=>decodeWorldCode('MKW1-155515555555-A'),e=>e.reason==='generator'&&e.message==='This world code is for generator version 1; this build uses version 6.');
   // m-kamenolom-u-hradu: a generator-2 code (0.77.x) is refused for a New Game, but a saved game keeps it (current:null).
   assert.throws(()=>decodeWorldCode('MKW2-155515555555-7KQ9X2'),e=>e.reason==='generator');
-  assert.deepEqual(decodeWorldCode('MKW2-155515555555-7KQ9X2',{current:null}),{generator:2,levels:defaultWorldLevels(),seed:parseInt('7KQ9X2',36)});
+  assert.deepEqual(decodeWorldCode('MKW2-155515555555-7KQ9X2',{current:null}),{generator:2,levels:defaultWorldLevels().slice(0,12),seed:parseInt('7KQ9X2',36)});
+  // m-teren-vyska part 3: a generator-5 code (0.84–0.147.2) has 12 digits; a New Game refuses it, its saved games keep it
+  // and their hills use the default terrain levels.
+  assert.throws(()=>decodeWorldCode('MKW5-155515555555-7KQ9X2'),e=>e.reason==='generator');assert.equal(decodeWorldCode('MKW5-155515555555-7KQ9X2',{current:null}).levels.length,12);
+  assert.throws(()=>decodeWorldCode('MKW5-1555155555555555-7KQ9X2',{current:null}),e=>e.reason==='invalid','an old generator with 16 digits');
   assert.throws(()=>decodeWorldCode('MKW2-1-A',{current:null}),e=>e.reason==='invalid');
   // velke-prirodni-objekty: a generator-3 code (0.78–0.82) is refused for a New Game too; its saved games keep it.
   assert.throws(()=>decodeWorldCode('MKW3-155515555555-7KQ9X2'),e=>e.reason==='generator');
@@ -32,7 +36,7 @@ test('world code: MKW<generator>-<levels>-<seed base36>, round trip, lower case 
   assert.throws(()=>decodeWorldCode('MKW4-155515555555-SU24BGPY'),e=>e.reason==='generator');
   assert.equal(decodeWorldCode('MKW4-155515555555-SU24BGPY',{current:null}).generator,4);
   assert.throws(()=>encodeWorldCode({seed:-1}));assert.throws(()=>encodeWorldCode({seed:1,levels:[1,2]}));
-  assert.match(randomWorldCode(),/^MKW5-155515555555-[0-9A-Z]{1,8}$/);
+  assert.match(randomWorldCode(),/^MKW6-1555155555555555-[0-9A-Z]{1,8}$/);
 });
 
 test('world code: simple Water / Desert / Forest choices set their levels; other changes read as Custom', () => {
@@ -40,7 +44,7 @@ test('world code: simple Water / Desert / Forest choices set their levels; other
   const l=applyPresets(d,{water:'high',desert:'off',forest:'dense'});assert.deepEqual(presetsFromLevels(l),{water:'high',desert:'off',forest:'dense',custom:false});
   assert.deepEqual([l[1],l[4],l[5],l[8]],[8,3,0,8]);
   const odd=[...d];odd[3]=9;assert.equal(presetsFromLevels(odd).custom,true);assert.equal(presetsFromLevels(odd).water,'custom');
-  assert.deepEqual(Object.values(settingsFromLevels(d)),[1,1,1,1,1,1,1,1,1,1,1,1],'level 5 / the defaults are the base values');
+  {const {height,...base}=settingsFromLevels(d);assert.deepEqual(Object.values(base),[1,1,1,1,1,1,1,1,1,1,1,1],'level 5 / the defaults are the base values');assert.deepEqual(height,{hilliness:5,hillHeight:5,plains:5,bankSlope:5},'generator 6: the terrain levels');}
 });
 
 test('seeded world: the same code gives the same world, another seed another; parts draw from separate streams', () => {

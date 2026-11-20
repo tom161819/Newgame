@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-hazel-1-views",
+  "variantId": "shrubs-hazel-1-views-autumn-270",
+  "name": "Hazel small, autumn 270° (back-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "c22f1d50",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 39,
+  "height": 40,
+  "anchor": {
+    "x": 19,
+    "y": 35
+  },
+  "origin": {
+    "x": 0.48718,
+    "y": 0.875
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 19,
+    "y": 35
+  },
+  "baseOrigin": {
+    "x": 0.48718,
+    "y": 0.875
+  },
+  "visualHeight": 35,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-seasons",
+  "variantId": "shrubs-seasons-heather-winter",
+  "name": "Heather – winter",
+  "category": "nature",
+  "version": 2,
+  "specHash": "7e9d03ed",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 44,
+  "height": 31,
+  "anchor": {
+    "x": 22,
+    "y": 23
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.74194
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 22,
+    "y": 23
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.74194
+  },
+  "visualHeight": 23,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

@@ -40,7 +40,7 @@ export const WORLD_GENERATION=Object.freeze({
   forest:{scale:16,threshold:.5,dryCut:.25},
   // Generator 4 (velke-prirodni-objekty): rock placements cycle through these widths (two rows deep); an untouched
   // 2 × 2 becomes one rock obstacle and an untouched 4 × 2 a rock ridge (natureGroups.js), 3 × 2 stays single rocks.
-  rocks:{scale:14,desertRim:6,widths:[2,3,2,4,3],nearStart:{none:9,thin:20,share:.6}},
+  rocks:{scale:14,desertRim:6,widths:[2,3,2,4,3],nearStart:{none:9,thin:20,share:.6},flat:.35,hill:[1,3.5],slope:[.6,1.5]},
   // Generator 4: dense bush patches along the water and at forest edges become one thicket (3 × 2, 2 × 2 or 2 × 1).
   // `fill`: a patch missing one bush gets it when the tile is free grass; `forestEdge`: the forest weight band.
   thickets:{waterReach:4,forestEdge:[.3,.85],fill:.6},

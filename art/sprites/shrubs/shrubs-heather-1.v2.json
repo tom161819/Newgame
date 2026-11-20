@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs",
+  "variantId": "shrubs-heather-1",
+  "name": "Heather – small",
+  "category": "nature",
+  "version": 2,
+  "specHash": "2cdb3796",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 44,
+  "height": 29,
+  "anchor": {
+    "x": 22,
+    "y": 22
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.75862
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 22,
+    "y": 22
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.75862
+  },
+  "visualHeight": 22,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

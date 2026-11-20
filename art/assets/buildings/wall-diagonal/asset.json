@@ -13,7 +13,7 @@
     {
       "id": "wall-diagonal-se",
       "name": "Run down the screen",
-      "version": 5,
+      "version": 6,
       "notes": "Towards grid (x+1, y+1). On screen the wall runs straight down, seen from its end.",
       "spec": {
         "piece": "diagonal",
@@ -24,7 +24,7 @@
     {
       "id": "wall-diagonal-ne",
       "name": "Run across the screen",
-      "version": 5,
+      "version": 6,
       "notes": "Towards grid (x+1, y−1). On screen the wall runs straight across, seen from its face.",
       "spec": {
         "piece": "diagonal",

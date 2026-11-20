@@ -5,6 +5,141 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.13] - 2026-11-19
+<!-- version: {"title":"Loading screen","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- A loading screen when a game starts or loads: the map opens once its pictures have loaded instead of filling in bit by bit.
+
+## [0.148.12] - 2026-11-19
+<!-- version: {"title":"Space flattens buildings","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- Space flattens the buildings to their ground plans, so whatever stands behind them can be clicked and placing is clearer; Space again shows them.
+
+### Changed
+- The camera returns to the King with C (Space now flattens the buildings).
+
+## [0.148.11] - 2026-11-19
+<!-- version: {"title":"Party goes on to the next map","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- A scouting party on another map can go on to a neighbouring map instead of only going home (World window, or the button on the zone map).
+
+## [0.148.10] - 2026-11-19
+<!-- version: {"title":"Dismiss soldiers","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- Chosen soldiers can be dismissed with the door button in the selection bar. The game asks first; dismissed soldiers become ordinary residents and their kit goes back to the store.
+
+## [0.148.9] - 2026-11-19
+<!-- version: {"title":"Soundtrack","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- A medieval-style soundtrack (provisional, composed by the game itself). Settings → Music sets its volume; 0 turns it off. It starts with your first click or key.
+
+## [0.148.8] - 2026-11-19
+<!-- version: {"title":"Neighbouring maps round the minimap","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- Small squares round the minimap for the neighbouring maps: "?" or what was found there, the hours left while your party marches, and with a level 3 Castle and Barracks a click opens the party window.
+
+## [0.148.7] - 2026-11-19
+<!-- version: {"title":"Party meets at the Barracks","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Changed
+- A scouting party first meets at the Barracks and then sets off to the map edge together.
+
+## [0.148.6] - 2026-11-19
+<!-- version: {"title":"Caravans on the minimap","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- Caravans show on the minimap as a small cart that moves with them: a foreign merchant in orange, your own caravan in blue.
+
+## [0.148.5] - 2026-11-19
+<!-- version: {"title":"Buildings open in fog","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Changed
+- Your own buildings and blueprints can be clicked and their windows stay open even in fog.
+
+## [0.148.4] - 2026-11-19
+<!-- version: {"title":"Nobody stuck under a blueprint","type":"fix","reconstructed":false,"saveVersion":66} -->
+### Fixed
+- Soldiers holding a place under a new blueprint now move beside it and keep holding there, and a resident shut inside a blueprint finds a way out, so building can start.
+
+## [0.148.3] - 2026-11-19
+<!-- version: {"title":"Caravans wait for their order","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Changed
+- A foreign caravan with an order still to be loaded waits up to one more day instead of leaving, and leaves as soon as the order is done.
+
+## [0.148.2] - 2026-11-19
+<!-- version: {"title":"Faster, fairly shared iron","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Changed
+- Iron is faster: the Iron Mine digs one Ore in 10 s and the Smelter makes 1 Iron from 2 Ore + 2 Wood in 25 s. A workshop that has waited longer for an input now gets it first, not only the nearest one.
+
+## [0.148.1] - 2026-11-19
+<!-- version: {"title":"Training without a combat level","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Changed
+- Training a unit no longer needs a combat level: any recruit can become any unit with the kit from the Armory (and a horse for the Light Cavalry).
+
+## [0.148.0] - 2026-11-19
+<!-- version: {"title":"Terrain sliders and rocks on hills","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- New Game and the World Editor have terrain sliders: Hilliness, Hill height, Plains and Bank slope (the World Editor's new Terrain tab). They are part of the world code (generator 6, 16 digits).
+### Changed
+- Rock outcrops lean towards hills and slopes in new worlds.
+- Saved games and World Editor presets from before keep their worlds; their hills stay as they were.
+
+## [0.147.2] - 2026-11-19
+<!-- version: {"title":"Fog edge on hills drawn faster","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Changed
+- The Fog of War edge on hilly ground is drawn about a fifth faster (fewer separate pieces; the picture is the same).
+
+## [0.147.1] - 2026-11-19
+<!-- version: {"title":"Diagonal wall sites and remembered diagonal walls","type":"fix","reconstructed":false,"saveVersion":66} -->
+### Fixed
+- A diagonal Stone Wall under construction already shows its diagonal pieces instead of blocks.
+- The remembered map (under the Fog of War) keeps diagonal walls diagonal.
+
+## [0.147.0] - 2026-11-19
+<!-- version: {"title":"Analog tax slider","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Changed
+- Kingdom policy: the tax slider moves smoothly from 0 to 1.50 Gold per resident (steps of 0.05) instead of five fixed levels; Happiness changes gradually between the old levels, and the name and icon show the nearest one.
+
+### Fixed
+- Kingdom policy: moving the tax slider updates the Gold per resident, the daily total and the Happiness straight away (marked "from tomorrow" until the change takes effect).
+
+## [0.146.20] - 2026-11-19
+<!-- version: {"title":"Diagonal walls","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Added
+- Diagonal walls: a wall dragged diagonally is one straight line instead of steps, as thick as a straight wall, with merlons along both edges and mitred joints where it meets a straight wall.
+
+## [0.146.19] - 2026-11-19
+<!-- version: {"title":"Weavers fetch their own Flax","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- Weaver: weavers fetch Flax from the store themselves right away instead of waiting up to half a day for a Hauler.
+
+## [0.146.18] - 2026-11-19
+<!-- version: {"title":"Barracks window v2","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- Barracks window: training cards show each class's picture and weapon / armour icons; "Recruit automatically" is a highlighted slider; housed soldiers are a folded compact list with name, class, level and what they are doing.
+
+## [0.146.17] - 2026-11-19
+<!-- version: {"title":"Party picked by soldier class","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- World window: the party is picked by soldier class – a slider per class (e.g. 6 of 10) and an arrow that opens the soldiers by name, each with an icon of what he is doing (text on hover).
+
+## [0.146.16] - 2026-11-19
+<!-- version: {"title":"No more black squares on the map","type":"fix","reconstructed":false,"saveVersion":65} -->
+### Fixed
+- Black squares on the map: Wood, Ore, Iron, Flour and Bread lying on the ground are drawn again.
+
+## [0.146.15] - 2026-11-19
+<!-- version: {"title":"Waiting goods notice after a day","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- The notice that goods wait at a workshop while the Haulers carry other things now comes after a whole day (was 2 hours).
+
+## [0.146.14] - 2026-11-19
+<!-- version: {"title":"Clearer start guide arrow","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- Start guide: a much bigger, high-contrast arrow; the button it points at glows and blinks together with the arrow; the hint text is bigger and sits in the open map instead of the top bar.
+
+## [0.146.13] - 2026-11-19
+<!-- version: {"title":"Soldier class on hover","type":"feature","reconstructed":false,"saveVersion":65} -->
+### Changed
+- Hovering a soldier shows his class – Recruit, Soldier, Archer, Swordsman, Knight… – instead of the generic "Soldier".
+
 ## [0.146.12] - 2026-11-18
 <!-- version: {"title":"Faster with many soldiers","type":"feature","reconstructed":false,"saveVersion":65} -->
 ### Changed

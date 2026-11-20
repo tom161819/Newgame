@@ -109,7 +109,8 @@ function diagonalPiece(run, [cx, cz] = [0, 0]) {
   const h = WALL_HEIGHT, { step } = DIAGONAL, parts = [...bandBody(-HALF - 0.04, HALF + 0.04)];
   for (const u of [-BAND_EDGE, BAND_EDGE]) {
     parts.push(rail(2 * HALF + 0.06, [0, h, u], true));
-    for (let k = -4; k < 4; k++) parts.push(merlon(step / 2, [(k + 0.5) * step, h + 0.1, u], true));
+    // Owner 15 Nov (v5): "to cimbuří je nějaký divný" – merlons ran 2.5 tiles over a 1.5-tile band; keep the 4 per tile that sit on it.
+    for (let k = -2; k < 2; k++) parts.push(merlon(step / 2, [(k + 0.5) * step, h + 0.1, u], true));
   }
   return towards(parts, run === 'ne' ? [1, -1] : [1, 1], [cx, cz]);
 }

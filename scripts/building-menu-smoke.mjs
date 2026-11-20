@@ -34,8 +34,8 @@ async function mobileLastBuildingSmoke(page){
 export async function buildingMenuSmoke(page){
   if(!await page.locator('#building-categories').count())return;
   const definitions=await page.evaluate(()=>window.__game.registry.get('application').scene.objectRegistry.buildables().map(d=>({id:d.id,category:d.buildingCategory,menuOrder:d.menuOrder})));
-  // #132: menuOrder sorts buildings inside their category; in All each category keeps its slots.
-  // Owner 15 Nov 2026 (63): BUILDING_MENU_ORDER lists the order inside a category first.
+  // #132: menuOrder sorts buildings inside their category; in All each category keeps its slots. Since 0.139.0 (owner's
+  // point 63) BUILDING_MENU_ORDER comes first (the smoke expected menuOrder only and stopped here since then).
   const listed=d=>{const i=BUILDING_MENU_ORDER[d.category]?.indexOf(d.id)??-1;return i<0?Number.MAX_SAFE_INTEGER:i;};
   const menuOrder=list=>{const out=list.slice(),slots=new Map();list.forEach((d,i)=>{if(!slots.has(d.category))slots.set(d.category,[]);slots.get(d.category).push(i);});for(const idx of slots.values()){const sorted=idx.map(i=>list[i]).sort((a,b)=>listed(a)-listed(b)||(a.menuOrder??Number.MAX_SAFE_INTEGER)-(b.menuOrder??Number.MAX_SAFE_INTEGER));idx.forEach((i,j)=>{out[i]=sorted[j];});}return out;};
   await page.locator('#buildings-tab').click();await horizontalStripSmoke(page);

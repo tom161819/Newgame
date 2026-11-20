@@ -5,6 +5,8 @@
 export const SCOUTING=Object.freeze({
   castleLevel:3,building:'barracks',
   travelDays:.5,leaveHours:3,edgeReach:2,
+  // Owner 19 Nov 2026 (81): the party meets at the Barracks first (within gatherReach tiles), at most gatherHours.
+  gatherHours:3,gatherReach:3,
   // Named by where they lie on screen (the grid's north-west corner is the top of the screen).
   zones:Object.freeze([
     {id:'n',dx:-1,dy:-1},{id:'ne',dx:0,dy:-1},{id:'e',dx:1,dy:-1},{id:'se',dx:1,dy:0},
@@ -28,6 +30,8 @@ export function zoneType(worldCode,zoneId){
   for(const type of SCOUTING.types){if(roll<type.weight)return type.id;roll-=type.weight;}return SCOUTING.types[0].id;
 }
 export const zoneById=id=>SCOUTING.zones.find(z=>z.id===id)??null;
+// Owner 19 Nov 2026 (83): the maps next to a zone (the next one each way round the home map: one side step in the 3 × 3 grid).
+export const zoneNeighbours=id=>{const z=zoneById(id);return z?SCOUTING.zones.filter(o=>o.id!==z.id&&Math.abs(o.dx-z.dx)+Math.abs(o.dy-z.dy)===1).map(o=>o.id):[];};
 export const scoutTypeById=id=>SCOUTING.types.find(t=>t.id===id)??null;
 // The map-edge point a party leaves from towards a zone (grid tiles; the screen's top is the grid's north-west corner).
 export function zoneEdge(zone,width,height){

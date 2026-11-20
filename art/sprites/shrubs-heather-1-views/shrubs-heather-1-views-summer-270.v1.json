@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-heather-1-views",
+  "variantId": "shrubs-heather-1-views-summer-270",
+  "name": "Heather small, summer 270° (back-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "2cdd762d",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 45,
+  "height": 33,
+  "anchor": {
+    "x": 23,
+    "y": 24
+  },
+  "origin": {
+    "x": 0.51111,
+    "y": 0.72727
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 23,
+    "y": 24
+  },
+  "baseOrigin": {
+    "x": 0.51111,
+    "y": 0.72727
+  },
+  "visualHeight": 24,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

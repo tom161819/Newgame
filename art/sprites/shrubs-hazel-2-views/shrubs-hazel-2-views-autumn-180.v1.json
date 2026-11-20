@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-hazel-2-views",
+  "variantId": "shrubs-hazel-2-views-autumn-180",
+  "name": "Hazel medium, autumn 180° (back-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "2550524f",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 44,
+  "height": 41,
+  "anchor": {
+    "x": 23,
+    "y": 37
+  },
+  "origin": {
+    "x": 0.52273,
+    "y": 0.90244
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 23,
+    "y": 37
+  },
+  "baseOrigin": {
+    "x": 0.52273,
+    "y": 0.90244
+  },
+  "visualHeight": 37,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

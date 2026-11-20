@@ -1,0 +1,318 @@
+{
+  "schema": 1,
+  "id": "bush-berry-views",
+  "name": "Berry bush \u2013 4 seasons \u00d7 4 views",
+  "category": "nature",
+  "description": "Owner's Blender model bush-berry (15 Nov 2026): four seasons in the four isometric views of the trees. On the map a shrub can use any of the four views for variety, as the trees do.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "tree",
+  "variants": [
+    {
+      "id": "bush-berry-views-spring-0",
+      "name": "Berry bush, spring 0\u00b0 (front-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): spring, view 0\u00b0 (front-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
+      }
+    },
+    {
+      "id": "bush-berry-views-spring-90",
+      "name": "Berry bush, spring 90\u00b0 (front-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): spring, view 90\u00b0 (front-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 90
+      }
+    },
+    {
+      "id": "bush-berry-views-spring-180",
+      "name": "Berry bush, spring 180\u00b0 (back-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): spring, view 180\u00b0 (back-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 180
+      }
+    },
+    {
+      "id": "bush-berry-views-spring-270",
+      "name": "Berry bush, spring 270\u00b0 (back-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): spring, view 270\u00b0 (back-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 270
+      }
+    },
+    {
+      "id": "bush-berry-views-summer-0",
+      "name": "Berry bush, summer 0\u00b0 (front-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): summer, view 0\u00b0 (front-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
+      }
+    },
+    {
+      "id": "bush-berry-views-summer-90",
+      "name": "Berry bush, summer 90\u00b0 (front-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): summer, view 90\u00b0 (front-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 90
+      }
+    },
+    {
+      "id": "bush-berry-views-summer-180",
+      "name": "Berry bush, summer 180\u00b0 (back-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): summer, view 180\u00b0 (back-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 180
+      }
+    },
+    {
+      "id": "bush-berry-views-summer-270",
+      "name": "Berry bush, summer 270\u00b0 (back-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): summer, view 270\u00b0 (back-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 270
+      }
+    },
+    {
+      "id": "bush-berry-views-autumn-0",
+      "name": "Berry bush, autumn 0\u00b0 (front-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): autumn, view 0\u00b0 (front-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
+      }
+    },
+    {
+      "id": "bush-berry-views-autumn-90",
+      "name": "Berry bush, autumn 90\u00b0 (front-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): autumn, view 90\u00b0 (front-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 90
+      }
+    },
+    {
+      "id": "bush-berry-views-autumn-180",
+      "name": "Berry bush, autumn 180\u00b0 (back-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): autumn, view 180\u00b0 (back-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 180
+      }
+    },
+    {
+      "id": "bush-berry-views-autumn-270",
+      "name": "Berry bush, autumn 270\u00b0 (back-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): autumn, view 270\u00b0 (back-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 270
+      }
+    },
+    {
+      "id": "bush-berry-views-winter-0",
+      "name": "Berry bush, winter 0\u00b0 (front-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): winter, view 0\u00b0 (front-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
+      }
+    },
+    {
+      "id": "bush-berry-views-winter-90",
+      "name": "Berry bush, winter 90\u00b0 (front-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): winter, view 90\u00b0 (front-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 90
+      }
+    },
+    {
+      "id": "bush-berry-views-winter-180",
+      "name": "Berry bush, winter 180\u00b0 (back-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): winter, view 180\u00b0 (back-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 180
+      }
+    },
+    {
+      "id": "bush-berry-views-winter-270",
+      "name": "Berry bush, winter 270\u00b0 (back-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): winter, view 270\u00b0 (back-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 270
+      }
+    }
+  ]
+}

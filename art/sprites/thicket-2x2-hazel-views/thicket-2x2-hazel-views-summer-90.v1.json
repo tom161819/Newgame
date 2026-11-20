@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "thicket-2x2-hazel-views",
+  "variantId": "thicket-2x2-hazel-views-summer-90",
+  "name": "Thicket 2×2 – Hazel, summer 90° (front-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "71358398",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 109,
+  "height": 77,
+  "anchor": {
+    "x": 58,
+    "y": 55
+  },
+  "origin": {
+    "x": 0.53211,
+    "y": 0.71429
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 58,
+    "y": 55
+  },
+  "baseOrigin": {
+    "x": 0.53211,
+    "y": 0.71429
+  },
+  "visualHeight": 55,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

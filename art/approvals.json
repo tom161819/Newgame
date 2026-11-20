@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-14T18:01:06.458Z",
+  "updatedAt": "2026-11-19T18:30:00.000Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -7715,6 +7715,203 @@
           "status": "approved",
           "updatedAt": "2026-11-14T21:15:00.000Z",
           "version": 2
+        }
+      }
+    },
+    "wall-diagonal": {
+      "preferred": null,
+      "variants": {
+        "wall-diagonal-se": {
+          "approvedAt": "2026-11-19T18:17:13.492Z",
+          "comments": [
+            {
+              "at": "2026-11-15T05:55:10.655Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to cimbuří je nějaký divný, oprav to",
+              "version": 5
+            }
+          ],
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7cfc4d36",
+          "status": "approved",
+          "updatedAt": "2026-11-19T18:17:13.492Z",
+          "version": 6,
+          "history": []
+        },
+        "wall-diagonal-ne": {
+          "approvedAt": "2026-11-19T18:17:14.680Z",
+          "comments": [
+            {
+              "at": "2026-11-15T05:55:13.451Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to cimbuří je nějaký divný, oprav to",
+              "version": 5
+            }
+          ],
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cd439fc3",
+          "status": "approved",
+          "updatedAt": "2026-11-19T18:17:14.680Z",
+          "version": 6,
+          "history": []
+        },
+        "wall-diagonal-elbow-ne-00": {
+          "approvedAt": "2026-11-15T05:55:21.071Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a0876624",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:21.071Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-ne-01": {
+          "approvedAt": "2026-11-15T05:55:20.320Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4e31ce05",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:20.320Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-ne-10": {
+          "approvedAt": "2026-11-15T05:55:35.335Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "855830bb",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:35.335Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-ne-11": {
+          "approvedAt": "2026-11-15T05:55:17.245Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ccc14034",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:17.245Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-nw-00": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "01d03dba",
+          "status": "rejected",
+          "updatedAt": "2026-11-15T16:53:22.196Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-nw-01": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "694a183b",
+          "status": "rejected",
+          "updatedAt": "2026-11-15T16:53:20.520Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-nw-10": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a3a152e9",
+          "status": "rejected",
+          "updatedAt": "2026-11-15T16:53:14.982Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-nw-11": {
+          "approvedAt": "2026-11-15T05:55:29.642Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0a0aefc2",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:29.642Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-se-00": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c2c7e625",
+          "status": "rejected",
+          "updatedAt": "2026-11-15T16:53:14.039Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-se-01": {
+          "approvedAt": "2026-11-15T05:55:22.959Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "974d476a",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:22.959Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-se-10": {
+          "approvedAt": "2026-11-15T05:55:22.411Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e15d35d4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:22.411Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-se-11": {
+          "approvedAt": "2026-11-15T05:55:21.767Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8db96739",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:21.767Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-sw-00": {
+          "approvedAt": "2026-11-15T05:55:28.371Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a71728f7",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:28.371Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-sw-01": {
+          "approvedAt": "2026-11-15T05:55:27.278Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5630736c",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:27.278Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-sw-10": {
+          "approvedAt": "2026-11-15T05:55:26.338Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f66910a6",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:26.338Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-sw-11": {
+          "approvedAt": "2026-11-15T05:55:25.411Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e56c4a83",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:25.411Z",
+          "version": 5,
+          "history": []
         }
       }
     }

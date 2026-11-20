@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 export async function sideCardsSmoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);
   try{
-    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
+    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW6-1555155555555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.sideCards);
     await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const open=()=>page.evaluate(()=>({policy:!document.querySelector('#policy-card').hidden,population:document.querySelector('#population-panel').classList.contains('open'),employment:!document.querySelector('#employment-panel').hidden}));
@@ -22,7 +22,7 @@ export async function sideCardsSmoke(context,url,instrument){
       if(process.env.SMOKE_SHOTS&&style==='studio'){await page.locator('#policy-tab').click();await page.screenshot({path:`${process.env.SMOKE_SHOTS}/side-cards-policy.png`});await page.locator('#policy-tab').click();}
     }
     // A tax change in the card shows in the Castle panel's slider (the same policy), and Cancel in either clears it.
-    await page.locator('#policy-tab').click();const card=page.locator('#policy-card .policy-slider-tax input');await card.focus();await page.keyboard.press('ArrowRight');
+    await page.locator('#policy-tab').click();const card=page.locator('#policy-card .policy-slider-tax input');await card.focus();for(let i=0;i<6;i++)await page.keyboard.press('ArrowRight');
     assert.equal(await card.getAttribute('data-level'),'high');await page.locator('#policy-card [data-policy="pending"]:not([hidden])').waitFor();
     await page.locator('#employment-tab').click();assert.equal(await page.locator('#policy-tax').getAttribute('data-level'),'high','the Castle panel shows the card\'s choice');
     // A priority change in the Employments card is the Castle window's own control.

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-seasons",
+  "variantId": "shrubs-seasons-juniper-autumn",
+  "name": "Juniper – autumn",
+  "category": "nature",
+  "version": 2,
+  "specHash": "f6f5b1c4",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 44,
+  "height": 43,
+  "anchor": {
+    "x": 23,
+    "y": 41
+  },
+  "origin": {
+    "x": 0.52273,
+    "y": 0.95349
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 23,
+    "y": 41
+  },
+  "baseOrigin": {
+    "x": 0.52273,
+    "y": 0.95349
+  },
+  "visualHeight": 41,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

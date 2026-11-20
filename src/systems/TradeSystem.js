@@ -28,7 +28,7 @@ export function validateTradeStats(st,{check,number,integer,array,resource,day})
 export class TradeSystem {
   constructor(scene){
     this.scene=scene;this.orders=[];this.seq=0;this.listeners=new Set();this.stats=emptyTradeStats();this.auto=emptyAutoTrade();this.expedition=new Expedition(this);
-    if(scene.caravans)scene.caravans.deliveryPending=caravan=>this.openOrders(caravan.id).some(o=>o.status==='Transporting');
+    if(scene.caravans)scene.caravans.deliveryPending=caravan=>this.openOrders(caravan.id).length>0;/* owner 19 Nov 2026 (78): also an order not yet picked up keeps it waiting */
   }
   get storage(){return this.scene.foodStorage;}
   get caravan(){return this.scene.caravans?.active??null;}

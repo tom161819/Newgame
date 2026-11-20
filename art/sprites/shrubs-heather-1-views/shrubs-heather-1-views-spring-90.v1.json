@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-heather-1-views",
+  "variantId": "shrubs-heather-1-views-spring-90",
+  "name": "Heather small, spring 90° (front-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "1b59ea55",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 45,
+  "height": 31,
+  "anchor": {
+    "x": 22,
+    "y": 24
+  },
+  "origin": {
+    "x": 0.48889,
+    "y": 0.77419
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 22,
+    "y": 24
+  },
+  "baseOrigin": {
+    "x": 0.48889,
+    "y": 0.77419
+  },
+  "visualHeight": 24,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

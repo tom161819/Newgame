@@ -1,3 +1,4 @@
+import { LoadingScreen } from './LoadingScreen.js';
 import { sandboxSettings,SANDBOX_LANDS } from '../game/sandboxMode.js';
 import { zoneStart,homeAfterZone,buryFallen,nextMap } from '../game/zoneMode.js';
 import { recordSaveFailure } from '../systems/saveFailure.js';
@@ -96,6 +97,7 @@ export class GameApplication {
     this.setup.close();
     this.pauseDialog.close();this.main.hidden=true;document.body.classList.add('in-game');document.querySelector('main').inert=false;
     this.startedFromSave=!!state||!!zone;
+    (this.loadingScreen??=new LoadingScreen(document)).show();/* owner 19 Nov 2026 (74) */
     this.game.scene.stop('MainMenu');this.game.scene.stop('Game');this.scene=null;this.game.scene.start('Game',{state,settings,zone,sandbox});
   }
   startTestMap(land='home'){this.pendingGettingStarted=false;this.start(null,sandboxSettings(land),null,land==='home'?true:land);}
@@ -119,12 +121,12 @@ export class GameApplication {
   enterMine(){const scene=this.scene;if(!scene?.zone||scene.zone.dungeon)return false;const next=nextMap(scene,{dungeon:true});this.start(null,next.settings,next.zone);return true;}
   leaveMine(){const scene=this.scene;if(!scene?.zone?.dungeon)return false;const next=nextMap(scene,{dungeon:false});this.start(null,next.settings,next.zone);return true;}
   // Back home: the saved home state with the party on its way back.
-  leaveZone(){
-    const scene=this.scene;if(!scene?.zone)return false;const {home,fallen}=homeAfterZone(scene);let state,checked=true;
+  leaveZone(next=null){
+    const scene=this.scene;if(!scene?.zone)return false;const {home,fallen}=homeAfterZone(scene,{next});let state,checked=true;
     try{state=validateGameState(home);}catch(error){console.error('Zone return check failed:',error);checked=false;state=validateGameState(scene.zone.home);}
     this.pendingFallen=checked?fallen:[];this.start(state);if(fallen.length)this.notify(t('zone.fallen',{count:fallen.length}));return true;
   }
-  onGameReady(scene){this.scene=scene;if(this.pendingFallen?.length){buryFallen(scene,this.pendingFallen);}this.pendingFallen=null;this.telemetry.gameStarted(this.startedFromSave);
+  onGameReady(scene){this.scene=scene;this.loadingScreen?.watch(scene);if(this.pendingFallen?.length){buryFallen(scene,this.pendingFallen);}this.pendingFallen=null;this.telemetry.gameStarted(this.startedFromSave);
     // Developer console (trade F1.2): mkDev.summonCaravan() brings the next caravan now when a Marketplace is finished.
     try{globalThis.mkDev={summonCaravan:()=>this.scene?.caravans?.summon()??false,fillChildren:count=>{this.scene?.childrenSystem?.setDev(count);return !!this.scene?.childrenSystem;},setPathRenderer:style=>this.scene?.terrain?.setPathStyle(style)??false,setShoreStyle:style=>this.scene?.terrain?.setShoreStyle(style)??false,setGroundStyle:style=>this.scene?.terrain?.setGroundStyle(style)??false,pathStats:()=>this.scene?.terrain?.v2?.stats,scene:()=>this.scene};}catch{/* no global object */}
     this.autosave.reset();if(this.pendingGettingStarted){this.pendingGettingStarted=false;if(!scene.tutorial?.start())scene.gettingStarted?.show();}else scene.tutorial?.resume();}

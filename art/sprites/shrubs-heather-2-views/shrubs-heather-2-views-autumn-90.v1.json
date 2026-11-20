@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-heather-2-views",
+  "variantId": "shrubs-heather-2-views-autumn-90",
+  "name": "Heather medium, autumn 90° (front-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "8a9d086e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 45,
+  "height": 37,
+  "anchor": {
+    "x": 22,
+    "y": 29
+  },
+  "origin": {
+    "x": 0.48889,
+    "y": 0.78378
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 22,
+    "y": 29
+  },
+  "baseOrigin": {
+    "x": 0.48889,
+    "y": 0.78378
+  },
+  "visualHeight": 29,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

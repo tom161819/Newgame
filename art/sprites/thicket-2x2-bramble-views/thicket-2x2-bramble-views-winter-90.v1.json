@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "thicket-2x2-bramble-views",
+  "variantId": "thicket-2x2-bramble-views-winter-90",
+  "name": "Thicket 2×2 – Bramble, winter 90° (front-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "6c7258ed",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 101,
+  "height": 70,
+  "anchor": {
+    "x": 52,
+    "y": 45
+  },
+  "origin": {
+    "x": 0.51485,
+    "y": 0.64286
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 52,
+    "y": 45
+  },
+  "baseOrigin": {
+    "x": 0.51485,
+    "y": 0.64286
+  },
+  "visualHeight": 45,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

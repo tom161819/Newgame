@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs",
+  "variantId": "shrubs-heather-3",
+  "name": "Heather – large",
+  "category": "nature",
+  "version": 2,
+  "specHash": "d9bbc0aa",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 49,
+  "height": 32,
+  "anchor": {
+    "x": 24,
+    "y": 27
+  },
+  "origin": {
+    "x": 0.4898,
+    "y": 0.84375
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 24,
+    "y": 27
+  },
+  "baseOrigin": {
+    "x": 0.4898,
+    "y": 0.84375
+  },
+  "visualHeight": 27,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

@@ -12,6 +12,7 @@ import { castleRules } from '../data/castle.js';
 import { buildLinks,drawBuildLinks,linksEnabled } from './buildLinks.js';
 import { clockMinutes,formatClock } from '../data/dayNight.js';
 import { personHover } from '../ui/personHover.js';
+import { militaryRank } from '../ui/militaryPanel.js';
 import { TutorialGuide } from '../ui/TutorialGuide.js';
 import { SpeedControls } from '../ui/SpeedControls.js';
 import { FOOD_OUTLOOK,foodDays } from '../data/foodOutlook.js';
@@ -45,7 +46,7 @@ import { IssueIcons } from './IssueIcons.js';
 import { MaterialYardView,MaterialPiles } from './MaterialPiles.js';
 import { SideCards } from '../ui/SideCards.js';
 import { ArmyPanel } from '../ui/ArmyPanel.js';
-import { decodeWorldCode,randomWorldCode,defaultWorldLevels,settingsFromLevels } from '../data/worldCode.js';
+import { decodeWorldCode,randomWorldCode,defaultWorldLevels,settingsFromLevels,fullLevels,heightLevelsOf } from '../data/worldCode.js';
 import { buildRelief,setRelief,sightBonus } from './terrainRelief.js';
 import { worldStreams } from './seededRandom.js';
 import { FORESTRY as WORLD_FORESTRY,grandTiles } from '../data/naturalResources.js';
@@ -67,6 +68,8 @@ import { t } from '../i18n/index.js';
 import { localized } from '../i18n/names.js';
 import Phaser from 'phaser';
 import { COLUMNS, ROWS, PLAYER_START, isWalkable, tileCenter } from './map.js';
+import { buildingReachable } from './fogReach.js';
+import { FlatBuildings } from './FlatBuildings.js';
 import { setMapSize,mapArea } from './config.js';
 import { generateWorld, mapFromWorld, emptyGround, importGround, importBushes, emptyZones, importZones, importReeds } from './worldGeneration.js';
 import { importNatureGroups, pruneNatureGroups, exportNatureGroups, thicketTiles } from './natureGroups.js';
@@ -117,7 +120,7 @@ import { DevBalancePanel } from '../ui/DevBalancePanel.js';
 import { installPanelDismiss,closeOpenPanels } from '../ui/PanelDismiss.js';
 import { FortificationView } from './FortificationView.js';
 import { TowerDoors } from './TowerDoors.js';
-import { wallLine,wallLinePlan,placeWallLine,wallIndex,connectionsFor,connectedWalls,isWall,gateAxis,turnGate } from './walls.js';
+import { wallLine,wallLinePlan,placeWallLine,wallIndex,connectionsFor,connectedWalls,isWall,gateAxis,turnGate,wallShape,wallLayout } from './walls.js';
 import { replaceWalls } from './wallReplacement.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
 import { CombatFeedback } from '../ui/CombatFeedback.js';
@@ -202,6 +205,7 @@ import { StorePreview } from '../ui/StorePreview.js';
 import { WikiPanel } from '../ui/WikiPanel.js';
 import { DangerMarks } from '../ui/DangerMarks.js';
 import { bindSoundSetting } from '../ui/sound.js';
+import { bindMusic } from '../ui/music.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -259,7 +263,7 @@ export class GameScene extends Phaser.Scene {
     // stream per part; a loaded game keeps its saved world and its code.
     if(!this.loadState&&!this.gameSettings.worldCode)this.gameSettings=gameSettings({...this.gameSettings,worldCode:randomWorldCode()});
     const worldCode=this.gameSettings.worldCode?decodeWorldCode(this.gameSettings.worldCode,this.loadState?{current:null}:undefined):null;
-    this.worldLevels=worldCode?.levels??defaultWorldLevels();this.worldSeed=worldCode?.seed??0;this.worldRandom=worldCode?worldStreams(worldCode.seed):()=>Math.random;
+    this.worldLevels=worldCode?fullLevels(worldCode.levels):defaultWorldLevels();this.worldSeed=worldCode?.seed??0;this.worldRandom=worldCode?worldStreams(worldCode.seed):()=>Math.random;
     const world=this.loadState?{terrain:this.loadState.terrain.map(row=>[...row]),ground:this.loadState.ground?importGround(this.loadState.ground):emptyGround(),bushes:importBushes(this.loadState.bushes??[]),
       zones:this.loadState.grassZones?importZones(this.loadState.grassZones):emptyZones(),reeds:importReeds(this.loadState.reeds),natureGroups:importNatureGroups(this.loadState.natureGroups)}:generateWorld(Math.random,{levels:this.worldLevels,streams:this.worldRandom});
     // m-mapa-kraje: a bandit camp, ruins, a mine, or the mine's inside (zoneFeatures.js) before the world is drawn.
@@ -270,7 +274,7 @@ export class GameScene extends Phaser.Scene {
     // 'off' (the browser smokes, which click by the flat projection; also a way out on a weak machine).
     // The address ?lift=off / ?lift=on sets and remembers it (like ?renderer=).
     let liftOn=true;try{const asked=new URLSearchParams(globalThis.location?.search??'').get('lift');if(asked==='off'||asked==='on')globalThis.localStorage?.setItem('newgame.terrainLift',asked);liftOn=globalThis.localStorage?.getItem('newgame.terrainLift')!=='off';}catch{}
-    this.reliefLift=liftOn;this.relief=setRelief(buildRelief(world.ground,this.worldSeed),{lift:liftOn});this.bushes=world.bushes;this.grassZones=world.zones;this.reeds=world.reeds;
+    this.reliefLift=liftOn;this.relief=setRelief(buildRelief(world.ground,this.worldSeed,heightLevelsOf(this.worldLevels)),{lift:liftOn});this.bushes=world.bushes;this.grassZones=world.zones;this.reeds=world.reeds;
     // velke-prirodni-objekty: thickets and rock groups drawn as one object over their bushes and rock tiles.
     this.natureGroups=world.natureGroups??[];
     // Generator 2's weights for where forests and ore deposits grow (new games only; not saved).
@@ -378,7 +382,7 @@ export class GameScene extends Phaser.Scene {
     this.wageSystem=new WageSystem(this,{onPayroll:()=>this.updateInventory()});this.economyPanel=new EconomyPanel(this);
     this.buildingBar.close();this.updateInventory();
     this.gettingStarted=new GettingStartedPanel(this);this.wikiPanel=new WikiPanel(this);
-    this.domestic=new DomesticAnimalSystem(this);this.combat.shield=(target,attacker)=>this.domestic?.shield(target,attacker);this.domesticViews=new DomesticViews(this,this.domestic);this.issueIcons=new IssueIcons(this);this.materialPiles=new MaterialPiles(this);this.childrenSystem=new ChildrenSystem(this);this.porches=new PorchSystem(this);this.nightOverlay=new NightOverlay(this,this.dayNight);/* m-svet-vzhled-2: soft fog edge, fish in water */this.fogEdge=new FogEdgeLayer(this);this.fishShadows=new FishShadows(this);this.riverLife=new RiverLife(this);this.fuelIcons=new FuelIcons(this);this.fireViews=new FireViews(this);this.kingdomOverview=new KingdomOverview(this);this.speedControls=new SpeedControls(this);this.tutorial=new TutorialGuide(this);this.royalGoals=new RoyalGoals(this);this.kingSkills=new KingSkills(this,this.royalGoals);this.royalGoalsPanel=new RoyalGoalsPanel(this,this.royalGoals);this.completionFlash=new CompletionFlash(this);this.storePreview=new StorePreview(this);this.dangerMarks=new DangerMarks(this);this.soundController=new AbortController();bindSoundSetting(document,this.soundController.signal);this.helpArrow=new HelpArrow(this);this.nightControls=new NightControls(this);this.nightSpeedUp=new NightSpeedUp(this);this.dayNight.attention=()=>!!this.nightThreats?.wolvesNear||!!this.nightThreats?.fires.size||[...this.combat.attacks.keys()].some(attacker=>attacker.profession===undefined&&attacker!==this.character);this.childViews=new ChildViews(this,this.childrenSystem);this.villagePanel=new VillagePanel(this);this.catPanel=new CatPanel(this);
+    this.domestic=new DomesticAnimalSystem(this);this.combat.shield=(target,attacker)=>this.domestic?.shield(target,attacker);this.domesticViews=new DomesticViews(this,this.domestic);this.issueIcons=new IssueIcons(this);this.materialPiles=new MaterialPiles(this);this.childrenSystem=new ChildrenSystem(this);this.porches=new PorchSystem(this);this.nightOverlay=new NightOverlay(this,this.dayNight);/* m-svet-vzhled-2: soft fog edge, fish in water */this.fogEdge=new FogEdgeLayer(this);this.fishShadows=new FishShadows(this);this.riverLife=new RiverLife(this);this.fuelIcons=new FuelIcons(this);this.fireViews=new FireViews(this);this.kingdomOverview=new KingdomOverview(this);this.speedControls=new SpeedControls(this);this.tutorial=new TutorialGuide(this);this.royalGoals=new RoyalGoals(this);this.kingSkills=new KingSkills(this,this.royalGoals);this.royalGoalsPanel=new RoyalGoalsPanel(this,this.royalGoals);this.completionFlash=new CompletionFlash(this);this.storePreview=new StorePreview(this);this.dangerMarks=new DangerMarks(this);this.flatBuildings=new FlatBuildings(this);this.flatStatus=on=>t(on?'flat.on':'flat.off');this.soundController=new AbortController();bindSoundSetting(document,this.soundController.signal);this.music=bindMusic(document,this.soundController.signal);/* owner 19 Nov 2026 (79) */this.helpArrow=new HelpArrow(this);this.nightControls=new NightControls(this);this.nightSpeedUp=new NightSpeedUp(this);this.dayNight.attention=()=>!!this.nightThreats?.wolvesNear||!!this.nightThreats?.fires.size||[...this.combat.attacks.keys()].some(attacker=>attacker.profession===undefined&&attacker!==this.character);this.childViews=new ChildViews(this,this.childrenSystem);this.villagePanel=new VillagePanel(this);this.catPanel=new CatPanel(this);
     this.marketplacePanel=new MarketplacePanel(this);this.builderWorkshopPanel=new BuilderWorkshopPanel(this);this.policyPanel=new PolicyPanel(this);this.sideCards=new SideCards(this);
     this.updateTimeDisplay();
     this.setStatus(t('status.idle'));
@@ -448,7 +452,7 @@ export class GameScene extends Phaser.Scene {
       this.settingsPanel.destroy();this.fpsOverlay.destroy();this.devBalancePanel?.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);this.input.keyboard.off('keydown-R',onRotate);
       this.clearWallPreviews();
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
-      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.wikiPanel?.destroy();this.royalGoalsPanel?.destroy();this.royalGoals?.destroy();this.kingSkills?.destroy();this.completionFlash?.destroy();this.storePreview?.destroy();this.dangerMarks?.destroy();this.soundController?.abort();this.marketplacePanel.destroy();this.catPanel?.destroy();this.domesticViews?.destroy();this.domestic?.destroy();this.villagePanel?.destroy();this.issueIcons?.destroy();this.materialPiles?.destroy();this.sideCards?.destroy();this.childViews?.destroy();this.childrenSystem?.destroy();this.porches?.destroy();this.lightFuel?.destroy();this.nightThreats?.destroy();this.heating?.destroy();this.clothing?.destroy();this.fuelIcons?.destroy();this.fireViews?.destroy();this.kingdomOverview?.destroy();this.speedControls?.destroy();this.tutorial?.destroy();this.helpArrow?.destroy();this.nightOverlay?.destroy();this.fogEdge?.destroy();this.fishShadows?.destroy();this.nightControls?.destroy();this.nightSpeedUp?.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
+      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.wikiPanel?.destroy();this.royalGoalsPanel?.destroy();this.royalGoals?.destroy();this.kingSkills?.destroy();this.completionFlash?.destroy();this.storePreview?.destroy();this.dangerMarks?.destroy();this.soundController?.abort();this.flatBuildings?.destroy();this.marketplacePanel.destroy();this.catPanel?.destroy();this.domesticViews?.destroy();this.domestic?.destroy();this.villagePanel?.destroy();this.issueIcons?.destroy();this.materialPiles?.destroy();this.sideCards?.destroy();this.childViews?.destroy();this.childrenSystem?.destroy();this.porches?.destroy();this.lightFuel?.destroy();this.nightThreats?.destroy();this.heating?.destroy();this.clothing?.destroy();this.fuelIcons?.destroy();this.fireViews?.destroy();this.kingdomOverview?.destroy();this.speedControls?.destroy();this.tutorial?.destroy();this.helpArrow?.destroy();this.nightOverlay?.destroy();this.fogEdge?.destroy();this.fishShadows?.destroy();this.nightControls?.destroy();this.nightSpeedUp?.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.pavementTool.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
       this.demolitionUI.destroy();this.demolition.destroy();this.repairs.destroy();this.farmConnections.destroy();this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
@@ -499,7 +503,7 @@ export class GameScene extends Phaser.Scene {
       const allowed=!!b&&buildingTooltipAllowed({dragging:!!pointer.isDown||!!this.unitSelection?.dragging,selected:selectedBuildingIds(this).has(b.id),touch:!!pointer.wasTouch||!!globalThis.matchMedia?.('(hover: none)').matches});
       this.storePreview?.hoverBuilding(b,rect.left+pointer.x*rect.width/this.scale.width,rect.top+pointer.y*rect.height/this.scale.height,{allowed});}
     if(hoverHit?.kind==='human'){
-      const unit=hoverHit.object;tooltip.hidden=false;this.personTooltip(tooltip,personHover(unit,{king:unit===this.character}));
+      const unit=hoverHit.object;tooltip.hidden=false;this.personTooltip(tooltip,personHover(unit,{king:unit===this.character,role:unit!==this.character&&unit.profession==='soldier'?militaryRank(this,unit):null}));
       const rect=this.game.canvas.getBoundingClientRect();tooltip.style.left=`${Math.min(window.innerWidth-150,rect.left+pointer.x*rect.width/this.scale.width+14)}px`;tooltip.style.top=`${Math.max(4,rect.top+pointer.y*rect.height/this.scale.height-32)}px`;return;
     }
     // Owner 9 Nov 2026: a child shows its name and "Child" as its occupation.
@@ -712,9 +716,12 @@ export class GameScene extends Phaser.Scene {
   selectableHumans(){return this.workerSystem?.liveWorkers()??[];}
   // m-budovy-klik-mimo-dohled (owner, 12 Nov): the King always knows his own buildings, so one on explored ground (grey
   // fog) opens like one in sight; animals, loot and strangers in the fog stay out of reach.
-  buildingReachable(building){const f=this.fog;if(!f?.enabled||f.isVisibleObject(building))return true;if(building.unverified)return true;const w=f.width;return !!f.explored&&(building.tiles??[]).some(t=>f.explored[t.y*w+t.x]);}
+  // Owner 19 Nov 2026 (80): an own building or blueprint opens in any fog, also its window stays open; an enemy one
+  // still needs explored ground.
+  buildingReachable(building){return buildingReachable(this.fog,building);}
   towerAtPoint(x,y,tile) {
-    return [...this.buildings].filter(building=>this.buildingReachable(building)).sort((a,b)=>towerBase(b).y-towerBase(a).y).find(building=>this.towerViews.get(building.id).contains(x,y)||building.tiles.some(part=>tileKey(part)===tileKey(tile)));
+    // (84) flattened buildings are found by their ground plan only.
+    const flat=!!this.flatBuildings?.on;return [...this.buildings].filter(building=>this.buildingReachable(building)).sort((a,b)=>towerBase(b).y-towerBase(a).y).find(building=>!flat&&this.towerViews.get(building.id).contains(x,y)||building.tiles.some(part=>tileKey(part)===tileKey(tile)));
   }
   startBuilding(definition=this.objectRegistry.require('tower')) {
     this.rockMiningTool?.close();
@@ -818,10 +825,10 @@ export class GameScene extends Phaser.Scene {
     else this.cancelBuilding(message);
   }
   refreshWallConnections(){
-    this.wallMap=wallIndex(this.buildings);
-    for(const building of this.wallMap.values()){
-      const connections=connectionsFor(this.wallMap,building),key=JSON.stringify(connections);
-      if(key!==building.connectionKey){building.connections=connections;building.connectionKey=key;this.towerViews.get(building.id)?.paint(building,building.enemy?ENEMY_TINT:null);}
+    const layout=wallLayout(this.buildings);this.wallMap=layout.finished;
+    for(const {building,connections,shape} of layout.walls){
+      const key=JSON.stringify(connections)+JSON.stringify(shape);
+      if(key!==building.connectionKey){building.connections=connections;building.connectionKey=key;if(shape?.diagonal)building.diagonal=shape.diagonal;else delete building.diagonal;if(shape?.elbow)building.elbow=shape.elbow;else delete building.elbow;this.towerViews.get(building.id)?.paint(building,building.enemy?ENEMY_TINT:null);}
     }
   }
   showMarker(tile) { this.marker.clear().lineStyle(2,0xe3c879,1).strokePoints(tilePolygon(tile),true).setVisible(true); }
@@ -1004,8 +1011,9 @@ export class GameScene extends Phaser.Scene {
     const fades=this.sightFade??=new Map(),fading=this.fog.enabled,frame=this.game?.loop?.delta??16;if(!fading&&fades.size)fades.clear();
     for(const building of this.buildings){const visual=this.towerViews.get(building.id),seen=this.fog.isVisibleObject(building);let lit=seen?1:0;
       if(fading){const key=`building:${building.id}`;if(buildingIsComplete(building)&&this.mapMemory?.objects.has(key)){const target=edgeLight(this.fog,building,buildingDefinition(building));lit=fadeStep(visual.sightLit??target,target,frame);}visual.sightLit=lit;if(lit<1&&lit>0)fades.set(key,lit);else fades.delete(key);}
-      const shown=(seen||lit>0)&&visual.inView(view);visual.setVisible(shown);
+      const shown=(seen||lit>0)&&visual.inView(view)&&!this.flatBuildings?.on;visual.setVisible(shown);
       if(shown&&buildingIsComplete(building))applyFootprint(visual,footprintShown({selected:selectedIds.has(building.id),buildMode:!!this.buildMode}));}
+    this.flatBuildings?.update();
     this.player.setVisible(!this.character.away&&this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
     this.combatFeedback?.refresh();
     this.experienceFeedback?.refreshVisibility();this.unitPanel?.refresh();

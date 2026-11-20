@@ -12,6 +12,8 @@ export function staticMemoryEntries(scene){
   for(const building of scene.buildings)add('building',building.id,building.type,building,()=>({
     ...(building.construction?{construction:{state:building.construction.state,progress:building.construction.progress,workDone:building.construction.workDone}}:{}),
     ...(building.connections?{connections:{...building.connections}}:{}),
+    // m-hradby-diagonala: the remembered wall keeps its diagonal piece or elbow.
+    ...(building.diagonal?{diagonal:building.diagonal}:{}),...(building.elbow?{elbow:building.elbow}:{}),
     ...(building.definition.crop?{stage:scene.farmingSystem?.records.get(building.id)?.stage??0,season:scene.seasons?.season??'Spring'}:{}),
   }));
   for(const chest of scene.treasureSystem?.chests.values()??[])add('chest',chest.id,chest.type,chest,()=>({opened:chest.opened,lid:chest.view.lid?{y:chest.view.lid.y,rotation:chest.view.lid.rotation}:null}));

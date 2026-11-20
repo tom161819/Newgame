@@ -1,3 +1,4 @@
+import { buildingReachable } from '../game/fogReach.js';
 import { localized,workMessageLabel } from '../i18n/names.js';
 import { TORCH_TARGET_MAX } from '../systems/FoodProductionSystem.js';
 import { t } from '../i18n/index.js';
@@ -8,7 +9,7 @@ import { element } from './objectLabels.js';
 import { CANDIDATE_GROUPS,candidateGroups } from './workplaceCandidates.js';
 import { buildingIssueLine } from './noticeText.js';
 import { buildingName } from '../game/depletedMine.js';
-import { renderMilitary,militarySignature,handleMilitaryClick } from './militaryPanel.js';
+import { renderMilitary,militarySignature,handleMilitaryClick,barracksRosterRow } from './militaryPanel.js';
 import { staffingLine } from '../systems/StaffingStatus.js';
 
 // m-okno-budovy-sklad: one row per own store of a building – input, output, pile by the building, kit store – with
@@ -85,7 +86,7 @@ export class WorkplacePanel {
   refresh(){
     if(this.pressing)return;
     if(!this.dialog.open||!this.building)return;
-    const s=this.scene,b=this.building;if(!s.buildings.includes(b)||!(s.buildingReachable?.(b)??s.fog.isVisibleObject(b))){this.close();return;}
+    const s=this.scene,b=this.building;if(!s.buildings.includes(b)||!buildingReachable(s.fog,b)){this.close();return;}
     this.renderOwnStore(b);
     const spec=buildingDefinition(b),summary=s.workplaceSystem.summary(b),employees=s.workplaceSystem.employees(b),candidates=s.workerSystem.liveSubjects();
     const plots=b.type==='farmhouse'?s.farmingSystem?.plotSummary(b):null;this.farmCount.hidden=!plots;if(plots)this.farmCount.textContent=t('farmPlots.count',plots);
@@ -144,8 +145,17 @@ export class WorkplacePanel {
     document.querySelector('#workplace-wages').textContent=t('workplace.wages',{amount:summary.wages.toFixed(2)});
     document.querySelector('#workplace-average').textContent=t('workplace.average',{skill:SKILLS[spec.workplace.skill],value:summary.averageSkill.toFixed(2)});
     document.querySelector('#workplace-production').textContent=t('workplace.delivered',{list:Object.entries(summary.delivered).map(([id,n])=>`${s.objectRegistry.require(id).name} ${n}`).join(' · ')||'0'});
-    const rows=employees.map(w=>{const row=element('li','workplace-worker'),text=element('span','',`${w.name} · ${t('workplace.skillLevel',{skill:SKILLS[spec.workplace.skill],level:w.skills[spec.workplace.skill].level})} · ${localized(`work.state.${w.workState}`,w.workState)}${w.workMessage?` — ${workMessageLabel(w.workMessage)}`:''}`),remove=element('button','',t('workplace.remove'));remove.type='button';remove.dataset.removeWorker=w.id;row.append(text,remove);return row;});
-    if(!b.depleted)for(let i=summary.count;i<summary.capacity;i++)rows.push(element('li','empty-slot',t('workplace.emptySlot')));document.querySelector('#workplace-workers').replaceChildren(...rows);renderMilitary(s,b,this.militaryDetails,employees);
+    // Owner 19 Nov 2026: the Barracks lists its soldiers compactly (name, class, level, state) in a section that is
+    // closed by default; no "free place" lines (the summary says how many are housed).
+    const barracks=b.type==='barracks';
+    {const list=document.querySelector('#workplace-workers');let roster=document.querySelector('#barracks-roster');
+      if(barracks){if(!roster){roster=document.createElement('details');roster.id='barracks-roster';roster.className='barracks-roster';roster.append(document.createElement('summary'));list.before(roster);}
+        roster.hidden=false;if(list.parentElement!==roster)roster.append(list);roster.querySelector('summary').textContent=t('military.roster',{count:summary.count,capacity:summary.capacity});}
+      else if(roster){roster.hidden=true;if(list.parentElement===roster)roster.after(list);}
+      list.classList.toggle('barracks-roster-list',barracks);
+      document.querySelector('#workplace-count').hidden=barracks;document.querySelector('#workplace-production').hidden=barracks;}
+    const rows=barracks?employees.map(w=>barracksRosterRow(s,w)):employees.map(w=>{const row=element('li','workplace-worker'),text=element('span','',`${w.name} · ${t('workplace.skillLevel',{skill:SKILLS[spec.workplace.skill],level:w.skills[spec.workplace.skill].level})} · ${localized(`work.state.${w.workState}`,w.workState)}${w.workMessage?` — ${workMessageLabel(w.workMessage)}`:''}`),remove=element('button','',t('workplace.remove'));remove.type='button';remove.dataset.removeWorker=w.id;row.append(text,remove);return row;});
+    if(!b.depleted&&!barracks)for(let i=summary.count;i<summary.capacity;i++)rows.push(element('li','empty-slot',t('workplace.emptySlot')));document.querySelector('#workplace-workers').replaceChildren(...rows);renderMilitary(s,b,this.militaryDetails,employees);
     document.querySelector('#assign-workplace-worker').disabled=!!blocked||summary.count>=summary.capacity;
     // Three groups in a fixed order (this profession without a workplace, others without one, already working: elsewhere or as a Hauler/Builder), each sorted by the skill this building needs.
     const skill=spec.workplace.skill,groups=candidateGroups(candidates,spec.workplace),full=summary.count>=summary.capacity;

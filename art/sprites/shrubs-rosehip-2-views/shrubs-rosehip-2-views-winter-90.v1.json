@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-rosehip-2-views",
+  "variantId": "shrubs-rosehip-2-views-winter-90",
+  "name": "Rosehip medium, winter 90° (front-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "23a4d2c6",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 38,
+  "height": 36,
+  "anchor": {
+    "x": 19,
+    "y": 32
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.88889
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 19,
+    "y": 32
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.88889
+  },
+  "visualHeight": 32,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

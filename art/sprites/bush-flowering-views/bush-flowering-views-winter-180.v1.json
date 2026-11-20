@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "bush-flowering-views",
+  "variantId": "bush-flowering-views-winter-180",
+  "name": "Flowering bush, winter 180° (back-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "ae04ab82",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 50,
+  "height": 37,
+  "anchor": {
+    "x": 27,
+    "y": 32
+  },
+  "origin": {
+    "x": 0.54,
+    "y": 0.86486
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 27,
+    "y": 32
+  },
+  "baseOrigin": {
+    "x": 0.54,
+    "y": 0.86486
+  },
+  "visualHeight": 32,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

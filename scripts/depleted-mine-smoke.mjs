@@ -10,7 +10,7 @@ export async function depletedMineSmoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);const errors=[];page.on('pageerror',e=>errors.push(e.message));
   try{
     await page.setViewportSize({width:1280,height:800});
-    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
+    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW6-1555155555555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.materialPiles);
     await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.employment.setEnabled(false);s.fog.setEnabled(false);s.refreshVisibility();});

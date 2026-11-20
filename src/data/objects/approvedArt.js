@@ -77,6 +77,25 @@ export const APPROVED_WALL_ART=Object.freeze({
   S:{sprite:'/assets/buildings/wall/kit/wall-kit-parapet-s.v1.png',artSource:'art/sprites/wall-kit/wall-kit-parapet-s.v1.json',origin:{"x":0.49254,"y":0.9802}},
   W:{sprite:'/assets/buildings/wall/kit/wall-kit-parapet-w.v1.png',artSource:'art/sprites/wall-kit/wall-kit-parapet-w.v1.json',origin:{"x":0.49254,"y":0.98261}},
 });
+// m-hradby-diagonala: diagonal wall pieces, drawn on the TILE CENTRE (origin = the export's anchor). se / ne: a tile in
+// the middle of a run (towards grid x+1, y+1 / x+1, y−1), instead of the block and its parapets. elbow-<corner>-<z><x>:
+// the end of a run – the straight wall and half the band in a mitre with all its parapets (no kit pieces on that tile). Approved by the owner in the Studio (se/ne v6 on 19 Nov, elbows v5 on 15 Nov); the rejected elbows NW-00, NW-01, NW-10 and SE-00 are left out, those tiles stay a plain block.
+export const DIAGONAL_WALL_ART=Object.freeze({
+  'se':{sprite:'/assets/buildings/wall/kit/wall-diagonal-se.v6.png',artSource:'art/sprites/wall-diagonal/wall-diagonal-se.v6.json',origin:{"x":0.49744,"y":0.65986}},
+  'ne':{sprite:'/assets/buildings/wall/kit/wall-diagonal-ne.v6.png',artSource:'art/sprites/wall-diagonal/wall-diagonal-ne.v6.json',origin:{"x":0.49744,"y":0.65278}},
+  'elbow-NE-11':{sprite:'/assets/buildings/wall/kit/wall-diagonal-elbow-ne-11.v5.png',artSource:'art/sprites/wall-diagonal/wall-diagonal-elbow-ne-11.v5.json',origin:{"x":0.49744,"y":0.65278}},
+  'elbow-NE-10':{sprite:'/assets/buildings/wall/kit/wall-diagonal-elbow-ne-10.v5.png',artSource:'art/sprites/wall-diagonal/wall-diagonal-elbow-ne-10.v5.json',origin:{"x":0.49744,"y":0.65986}},
+  'elbow-NE-01':{sprite:'/assets/buildings/wall/kit/wall-diagonal-elbow-ne-01.v5.png',artSource:'art/sprites/wall-diagonal/wall-diagonal-elbow-ne-01.v5.json',origin:{"x":0.49744,"y":0.65278}},
+  'elbow-NE-00':{sprite:'/assets/buildings/wall/kit/wall-diagonal-elbow-ne-00.v5.png',artSource:'art/sprites/wall-diagonal/wall-diagonal-elbow-ne-00.v5.json',origin:{"x":0.49744,"y":0.65986}},
+  'elbow-SE-11':{sprite:'/assets/buildings/wall/kit/wall-diagonal-elbow-se-11.v5.png',artSource:'art/sprites/wall-diagonal/wall-diagonal-elbow-se-11.v5.json',origin:{"x":0.49744,"y":0.65986}},
+  'elbow-SE-10':{sprite:'/assets/buildings/wall/kit/wall-diagonal-elbow-se-10.v5.png',artSource:'art/sprites/wall-diagonal/wall-diagonal-elbow-se-10.v5.json',origin:{"x":0.49744,"y":0.65986}},
+  'elbow-SE-01':{sprite:'/assets/buildings/wall/kit/wall-diagonal-elbow-se-01.v5.png',artSource:'art/sprites/wall-diagonal/wall-diagonal-elbow-se-01.v5.json',origin:{"x":0.49744,"y":0.65986}},
+  'elbow-SW-11':{sprite:'/assets/buildings/wall/kit/wall-diagonal-elbow-sw-11.v5.png',artSource:'art/sprites/wall-diagonal/wall-diagonal-elbow-sw-11.v5.json',origin:{"x":0.49744,"y":0.65278}},
+  'elbow-SW-10':{sprite:'/assets/buildings/wall/kit/wall-diagonal-elbow-sw-10.v5.png',artSource:'art/sprites/wall-diagonal/wall-diagonal-elbow-sw-10.v5.json',origin:{"x":0.49744,"y":0.65278}},
+  'elbow-SW-01':{sprite:'/assets/buildings/wall/kit/wall-diagonal-elbow-sw-01.v5.png',artSource:'art/sprites/wall-diagonal/wall-diagonal-elbow-sw-01.v5.json',origin:{"x":0.49744,"y":0.65986}},
+  'elbow-SW-00':{sprite:'/assets/buildings/wall/kit/wall-diagonal-elbow-sw-00.v5.png',artSource:'art/sprites/wall-diagonal/wall-diagonal-elbow-sw-00.v5.json',origin:{"x":0.49744,"y":0.65986}},
+  'elbow-NW-11':{sprite:'/assets/buildings/wall/kit/wall-diagonal-elbow-nw-11.v5.png',artSource:'art/sprites/wall-diagonal/wall-diagonal-elbow-nw-11.v5.json',origin:{"x":0.49744,"y":0.65986}},
+});
 export const TIMBER_SCAFFOLD_BUILDINGS=Object.freeze(['farmhouse','granary','hunting_lodge','lumberjack_hut','fisherman_hut']);
 
 // Approved villager looks (art/sprites/<profession>/<variant>.v1.facing-<k>.png,

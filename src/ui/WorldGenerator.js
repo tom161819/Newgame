@@ -6,6 +6,7 @@ import { worldStreams } from '../game/seededRandom.js';
 import { COLUMNS, ROWS, PLAYER_START, DEFAULT_MAP_SIZE, validMapSize, withMapSize } from '../game/config.js';
 import { GROUND, GRASS_ZONE } from '../data/worldTerrain.js';
 import { WORLD_SETTINGS } from '../data/worldCode.js';
+import { HEIGHT_SETTINGS } from '../game/terrainHeight.js';
 import { t } from '../i18n/index.js';
 
 const GROUND_COLORS = {
@@ -38,6 +39,8 @@ export function previewPixels(world) {
 const COUNTS = { fords: 22, forest: 200, rocks: 65, bushes: 26 };
 export function describe(setting, level) {
   const k = setting.key, v = setting.value?.(level);
+  // Generator 6: the terrain settings say what they make (numbers from terrainHeight.js).
+  if (setting.height) { const h = HEIGHT_SETTINGS.find(s => s.key === k).value(level); const count = k === 'hilliness' ? Math.round(2 * h.scale) : k === 'plains' ? Math.round(100 * h) : k === 'hillHeight' ? h.toFixed(1) : h.toFixed(1); return t(`setup.gen.${k}Is`, { count }); }
   if (k === 'rivers') return t(`setup.gen.rivers.${level}`);
   if (k === 'lakes') return t('setup.gen.lakesCount', { count: level });
   if (k === 'desert' && !level) return t('setup.gen.none');

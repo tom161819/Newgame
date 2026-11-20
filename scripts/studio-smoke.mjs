@@ -610,11 +610,11 @@ try {
     const { page: wl, errors: wlErrors } = await open(context, 'world-lab.html');
     await wl.waitForFunction(() => window.worldLab?.ready);
     const first = await wl.evaluate(() => window.worldLab.code());
-    assert.match(first, /^MKW5-155515555555-[0-9A-Z]{1,8}$/);
+    assert.match(first, /^MKW6-1555155555555555-[0-9A-Z]{1,8}$/);
     await wl.locator('#wl-settings [data-setting="lakes"]').evaluate(input => { input.value = '3'; input.dispatchEvent(new Event('input', { bubbles: true })); });
     await wl.waitForFunction(code => window.worldLab.code() !== code && window.worldLab.report()?.lakes >= 0, first);
-    assert.match(await wl.evaluate(() => window.worldLab.code()), /^MKW5-1555355/);
-    await wl.locator('#wl-code').fill('MKW5-155515555555-ABC123');
+    assert.match(await wl.evaluate(() => window.worldLab.code()), /^MKW6-1555355/);
+    await wl.locator('#wl-code').fill('MKW6-1555155555555555-ABC123');
     await wl.getByRole('button', { name: 'Apply' }).click();
     await wl.waitForFunction(() => window.worldLab.seed() === parseInt('ABC123', 36));
     await wl.waitForTimeout(300);
@@ -622,7 +622,7 @@ try {
     await wl.locator('#wl-code').fill('MKW9-155515555555-ABC123');
     await wl.getByRole('button', { name: 'Apply' }).click();
     assert.equal(await wl.locator('#wl-code').getAttribute('aria-invalid'), 'true');
-    await wl.locator('#wl-compare-input').fill('MKW5-155515555555-ABC123'); await wl.locator('#wl-compare-input').dispatchEvent('change');
+    await wl.locator('#wl-compare-input').fill('MKW6-1555155555555555-ABC123'); await wl.locator('#wl-compare-input').dispatchEvent('change');
     await wl.waitForFunction(() => window.worldLab.reportB());
     assert.deepEqual(await wl.evaluate(() => window.worldLab.reportB()), a, 'the same code gives the same world');
     assert.ok(await luminance(wl, '#wl-iso') > 20, 'the isometric window is drawn with the game art');

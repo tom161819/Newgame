@@ -1,6 +1,7 @@
 import { definitionFor } from '../game/buildings.js';
 import { t,onLanguageChange } from '../i18n/index.js';
 import { VISIBILITY } from '../systems/FogOfWarSystem.js';
+import { SCOUTING,scoutTypeById } from '../data/scouting.js';
 import { gridToWorldFlat as gridToWorld, worldToGridFlat as worldToGrid, clampMapCenter } from '../game/isometric.js'; // flat: painted into the ground picture before it is lifted
 
 // #104: a small map of the 100 × 100 grid in the bottom-right corner. It shows only what the player knows:
@@ -23,6 +24,32 @@ export function minimapDeposits(scene,kind){
   const rule=DEPOSIT_MARKS[kind],f=scene.fog,mining=scene.naturalResources?.mining;if(!rule||!mining)return [];
   const known=d=>!f?.enabled||[...Array(d.definition.width*d.definition.height).keys()].some(i=>f.explored?.[(d.y+Math.floor(i/d.definition.width))*f.width+d.x+i%d.definition.width]||f.isInSightTile?.({x:d.x+i%d.definition.width,y:d.y+Math.floor(i/d.definition.width)}));
   return mining.deposits().filter(d=>(d.type===rule.family||d.type.startsWith(rule.family))&&d.natural.remaining>0&&known(d)).map(d=>({id:d.natural.id,x:d.x+d.definition.width/2,y:d.y+d.definition.height/2,free:d.natural.boundBuildingId==null}));
+}
+// Owner 19 Nov 2026 (77): a caravan shows on the minimap as a small cart that moves with it, the kingdom's own one in
+// another colour than a foreign merchant's. The foreign one shows wherever it is (its arrival is announced); the own one
+// while it gathers at the Marketplace (its Wagon), not while it is away on the road.
+export const CARAVAN_MARKS=Object.freeze({own:'#62b6ff',foreign:'#ffa13d',outline:'#1c140a'});
+export function minimapCaravans(scene){
+  const out=[],c=scene.caravans?.active;if(c?.position)out.push({x:c.position.x,y:c.position.y,own:false});
+  const e=scene.trade?.expedition?.state,v=e?.phase==='gathering'?scene.vehicles?.vehicles?.get?.(e.wagonId):null;
+  if(v){const p=scene.vehicles.position?.(v)??{x:v.x+.5,y:v.y+.5};out.push({x:p.x,y:p.y,own:true});}
+  return out;
+}
+// The canvas is turned by CSS (scaleY(.5) rotate(45deg)); the cart is drawn through the inverse so it stands upright.
+function drawCart(c,x,y,color){
+  c.save();c.translate(x,y);c.rotate(-Math.PI/4);c.scale(1,2);c.fillStyle=color;c.strokeStyle=CARAVAN_MARKS.outline;c.lineWidth=.8;
+  c.beginPath();c.rect(-4.5,-4,9,4);c.fill();c.stroke();for(const wx of [-2.6,2.6]){c.beginPath();c.arc(wx,1.2,1.7,0,Math.PI*2);c.fill();c.stroke();}c.restore();
+}
+// Owner 19 Nov 2026 (82): a small square for each neighbouring map round the minimap: '?' or the icon of what was found
+// there. With Castle level 3 and Barracks a click opens the party window on that map; while the party marches to or from
+// it the square shows the hours left. Squares sit on the diamond's tips and edge middles (sx, sy: screen direction).
+export function minimapZoneMarks(scene){
+  const s=scene.scouting;if(!s)return [];const p=s.party,blocked=typeof s.blocker==='function'?s.blocker():'castle',now=scene.gameTime?.totalElapsed??0,day=scene.gameTime?.dayDuration||1;
+  return SCOUTING.zones.map(z=>{const found=s.zones?.[z.id],type=found&&scoutTypeById(found.type),here=p?.zone===z.id;
+    const hours=here&&(p.phase==='away'||p.phase==='returning')&&Number.isFinite(p.at)?Math.max(0,Math.ceil((p.at-now)/day*24)):null;
+    const label=hours!=null?t('minimap.zoneHours',{hours}):here&&p.phase==='leaving'?'…':type?type.icon:'?';
+    const title=[t(`scouting.zone.${z.id}`),type?t(`scouting.type.${type.id}`):null,here?t(`scouting.phase.${p.phase}`):null,hours!=null?t('scouting.hoursLeft',{hours}):null,blocked?t(`scouting.locked.${blocked}`):null].filter(Boolean).join(' · ');
+    return {id:z.id,label,title,hours,party:here?p.phase:null,found:!!type,enabled:!blocked,sx:z.dx-z.dy,sy:z.dx+z.dy};});
 }
 export const MINIMAP_SIZES=Object.freeze([.75,1,1.35,1.7]);
 export const MINIMAP_SIZE_DEFAULT=1;
@@ -103,7 +130,11 @@ export class Minimap {
     this.depositButtons={};for(const kind of Object.keys(DEPOSIT_MARKS)){const b=doc.createElement('button');b.type='button';b.className='minimap-deposit';b.textContent=DEPOSIT_MARKS[kind].icon;b.setAttribute('data-minimap-deposit',kind);
       b.addEventListener('click',e=>{e.stopPropagation();this.depositMarks[kind]=!this.depositMarks[kind];try{storage?.setItem?.(DEPOSIT_KEY,JSON.stringify(this.depositMarks));}catch{/* works without storage */}this.markButtons();this.nextOverlay=0;},{signal:this.controller.signal});this.depositButtons[kind]=b;this.sizeControls.append(b);}
     this.markButtons();
-    this.root.addEventListener('pointerdown',e=>{if(e.target?.closest?.('.minimap-size')){e.stopPropagation();return;}e.preventDefault();e.stopPropagation();this.panTo(minimapPointToGrid(this.root.getBoundingClientRect(),{x:e.clientX,y:e.clientY},{size:fog.width,cssSize:this.canvas.offsetWidth||MINIMAP.cssSize}));},options);
+    this.zoneButtons=new Map();for(const z of SCOUTING.zones){const b=doc.createElement('button');b.type='button';b.className='minimap-zone';b.setAttribute('data-minimap-zone',z.id);
+      const sx=z.dx-z.dy,sy=z.dx+z.dy;b.style?.setProperty?.('--zx',String(sx));b.style?.setProperty?.('--zy',String(sy));
+      b.addEventListener('click',e=>{e.stopPropagation();if(b.disabled)return;const panel=scene.worldPanel;if(!panel)return;if(!scene.scouting?.party)panel.selected=z.id;panel.open();},{signal:this.controller.signal});this.zoneButtons.set(z.id,b);this.root.append(b);}
+    this.zoneSignature=null;
+    this.root.addEventListener('pointerdown',e=>{if(e.target?.closest?.('.minimap-size,.minimap-zone')){e.stopPropagation();return;}e.preventDefault();e.stopPropagation();this.panTo(minimapPointToGrid(this.root.getBoundingClientRect(),{x:e.clientX,y:e.clientY},{size:fog.width,cssSize:this.canvas.offsetWidth||MINIMAP.cssSize}));},options);
     for(const type of ['click','mousedown','mouseup','wheel','contextmenu'])this.root.addEventListener(type,e=>e.stopPropagation(),options);
     (doc.querySelector('#corner-stack')??doc.querySelector('#game')??scene.game?.canvas?.parentElement)?.append(this.root);this.setSizeStep(readMinimapStep(storage),{save:false});this.label();this.offLanguage=onLanguageChange(()=>this.label());
   }
@@ -131,7 +162,11 @@ export class Minimap {
   update(){
     if(!this.context||!this.image)return;const now=this.now();
     if(now>=this.nextRefresh){const signature=this.knowledgeSignature();if(signature!==this.signature){this.signature=signature;minimapPixels(this.scene,this.image.data);this.baseContext.putImageData(this.image,0,0);this.redraws++;this.nextOverlay=0;}this.nextRefresh=now+MINIMAP.refreshMs;}
-    if(now>=this.nextOverlay){this.nextOverlay=now+MINIMAP.overlayMs;this.drawOverlay();}
+    if(now>=this.nextOverlay){this.nextOverlay=now+MINIMAP.overlayMs;this.drawOverlay();this.updateZones();}
+  }
+  updateZones(){
+    const marks=minimapZoneMarks(this.scene),signature=JSON.stringify(marks);if(signature===this.zoneSignature)return;this.zoneSignature=signature;
+    for(const m of marks){const b=this.zoneButtons?.get(m.id);if(!b)continue;b.textContent=m.label;b.title=m.title;b.setAttribute('aria-label',m.title);b.disabled=!m.enabled;b.classList?.toggle?.('found',m.found);b.classList?.toggle?.('marching',m.hours!=null||m.party==='leaving');b.classList?.toggle?.('there',m.party==='there');}
   }
   drawOverlay(){
     const s=this.scene,c=this.context,k=MINIMAP.scale,view=s.cameras?.main?.worldView;
@@ -139,6 +174,7 @@ export class Minimap {
     if(view){const corners=[[view.x,view.y],[view.right,view.y],[view.right,view.bottom],[view.x,view.bottom]].map(([x,y])=>worldToGrid(x,y));
       c.strokeStyle='#f6e7b0';c.lineWidth=1.5;c.beginPath();corners.forEach((p,i)=>i?c.lineTo(p.x*k,p.y*k):c.moveTo(p.x*k,p.y*k));c.closePath();c.stroke();}
     for(const kind of Object.keys(DEPOSIT_MARKS))if(this.depositMarks?.[kind])for(const d of minimapDeposits(s,kind)){const r=DEPOSIT_MARKS[kind];c.fillStyle=d.free?r.free:r.bound;c.strokeStyle='#1c140a';c.lineWidth=1;c.beginPath();c.moveTo(d.x*k,d.y*k-4);c.lineTo(d.x*k+4,d.y*k);c.lineTo(d.x*k,d.y*k+4);c.lineTo(d.x*k-4,d.y*k);c.closePath();c.fill();c.stroke();}
+    for(const m of minimapCaravans(s))drawCart(c,m.x*k,m.y*k,m.own?CARAVAN_MARKS.own:CARAVAN_MARKS.foreign);
     const king=s.character?.position??s.character?.tile;if(king){c.fillStyle='#ffd34d';c.strokeStyle='#2a1c08';c.lineWidth=1;c.beginPath();c.arc(king.x*k,king.y*k,3,0,Math.PI*2);c.fill();c.stroke();}
   }
   destroy(){this.controller.abort();this.offLanguage?.();this.root.remove();}

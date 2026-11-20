@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-juniper-3-views",
+  "variantId": "shrubs-juniper-3-views-spring-0",
+  "name": "Juniper large, spring 0° (front-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "a164ef97",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 42,
+  "height": 44,
+  "anchor": {
+    "x": 19,
+    "y": 40
+  },
+  "origin": {
+    "x": 0.45238,
+    "y": 0.90909
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 19,
+    "y": 40
+  },
+  "baseOrigin": {
+    "x": 0.45238,
+    "y": 0.90909
+  },
+  "visualHeight": 40,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

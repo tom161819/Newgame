@@ -1,6 +1,7 @@
 import { t } from '../i18n/index.js';
-import { SCOUTING,zoneType,zoneById,zoneEdge,scoutTypeById } from '../data/scouting.js';
+import { SCOUTING,zoneType,zoneById,zoneEdge,scoutTypeById,zoneNeighbours } from '../data/scouting.js';
 import { buildingIsComplete } from '../game/buildingState.js';
+import { towerNeighbors } from '../game/buildings.js';
 import { castleLevel } from '../data/castle.js';
 import { loadWeight } from '../data/logistics.js';
 import { wagonLoad } from './Expedition.js';
@@ -9,7 +10,13 @@ import { wagonLoad } from './Expedition.js';
 // side, at most `leaveHours`) → away (`travelDays` there; the zone's content is reported on arrival) → returning
 // (`travelDays` back) → home (they step back in at the edge). One party at a time. Saved as `scouting`.
 export class ScoutingSystem {
-  constructor(scene){this.scene=scene;this.zones={};this.party=null;this.listeners=new Set();}
+  constructor(scene){this.scene=scene;this.zones={};this.party=null;this.gathering=null;this.listeners=new Set();}
+  // Owner 19 Nov 2026 (81): before leaving, the party first meets at the Barracks and then sets off together. The meeting
+  // is runtime only (a loaded party that is leaving goes straight on), so the save format is unchanged.
+  barracks(){return (this.scene.buildings??[]).find(b=>b.type===SCOUTING.building&&buildingIsComplete(b))??null;}
+  nearBarracks(unit,b=this.gathering&&this.scene.buildings.find(x=>x.id===this.gathering.barracksId)){if(!b)return true;const xs=b.tiles.map(t=>t.x),ys=b.tiles.map(t=>t.y);
+    return Math.max(Math.min(...xs)-unit.tile.x,unit.tile.x-Math.max(...xs),Math.min(...ys)-unit.tile.y,unit.tile.y-Math.max(...ys))<=SCOUTING.gatherReach;}
+  gatherGoals(){const b=this.scene.buildings.find(x=>x.id===this.gathering?.barracksId),m=this.scene.map;return b?towerNeighbors(b).filter(t=>m[t.y]?.[t.x]===0):[];}
   onChange(f){this.listeners.add(f);return ()=>this.listeners.delete(f);}
   changed(){for(const f of this.listeners)f();}
   worldCode(){return this.scene.gameSettings?.worldCode??'';}
@@ -41,14 +48,17 @@ export class ScoutingSystem {
     const goods=cart?Object.fromEntries(Object.entries(cargo??{}).filter(([id,q])=>Number.isInteger(q)&&q>0&&q<=this.available(id))):{};
     if(this.load(goods)>this.capacity())return {error:t('scouting.heavy')};
     const now=this.scene.gameTime.totalElapsed;this.party={zone:zoneId,ids:pick.map(w=>w.id),phase:'leaving',since:now,...(king?{king:true}:{}),...(cart?{wagonId:cart.id,cargo:goods}:{})};
-    if(king)this.scene.character.command({kind:'move',goal:this.edgeGoals(zoneId)[0]??this.edge(zoneId),pickupKey:null});
+    const barracks=this.barracks();this.gathering=barracks?{barracksId:barracks.id,until:now+SCOUTING.gatherHours*this.scene.gameTime.dayDuration/24}:null;
+    if(king){const goal=this.gathering?this.gatherGoals()[0]:null;this.scene.character.command({kind:'move',goal:goal??this.edgeGoals(zoneId)[0]??this.edge(zoneId),pickupKey:null});}
     for(const w of pick){this.scene.military?.wallPatrol?.set(w,false);delete w.huntWolfId;this.scene.combat?.stopAttack?.(w);w.scoutZone=zoneId;}
     this.scene.eventFeed?.push?.(`scouting-out:${now}`,t('scouting.left',{count:pick.length+(king?1:0),zone:t(`scouting.zone.${zoneId}`)}),{important:true});this.changed();return {party:this.party};
   }
   // Soldier behaviour while leaving (MilitarySystem.updateSoldier): walk to the edge.
   updateSoldier(worker){
     if(worker.scoutZone==null||this.party?.phase!=='leaving')return false;
-    worker.workState='Traveling to Target';worker.workMessage=t('scouting.leaving');
+    worker.workState='Traveling to Target';
+    if(this.gathering){worker.workMessage=t('scouting.gathering');if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0&&!this.nearBarracks(worker)){worker.aiCooldown=1500;worker.moveTo(this.gatherGoals());}return true;}
+    worker.workMessage=t('scouting.leaving');
     if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0&&!this.atEdge(worker)){worker.aiCooldown=1500;worker.moveTo(this.edgeGoals(worker.scoutZone));}
     return true;
   }
@@ -60,6 +70,15 @@ export class ScoutingSystem {
     const p=this.party;if(!p)return;const s=this.scene,now=s.gameTime.totalElapsed,day=s.gameTime.dayDuration,party=this.partyWorkers().filter(w=>w.isAlive);
     if(!party.length&&!p.king&&p.phase!=='returning'){this.party=null;this.changed();return;}
     if(p.king&&!s.character?.isAlive)return;
+    if(p.phase==='leaving'&&this.gathering){
+      if(p.king&&!s.character.walking&&!s.character.path?.length&&!this.nearBarracks(s.character)&&now-(this.kingOrderAt??-1e9)>1500){const goal=this.gatherGoals()[0];if(goal){this.kingOrderAt=now;s.character.command({kind:'move',goal,pickupKey:null});}}
+      const met=party.every(w=>this.nearBarracks(w))&&(!p.king||this.nearBarracks(s.character));
+      if(!met&&now<this.gathering.until&&s.buildings.some(b=>b.id===this.gathering.barracksId))return;
+      // Together now: the walk to the edge starts (its time limit counts from here); the King's order turns there.
+      this.gathering=null;p.since=now;this.kingOrderAt=-1e9;if(p.king)s.character.command({kind:'move',goal:this.edgeGoals(p.zone)[0]??this.edge(p.zone),pickupKey:null});
+      for(const w of party){w.path=[];w.aiCooldown=0;}
+      s.eventFeed?.push?.(`scouting-together:${now}`,t('scouting.together',{zone:t(`scouting.zone.${p.zone}`)}));this.changed();return;
+    }
     if(p.king&&p.phase==='leaving'&&!s.character.walking&&!s.character.path?.length&&!this.atEdge(s.character)&&now-(this.kingOrderAt??-1e9)>1500){this.kingOrderAt=now;s.character.command({kind:'move',goal:this.edgeGoals(p.zone)[0]??this.edge(p.zone),pickupKey:null});}
     if(p.phase==='leaving'&&(party.every(w=>this.atEdge(w))&&(!p.king||this.atEdge(s.character))||now-p.since>=SCOUTING.leaveHours*day/24)){
       for(const w of party){w.away=true;w.path=[];w.nextTile=null;w.view?.setVisible?.(false);}
@@ -68,13 +87,17 @@ export class ScoutingSystem {
       Object.assign(p,{phase:'away',at:now+SCOUTING.travelDays*day});this.changed();return;
     }
     if(p.phase==='away'&&now>=p.at){
-      const type=zoneType(this.worldCode(),p.zone);this.zones[p.zone]={type,day:s.gameTime.day};
+      const type=zoneType(this.worldCode(),p.zone);this.zones[p.zone]={...this.zones[p.zone],type,day:s.gameTime.day};/* (83) a second visit keeps what was taken there */
       s.eventFeed?.push?.(`scouting-found:${p.since}`,t('scouting.found',{zone:t(`scouting.zone.${p.zone}`),found:`${scoutTypeById(type)?.icon??''} ${t(`scouting.type.${type}`)}`}),{important:true});
       // Owner 16 Nov 2026: the party stays there until it is sent home (or you switch to it and play the zone).
       Object.assign(p,{phase:'there',at:now});this.changed();return;
     }
     if(p.phase==='returning'&&now>=p.at)this.home();
   }
+  // Owner 19 Nov 2026 (83): the party that is in a zone goes on to a neighbouring one (the same time on the road).
+  moveOn(zoneId){const p=this.party;if(p?.phase!=='there'||!zoneNeighbours(p.zone).includes(zoneId))return false;const now=this.scene.gameTime.totalElapsed;
+    Object.assign(p,{zone:zoneId,phase:'away',since:now,at:now+SCOUTING.travelDays*this.scene.gameTime.dayDuration});
+    this.scene.eventFeed?.push?.(`scouting-on:${now}`,t('scouting.movedOn',{zone:t(`scouting.zone.${zoneId}`)}),{});this.changed();return true;}
   // Send the party that is in a zone back home (half a day on the road).
   sendHome(){const p=this.party;if(p?.phase!=='there')return false;Object.assign(p,{phase:'returning',at:this.scene.gameTime.totalElapsed+SCOUTING.travelDays*this.scene.gameTime.dayDuration});this.scene.eventFeed?.push?.(`scouting-back:${p.since}`,t('scouting.sentHome'),{});this.changed();return true;}
   // The goods leave the stores when the party sets off (like the own caravan).
@@ -104,7 +127,7 @@ export class ScoutingSystem {
   }
   exportState(){return {zones:structuredClone(this.zones),party:this.party?structuredClone(this.party):null};}
   importState(data){
-    this.zones=structuredClone(data?.zones??{});this.party=data?.party?structuredClone(data.party):null;
+    this.zones=structuredClone(data?.zones??{});this.party=data?.party?structuredClone(data.party):null;this.gathering=null;
     for(const w of this.partyWorkers()){w.scoutZone=this.party.zone;if(this.party.phase!=='leaving'){w.away=true;w.view?.setVisible?.(false);}}
     if(this.party?.king&&this.party.phase!=='leaving'&&!this.scene.zone)this.setKingAway(true);
   }

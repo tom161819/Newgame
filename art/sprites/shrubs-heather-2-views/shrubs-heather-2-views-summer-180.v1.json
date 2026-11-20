@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-heather-2-views",
+  "variantId": "shrubs-heather-2-views-summer-180",
+  "name": "Heather medium, summer 180° (back-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "88a32b9b",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 54,
+  "height": 33,
+  "anchor": {
+    "x": 27,
+    "y": 26
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.78788
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 27,
+    "y": 26
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.78788
+  },
+  "visualHeight": 26,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

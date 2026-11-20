@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-bramble-3-views",
+  "variantId": "shrubs-bramble-3-views-autumn-0",
+  "name": "Bramble large, autumn 0° (front-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "ed7f1786",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 48,
+  "height": 27,
+  "anchor": {
+    "x": 23,
+    "y": 22
+  },
+  "origin": {
+    "x": 0.47917,
+    "y": 0.81481
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 23,
+    "y": 22
+  },
+  "baseOrigin": {
+    "x": 0.47917,
+    "y": 0.81481
+  },
+  "visualHeight": 22,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

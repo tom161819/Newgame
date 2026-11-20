@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-heather-3-views",
+  "variantId": "shrubs-heather-3-views-summer-90",
+  "name": "Heather large, summer 90° (front-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "d9bdff41",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 50,
+  "height": 36,
+  "anchor": {
+    "x": 24,
+    "y": 28
+  },
+  "origin": {
+    "x": 0.48,
+    "y": 0.77778
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 24,
+    "y": 28
+  },
+  "baseOrigin": {
+    "x": 0.48,
+    "y": 0.77778
+  },
+  "visualHeight": 28,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

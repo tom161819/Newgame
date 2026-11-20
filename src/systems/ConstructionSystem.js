@@ -42,7 +42,10 @@ export class ConstructionSystem {
     const inside=new Set(site.tiles.map(t=>`${t.x},${t.y}`)),on=u=>!!u?.isAlive&&u.tile&&inside.has(`${u.tile.x},${u.tile.y}`);let found=false;
     if(s.character?.state==='ground'&&on(s.character))found=true;
     for(const a of s.animalSystem?.animals.values()??[])if(!a.mounted&&on(a)){found=true;break;}
-    for(const w of s.workerSystem?.liveWorkers()??[])if(on(w)){found=true;if(!w.nextTile&&!w.path?.length&&w.commandState?.state!=='Holding'&&(w.stepAside??0)<=(s.gameTime?.totalElapsed??0)){w.stepAside=(s.gameTime?.totalElapsed??0)+3000;this.stepAside(w,site);}}
+    // Owner 19 Nov 2026 (76): a soldier holding a place under the blueprint (or ordered to one) moves his hold beside it.
+    const now=s.gameTime?.totalElapsed??0;
+    for(const w of s.workerSystem?.liveWorkers()??[])if(on(w)){found=true;if(w.nextTile||(w.stepAside??0)>now)continue;const c=w.commandState,held=c?.state==='Holding'||c?.state==='MovingToHold'&&!!c.goal&&inside.has(`${c.goal.x},${c.goal.y}`);
+      if(held){w.stepAside=now+3000;this.holdAside(w,site,inside);}else if(!w.path?.length){w.stepAside=now+3000;this.stepAside(w,site);}}
     if(!found)for(const drop of s.dropSystem?.drops.values()??[])if(inside.has(`${drop.tile.x},${drop.tile.y}`)){found=true;s.dropSystem.clearSite?.(site);break;}
     return found;
   }
@@ -51,7 +54,24 @@ export class ConstructionSystem {
   stepAside(worker,site){
     const s=this.scene,base=s.workerSystem?.navigationMap?.(worker)??s.map,map=base.map(row=>[...row]);for(const t of site.tiles)map[t.y][t.x]=0;
     const goals=towerNeighbors(site).filter(t=>base[t.y]?.[t.x]===0),route=goals.length?findPathToAny(map,worker.tile,goals,s.pathWear?.routingOptions(worker)):null;
-    if(route?.path?.length){worker.path=route.path;worker.steppingAside=site.id;return true;}return false;
+    if(route?.path?.length){worker.path=route.path;worker.steppingAside=site.id;return true;}
+    // (76): with the tiles beside it taken, a wider ring (up to 3 tiles) is tried, so nobody stays shut inside.
+    const far=this.ringGoals(site,base,new Set(site.tiles.map(t=>`${t.x},${t.y}`)),new Set(),2),wide=far.length?findPathToAny(map,worker.tile,far,s.pathWear?.routingOptions(worker)):null;
+    if(wide?.path?.length){worker.path=wide.path;worker.steppingAside=site.id;return true;}return false;
+  }
+  ringGoals(site,base,inside,claimed,from=1,to=3){
+    const xs=site.tiles.map(t=>t.x),ys=site.tiles.map(t=>t.y),[x0,x1,y0,y1]=[Math.min(...xs),Math.max(...xs),Math.min(...ys),Math.max(...ys)],goals=[];
+    for(let y=y0-to;y<=y1+to;y++)for(let x=x0-to;x<=x1+to;x++){const r=Math.max(x0-x,x-x1,y0-y,y-y1),k=`${x},${y}`;if(r>=from&&r<=to&&base[y]?.[x]===0&&!inside.has(k)&&!claimed.has(k))goals.push({x,y});}
+    return goals;
+  }
+  // The new hold is the nearest free tile in a ring of up to 3 tiles round the site that no other unit holds or heads for.
+  holdAside(worker,site,inside){
+    const s=this.scene,base=s.workerSystem?.navigationMap?.(worker)??s.map,map=base.map(row=>[...row]);for(const t of site.tiles)map[t.y][t.x]=0;
+    const claimed=new Set(s.workerSystem.liveWorkers().filter(o=>o!==worker&&o.commandState?.goal).map(o=>`${o.commandState.goal.x},${o.commandState.goal.y}`));
+    for(let r=1;r<=3;r++){const goals=this.ringGoals(site,base,inside,claimed,r,r);
+      const route=goals.length?findPathToAny(map,worker.tile,goals,s.pathWear?.routingOptions(worker)):null;
+      if(route?.path?.length){const goal=route.path[route.path.length-1];worker.commandState={...worker.commandState,state:'MovingToHold',goal:{x:goal.x,y:goal.y}};worker.workState='MovingToHold';worker.commandRetry=0;worker.commandWait=0;worker.path=route.path;worker.steppingAside=site.id;return true;}}
+    return false;
   }
   actor(id){return id==='king'?this.scene.character:this.scene.workerSystem.workers.get(id);}
   slotKey(goal){return `construction-slot:${tileKey(goal)}`;}

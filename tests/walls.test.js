@@ -29,10 +29,10 @@ test('wall dragging snaps to the dominant logical axis in either direction',()=>
   assert.deepEqual(wallLine({x:5,y:5},{x:2,y:6}),[{x:5,y:5},{x:4,y:5},{x:3,y:5},{x:2,y:5}]);
   assert.deepEqual(wallLine({x:2,y:2},{x:3,y:5}),[{x:2,y:2},{x:2,y:3},{x:2,y:4},{x:2,y:5}]);
   assert.deepEqual(wallLine({x:1,y:1},{x:1,y:1}),[{x:1,y:1}]);
-  // m-hradby-8-smeru: a diagonal drag gives steps whose pieces touch side by side, in all four diagonal directions.
-  assert.deepEqual(wallLine({x:2,y:2},{x:4,y:4}),[{x:2,y:2},{x:3,y:2},{x:3,y:3},{x:4,y:3},{x:4,y:4}]);
-  assert.deepEqual(wallLine({x:5,y:5},{x:3,y:7}),[{x:5,y:5},{x:4,y:5},{x:4,y:6},{x:3,y:6},{x:3,y:7}]);
-  for(const end of [{x:9,y:9},{x:1,y:9},{x:9,y:1},{x:1,y:1},{x:9,y:8},{x:2,y:8}]){const line=wallLine({x:5,y:5},end);for(let i=1;i<line.length;i++)assert.equal(Math.abs(line[i].x-line[i-1].x)+Math.abs(line[i].y-line[i-1].y),1,'neighbouring pieces share a side');assert.equal(new Set(line.map(t=>`${t.x},${t.y}`)).size,line.length);}
+  // m-hradby-diagonala (point 41): a diagonal drag gives only the diagonal tiles (no steps), in all four directions.
+  assert.deepEqual(wallLine({x:2,y:2},{x:4,y:4}),[{x:2,y:2},{x:3,y:3},{x:4,y:4}]);
+  assert.deepEqual(wallLine({x:5,y:5},{x:3,y:7}),[{x:5,y:5},{x:4,y:6},{x:3,y:7}]);
+  for(const end of [{x:9,y:9},{x:1,y:9},{x:9,y:1},{x:1,y:1},{x:9,y:8},{x:2,y:8}]){const line=wallLine({x:5,y:5},end);for(let i=1;i<line.length;i++){assert.equal(Math.abs(line[i].x-line[i-1].x),1);assert.equal(Math.abs(line[i].y-line[i-1].y),1,'neighbouring pieces touch at a corner');}assert.equal(new Set(line.map(t=>`${t.x},${t.y}`)).size,line.length);}
   assert.deepEqual(wallLine({x:5,y:5},{x:9,y:6}).at(-1),{x:9,y:5},'a shallow drag stays straight');
 });
 
@@ -68,9 +68,10 @@ test('connection masks cover ends, straight lines, corners, T junctions and cros
   assert.deepEqual(connectionsFor(wallIndex([center,north,east,south,west]),center),{N:true,E:true,S:true,W:true});
 });
 
-test('roof navigation only joins shared edges and finds an exit beyond a surrounded central segment',()=>{
-  const a=makeWall(2,2,1),diagonal=makeWall(3,3,2);assert.equal(findRoofPath([a,diagonal],a,diagonal),null);
-  const bridge=makeWall(3,2,3);assert.deepEqual(findRoofPath([a,bridge,diagonal],a,diagonal).map(b=>b.id),[3,2]);
+test('roof navigation joins shared edges and corners and finds an exit beyond a surrounded central segment',()=>{
+  // m-hradby-diagonala: two wall tiles that touch at a corner are one wall (a diagonal run); the walk crosses the corner.
+  const a=makeWall(2,2,1),diagonal=makeWall(3,3,2),far=makeWall(5,4,4);assert.deepEqual(findRoofPath([a,diagonal],a,diagonal).map(b=>b.id),[2]);assert.equal(findRoofPath([a,diagonal,far],a,far),null);
+  const bridge=makeWall(3,2,3);assert.equal(findRoofPath([a,bridge,diagonal],a,diagonal).length,1);
   const world=map(),buildings=[];
   for(let y=4;y<=6;y++)for(let x=4;x<=6;x++){const g=x===6&&y===6;buildings.push((g?makeGate:makeWall)(x,y,buildings.length+1));world[y][x]=g?0:1;}
   const center=buildings.find(b=>b.x===5&&b.y===5),route=planRoofExit(world,buildings,center,{kind:'move',goal:{x:0,y:0}});
@@ -110,4 +111,23 @@ test('#97: a Gate is walkable on the ground; a plain wall is climbed via its Gat
   // A wall touching a Tower is its stair.
   const tower={id:20,x:11,y:9,type:'tower',tiles:[{x:11,y:9},{x:12,y:9},{x:11,y:10},{x:12,y:10}]};assert.equal(k.command({kind:'enter',tower:lone[0]}),false);
   const s3={...s2,buildings:[...lone,tower]};const k3=new PlayerController(s3,{...sprite},{x:12,y:12});assert.equal(k3.command({kind:'enter',tower:lone[0]}),true);
+});
+
+test('m-hradby-diagonala: a diagonal run is one wall – its tiles know their run, nobody passes between them, the walk goes on',async()=>{
+  const {diagonalRun,wallShape,wallIndex,connectedWalls,findRoofPath}=await import('../src/game/walls.js'),{reachableTiles,findPath}=await import('../src/game/pathfinding.js');
+  const wall=objectRegistry.require('wall'),mk=(x,y,id)=>({id,type:'wall',x,y,definition:wall,tiles:[{x,y}]});
+  const run=[mk(3,3,1),mk(4,4,2),mk(5,5,3)],straight=[mk(6,5,4),mk(7,5,5)],other=[mk(9,2,6),mk(8,3,7)],buildings=[...run,...straight,...other],index=wallIndex(buildings,true);
+  // the middle of a run is a diagonal piece; each end is an elbow towards the run (also at a straight wall)
+  assert.deepEqual(wallShape(index,run[1]),{diagonal:'se'});assert.equal(diagonalRun(index,run[1]),'se');
+  assert.deepEqual(wallShape(index,run[0]),{elbow:'SE-11'},'a free end: both sides across open');assert.deepEqual(wallShape(index,run[2]),{elbow:'NW-10'},'the end at a straight wall (east of it): that side is joined');
+  assert.equal(wallShape(index,straight[1]),null);assert.match(wallShape(index,other[0]).elbow,/^SW-/);assert.match(wallShape(index,other[1]).elbow,/^NE-/);
+  assert.deepEqual(wallShape(index,run[1],new Set(['4,3'])),{elbow:'SE-01'},'a tower beside it: the link through that corner is filled');
+  // an L corner (the tile between is a wall) is no diagonal link
+  const l=wallIndex([mk(1,1,20),mk(2,1,21),mk(2,2,22)],true);assert.equal(wallShape(l,l.get('1,1')),null);
+  // a wall from edge to edge of a small map along the diagonal: the two halves are separate
+  const size=8,world=Array.from({length:size},()=>Array(size).fill(0));for(let i=0;i<size;i++)world[i][i]=1;
+  const reach=reachableTiles(world,[{x:5,y:1}]);assert.ok(reach.length>0&&reach.every(t=>t.x>t.y),'nobody slips through the corners');assert.equal(findPath(world,{x:5,y:1},{x:1,y:5}),null);
+  // the wall walk continues across the corners (finished walls)
+  const done=buildings.map(b=>({...b,construction:{state:'complete'}}));assert.equal(connectedWalls(done,done[0]).length,5);assert.equal(findRoofPath(done,done[0],done[4]).length,4);
+  assert.equal(connectedWalls(done,done[5]).length,2);
 });

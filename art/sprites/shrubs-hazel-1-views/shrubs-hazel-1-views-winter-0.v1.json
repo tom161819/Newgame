@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-hazel-1-views",
+  "variantId": "shrubs-hazel-1-views-winter-0",
+  "name": "Hazel small, winter 0° (front-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "ec6a458b",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 39,
+  "height": 34,
+  "anchor": {
+    "x": 20,
+    "y": 30
+  },
+  "origin": {
+    "x": 0.51282,
+    "y": 0.88235
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 20,
+    "y": 30
+  },
+  "baseOrigin": {
+    "x": 0.51282,
+    "y": 0.88235
+  },
+  "visualHeight": 30,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

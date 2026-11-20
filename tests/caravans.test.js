@@ -54,10 +54,10 @@ test('a caravan drives from a map edge to the Marketplace, trades 0.75 day, warn
   for(const event of ['arriving','arrived','leavingSoon','left'])assert.ok(w.feed.some(k=>k.endsWith(`:${event}`)),event);
 });
 
-test('a pending delivery keeps the caravan at most 0.25 day longer', () => {
+test('a pending delivery keeps the caravan at most 1 day longer (owner 78)', () => {
   const w=world();w.system.update(100);w.system.summon();for(let i=0;i<4000&&w.system.active.phase==='arriving';i++)step(w,100);
   w.system.deliveryPending=()=>true;step(w,.75*DAY,1000);assert.equal(w.system.active.phase,'trading');assert.equal(w.system.active.waiting,true);
-  step(w,.2*DAY,1000);assert.equal(w.system.active.phase,'trading');step(w,.06*DAY,1000);assert.equal(w.system.active.phase,'leaving','leaves after the extra quarter day');
+  step(w,.95*DAY,1000);assert.equal(w.system.active.phase,'trading');step(w,.06*DAY,1000);assert.equal(w.system.active.phase,'leaving','leaves after the extra day');
   const v=world();v.system.update(100);v.system.summon();for(let i=0;i<4000&&v.system.active.phase==='arriving';i++)step(v,100);
   let pending=true;v.system.deliveryPending=()=>pending;step(v,.76*DAY,1000);assert.equal(v.system.active.waiting,true);pending=false;step(v,1000,1000);assert.equal(v.system.active.phase,'leaving','leaves once the delivery is done');
 });

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "shrubs-seasons",
-  "name": "Shrubs – seasons",
+  "name": "Shrubs \u2013 seasons",
   "category": "nature",
   "description": "Concept for review (g-sad-pole-kere). The owner picks; phases, sizes and footprints then go to Mechaniky.",
   "footprint": {
@@ -12,197 +12,272 @@
   "variants": [
     {
       "id": "shrubs-seasons-hazel-spring",
-      "name": "Hazel – spring",
-      "version": 1,
-      "notes": "Hazel, medium, spring.",
+      "name": "Hazel \u2013 spring",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-hazel-2, spring, view 0\u00b0, fitted into the original 48\u00d737 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "hazel",
         "size": 2,
         "season": "spring",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "shrubs-seasons-hazel-autumn",
-      "name": "Hazel – autumn",
-      "version": 1,
-      "notes": "Hazel, medium, autumn.",
+      "name": "Hazel \u2013 autumn",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-hazel-2, autumn, view 0\u00b0, fitted into the original 48\u00d737 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "hazel",
         "size": 2,
         "season": "autumn",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "shrubs-seasons-hazel-winter",
-      "name": "Hazel – winter",
-      "version": 1,
-      "notes": "Hazel, medium, winter.",
+      "name": "Hazel \u2013 winter",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-hazel-2, winter, view 0\u00b0, fitted into the original 46\u00d741 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "hazel",
         "size": 2,
         "season": "winter",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "shrubs-seasons-rosehip-spring",
-      "name": "Rosehip – spring",
-      "version": 1,
-      "notes": "Rosehip, medium, spring.",
+      "name": "Rosehip \u2013 spring",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-rosehip-2, spring, view 0\u00b0, fitted into the original 45\u00d732 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "rosehip",
         "size": 2,
         "season": "spring",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "shrubs-seasons-rosehip-autumn",
-      "name": "Rosehip – autumn",
-      "version": 1,
-      "notes": "Rosehip, medium, autumn.",
+      "name": "Rosehip \u2013 autumn",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-rosehip-2, autumn, view 0\u00b0, fitted into the original 45\u00d732 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "rosehip",
         "size": 2,
         "season": "autumn",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "shrubs-seasons-rosehip-winter",
-      "name": "Rosehip – winter",
-      "version": 1,
-      "notes": "Rosehip, medium, winter.",
+      "name": "Rosehip \u2013 winter",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-rosehip-2, winter, view 0\u00b0, fitted into the original 44\u00d733 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "rosehip",
         "size": 2,
         "season": "winter",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "shrubs-seasons-juniper-spring",
-      "name": "Juniper – spring",
-      "version": 1,
-      "notes": "Juniper, medium, spring.",
+      "name": "Juniper \u2013 spring",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-juniper-2, spring, view 0\u00b0, fitted into the original 44\u00d743 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "juniper",
         "size": 2,
         "season": "spring",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "shrubs-seasons-juniper-autumn",
-      "name": "Juniper – autumn",
-      "version": 1,
-      "notes": "Juniper, medium, autumn.",
+      "name": "Juniper \u2013 autumn",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-juniper-2, autumn, view 0\u00b0, fitted into the original 44\u00d743 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "juniper",
         "size": 2,
         "season": "autumn",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "shrubs-seasons-juniper-winter",
-      "name": "Juniper – winter",
-      "version": 1,
-      "notes": "Juniper, medium, winter.",
+      "name": "Juniper \u2013 winter",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-juniper-2, winter, view 0\u00b0, fitted into the original 44\u00d743 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "juniper",
         "size": 2,
         "season": "winter",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "shrubs-seasons-bramble-spring",
-      "name": "Bramble – spring",
-      "version": 1,
-      "notes": "Bramble, medium, spring.",
+      "name": "Bramble \u2013 spring",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-bramble-2, spring, view 0\u00b0, fitted into the original 52\u00d731 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "bramble",
         "size": 2,
         "season": "spring",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "shrubs-seasons-bramble-autumn",
-      "name": "Bramble – autumn",
-      "version": 1,
-      "notes": "Bramble, medium, autumn.",
+      "name": "Bramble \u2013 autumn",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-bramble-2, autumn, view 0\u00b0, fitted into the original 52\u00d731 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "bramble",
         "size": 2,
         "season": "autumn",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "shrubs-seasons-bramble-winter",
-      "name": "Bramble – winter",
-      "version": 1,
-      "notes": "Bramble, medium, winter.",
+      "name": "Bramble \u2013 winter",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-bramble-2, winter, view 0\u00b0, fitted into the original 44\u00d731 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "bramble",
         "size": 2,
         "season": "winter",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "shrubs-seasons-heather-spring",
-      "name": "Heather – spring",
-      "version": 1,
-      "notes": "Heather, medium, spring.",
+      "name": "Heather \u2013 spring",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-heather-2, spring, view 0\u00b0, fitted into the original 47\u00d731 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "heather",
         "size": 2,
         "season": "spring",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "shrubs-seasons-heather-autumn",
-      "name": "Heather – autumn",
-      "version": 1,
-      "notes": "Heather, medium, autumn.",
+      "name": "Heather \u2013 autumn",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-heather-2, autumn, view 0\u00b0, fitted into the original 47\u00d731 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "heather",
         "size": 2,
         "season": "autumn",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     },
     {
       "id": "shrubs-seasons-heather-winter",
-      "name": "Heather – winter",
-      "version": 1,
-      "notes": "Heather, medium, winter.",
+      "name": "Heather \u2013 winter",
+      "version": 2,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model shrubs-heather-2, winter, view 0\u00b0, fitted into the original 44\u00d731 frame without distortion. Previous version: generated drawing v1.",
       "spec": {
         "kind": "shrub",
         "species": "heather",
         "size": 2,
         "season": "winter",
         "seed": 7
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
       }
     }
   ]

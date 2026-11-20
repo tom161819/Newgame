@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-juniper-1-views",
+  "variantId": "shrubs-juniper-1-views-spring-180",
+  "name": "Juniper small, spring 180° (back-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "7c57dbd3",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 32,
+  "height": 36,
+  "anchor": {
+    "x": 15,
+    "y": 31
+  },
+  "origin": {
+    "x": 0.46875,
+    "y": 0.86111
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 15,
+    "y": 31
+  },
+  "baseOrigin": {
+    "x": 0.46875,
+    "y": 0.86111
+  },
+  "visualHeight": 31,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

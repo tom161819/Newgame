@@ -6,7 +6,7 @@ import { tileKey } from '../game/stones.js';
 
 // Derived catalog only: physical ownership stays in storage, drops and cargo.
 export class LogisticsTaskManager {
-  constructor(scene){this.scene=scene;this.catalog=[];this.nextRefresh=0;this.failedRoutes=new Map();this.unreachable=new Map();this.producerWaits=new Map();this.stoneAreaCache=null;}
+  constructor(scene){this.scene=scene;this.catalog=[];this.nextRefresh=0;this.failedRoutes=new Map();this.unreachable=new Map();this.producerWaits=new Map();this.inputWaits=new Map();this.stoneAreaCache=null;}
   // m-nedostupny-sklad (owner 14 Nov 2026): a store, pile or site no carrier can walk to is remembered (building id →
   // game time of the last failed trip) so that Notices can say so (ProductionDiagnostics.accessIssues).
   noteUnreachable(worker,location){if(location?.buildingId!=null&&!this.scene.foodStorage.route(worker,[location]))this.unreachable.set(location.buildingId,this.scene.gameTime.totalElapsed);}
@@ -16,15 +16,21 @@ export class LogisticsTaskManager {
     this.nextRefresh=now+LOGISTICS_RULES.planningInterval;this.catalog=[];
     for(const [key,expires]of this.failedRoutes)if(expires<=now)this.failedRoutes.delete(key);
     for(const key of this.producerWaits.keys())if(!this.scene.foodProduction.records.has(Number(key.split(':')[0])))this.producerWaits.delete(key);
+    for(const key of this.inputWaits.keys())if(!this.scene.foodProduction.records.has(Number(key.split(':')[0])))this.inputWaits.delete(key);
     const storage=this.storage,stores=[...storage.locations.values()].filter(l=>storage.isStock(l));
     this.catalog.push(...(this.scene.constructionSystem?.materials.candidates()??[]),...(this.scene.military?.candidates()??[]),...(this.scene.trade?.candidates()??[]),...(this.scene.lightFuel?.candidates()??[]),...(this.scene.heating?.candidates()??[]));
     for(const record of this.scene.foodProduction.records.values()){
       const building=this.scene.foodProduction.building(record.buildingId);if(!building||buildingDefinition(building).selfSupplied)continue;
       const recipe=this.scene.foodProduction.recipe(building),input=storage.locations.get(`input-${building.id}`);
       // m-nosici-trakar-pracoviste (62): the catalog offers the vehicle target; updateWorker trims it per carrier.
-      if(record.auto&&input&&!this.scene.foodProduction.inputShortage(building)){
-        for(const resource of Object.keys(recipe.input)){const missing=this.scene.foodProduction.inputTarget(building,resource,{bulk:true})-(input.stock[resource]??0)-storage.incoming(input.id,resource);
-          if(missing>0)for(const source of stores)if(storage.free(source.id,resource)>0)this.catalog.push({priority:20,sourceId:source.id,destinationId:input.id,resource,amount:missing});}
+      if(record.auto&&input){const short=this.scene.foodProduction.inputShortage(building);
+        for(const resource of Object.keys(recipe.input)){const missing=this.scene.foodProduction.inputTarget(building,resource,{bulk:true})-(input.stock[resource]??0)-storage.incoming(input.id,resource),key=`${building.id}:${resource}`;
+          // Owner 19 Nov 2026 (75): with scarce Iron the nearest workshop always got it and the others never did. A
+          // workshop that has waited longer for an input goes first (priority 20 + a fraction that shrinks with the wait).
+          // The wait also counts while the kingdom has none of the input, so the first Ore goes to the longest-waiting one.
+          if(missing<=0){this.inputWaits.delete(key);continue;}if(!this.inputWaits.has(key))this.inputWaits.set(key,now);if(short)continue;
+          const waited=now-this.inputWaits.get(key),priority=20+.9*Math.exp(-waited/LOGISTICS_RULES.inputWaitScale);
+          for(const source of stores)if(storage.free(source.id,resource)>0)this.catalog.push({priority,sourceId:source.id,destinationId:input.id,resource,amount:missing});}
       }
       // Every product lying in the output buffer is offered, also one of a recipe the workshop has switched away from.
       const [current]=Object.entries(recipe.output)[0],output=storage.locations.get(`output-${building.id}`);
@@ -143,7 +149,7 @@ export class LogisticsTaskManager {
     if(task.progressMs>=IDLE_STONE.pickupDuration){this.scene.collectResource(task.targetId,worker.tile,worker);ai.cancel(worker);worker.workState='Searching for Work';}
   }
   waitForHauler(building,kind){
-    if(buildingDefinition(building).selfSupplied)return false;
+    const definition=buildingDefinition(building);if(definition.selfSupplied||kind==='input'&&definition.fetchesOwnInputs)return false;
     const record=this.scene.foodProduction.records.get(building.id),now=this.scene.gameTime.totalElapsed,key=`${building.id}:${kind}`;
     let wait=this.producerWaits.get(key);if(!wait||wait.cycle!==record.nextCycle){wait={cycle:record.nextCycle,since:now,checkedAt:-Infinity,available:false};this.producerWaits.set(key,wait);}
     const limit=kind==='input'?PRODUCER_WAIT.inputDays*(this.scene.gameTime.dayDuration??120000):PRODUCER_WAIT.outputMs;if(now-wait.since>=limit)return false;
@@ -152,5 +158,5 @@ export class LogisticsTaskManager {
       wait.available=this.scene.workerSystem.liveWorkers().filter(w=>(!w.commandState||w.commandState.state==='Working')&&w.profession==='hauler'&&!w.arriving&&!w.restPhase).slice(0,6).some(w=>!!this.storage.route(w,[location]));
     }return wait.available;
   }
-  destroy(){this.stoneAreaCache=null;this.catalog=[];this.failedRoutes.clear();this.producerWaits.clear();}
+  destroy(){this.stoneAreaCache=null;this.catalog=[];this.failedRoutes.clear();this.producerWaits.clear();this.inputWaits.clear();}
 }

@@ -67,7 +67,6 @@ export class MilitarySystem {
     if(spec.vehicle&&!this.engines.free(spec.vehicle))return `vehicle_${spec.vehicle}`;
     if(this.unit(worker))return 'trained';
     if(!this.isRecruit(worker)||!this.barracks(worker.assignedWorkplaceId))return 'notSoldier';if(this.order(worker))return 'training';
-    if((worker.skills.combat?.level??1)<spec.requiredCombatLevel)return 'skill';
     return this.supplyBlocker(type);
   }
   // m-vojaci-chyba (owner point 87): what the kingdom lacks for this unit type, whoever trains: an Armory, the unit's
@@ -101,6 +100,15 @@ export class MilitarySystem {
     if(!worker?.isAlive||!UNIT_TYPES[type]||UNIT_TYPES[type].mount&&!withoutHorse)return false;
     if(!this.scene.workerSystem.jobs.assign(worker,'soldier'))return false;
     this.units.set(worker.id,{type,equipment:{...UNIT_TYPES[type].equipment},garrison:true});this.apply(worker);worker.currentHP=worker.maxHP;return true;
+  }
+  // Owner 19 Nov 2026 (73): dismissed soldiers become ordinary residents again (Idle); their kit goes back to the store
+  // like a discharge. Returns how many were dismissed.
+  dismiss(workers){
+    let count=0;const ws=this.scene.workerSystem;
+    for(const w of workers){if(!w?.isAlive||w.profession!=='soldier'||w.away||w.scoutZone!=null)continue;
+      this.wallPatrol?.set?.(w,false);delete w.huntWolfId;this.scene.combat?.stopAttack?.(w);this.release(w);delete w.stance;delete w.squad;
+      if(ws.jobs.assign(w,'idle')){ws.commands?.resume?.(w);count++;}}
+    if(count){ws.updateUI?.();this.scene.updateInventory?.();}return count;
   }
   train(worker,type){
     const reason=this.blocker(worker,type);if(reason)return reason;const spec=UNIT_TYPES[type],id=this.nextOrder++;

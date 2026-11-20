@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-juniper-2-views",
+  "variantId": "shrubs-juniper-2-views-summer-0",
+  "name": "Juniper medium, summer 0° (front-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "8d0ba389",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 40,
+  "height": 42,
+  "anchor": {
+    "x": 22,
+    "y": 37
+  },
+  "origin": {
+    "x": 0.55,
+    "y": 0.88095
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 22,
+    "y": 37
+  },
+  "baseOrigin": {
+    "x": 0.55,
+    "y": 0.88095
+  },
+  "visualHeight": 37,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

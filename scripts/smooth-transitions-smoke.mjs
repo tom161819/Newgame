@@ -6,7 +6,7 @@ import { decodePng } from './png-lite.mjs';
 // under winter ice); the continuous ground changes season gradually in patches over the 3-day window, a few chunks
 // per step, trees and bushes by the same mask; a game loaded mid-change draws the same step; FPS with and without a
 // change running. Screenshots /tmp/shots/smooth-*.png (look at them), numbers in /tmp/smooth-transitions.json.
-const SHOTS = '/tmp/shots', WORLD = 'MKW5-155515555555-1', MEASURE_MS = Number(process.env.SMOOTH_MEASURE_MS ?? 40000);
+const SHOTS = '/tmp/shots', WORLD = 'MKW6-1555155555555555-1', MEASURE_MS = Number(process.env.SMOOTH_MEASURE_MS ?? 40000);
 const scene = (page, fn, arg) => page.evaluate(fn, arg);
 const frames = page => page.evaluate(() => new Promise(resolve => { window.__game.registry.get('application').scene.refreshVisibility(); requestAnimationFrame(() => requestAnimationFrame(resolve)); }));
 // Repaint until every chunk in view shows its current ground look (one ground repaint a frame).

@@ -14,19 +14,25 @@
     {
       "id": "bush-meadow",
       "name": "Meadow bush",
-      "version": 1,
+      "version": 2,
       "spec": {
         "kind": "bush",
         "height": 0.6,
         "crown": 0.34,
         "clusters": 6,
         "seed": 3
-      }
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
+      },
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model bush-meadow, summer, view 0\u00b0, fitted into the original 47\u00d733 frame without distortion. Previous version: generated drawing v1."
     },
     {
       "id": "bush-berry",
       "name": "Berry bush",
-      "version": 1,
+      "version": 2,
       "spec": {
         "kind": "bush",
         "height": 0.55,
@@ -34,12 +40,18 @@
         "clusters": 6,
         "seed": 7,
         "berries": "cloth_red"
-      }
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
+      },
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model bush-berry, summer, view 0\u00b0, fitted into the original 41\u00d731 frame without distortion. Previous version: generated drawing v1."
     },
     {
       "id": "bush-flowering",
       "name": "Flowering bush",
-      "version": 1,
+      "version": 2,
       "spec": {
         "kind": "bush",
         "height": 0.7,
@@ -48,12 +60,18 @@
         "seed": 11,
         "berries": "blossom",
         "season": "spring"
-      }
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
+      },
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model bush-flowering, summer, view 0\u00b0, fitted into the original 48\u00d735 frame without distortion. Previous version: generated drawing v1."
     },
     {
       "id": "bush-scrub",
       "name": "Dry scrub",
-      "version": 1,
+      "version": 2,
       "spec": {
         "kind": "bush",
         "height": 0.5,
@@ -61,7 +79,13 @@
         "clusters": 6,
         "seed": 5,
         "dry": true
-      }
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
+      },
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): model bush-scrub, summer, view 0\u00b0, fitted into the original 40\u00d730 frame without distortion. Previous version: generated drawing v1."
     }
   ]
 }

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "thicket-2x1-hazel-views",
+  "variantId": "thicket-2x1-hazel-views-autumn-90",
+  "name": "Thicket 2×1 – Hazel, autumn 90° (front-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "0b3eab68",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 83,
+  "height": 64,
+  "anchor": {
+    "x": 44,
+    "y": 52
+  },
+  "origin": {
+    "x": 0.53012,
+    "y": 0.8125
+  },
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "base": {
+    "x": 44,
+    "y": 52
+  },
+  "baseOrigin": {
+    "x": 0.53012,
+    "y": 0.8125
+  },
+  "visualHeight": 52,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

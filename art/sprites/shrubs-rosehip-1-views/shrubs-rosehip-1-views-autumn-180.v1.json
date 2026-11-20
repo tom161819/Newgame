@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-rosehip-1-views",
+  "variantId": "shrubs-rosehip-1-views-autumn-180",
+  "name": "Rosehip small, autumn 180° (back-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "c8ea6151",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 38,
+  "height": 29,
+  "anchor": {
+    "x": 19,
+    "y": 24
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.82759
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 19,
+    "y": 24
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.82759
+  },
+  "visualHeight": 24,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

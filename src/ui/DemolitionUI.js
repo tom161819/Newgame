@@ -1,3 +1,4 @@
+import { buildingReachable } from '../game/fogReach.js';
 import { renderCastleUpgrade,clickCastleUpgrade } from './castleCard.js';
 import { buildingHP,repairPlan } from '../game/buildingHealth.js';
 import { countName } from '../i18n/names.js';
@@ -35,7 +36,7 @@ export class DemolitionUI {
   select(building){this.selectedId=building&&buildingIsComplete(building)?building.id:null;this.refresh();}
   attach(dialog,building){if(!building)return;this.buildingId=building.id;this.host=dialog;dialog.append(this.section);this.refresh();}
   openSelected(){
-    const b=this.building(this.selectedId);if(!b||!this.scene.fog.isVisibleObject(b))return;
+    const b=this.building(this.selectedId);if(!b||!buildingReachable(this.scene.fog,b))return;
     if(this.scene.character.state==='ground'&&this.scene.character.order?.kind==='enter'&&this.scene.character.order.tower?.id===b.id)this.scene.character.stopForBuilding();
     text(document.querySelector('#building-detail-title'),`${buildingName(b)} #${b.id}`);text(document.querySelector('#building-detail-description'),buildingDefinition(b).description);
     {const hp=buildingHP(b),box=document.querySelector('#building-detail-hp');if(box){box.hidden=!hp;if(hp){const r=b.repair,plan=!r&&hp.hp<hp.max?repairPlan(b):null,note=this.scene.nightThreats?.burning?.(b)?t('building.repairFire'):r?(r.assignedBuilders.length||r.workDone>0?t('building.repairWork',{percent:Math.floor(r.progress),count:r.assignedBuilders.length}):t('building.repairWait')):plan?t('building.repairCost',{cost:formatCost(plan.cost,this.scene.objectRegistry)}):'';text(document.querySelector('#building-detail-hp-text'),t('building.hp',{hp:Math.ceil(hp.hp),max:hp.max})+(note?` · ${note}`:''));const bar=document.querySelector('#building-detail-hp-bar');bar.max=hp.max;bar.value=hp.hp;}}}
@@ -44,7 +45,7 @@ export class DemolitionUI {
     this.scene.setGalleryInput(false);if(!this.dialog.open)this.dialog.showModal();this.attach(this.dialog,b);this.refresh();
   }
   reason(b){
-    if(!b||!this.scene.fog.isVisibleObject(b))return 'unavailable';if(b.type==='castle')return 'castle';if(b.type==='starter_stockpile')return 'starter';
+    /* (80): the window opens in fog, demolishing still needs sight */if(!b||!this.scene.fog.isVisibleObject(b))return 'unavailable';if(b.type==='castle')return 'castle';if(b.type==='starter_stockpile')return 'starter';
     if(!buildingIsComplete(b))return 'unfinished';if(!this.scene.demolition.eligible(b))return 'unavailable';if(this.scene.demolition.roofBlocked(b))return 'roof';return null;
   }
   refundLabel(b){const refund=buildingDemolitionRefund(b,buildingDefinition(b));return Object.keys(refund).length?Object.entries(refund).map(([id,n])=>countName(this.scene.objectRegistry.require(id),n)).join(', '):t('demolition.noRefund');}
@@ -54,7 +55,7 @@ export class DemolitionUI {
     this.scene.setGalleryInput(false);this.confirm.showModal();
   }
   refresh(){/* m-hrad-urovne: the Upgrade button follows the stores while the detail is open */{const b=this.dialog?.open?this.building(this.buildingId):null,box=b?.type==='castle'?document.querySelector('#building-detail-upgrade'):null;if(box)this.castleKey=renderCastleUpgrade(this.scene,box,b,this.castleKey);}
-    const selected=this.building(this.selectedId);this.inspect.hidden=!selected||!this.scene.fog.isVisibleObject(selected);
+    const selected=this.building(this.selectedId);this.inspect.hidden=!selected||!buildingReachable(this.scene.fog,selected);
     if(selected){const label=t('demolition.inspect',{name:buildingName(selected)});text(this.inspect,label);this.inspect.title=label;}
     const b=this.building(this.buildingId);if(!b){this.section.hidden=true;if(this.host?.open)this.host.close();return;}
     this.section.hidden=!this.host?.open;if(this.section.hidden)return;

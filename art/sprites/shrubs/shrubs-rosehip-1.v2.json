@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs",
+  "variantId": "shrubs-rosehip-1",
+  "name": "Rosehip – small",
+  "category": "nature",
+  "version": 2,
+  "specHash": "39ce84f3",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 44,
+  "height": 31,
+  "anchor": {
+    "x": 22,
+    "y": 28
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.90323
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 22,
+    "y": 28
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.90323
+  },
+  "visualHeight": 28,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

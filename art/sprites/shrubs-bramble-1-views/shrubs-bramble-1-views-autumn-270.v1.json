@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-bramble-1-views",
+  "variantId": "shrubs-bramble-1-views-autumn-270",
+  "name": "Bramble small, autumn 270° (back-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "bc352cee",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 51,
+  "height": 30,
+  "anchor": {
+    "x": 24,
+    "y": 23
+  },
+  "origin": {
+    "x": 0.47059,
+    "y": 0.76667
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 24,
+    "y": 23
+  },
+  "baseOrigin": {
+    "x": 0.47059,
+    "y": 0.76667
+  },
+  "visualHeight": 23,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

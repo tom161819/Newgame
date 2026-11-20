@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-hazel-2-views",
+  "variantId": "shrubs-hazel-2-views-spring-270",
+  "name": "Hazel medium, spring 270° (back-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "a6f09f9a",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 42,
+  "height": 43,
+  "anchor": {
+    "x": 24,
+    "y": 39
+  },
+  "origin": {
+    "x": 0.57143,
+    "y": 0.90698
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 24,
+    "y": 39
+  },
+  "baseOrigin": {
+    "x": 0.57143,
+    "y": 0.90698
+  },
+  "visualHeight": 39,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

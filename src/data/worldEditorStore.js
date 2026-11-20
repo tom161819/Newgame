@@ -2,7 +2,7 @@
 // localStorage only. A record is {levels, seed, ground}; ground holds only the ground-look values that differ from the
 // game's look (null = game look). Broken or foreign records are skipped, never thrown; writes report 'full' or
 // 'unavailable' instead of throwing, so the editor and the game keep working without storage.
-import { validLevels, defaultWorldLevels, encodeWorldCode, randomSeed, WORLD_SEED_MAX } from './worldCode.js';
+import { validLevels, defaultWorldLevels, encodeWorldCode, randomSeed, WORLD_SEED_MAX, fullLevels } from './worldCode.js';
 import { groundLookDiff, sanitizeGroundLook } from './groundLook.js';
 
 export const PRESETS_KEY = 'newgame.worldEditor.presets', LAST_KEY = 'newgame.worldEditor.last';
@@ -14,9 +14,11 @@ export const editorWorldCode = state => encodeWorldCode({ levels: state.levels, 
 // A valid record, or null.
 export function normalizeRecord(input) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) return null;
-  if (!validLevels(input.levels) || !Number.isSafeInteger(input.seed) || input.seed < 0 || input.seed > WORLD_SEED_MAX) return null;
+  // Generator 6 added four terrain settings: a preset saved before (12 levels) is kept with the default terrain.
+  const levels = validLevels(input.levels) ? input.levels : validLevels(input.levels, 5) ? fullLevels(input.levels) : null;
+  if (!levels || !Number.isSafeInteger(input.seed) || input.seed < 0 || input.seed > WORLD_SEED_MAX) return null;
   if (input.ground != null && !sanitizeGroundLook(input.ground)) return null;
-  return { levels: [...input.levels], seed: input.seed, ground: input.ground == null ? null : groundLookDiff(input.ground) };
+  return { levels: [...levels], seed: input.seed, ground: input.ground == null ? null : groundLookDiff(input.ground) };
 }
 function normalizePreset(input) {
   const record = normalizeRecord(input), name = typeof input?.name === 'string' ? input.name.trim().slice(0, NAME_MAX) : '';

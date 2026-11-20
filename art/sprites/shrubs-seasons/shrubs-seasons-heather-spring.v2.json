@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-seasons",
+  "variantId": "shrubs-seasons-heather-spring",
+  "name": "Heather – spring",
+  "category": "nature",
+  "version": 2,
+  "specHash": "c6f56815",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 47,
+  "height": 31,
+  "anchor": {
+    "x": 23,
+    "y": 25
+  },
+  "origin": {
+    "x": 0.48936,
+    "y": 0.80645
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 23,
+    "y": 25
+  },
+  "baseOrigin": {
+    "x": 0.48936,
+    "y": 0.80645
+  },
+  "visualHeight": 25,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

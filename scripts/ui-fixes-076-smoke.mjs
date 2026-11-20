@@ -14,7 +14,7 @@ export async function uiFixes076Smoke(context,url,instrument){
   let saved=null;
   try{
     await page.goto(url);saved=await page.evaluate(()=>Object.fromEntries(['newgame.language','newgame.tutorial','newgame.tipsSeen','newgame.tutorial.speedSeen','newgame.tips'].map(k=>[k,localStorage.getItem(k)])));await page.evaluate(()=>{localStorage.setItem('newgame.language','cs');localStorage.removeItem('newgame.tutorial');localStorage.removeItem('newgame.tipsSeen');localStorage.removeItem('newgame.tutorial.speedSeen');});await page.reload();
-    await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-9H2936D1');await page.locator('#start-game').click();
+    await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW6-1555155555555555-9H2936D1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.tutorial);
     await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     // Point 8: the More toggle follows the language read after it was built.

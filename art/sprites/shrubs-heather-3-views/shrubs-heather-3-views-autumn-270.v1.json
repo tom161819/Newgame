@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-heather-3-views",
+  "variantId": "shrubs-heather-3-views-autumn-270",
+  "name": "Heather large, autumn 270° (back-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "2d387d38",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 50,
+  "height": 32,
+  "anchor": {
+    "x": 26,
+    "y": 26
+  },
+  "origin": {
+    "x": 0.52,
+    "y": 0.8125
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 26,
+    "y": 26
+  },
+  "baseOrigin": {
+    "x": 0.52,
+    "y": 0.8125
+  },
+  "visualHeight": 26,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

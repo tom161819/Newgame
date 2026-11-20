@@ -53,6 +53,8 @@ export function tipPlacement({point=null,rect=null,from=null,vw,vh,bubble,window
   return tutorialPlacement({point,rect,from,vw,vh,bubble,windows:all,top,arrowLength});
 }
 const box=r=>r?{left:r.left,right:r.right,top:r.top,bottom:r.bottom}:null;
+// The start guide's blink period (CSS tutorial-blink on the big arrow and the glowing box).
+export const BLINK_MS=1200;
 export class TutorialGuide {
   constructor(scene,{doc=globalThis.document}={}){
     this.scene=scene;this.doc=doc;this.active=false;this.seen=new Set();this.skipped=new Set();this.lastCheck=-Infinity;this.currentId=null;
@@ -65,9 +67,12 @@ export class TutorialGuide {
     this.closeButton=this.button('tutorial-close',()=>this.end());this.closeButton.textContent='×';
     actions.append(this.showButton,this.nextButton,this.skipButton);this.bubble.append(this.closeButton,this.count,this.text,actions);
     this.arrow=doc.createElement('div');this.arrow.id='tutorial-arrow';this.arrow.className='tutorial-arrow';this.arrow.setAttribute('aria-hidden','true');this.arrow.hidden=true;
+    // Owner 19 Nov 2026: the start guide also lights up the place the arrow points at (a glowing box over the button),
+    // blinking together with the big arrow. It never takes clicks.
+    this.spot=doc.createElement('div');this.spot.id='tutorial-spot';this.spot.className='tutorial-spot';this.spot.setAttribute('aria-hidden','true');this.spot.hidden=true;
     this.done=doc.createElement('div');this.done.className='tutorial-done';this.done.textContent='✓';this.done.hidden=true;
     for(const e of ['pointerdown','mousedown','mouseup','click','wheel'])this.bubble.addEventListener(e,ev=>ev.stopPropagation(),options);
-    doc.body.append(this.bubble,this.arrow,this.done);
+    doc.body.append(this.spot,this.bubble,this.arrow,this.done);
     // m-tutorial-v2 bugs 6–7: the progress also follows the world on a timer, so a step ends even on frames where the
     // scene's update returns early (a paused or blocked frame).
     this.timer=globalThis.setInterval?.(()=>{if(this.active)this.update();},500);this.timer?.unref?.();
@@ -94,7 +99,7 @@ export class TutorialGuide {
   start(){this.seen.delete('wiki');this.seen.delete('tasks');this.skipped.clear();this.active=true;this.startedAt=performance.now();this.update(true);return true;}
   resume(){if(tutorialEnabled()&&!introDone()&&!this.progress().allDone){this.active=true;this.startedAt=performance.now();this.update(true);}}
   end(){if(this.tip){this.closeTip();try{localStorage.setItem(TIPS_KEY,'off');}catch{/* session */}if(this.tipSetting)this.tipSetting.checked=false;return;}this.active=false;try{localStorage.setItem(INTRO_KEY,'done');}catch{/* session */}this.hide();}
-  hide(){this.bubble.hidden=true;this.arrow.hidden=true;}
+  hide(){this.bubble.hidden=true;this.arrow.hidden=true;this.spot.hidden=true;}
   next(){if(this.tip){this.closeTip();return;}const p=this.progress();if(p.current){this.seen.add(p.current.id);if(p.current.id==='speed')try{localStorage.setItem(SPEED_KEY,'1');}catch{/* session */}}this.update(true);}
   skip(){const p=this.progress();if(p.current)this.skipped.add(p.current.id);this.update(true);}
   pendingBuilding(step){const types=new Set(this.scene.buildings.map(b=>b.type));return step.buildingIds?.find(id=>!types.has(id))??step.buildingIds?.[0];}
@@ -169,7 +174,7 @@ export class TutorialGuide {
     const target=this.target(p.current);
     const key=target.quarry?'tutorial.step.stoneQuarry':target.placing?'tutorial.place':target.from==='above'&&p.current.id==='stone'?'tutorial.step.stoneMark':`tutorial.step.${p.current.id}`;
     const intro=GUIDE.intro.find(step=>step.id===p.current.id);
-    this.arrow.classList.toggle('big',!!intro);
+    this.arrow.classList.toggle('big',!!intro);this.bubble.classList.toggle('big',!!intro);this.big=!!intro;
     this.text.textContent=guideText(intro?.text,language())??t(key,{name:this.scene.objectRegistry?.get(this.pendingBuilding(p.current)??'')?.name??'',plots:FARM_PLOT_CAPACITY});
     this.count.textContent=t('tutorial.count',{step:p.doneCount+1,total:p.total});
     this.showButton.textContent=t('tutorial.show');this.skipButton.textContent=t('tutorial.skip');this.nextButton.textContent=t('tutorial.next');this.closeButton.title=this.closeButton.ariaLabel=t('tutorial.close');
@@ -188,15 +193,28 @@ export class TutorialGuide {
     if(target.el&&visible(target.el)){rect=target.el.getBoundingClientRect();point={x:rect.left+rect.width/2,y:rect.top+rect.height/2};}
     else if(target.world){const sp=this.screenPoint(target.world);if(sp)point={x:sp.x,y:sp.y};}
     if(this.tip&&!this.active){this.placeTipBubble(point,rect,target,vw,vh);return;}
-    if(!point){this.arrow.hidden=true;this.positionBubble(null);return;}
+    if(!point){this.arrow.hidden=true;this.spot.hidden=true;this.positionBubble(null);return;}
     // m-tutorial-v2 point 2: arrow and bubble beside the target (and beside the panel it lives in), never over it.
-    const w=Math.min(300,vw-24);this.bubble.style.width=`${w}px`;const h=this.bubble.offsetHeight||90;
+    const w=Math.min(this.big?380:300,vw-24);this.bubble.style.width=`${w}px`;const h=this.bubble.offsetHeight||90;
     const boxes=[target.avoid??[]].flat().filter(visible).map(restingBox);
     const avoid=boxes.length?{left:Math.min(...boxes.map(b=>b.left)),right:Math.max(...boxes.map(b=>b.right)),top:Math.min(...boxes.map(b=>b.top)),bottom:Math.max(...boxes.map(b=>b.bottom))}:null;
-    const {arrow,bubble}=this.placed('step',{point,rect:box(rect),avoid,from:target.from??null,vw,vh,bubble:{w,h},windows:openWindowRects(this.doc,vw,vh).map(box),arrowLength:this.arrowLength()},tutorialPlacement);
-    this.arrow.hidden=false;this.arrow.style.left=`${Math.round(arrow.x)}px`;this.arrow.style.top=`${Math.round(arrow.y)}px`;this.arrow.style.transform=`translate(-50%,-50%) rotate(${arrow.angle}rad)`;this.arrow.classList.toggle('offscreen',arrow.off);
+    // Owner 19 Nov 2026: the start guide's bubble keeps out of the top bar and the HUD (like a tip), so it sits in the
+    // open map beside the big arrow instead of hiding in the bar next to the button.
+    let windows=openWindowRects(this.doc,vw,vh),top=70;
+    if(this.big){const bar=this.doc.querySelector?.('.inventory'),topBar=bar&&visible(bar)?bar.getBoundingClientRect():null;top=tipTop(topBar);windows=[...(topBar?[topBar]:[]),...tipWindowRects(this.doc,vw,vh)];}
+    const {arrow,bubble}=this.placed('step',{point,rect:box(rect),avoid,from:target.from??null,vw,vh,bubble:{w,h},windows:windows.map(box),top,arrowLength:this.arrowLength()},tutorialPlacement);
+    this.showSpot(this.big&&rect?rect:null);
+    const shown=this.arrow.hidden;this.arrow.hidden=false;if(shown)this.syncBlink();this.arrow.style.left=`${Math.round(arrow.x)}px`;this.arrow.style.top=`${Math.round(arrow.y)}px`;this.arrow.style.transform=`translate(-50%,-50%) rotate(${arrow.angle}rad)`;this.arrow.classList.toggle('offscreen',arrow.off);
     this.bubble.style.left=`${bubble.x}px`;this.bubble.style.top=`${bubble.y}px`;
   }
+  // The glowing box over the target (padding 6 px), or hidden.
+  showSpot(rect){
+    const sp=this.spot;if(!rect){sp.hidden=true;return;}const pad=6;
+    sp.style.left=`${Math.round(rect.left-pad)}px`;sp.style.top=`${Math.round(rect.top-pad)}px`;sp.style.width=`${Math.round(rect.width+pad*2)}px`;sp.style.height=`${Math.round(rect.height+pad*2)}px`;
+    if(sp.hidden){sp.hidden=false;this.syncBlink();}
+  }
+  // Arrow and glowing box blink in step: both animations get the same phase of the page clock.
+  syncBlink(){const ms=BLINK_MS,phase=(globalThis.document?.timeline?.currentTime??performance.now())%ms;for(const e of [this.arrow,this.spot])e.style.animationDelay=`${-Math.round(phase)}ms`;}
   // performance-3: the search for a free spot (thousands of candidate places) runs only when something it depends on
   // moved; with the same boxes as last time the last answer stands.
   placed(kind,input,solve){const key=kind+JSON.stringify(input);if(this.placedKey!==key){this.placedKey=key;this.placedResult=solve(input);}return this.placedResult;}
@@ -260,7 +278,7 @@ export class TutorialGuide {
   showTip(tip){
     this.text.textContent=guideText(tip.text,language())??t(`tips.${tip.id}`);this.count.textContent=t('tips.label');
     this.showButton.hidden=false;this.showButton.textContent=t('tips.more');this.nextButton.hidden=false;this.nextButton.textContent=t('tips.gotIt');this.skipButton.hidden=true;this.closeButton.title=this.closeButton.ariaLabel=t('tips.off');
-    this.arrow.classList.remove('big');this.bubble.classList.add('is-tip');this.bubble.hidden=false;this.hovered=false;this.placeTip();
+    this.arrow.classList.remove('big');this.bubble.classList.remove('big');this.big=false;this.spot.hidden=true;this.bubble.classList.add('is-tip');this.bubble.hidden=false;this.hovered=false;this.placeTip();
   }
   placeTip(){
     const tip=this.tip,s=this.scene;if(!tip)return;
@@ -277,5 +295,5 @@ export class TutorialGuide {
   reopenTip(id){if(this.active||!this.tips.reopen(id,this.gameNow()))return false;this.saveSeen();this.showTip(this.tip);this.scene.noticesPanel?.render?.();return true;}
   dropTip(id){if(this.tips.drop(id))this.scene.noticesPanel?.render?.();}
   relabel(){this.update(true);}
-  destroy(){this.controller.abort();globalThis.clearInterval?.(this.timer);clearTimeout(this.doneTimer);this.bubble.remove();this.arrow.remove();this.done.remove();}
+  destroy(){this.controller.abort();globalThis.clearInterval?.(this.timer);clearTimeout(this.doneTimer);this.bubble.remove();this.arrow.remove();this.spot.remove();this.done.remove();}
 }

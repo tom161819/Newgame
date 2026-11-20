@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-seasons",
+  "variantId": "shrubs-seasons-rosehip-winter",
+  "name": "Rosehip – winter",
+  "category": "nature",
+  "version": 2,
+  "specHash": "d57617d4",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 44,
+  "height": 33,
+  "anchor": {
+    "x": 25,
+    "y": 31
+  },
+  "origin": {
+    "x": 0.56818,
+    "y": 0.93939
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 25,
+    "y": 31
+  },
+  "baseOrigin": {
+    "x": 0.56818,
+    "y": 0.93939
+  },
+  "visualHeight": 31,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

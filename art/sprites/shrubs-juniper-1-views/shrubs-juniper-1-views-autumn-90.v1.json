@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "shrubs-juniper-1-views",
+  "variantId": "shrubs-juniper-1-views-autumn-90",
+  "name": "Juniper small, autumn 90° (front-left)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "42822442",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 33,
+  "height": 32,
+  "anchor": {
+    "x": 17,
+    "y": 28
+  },
+  "origin": {
+    "x": 0.51515,
+    "y": 0.875
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 17,
+    "y": 28
+  },
+  "baseOrigin": {
+    "x": 0.51515,
+    "y": 0.875
+  },
+  "visualHeight": 28,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

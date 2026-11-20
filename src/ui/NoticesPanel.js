@@ -1,3 +1,4 @@
+import { buildingReachable } from '../game/fogReach.js';
 import { WIKI_NOTICE_TOPICS } from '../data/wiki.js';
 import { wikiInfoButton } from './WikiPanel.js';
 import { hireUnemployed } from './jobChange.js';
@@ -139,7 +140,7 @@ export class NoticesPanel {
     const s=this.scene,building=s.buildings.find(b=>b.id===id),issue=[...(s.diagnostics?.issues?.values?.()??[])].find(i=>i.entityId===id&&NOTICE_CAMERA.has(i.reason));
     // m-drevorubci-stromy / m-zelezny-dul-misto: these notices move the camera to the hut or to the cancelled site.
     if(issue){const tile=issue.params?.tile??(building?{x:building.x+buildingDefinition(building).width/2,y:building.y+buildingDefinition(building).height/2}:null);if(tile)s.worldCamera?.lookAt?.(tile);}
-    if(!building||!s.fog.isVisibleObject(building))return;
+    if(!building||!buildingReachable(s.fog,building))return;
     if(!buildingIsComplete(building))s.constructionUI?.open(building);else if(buildingDefinition(building).workplace)s.workplacePanel.open(building);
   }
   render(){

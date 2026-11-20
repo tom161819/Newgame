@@ -4,26 +4,28 @@
 // (Sword +100 % attack, Bow +40 % attack, Armor +30 armor; see militaryEquipment.js). Values are first proposals
 // derived from the current combat numbers, not historical facts.
 export const UNIT_TYPES=Object.freeze({
-  soldier:Object.freeze({equipment:Object.freeze({weapon:'sword'}),modifiers:Object.freeze({maxHP:20}),trainingTime:20000,goldCost:5,wageBonus:1,requiredCombatLevel:1}),
+  soldier:Object.freeze({equipment:Object.freeze({weapon:'sword'}),modifiers:Object.freeze({maxHP:20}),trainingTime:20000,goldCost:5,wageBonus:1}),
+  // Owner 19 Nov 2026 ("ty požadavky na vycvičení teď zruš"): no combat level is needed to train any unit any more
+  // (requiredCombatLevel removed); a recruit needs only the kit, the gold and – for the Light Cavalry – a horse.
   // p71 (owner 17 Nov 2026): the Swordsman, Royal Archer, Crossbowman and Light Cavalry wear Light Armor from the Tailor.
-  swordsman:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'light_armor'}),modifiers:Object.freeze({maxHP:60,attackBonus:50,armor:15}),trainingTime:45000,goldCost:12,wageBonus:2,requiredCombatLevel:3}),
-  archer:Object.freeze({equipment:Object.freeze({weapon:'bow'}),modifiers:Object.freeze({maxHP:10,attackRange:8}),trainingTime:30000,goldCost:8,wageBonus:1,requiredCombatLevel:1}),
+  swordsman:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'light_armor'}),modifiers:Object.freeze({maxHP:60,attackBonus:50,armor:15}),trainingTime:45000,goldCost:12,wageBonus:2}),
+  archer:Object.freeze({equipment:Object.freeze({weapon:'bow'}),modifiers:Object.freeze({maxHP:10,attackRange:8}),trainingTime:30000,goldCost:8,wageBonus:1}),
   // p70 (owner 17 Nov 2026): the Knight now fights on foot (sword and armour, no horse); the mounted unit is the
   // Light Cavalry below. A Knight from an older save gives his horse back to the Stables on load.
-  knight:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'armor'}),modifiers:Object.freeze({maxHP:100,attackBonus:50,armor:10}),trainingTime:60000,goldCost:25,wageBonus:4,requiredCombatLevel:4}),
+  knight:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'armor'}),modifiers:Object.freeze({maxHP:100,attackBonus:50,armor:10}),trainingTime:60000,goldCost:25,wageBonus:4}),
   // p70 new units. Halberdier: halberd and armour, strikes from 2 tiles (still a melee fighter, see isRanged).
-  halberdier:Object.freeze({equipment:Object.freeze({weapon:'halberd',armor:'armor'}),modifiers:Object.freeze({maxHP:60,attackRange:1}),bonusVs:Object.freeze({mounted:1.5}),trainingTime:50000,goldCost:15,wageBonus:3,requiredCombatLevel:3}),
+  halberdier:Object.freeze({equipment:Object.freeze({weapon:'halberd',armor:'armor'}),modifiers:Object.freeze({maxHP:60,attackRange:1}),bonusVs:Object.freeze({mounted:1.5}),trainingTime:50000,goldCost:15,wageBonus:3}),
   // Royal Archer: a bow and the Swordsman's defence (+60 HP, armour 15) and Light Armor.
-  royal_archer:Object.freeze({equipment:Object.freeze({weapon:'bow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:60,attackBonus:20,armor:15,attackRange:8}),trainingTime:45000,goldCost:14,wageBonus:2,requiredCombatLevel:3}),
+  royal_archer:Object.freeze({equipment:Object.freeze({weapon:'bow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:60,attackBonus:20,armor:15,attackRange:8}),trainingTime:45000,goldCost:14,wageBonus:2}),
   // Crossbowman: crossbow and Light Armor.
-  crossbowman:Object.freeze({equipment:Object.freeze({weapon:'crossbow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:30,attackRange:6.5}),pierce:.5,trainingTime:40000,goldCost:12,wageBonus:2,requiredCombatLevel:2}),
+  crossbowman:Object.freeze({equipment:Object.freeze({weapon:'crossbow',armor:'light_armor'}),modifiers:Object.freeze({maxHP:30,attackRange:6.5}),pierce:.5,trainingTime:40000,goldCost:12,wageBonus:2}),
   // Light Cavalry: sword and a tamed horse from the Stables, fast. His own look comes later (owner's art).
-  light_cavalry:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'light_armor'}),mount:'horse',charge:Object.freeze({run:5,damage:35}),modifiers:Object.freeze({maxHP:50,attackBonus:30}),trainingTime:50000,goldCost:20,wageBonus:3,requiredCombatLevel:3}),
+  light_cavalry:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'light_armor'}),mount:'horse',charge:Object.freeze({run:5,damage:35}),modifiers:Object.freeze({maxHP:50,attackBonus:30}),trainingTime:50000,goldCost:20,wageBonus:3}),
   // Owner 18 Nov 2026: a Catapult crew (a Recruit and a finished Catapult from the Builder's Workshop) and a Military
   // Wagon (a Recruit and a Horse Wagon with its horse). `vehicle`: the vehicle the unit takes; no Armory items.
   // speedFactor: a Catapult rolls slowly, the Wagon at the horse's pace.
-  catapult:Object.freeze({equipment:Object.freeze({}),vehicle:'catapult',speedFactor:.55,modifiers:Object.freeze({maxHP:20}),trainingTime:20000,goldCost:5,wageBonus:1,requiredCombatLevel:1}),
-  military_wagon:Object.freeze({equipment:Object.freeze({}),vehicle:'horse_wagon',speedFactor:1.25,modifiers:Object.freeze({maxHP:10}),trainingTime:15000,goldCost:3,wageBonus:1,requiredCombatLevel:1}),
+  catapult:Object.freeze({equipment:Object.freeze({}),vehicle:'catapult',speedFactor:.55,modifiers:Object.freeze({maxHP:20}),trainingTime:20000,goldCost:5,wageBonus:1}),
+  military_wagon:Object.freeze({equipment:Object.freeze({}),vehicle:'horse_wagon',speedFactor:1.25,modifiers:Object.freeze({maxHP:10}),trainingTime:15000,goldCost:3,wageBonus:1}),
 });
 // Battle test 18 Nov 2026 (unit balance, roles): `bonusVs.mounted` – damage multiplier against riders (the Halberdier,
 // whose armour came down from 35 to 30, the Swordsman's: his reach is his strength); `pierce` – share of the target's armour his shot

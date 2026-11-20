@@ -22,7 +22,7 @@ const placeBlueprint=(page,type)=>page.evaluate(type=>{const s=window.__game.reg
 const finish=(id)=>page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id),m=s.constructionSystem.materials;
   if(b.materialSupply){const loc=s.foodStorage.locations.get(m.owner(b.id));loc.stock={...b.materialSupply.required};}delete b.unverified;b.construction.workDone=b.construction.requiredWork;b.construction.contributions={king:b.construction.requiredWork};const done=s.constructionSystem.finish(b);for(const [rid,r] of [...s.foodStorage.reservations])if(r.siteId===id)s.foodStorage.release(rid);return done;},id);
 await page.goto(url);await page.waitForFunction(()=>window.__game?.registry.get('application'));
-await page.evaluate(()=>{const app=window.__game.registry.get('application');app.start(null,{...app.setup.value(),worldCode:'MKW5-155515555555-1'});});
+await page.evaluate(()=>{const app=window.__game.registry.get('application');app.start(null,{...app.setup.value(),worldCode:'MKW6-1555155555555555-1'});});
 await page.waitForFunction(()=>window.__game.registry.get('application').scene?.lightFuel&&window.__game.registry.get('application').scene?.workerSystem);await page.waitForTimeout(1500);
 await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;const s=window.__game.registry.get('application').scene;s.inventory.add('wood',80);s.inventory.add('stone',40);s.updateInventory();s.fog?.setEnabled?.(false);});
 await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;if(!s.playerPaused)s.speedControls.togglePause();});

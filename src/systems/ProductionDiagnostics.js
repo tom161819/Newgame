@@ -4,7 +4,8 @@ import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { DIAGNOSTICS,INPUT_SOURCES,GATHER_OUTPUTS,DEPLETION_SOURCES,STORAGE_WAIT_MESSAGES,CHAIN_ADVICE,noticeRepeatDays,noticeSeverity,NOTICE_REPEAT_MAX_DAYS,NOTICE_CLOSED_LIMIT } from '../data/diagnostics.js';
 import { chainLinks,isRawSource } from '../data/productionChains.js';
 import { DAY_DURATION } from './GameTimeSystem.js';
-const PILE_WAIT_HOURS=2;
+// Owner 19 Nov 2026: the "goods wait, set Carries first" notice comes after a whole game day (was 2 game hours).
+const PILE_WAIT_HOURS=24;
 import { storageResources } from '../data/logistics.js';
 import { noticeText } from '../ui/noticeText.js';
 import { farmReady } from '../data/farmPlots.js';

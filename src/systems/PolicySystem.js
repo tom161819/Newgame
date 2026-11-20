@@ -1,5 +1,5 @@
 import { devFactor } from '../data/devBalance.js';
-import { TAX_RATES,RATIONS,DEFAULT_POLICY,POLICY_RULES,FEAST } from '../data/policy.js';
+import { RATIONS,DEFAULT_POLICY,POLICY_RULES,FEAST,normalizeTax,taxHappiness,taxLevel } from '../data/policy.js';
 import { t } from '../i18n/index.js';
 
 // #103: tax rate and food rations. Taxes are collected at the start of each day from the permanent residents (Gold,
@@ -16,7 +16,8 @@ export class PolicySystem {
   changed(){for(const listener of this.listeners)listener();}
   // A choice waits for the next morning; choosing the policy in force again cancels the wait.
   set(kind,value){
-    if(!(kind==='tax'&&Object.hasOwn(TAX_RATES,value)||kind==='rations'&&Object.hasOwn(RATIONS,value)))return false;
+    // The tax takes a number (Gold per resident) or a named level (its anchor rate), snapped to the slider step.
+    if(kind==='tax'){value=normalizeTax(value);if(value===null)return false;}else if(!(kind==='rations'&&Object.hasOwn(RATIONS,value)))return false;
     const next={tax:this.pending?.tax??this.tax,rations:this.pending?.rations??this.rations,[kind]:value};
     this.pending=next.tax===this.tax&&next.rations===this.rations?null:next;this.changed();return true;
   }
@@ -27,7 +28,7 @@ export class PolicySystem {
     const day=this.scene.gameTime?.dayDuration;if(!(delta>0)||!day)return;const target=this.target();if(this.effect===target)return;
     const step=POLICY_RULES.effectPerDay*delta/day;this.effect=this.effect<target?Math.min(target,this.effect+step):Math.max(target,this.effect-step);
   }
-  target(policy=this){return TAX_RATES[policy.tax].happiness;}
+  target(policy=this){return taxHappiness(policy.tax);}
   // Days until the Happiness effect reaches its target (for the panel).
   daysToTarget(){return Math.abs(this.target()-this.effect)/POLICY_RULES.effectPerDay;}
   residents(){return (this.scene.workerSystem?.liveWorkers?.()??[]).filter(w=>w.isAlive&&w.isSubject!==false);}
@@ -37,15 +38,15 @@ export class PolicySystem {
   // Policy v2 P2: situation penalties of one resident, each with its reason (shown in the Happiness tooltip).
   contextPenalties(worker,{hungry=false}={}){
     const s=this.scene,c=POLICY_RULES.context,out=[];
-    if(this.tax!=='none'&&(s.wageSystem?.unpaid?.(worker)??0)>0)out.push({id:'taxedUnpaid',value:c.taxedUnpaid});
+    if(this.tax>0&&(s.wageSystem?.unpaid?.(worker)??0)>0)out.push({id:'taxedUnpaid',value:c.taxedUnpaid});
     // Generous rations promised, but no meal for this resident.
     if(this.rations==='generous'&&s.foodSystem?.residents?.get(worker.id)?.hungry)out.push({id:'promisedFood',value:c.promisedFood});
-    if(hungry&&c.hungryTaxRates.includes(this.tax))out.push({id:'hungryTaxes',value:c.hungryTaxes});
+    if(hungry&&c.hungryTaxRates.includes(taxLevel(this.tax)))out.push({id:'hungryTaxes',value:c.hungryTaxes});
     return out;
   }
   // The Happiness effect in force now (whole points shown, the exact value used).
   happiness(){return this.effect;}
-  dailyTaxes(tax=this.tax){return Math.round(this.residents().length*TAX_RATES[tax].perResident*(this.scene.kingSkills?.taxMultiplier?.()??1)*devFactor('taxes')*100)/100;}
+  dailyTaxes(tax=this.tax){return Math.round(this.residents().length*tax*(this.scene.kingSkills?.taxMultiplier?.()??1)*devFactor('taxes')*100)/100;}
   collect(day){
     if(day<=this.lastTaxDay)return 0;this.lastTaxDay=day;this.apply();
     const castle=this.scene.buildings?.some(b=>b.type==='castle'&&(!b.construction||b.construction.state==='complete'));const amount=castle?this.dailyTaxes():0;

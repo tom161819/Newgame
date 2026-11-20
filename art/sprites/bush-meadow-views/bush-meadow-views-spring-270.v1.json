@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "bush-meadow-views",
+  "variantId": "bush-meadow-views-spring-270",
+  "name": "Meadow bush, spring 270° (back-right)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "c0bb75fc",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 45,
+  "height": 33,
+  "anchor": {
+    "x": 22,
+    "y": 27
+  },
+  "origin": {
+    "x": 0.48889,
+    "y": 0.81818
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 22,
+    "y": 27
+  },
+  "baseOrigin": {
+    "x": 0.48889,
+    "y": 0.81818
+  },
+  "visualHeight": 27,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "lights": [],
+  "render": {
+    "source": "blender"
+  }
+}

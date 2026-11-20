@@ -578,6 +578,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .minimap canvas { position:absolute; left:50%; top:50%; width:var(--minimap-size); height:var(--minimap-size); margin:calc(var(--minimap-size) / -2) 0 0 calc(var(--minimap-size) / -2); transform:scaleY(.5) rotate(45deg); image-rendering:pixelated; border:1px solid #b99a53; }
 @media(max-width:760px){ .minimap { --minimap-size:calc(105px * var(--minimap-scale, 1)); } }
 /* Request 55: + / − in the minimap's top-right corner change its on-screen size (Minimap.js MINIMAP_SIZES). */
+/* Owner 19 Nov 2026 (82): a small square for each neighbouring map, just outside the diamond's tips and edge middles. */
+.minimap-zone { position:absolute; z-index:1; left:calc(50% + var(--zx) * (25% + 7px) - 9px); top:calc(50% + var(--zy) * (25% + 5px) - 9px); width:18px; height:18px; min-height:0; padding:0; display:grid; place-items:center; border:1px solid var(--line, #79704b); border-radius:4px; background:var(--glass, rgb(30 35 25 / .86)); color:var(--ink, #ede5c9); font:700 9px/1 var(--font-ui, system-ui); cursor:pointer; white-space:nowrap; overflow:hidden; }
+.minimap-zone.found { font-size:11px; }
+.minimap-zone.marching { border-color:var(--gold, #e3c57a); color:var(--gold, #e3c57a); width:auto; min-width:18px; padding:0 2px; }
+.minimap-zone.there { border-color:#8fd16a; }
+.minimap-zone:hover:not(:disabled) { border-color:var(--gold, #e3c57a); }
+.minimap-zone:disabled { opacity:.55; cursor:default; }
 .minimap-size { position:absolute; top:0; right:0; z-index:1; display:flex; gap:3px; }
 .minimap-size button { width:20px; height:20px; min-height:0; padding:0; display:grid; place-items:center; border:1px solid var(--line, #79704b); border-radius:5px; background:var(--glass, rgb(30 35 25 / .86)); color:var(--ink, #ede5c9); font:700 13px/1 var(--font-ui, system-ui); cursor:pointer; }
 .minimap-size button:hover:not(:disabled) { border-color:var(--gold, #e3c57a); color:var(--gold, #e3c57a); }
@@ -1237,6 +1244,28 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 .barracks-auto-hire { display:flex; flex-direction:column; gap:2px; margin:4px 0 8px; font-size:12px; }
 .barracks-auto-hire input[type=range] { appearance:auto; width:100%; height:18px; border:0; background:none; accent-color:#c9a85a; margin:0; }
 .barracks-auto-hire input[type=range]::before { content:none; }
+/* Owner 19 Nov 2026: "Recruit automatically" is the main control of the Barracks – a framed, larger slider. */
+.barracks-auto-hire { gap:6px; margin:6px 0 12px; padding:10px 12px; border:1px solid #c9a85a; border-radius:8px; background:linear-gradient(180deg,rgb(201 168 90 / .18),rgb(201 168 90 / .06)); box-shadow:inset 0 0 0 1px rgb(0 0 0 / .25); }
+.barracks-auto-hire .barracks-auto-hire-text { font-size:15px; font-weight:700; color:var(--gold,#f0d78b); letter-spacing:.01em; }
+.barracks-auto-hire input[type=range] { height:24px; accent-color:#e0b84f; }
+/* Training cards: the class picture and weapon / armour icons like the selection bar. */
+.unit-card-head { display:flex; align-items:flex-end; gap:6px; margin-bottom:2px; }
+.unit-card-pic { flex:0 0 36px; height:50px; display:flex; align-items:center; justify-content:center; font-size:24px; border-radius:6px; background:rgb(0 0 0 / .18); overflow:hidden; }
+.unit-card-pic img { width:36px; height:50px; image-rendering:auto; }
+.unit-card-title { display:flex; flex-direction:column; gap:3px; min-width:0; }
+.unit-card-gear { display:flex; gap:4px; color:var(--gold,#e8cf86); }
+.unit-card-gear i { display:inline-flex; width:20px; height:20px; align-items:center; justify-content:center; border-radius:4px; background:rgb(0 0 0 / .28); font-style:normal; cursor:help; }
+/* The housed soldiers: a closed section with one compact line each. */
+.barracks-roster { margin:8px 0; border:1px solid rgba(120,90,50,.45); border-radius:6px; padding:4px 8px; }
+.barracks-roster > summary { cursor:pointer; font-weight:600; padding:4px 0; }
+.barracks-roster[hidden] { display:none; }
+#workplace-workers.barracks-roster-list { gap:0; margin:2px 0 4px; }
+.barracks-roster-row { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) 44px minmax(0,1.3fr) 26px; align-items:center; gap:8px; padding:3px 4px; border-top:1px solid rgb(255 255 255 / .06); font-size:13px; }
+.barracks-roster-name, .barracks-roster-class { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.barracks-roster-class, .barracks-roster-level { color:var(--muted,#cdbf9c); }
+.barracks-roster-level { font-variant-numeric:tabular-nums; }
+.barracks-roster-state { display:flex; align-items:center; gap:4px; min-width:0; white-space:nowrap; overflow:hidden; cursor:help; }
+.barracks-roster-remove { width:24px; height:24px; min-height:0; padding:0; font-size:12px; line-height:1; }
 .market-auto-table, #marketplace-prices, #marketplace-status { font-variant-numeric: tabular-nums; }
 .own-store { margin:6px 0; } .own-store h3 { margin:0 0 4px; font-size:13px; }
 .own-store-location { margin:4px 0; font-size:12px; font-variant-numeric:tabular-nums; }
@@ -1281,8 +1310,19 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 .castle-upgrade h3 { margin:0; font-size:15px; }
 .castle-upgrade-error { margin:0; color:#e6b062; font-size:12px; }
 
-/* Owner 15 Nov 2026: the start guide (Wiki, Getting started) uses a big arrow. */
-html .tutorial-arrow.big:not(.offscreen) { width:84px; height:54px; }
+/* Owner 15 Nov 2026: the start guide (Wiki, Getting started) uses a big arrow.
+   Owner 19 Nov 2026: bigger and easy to see on the light top bar too (gold with a light halo and a dark outline, the
+   same in every pointer theme); the place it points at lights up with a glowing box, and both blink together
+   (tutorial-blink, BLINK_MS in TutorialGuide.js, phase set by syncBlink). The bubble is bigger and brighter. */
+html .tutorial-arrow.big:not(.offscreen) { width:120px; height:76px; clip-path:none; -webkit-mask:none; mask:none; background:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgNzYiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZjNhOCIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjZmZjZjNhIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZTA4YTEyIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTYgMjYgSDcwIFY4IEwxMTQgMzggTDcwIDY4IFY1MCBINiBaIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmY2ZDAiIHN0cm9rZS13aWR0aD0iMTAiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNNiAyNiBINzAgVjggTDExNCAzOCBMNzAgNjggVjUwIEg2IFoiIGZpbGw9InVybCgjZykiIHN0cm9rZT0iIzNiMjMwNCIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTEyIDMxIEg3NCBWMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZmJlNiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii43Ii8+PC9zdmc+") center / contain no-repeat; filter:drop-shadow(0 0 10px #ffc83dcc) drop-shadow(0 3px 4px #000a); animation:tutorial-blink 1.2s ease-in-out infinite; }
+.tutorial-spot { position:fixed; z-index:45; pointer-events:none; box-sizing:border-box; border:3px solid #ffd54a; border-radius:10px; background:rgb(255 210 70 / .38); box-shadow:0 0 0 2px #3b2304, 0 0 22px 6px rgb(255 200 60 / .85); animation:tutorial-blink 1.2s ease-in-out infinite; }
+.tutorial-spot[hidden] { display:none; }
+@keyframes tutorial-blink { 0%,100% { opacity:1; } 50% { opacity:.28; } }
+.tutorial-bubble.big { padding:16px 20px 14px; border-width:2px; box-shadow:0 0 0 1px #3b2304, 0 0 26px 4px rgb(255 200 60 / .55), 0 10px 32px #000c; }
+.tutorial-bubble.big .tutorial-count { font-size:12px; }
+.tutorial-bubble.big .tutorial-text { margin:6px 0 14px; font-size:18px; line-height:1.4; font-weight:600; }
+.tutorial-bubble.big .tutorial-actions button { padding:6px 14px; font-size:14px; }
+@media (prefers-reduced-motion:reduce){ html .tutorial-arrow.big, .tutorial-spot { animation:none; } }
 /* Owner 15 Nov 2026: the Haulers box is one line; its details open above it on hover or focus. */
 .population-haulers { position:relative; padding:4px 8px; }
 .population-haulers .employment-row { margin:0; }
@@ -1299,6 +1339,21 @@ html .tutorial-arrow.big:not(.offscreen) { width:84px; height:54px; }
 .world-zone-label { display:grid; place-items:center; gap:1px; transform:rotate(-45deg); }
 .world-zone-label b { font-size:22px; } .world-zone-label small { font-size:10px; } .world-zone-label em { font-size:10px; color:var(--gold, #e3c57a); }
 .world-soldiers { display:flex; flex-wrap:wrap; gap:4px 12px; justify-content:center; max-height:140px; overflow:auto; margin:6px 0; }
+/* Owner 19 Nov 2026: soldiers by class – slider "6 of 10", an arrow opens the names with a tick and a state icon. */
+.world-dialog .world-soldiers { max-height:none; overflow:visible; }
+.world-classes { display:grid; gap:4px; width:100%; max-height:260px; overflow:auto; text-align:left; }
+.world-class { border:1px solid var(--line-soft,#91835b55); border-radius:6px; padding:4px 8px; background:rgb(0 0 0 / .12); }
+.world-class-head { display:grid; grid-template-columns:22px minmax(0,1fr) minmax(90px,150px) 64px; align-items:center; gap:8px; }
+.world-class-toggle { width:22px; height:22px; padding:0; border:0; background:none; box-shadow:none; color:var(--gold,#f0d78b); font-size:14px; line-height:1; }
+.world-class-name { font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.world-class-slider { width:100%; accent-color:var(--gold,#e0b84f); }
+.world-class-count { font-variant-numeric:tabular-nums; text-align:right; color:var(--muted,#cdbf9c); font-size:12px; }
+.world-class-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:2px 12px; padding:4px 0 2px 30px; }
+.world-class-list[hidden] { display:none; }
+.world-soldier { display:flex; align-items:center; gap:6px; min-width:0; }
+.world-soldier-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.world-soldier-state { cursor:help; font-size:13px; }
+.world-all { justify-self:center; }
 .world-warn, .world-locked, .world-error { font-size:12px; color:#e9b46a; } .world-error { color:#ef8a7a; }
 .world-send, .world-close { margin:4px; }
 /* m-mapa-kraje step 2: playing a zone with the party */
@@ -1346,3 +1401,18 @@ body.sandbox-tool canvas { cursor:crosshair !important; }
 
 .stock-limit-row { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:4px 0; } .stock-limit-row label { display:flex; gap:6px; align-items:center; } .stock-limit-row input { width:5.5em; } .stock-limit-row small { opacity:.8; }
 .builder-workshop-engines { margin-top:8px; padding-top:6px; border-top:1px solid rgba(227,197,122,.25); }
+
+/* Owner 19 Nov 2026 (73): the in-game Yes / No question (confirmAsk.js). */
+.confirm-ask { max-width:min(420px, 92vw); padding:16px 18px; border:1px solid var(--line, #79704b); border-radius:8px; background:var(--glass, rgb(30 35 25 / .96)); color:var(--ink, #ede5c9); font:14px/1.4 var(--font-ui, system-ui); }
+.confirm-ask::backdrop { background:#0006; }
+.confirm-ask p { margin:0 0 14px; }
+.confirm-ask-actions { display:flex; justify-content:flex-end; gap:8px; }
+.confirm-ask-actions button { min-width:90px; }
+
+/* Owner 19 Nov 2026 (74): the loading screen over the game until the first view is ready (LoadingScreen.js). */
+.loading-screen { position:fixed; inset:0; z-index:1000; pointer-events:none; display:grid; place-content:center; gap:14px; text-align:center; background:radial-gradient(circle at 50% 40%, #2b3424, #10140d 70%); color:var(--ink, #ede5c9); font:15px/1.4 var(--font-ui, system-ui); }
+.loading-screen[hidden] { display:none; }
+.loading-screen h2 { margin:0; font:600 34px/1.1 var(--font-title, Georgia, serif); letter-spacing:.06em; color:var(--gold, #e3c57a); }
+.loading-screen p { margin:0; opacity:.85; }
+.loading-bar { width:min(360px, 70vw); height:8px; border:1px solid var(--line, #79704b); border-radius:5px; overflow:hidden; background:#0008; }
+.loading-bar span { display:block; height:100%; width:5%; background:linear-gradient(90deg, #a8843f, #f0d78b); transition:width .25s; }

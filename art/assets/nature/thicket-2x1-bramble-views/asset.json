@@ -1,0 +1,358 @@
+{
+  "schema": 1,
+  "id": "thicket-2x1-bramble-views",
+  "name": "Thicket 2\u00d71 \u2013 Bramble \u2013 4 seasons \u00d7 4 views",
+  "category": "nature",
+  "description": "Owner's Blender model thicket-2x1-bramble (15 Nov 2026): four seasons in the four isometric views of the trees. On the map a shrub can use any of the four views for variety, as the trees do.",
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "generator": "vegetation",
+  "variants": [
+    {
+      "id": "thicket-2x1-bramble-views-spring-0",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, spring 0\u00b0 (front-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): spring, view 0\u00b0 (front-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "species": "bramble",
+        "mix": [
+          "bramble",
+          "rosehip",
+          "bramble"
+        ],
+        "season": "spring",
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-spring-90",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, spring 90\u00b0 (front-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): spring, view 90\u00b0 (front-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "species": "bramble",
+        "mix": [
+          "bramble",
+          "rosehip",
+          "bramble"
+        ],
+        "season": "spring",
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 90
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-spring-180",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, spring 180\u00b0 (back-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): spring, view 180\u00b0 (back-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "species": "bramble",
+        "mix": [
+          "bramble",
+          "rosehip",
+          "bramble"
+        ],
+        "season": "spring",
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 180
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-spring-270",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, spring 270\u00b0 (back-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): spring, view 270\u00b0 (back-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "species": "bramble",
+        "mix": [
+          "bramble",
+          "rosehip",
+          "bramble"
+        ],
+        "season": "spring",
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 270
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-summer-0",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, summer 0\u00b0 (front-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): summer, view 0\u00b0 (front-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "species": "bramble",
+        "mix": [
+          "bramble",
+          "rosehip",
+          "bramble"
+        ],
+        "season": "summer",
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-summer-90",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, summer 90\u00b0 (front-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): summer, view 90\u00b0 (front-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "species": "bramble",
+        "mix": [
+          "bramble",
+          "rosehip",
+          "bramble"
+        ],
+        "season": "summer",
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 90
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-summer-180",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, summer 180\u00b0 (back-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): summer, view 180\u00b0 (back-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "species": "bramble",
+        "mix": [
+          "bramble",
+          "rosehip",
+          "bramble"
+        ],
+        "season": "summer",
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 180
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-summer-270",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, summer 270\u00b0 (back-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): summer, view 270\u00b0 (back-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "species": "bramble",
+        "mix": [
+          "bramble",
+          "rosehip",
+          "bramble"
+        ],
+        "season": "summer",
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 270
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-autumn-0",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, autumn 0\u00b0 (front-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): autumn, view 0\u00b0 (front-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "mix": [
+          "hazel",
+          "rosehip",
+          "bramble"
+        ],
+        "season": "autumn",
+        "seed": 9
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-autumn-90",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, autumn 90\u00b0 (front-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): autumn, view 90\u00b0 (front-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "mix": [
+          "hazel",
+          "rosehip",
+          "bramble"
+        ],
+        "season": "autumn",
+        "seed": 9
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 90
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-autumn-180",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, autumn 180\u00b0 (back-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): autumn, view 180\u00b0 (back-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "mix": [
+          "hazel",
+          "rosehip",
+          "bramble"
+        ],
+        "season": "autumn",
+        "seed": 9
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 180
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-autumn-270",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, autumn 270\u00b0 (back-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): autumn, view 270\u00b0 (back-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "mix": [
+          "hazel",
+          "rosehip",
+          "bramble"
+        ],
+        "season": "autumn",
+        "seed": 9
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 270
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-winter-0",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, winter 0\u00b0 (front-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): winter, view 0\u00b0 (front-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "mix": [
+          "hazel",
+          "juniper",
+          "rosehip"
+        ],
+        "season": "winter",
+        "seed": 9
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 0
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-winter-90",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, winter 90\u00b0 (front-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): winter, view 90\u00b0 (front-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "mix": [
+          "hazel",
+          "juniper",
+          "rosehip"
+        ],
+        "season": "winter",
+        "seed": 9
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 90
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-winter-180",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, winter 180\u00b0 (back-left)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): winter, view 180\u00b0 (back-left), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "mix": [
+          "hazel",
+          "juniper",
+          "rosehip"
+        ],
+        "season": "winter",
+        "seed": 9
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 180
+      }
+    },
+    {
+      "id": "thicket-2x1-bramble-views-winter-270",
+      "name": "Thicket 2\u00d71 \u2013 Bramble, winter 270\u00b0 (back-right)",
+      "version": 1,
+      "notes": "Owner's Blender render (15 Nov 2026, Ke\u0159e a hou\u0161tiny): winter, view 270\u00b0 (back-right), same camera as the trees; all seasons of this view share the crop and anchor. 1x game scale (tile 64 px wide).",
+      "spec": {
+        "kind": "thicket",
+        "mix": [
+          "hazel",
+          "juniper",
+          "rosehip"
+        ],
+        "season": "winter",
+        "seed": 9
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "blender",
+        "view": 270
+      }
+    }
+  ]
+}

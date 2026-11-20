@@ -1,6 +1,8 @@
 import { COLUMNS, ROWS, PLAYER_START, onMapSize } from './config.js';
 import { GROUND, GROUND_CODES, WORLD_GENERATION as W, WATER_CELL, BUSH_TYPES, GRASS_BUSHES, GRASS_ZONE, GRASS_ZONE_CODES, isWaterGround, isRiverGround } from '../data/worldTerrain.js';
 import { settingsFromLevels } from '../data/worldCode.js';
+import { computeHeights,tileHeight,tileSlope } from './terrainHeight.js';
+import { worldRandom } from './seededRandom.js';
 import { rockGroupFor,mergeThickets,groupTiles } from './natureGroups.js';
 
 // World generator 2 (World v2 step 2a, zadani-svet-v2.md). Everything is drawn from named random streams (see
@@ -141,10 +143,10 @@ function distanceField(grid,test,cap=40){
 }
 
 // Rock outcrops (2×2 or 3×2) weighted towards stony country and the desert's edge, never in water or near the start.
-function placeRocks(terrain,ground,random,o,stony,desertDistance){
+function placeRocks(terrain,ground,random,o,stony,desertDistance,hill=()=>1){
   const count=Math.round(65*o.rocks*AREA),widths=W.rocks.widths,groups=[];let placed=0;
   for(let attempt=0;attempt<count*40&&placed<count;attempt++){
-    const x=2+Math.floor(random()*(COLUMNS-6)),y=2+Math.floor(random()*(ROWS-6)),dd=desertDistance[index(x,y)],weight=.2+.8*Math.max(stony(x,y),dd>0&&dd<W.rocks.desertRim?.9:0);
+    const x=2+Math.floor(random()*(COLUMNS-6)),y=2+Math.floor(random()*(ROWS-6)),dd=desertDistance[index(x,y)],weight=(.2+.8*Math.max(stony(x,y),dd>0&&dd<W.rocks.desertRim?.9:0))*hill(x,y);
     if(random()>weight)continue;
     const w=widths[placed%widths.length],tiles=[];for(let dy=0;dy<2;dy++)for(let dx=0;dx<w;dx++)tiles.push({x:x+dx,y:y+dy});
     // Point 56 (owner 15 Nov 2026): no rock obstacles close to the start and only a few a little further (no extra random draw: a hash of the place decides).
@@ -212,7 +214,12 @@ function generateOnce(rng,o){
   const moistNoise=valueNoise(rng('moisture'),W.grass.noiseScale*zoneScale),variation=valueNoise(rng('variation'),W.grass.variationScale*zoneScale);
   const forestNoise=valueNoise(rng('forest'),W.forest.scale),stony=valueNoise(rng('stony'),W.rocks.scale),bankNoise=valueNoise(rng('banks'),9);
   const waterDistance=distanceField(ground,isRiverGround),desertDistance=distanceField(ground,g=>g===GROUND.DESERT);
-  const rockGroups=placeRocks(terrain,ground,rng('rocks'),o,(x,y)=>smooth(.5,.78,stony(x,y)),desertDistance);
+  // Generator 6 (m-teren-vyska part 3): outcrops lean towards hills and slopes – the hills of this ground (the same
+  // algorithm and stream the game uses for its relief) make a place on a hilltop or a steep side up to ~3× likelier than
+  // on the flat. Without a seed (tests with a bare random) the old weighting stays.
+  const heights=o.seed!=null?computeHeights({ground,random:worldRandom(o.seed,'height'),levels:o.height}):null;
+  const hill=heights?(x,y)=>{const h=tileHeight(heights,x,y),s=tileSlope(heights,x,y);return W.rocks.flat+(1-W.rocks.flat)*Math.max(smooth(W.rocks.hill[0],W.rocks.hill[1],h),smooth(W.rocks.slope[0],W.rocks.slope[1],s));}:undefined;
+  const rockGroups=placeRocks(terrain,ground,rng('rocks'),o,(x,y)=>smooth(.5,.78,stony(x,y)),desertDistance,hill);
   for(let y=0;y<ROWS;y++)for(let x=0;x<COLUMNS;x++)if(isRiverGround(ground[y][x]))terrain[y][x]=0;
   for(const f of fords)for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)if(inside(f.x+dx,f.y+dy))terrain[f.y+dy][f.x+dx]=0;
   // Rock groups cut by water or a ford are not groups any more (their remaining tiles stay single rocks).
@@ -258,7 +265,7 @@ export function fairStartReport(world,{expectWater=true}={}){
 // A world whose start is unfair is generated again from the streams with the attempt number (river#2…), so the
 // result is still reproducible from the code.
 export function generateWorld(random=Math.random,{levels,streams}={}){
-  const o=settingsFromLevels(levels);let world=null;
+  const o={...settingsFromLevels(levels),seed:streams?.seed??null};let world=null;
   for(let attempt=1;attempt<=W.fairStart.attempts;attempt++){
     const rng=streams?part=>streams(attempt>1?`${part}#${attempt}`:part):()=>random;
     world=generateOnce(rng,o);const report=fairStartReport(world,{expectWater:o.rivers>0||o.lakes>0});world.summary.fairStart={...report,attempt};
