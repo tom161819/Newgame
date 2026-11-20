@@ -2,7 +2,7 @@ import { t } from '../i18n/index.js';
 import { tileCenter, isWalkable } from './map.js';
 import { gridToWorld } from './isometric.js';
 import { tileKey } from './stones.js';
-import { groundDepthAbove,planGroundOrder, planTowerExit, towerNeighbors,entryTiles, buildingDepth, towerTop, buildingDefinition,buildingIsComplete } from './buildings.js';
+import { groundDepthAbove,planGroundOrder, planTowerExit, towerNeighbors,entryTiles, buildingDepth, towerTop, buildingDefinition,buildingIsComplete ,elevatedDepth } from './buildings.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { advanceMovement } from './movement.js';
 import { canStep } from './pathfinding.js';
@@ -231,7 +231,7 @@ export class PlayerController {
       advanceMovement(this,delta);
       this.currentTower=this.wallAt(this.tile)??this.currentTower;
       const point=gridToWorld(this.position.x,this.position.y),center=tileCenter(this.currentTower),top=towerTop(this.currentTower);
-      this.sprite.setPosition(point.x+top.x-center.x,point.y+top.y-center.y).setDepth(buildingDepth(this.currentTower)+point.y-center.y+.2);
+      this.sprite.setPosition(point.x+top.x-center.x,point.y+top.y-center.y).setDepth(elevatedDepth(this.currentTower,point.y-center.y));
       if(!this.nextTile&&!this.path.length){this.walking=false;if(this.roofContinuation)this.finishRoofRoute();}
       return;
     }

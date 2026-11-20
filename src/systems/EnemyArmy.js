@@ -1,5 +1,5 @@
 import { t } from '../i18n/index.js';
-import { buildingDefinition,buildingIsComplete,towerNeighbors,towerTop,buildingDepth } from '../game/buildings.js';
+import { buildingDefinition,buildingIsComplete,towerNeighbors,towerTop,buildingDepth ,elevatedDepth } from '../game/buildings.js';
 import { buildingHP,damageBuilding } from '../game/buildingHealth.js';
 import { gridToWorld,tileCenter } from '../game/isometric.js';
 import { isWalkable } from '../game/map.js';
@@ -77,7 +77,7 @@ export class EnemyArmy{
   }
   place(animal){
     const b=animal.onWall,view=animal.view;if(!b||!view)return;const p=gridToWorld(animal.position.x,animal.position.y),c=tileCenter(b),top=towerTop(b);
-    view.setPosition(p.x+top.x-c.x,p.y+top.y-c.y).setDepth?.(buildingDepth(b)+p.y-c.y+.2);
+    view.setPosition(p.x+top.x-c.x,p.y+top.y-c.y).setDepth?.(elevatedDepth(b,p.y-c.y));
   }
   // He shoots whoever of ours is in reach (from the height: 2 tiles further, over walls) and never moves.
   shoot(animal){

@@ -708,7 +708,10 @@ export class GameScene extends Phaser.Scene {
     if((building.type??building.definition?.id)==='gate'&&this.assets?.hasTexture?.('gate','art-axis-x')){
       const clean=flip?this.assets.key('gate','art-axis-x'):this.assets.textureKey('gate'),o=this.objectRegistry.require('gate').origin;sprite.cleanKey=clean;
       const key=building.id!=null&&buildingIsComplete(building)?damagedTexture(this,clean,damageStage(building),building.id,{chip:false}):clean;
-      if(sprite.texture?.key!==key)sprite.setTexture(key);sprite.setFlipX(false);sprite.setOrigin(o.x,o.y);return;
+      if(sprite.texture?.key!==key)sprite.setTexture(key);sprite.setFlipX(false);sprite.setOrigin(o.x,o.y);
+      const front=(view?.front??view?.view?.front)?.sprite,frontKey=flip&&this.assets.hasTexture('gate','art-axis-x-front')?this.assets.key('gate','art-axis-x-front'):this.assets.textureKey('gate','front');
+      if(front?.setTexture&&frontKey&&front.texture?.key!==frontKey){front.setTexture(frontKey);front.setFlipX(false);front.setOrigin(o.x,o.y);}
+      return;
     }
     {const current=sprite.texture?.key;if(!sprite.cleanKey||!(current===sprite.cleanKey||String(current).startsWith(`${sprite.cleanKey}:damage`)))sprite.cleanKey=current;const clean=sprite.cleanKey,key=clean&&buildingIsComplete(building)?damagedTexture(this,clean,damageStage(building),building.id,{chip:false}):clean;if(key&&sprite.texture?.key!==key)sprite.setTexture(key);}const o=building.definition?.origin??{x:.38372,y:.84348};sprite.setFlipX(flip);sprite.setOrigin(flip?1-o.x:o.x,o.y);
   }

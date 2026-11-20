@@ -16,7 +16,9 @@ export const buildings = [
     cost: { stone: 20 }, interactions: ['enter', 'exit'], description: 'Kamenná strážní věž s horní plošinou a cimbuřím.',
     constructionTime:20000,
     renderMode: 'sprite', renderer: 'tower', origin: { x: 0.36932, y: 0.99177 }, frontOrigin: { x: 0.36932, y: 0.99177 }, visualHeight: 241,
-    platform: { x: 0, y: -195.3 }, depth: { offset: 0 },
+    // Owner 20 Nov 2026 ("jednotky na věži překrývají texturu věže"): the deck floor in the middle of the Tripo platform (the
+    // render's -195.3 was the top of the front parapet, so men stood on its edge in front of the merlons).
+    platform: { x: 0, y: -206 }, depth: { offset: 0 },
     lights: [{ type: 'torch', x: -12, y: -84, color: '#ffb25a', radius: 102.4, intensity: 0.95, flicker: { amplitude: 0.12, speed: 7 }, flameSize: 1 }],
     // Day and night N2: two torch holders (2 Torches a night); their sight counts only with someone on the tower.
     fuel: TORCHES.places.tower,
@@ -64,7 +66,10 @@ export const buildings = [
   {
     id:'gate',name:'Gate',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/gate/gate-tripo.v1.png',artSource:'art/sprites/gate/gate-tripo.v1.json',
     // Owner 20 Nov 2026: the gatehouse from the owner's Tripo model, one picture per axis (walls north–south: main; east–west: axis-x).
-    artSprites:{'axis-x':{sprite:'/assets/buildings/gate/gate-tripo.v1.axis-x.png',origin:{x:.44,y:.98726}}},
+    // Owner 20 Nov 2026 ("jednotky na věži překrývají texturu"): men posted on the Gate stand on its deck behind the front
+    // merlons. The front layers are cut from the same Tripo render (render_glb.py --front, the approved camera and model).
+    frontSprite:'/assets/buildings/gate/gate-tripo.v1.front.png',frontOrigin:{x:.44,y:.98726},platform:{x:0,y:-118},
+    artSprites:{'axis-x':{sprite:'/assets/buildings/gate/gate-tripo.v1.axis-x.png',origin:{x:.44,y:.98726}},'axis-x-front':{sprite:'/assets/buildings/gate/gate-tripo.v1.axis-x.front.png',origin:{x:.44,y:.98726}}},
     width:2,height:2,walkable:true,collectible:false,buildable:true,cost:{stone:12},constructionTime:20000,repeatPlacement:true,replacesWall:true,
     interactions:[],description:'A 2 × 2 gate in the wall: people pass through it, and from the walls beside it you climb up to the wall walk.',
     visibility:{multiplier:1.75},

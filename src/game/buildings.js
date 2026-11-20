@@ -106,6 +106,11 @@ export function groundDepthAbove(buildings,tile,depth){
   return result;
 }
 export function buildingDepth(building) { return towerBase(building).y+(buildingDefinition(building).depth?.offset??0); }
+// Owner 20 Nov 2026 ("jednotky na věži překrývají texturu věže"): someone up on a wall, Tower or Gate is drawn above its
+// back layer and below its front layer (+.3, the front merlons); on a Tower, Gate or Castle platform his offset (px,
+// front = +) only orders the men up there among themselves.
+// A wall tile keeps the plain screen order (a man stepping onto the tile behind still stands on this one's top).
+export function elevatedDepth(building,offset=0){const d=buildingDefinition(building);return buildingDepth(building)+.2+(d.width>1||d.height>1?Math.max(-.08,Math.min(.08,offset*.002)):offset);}
 // Owner 20 Nov 2026: while Space flattens the buildings, people on Towers, Gates, walls and the Castle stand on the
 // ground plan (no lift: the unit is drawn on its own tile) instead of in the air.
 export const FLAT_VIEW={on:false};

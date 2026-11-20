@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.12] - 2026-11-20
+<!-- version: {"title":"Men stand on Tower and Gate decks","type":"fix","reconstructed":false,"saveVersion":67} -->
+### Fixed
+- Soldiers on a Stone Tower stand on its deck behind the front merlons instead of over the tower's walls.
+- Soldiers posted on a Gate stand up on its deck behind the merlons (they stood on the ground in the gateway).
+
 ## [0.149.11] - 2026-11-20
 <!-- version: {"title":"Walls join Gate and Tower","type":"fix","reconstructed":false,"saveVersion":67} -->
 ### Fixed

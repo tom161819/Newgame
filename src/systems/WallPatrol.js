@@ -1,4 +1,4 @@
-import { buildingIsComplete,towerTop,buildingDepth } from '../game/buildings.js';
+import { buildingIsComplete,towerTop,buildingDepth ,elevatedDepth } from '../game/buildings.js';
 import { wallIndex,isWallAccess,isWall } from '../game/walls.js';
 import { tileKey } from '../game/stones.js';
 import { tileCenter,gridToWorld } from '../game/isometric.js';
@@ -124,6 +124,6 @@ export class WallPatrol {
   // Where a soldier on a wall is drawn: on top of the wall under him.
   place(worker){
     const wall=worker.onWall;if(!wall)return false;const point=gridToWorld(worker.position.x,worker.position.y),center=tileCenter(wall),top=towerTop(wall);
-    worker.view.setPosition(point.x+top.x-center.x,point.y+top.y-center.y).setDepth(buildingDepth(wall)+point.y-center.y+.2);return true;
+    worker.view.setPosition(point.x+top.x-center.x,point.y+top.y-center.y).setDepth(elevatedDepth(wall,point.y-center.y));return true;
   }
 }

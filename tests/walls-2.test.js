@@ -136,3 +136,12 @@ test('owner 20 Nov 2026: a wall running into a finished Tower or Gate gets a stu
   const wall=s.buildings.find(b=>b.type==='wall'&&b.x===60&&b.y===52);assert.ok(buildingDepth(wall)>buildingDepth(tower.building));
   const back=s.buildings.find(b=>b.type==='wall'&&b.x===59&&b.y===50);assert.ok(buildingDepth(back)<buildingDepth(tower.building));
 });
+
+test('owner 20 Nov 2026: men on a Tower or Gate platform stay between its back and front layers; on a wall the screen order is kept',async()=>{
+  const { elevatedDepth,buildingDepth,towerTop,towerBase }=await import('../src/game/buildings.js');
+  const s=scene(),tower=place(s,'tower',{x:60,y:50}).building,gate=place(s,'gate',{x:66,y:50}).building;walls(s,[{x:70,y:50}],{planned:false});
+  for(const b of [tower,gate])for(const offset of [-40,0,40]){const d=elevatedDepth(b,offset)-buildingDepth(b);assert.ok(d>0&&d<.3,`${b.type} ${offset}: ${d}`);}
+  assert.ok(elevatedDepth(tower,10)>elevatedDepth(tower,-10),'the man in front is drawn over the one behind');
+  const wall=s.buildings.find(b=>b.type==='wall'&&b.x===70);assert.ok(Math.abs(elevatedDepth(wall,12)-buildingDepth(wall)-12.2)<1e-6);
+  assert.ok(towerTop(gate).y<towerBase(gate).y-100,'the Gate has a platform up on its deck');
+});
