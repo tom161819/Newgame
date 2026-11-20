@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { workerScene } from './helpers/workerScene.js';
 import { gameSettings } from '../src/systems/GameSettings.js';
 import { PolicySystem } from '../src/systems/PolicySystem.js';
-import { TAX_RATES,RATIONS,foodNeedTarget,normalizeTax,taxHappiness,taxLevel,validTax } from '../src/data/policy.js';
+import { TAX_RATES,RATIONS,foodNeedTarget,normalizeTax,taxHappiness,taxLevel,validTax,normalizeRations,rationLevel,rationFoodBase,validRations } from '../src/data/policy.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
 globalThis.document={querySelector:()=>({textContent:''})};
@@ -18,12 +18,11 @@ const day=s=>s.gameTime.dayDuration;
 
 test('policy has five tax rates and three rations; Normal is the default and invalid values are refused', () => {
   const s=world();assert.deepEqual(Object.keys(TAX_RATES),['none','low','normal','high','very_high']);assert.deepEqual(Object.keys(RATIONS),['small','normal','generous']);
-  assert.equal(s.policy.tax,.5);assert.equal(s.policy.rations,'normal');assert.equal(s.policy.happiness(),0);
+  assert.equal(s.policy.tax,.5);assert.equal(s.policy.rations,.8);assert.equal(s.policy.happiness(),0);
   assert.equal(s.policy.set('tax','pirate'),false);assert.equal(s.policy.set('rations','feast'),false);assert.equal(s.policy.set('tax',NaN),false);assert.equal(s.policy.tax,.5);
+  // Owner 20 Nov 2026 (87): a choice holds at once; the Happiness effect then moves towards the new target.
   assert.equal(s.policy.set('tax','very_high'),true);assert.equal(s.policy.set('rations','generous'),true);
-  // Policy v2 P1: the choice waits for the morning; the effect then moves towards the new target.
-  assert.deepEqual([s.policy.tax,s.policy.rations,s.policy.happiness()],[.5,'normal',0]);assert.deepEqual(s.policy.pending,{tax:1.5,rations:'generous'});
-  assert.equal(s.policy.apply(),true);assert.deepEqual([s.policy.tax,s.policy.rations,s.policy.target(),s.policy.pending],[1.5,'generous',-20,null]);
+  assert.deepEqual([s.policy.tax,s.policy.rations,s.policy.target(),s.policy.happiness()],[1.5,1.2,-20,0]);assert.equal(s.policy.pending,undefined);
 });
 
 test('taxes are collected once each morning from every permanent resident while the Castle stands', () => {
@@ -36,13 +35,13 @@ test('taxes are collected once each morning from every permanent resident while 
 });
 
 test('rations change how often residents eat and their Happiness; taxes move Happiness too', () => {
-  const eaten=rations=>{const s=world({residents:2});s.inventory.add('bread',100);s.policy.set('rations',rations);s.policy.apply();const start=s.inventory.count('bread');for(let i=0;i<40;i++)s.foodSystem.advance(day(s)/10);return start-s.inventory.count('bread');};
+  const eaten=rations=>{const s=world({residents:2});s.inventory.add('bread',100);s.policy.set('rations',rations);const start=s.inventory.count('bread');for(let i=0;i<40;i++)s.foodSystem.advance(day(s)/10);return start-s.inventory.count('bread');};
   const small=eaten('small'),normal=eaten('normal'),generous=eaten('generous');
   // Over 4 days each of 2 residents eats 0.4 / 0.8 / 1.2 portions a day (m-jidlo-balanc): 1.6 / 3.2 / 4.8 → 1 / 3 / 4 whole
   // meals each; the King always eats his own 2 a day (8).
   assert.deepEqual([small-8,normal-8,generous-8],[2,6,8]);
   const s=world({residents:1}),w=s.workerSystem.liveWorkers()[0],base=s.needs.status(w).happiness;
-  const now=(tax,rations='normal')=>{s.policy.set('tax',tax);s.policy.set('rations',rations);s.policy.apply();s.policy.effect=s.policy.target();};
+  const now=(tax,rations='normal')=>{s.policy.set('tax',tax);s.policy.set('rations',rations);s.policy.effect=s.policy.target();};
   now('very_high');assert.equal(s.needs.status(w).happiness,Math.max(0,base-20));
   // #68: rations no longer add to Happiness directly (Generous raises the Food need instead).
   now('none','generous');assert.equal(s.needs.status(w).happiness,Math.min(100,base+10));
@@ -51,32 +50,31 @@ test('rations change how often residents eat and their Happiness; taxes move Hap
 test('policy is saved and loaded; an unknown rate is rejected', () => {
   const s=world();s.policy.set('tax','high');s.policy.set('rations','small');s.gameTime.update(day(s));
   s.policy.set('tax','low');s.gameTime.update(day(s)/2);
-  const saved=validateGameState(serializeGameState(s));assert.deepEqual({...saved.policy,effect:undefined},{tax:1,rations:'small',lastTaxDay:2,pending:{tax:.25,rations:'small'},effect:undefined,feastUntil:null,lastFeastAt:null});
-  assert.ok(Math.abs(saved.policy.effect+2.5)<1e-6,'half a day at 5 points a day towards −25');
-  for(const corrupt of [p=>p.pending={tax:1,rations:'small'},p=>p.pending={tax:'pirate',rations:'small'},p=>p.pending={tax:.33,rations:'small'},p=>p.tax=1.55,p=>p.effect=-40,p=>p.effect=15.01,p=>delete p.effect]){const bad=structuredClone(saved);corrupt(bad.policy);assert.throws(()=>validateGameState(bad));}
+  const saved=validateGameState(serializeGameState(s));assert.deepEqual({...saved.policy,effect:undefined,taxDay:undefined},{tax:.25,rations:.4,lastTaxDay:2,taxDay:undefined,effect:undefined,feastUntil:null,lastFeastAt:null});
+  assert.ok(Math.abs(saved.policy.taxDay.ms-day(s)/2)<1e-6&&Math.abs(saved.policy.taxDay.sum-.25*day(s)/2)<1e-6,'half a day at 0.25');
+  assert.ok(saved.policy.effect<0&&saved.policy.effect>-15,'moving towards the new target');
+  for(const corrupt of [p=>p.pending=null,p=>p.rations='small',p=>p.rations=.43,p=>p.rations=1.25,p=>p.tax=1.55,p=>p.effect=-40,p=>p.effect=15.01,p=>delete p.effect,p=>p.taxDay={sum:-1,ms:0},p=>delete p.taxDay]){const bad=structuredClone(saved);corrupt(bad.policy);assert.throws(()=>validateGameState(bad));}
   // #68: a save from before the change may still hold the removed Generous +5 on top of No taxes (+10).
   const legacy=structuredClone(saved);legacy.policy.effect=15;assert.doesNotThrow(()=>validateGameState(legacy));
   const bad=structuredClone(saved);bad.policy.tax='robbery';assert.throws(()=>validateGameState(bad));
   const r=workerScene(saved.terrain,{starter:false,gameSettings:gameSettings()});r.policy=new PolicySystem(r);loadGameState(r,saved);assert.deepEqual(r.policy.exportState(),saved.policy);
 });
 
-test('Policy v2 P1: switching around dawn cannot dodge taxes or jump Happiness; the effect moves 5 points a day both ways', () => {
-  const s=world(),castle=s.production.dailyIncome().gold??0;let gold=s.inventory.count('gold');
-  s.gameTime.update(day(s)*.99);s.policy.set('tax','very_high');s.gameTime.update(day(s)*.02);
-  assert.equal(s.policy.tax,1.5,'the choice took effect at dawn');assert.equal(s.inventory.count('gold'),gold+castle+s.policy.residents().length*1.5,'taxed at the rate in force');gold=s.inventory.count('gold');
-  s.policy.set('tax','none');assert.equal(s.policy.tax,1.5);assert.ok(s.policy.happiness()>-1,'no jump: only a moment of the new effect');
-  s.gameTime.update(day(s)*.97);assert.equal(s.inventory.count('gold'),gold,'no second collection today');s.gameTime.update(day(s)*.02);assert.equal(s.inventory.count('gold'),gold+castle,'the next morning: no taxes');
-  // Moving towards −20, then back towards +10, never faster than 5 points a day.
-  const p=s.policy;p.cancel();p.effect=0;p.tax=1.5;p.pending=null;p.advance(day(s));assert.equal(p.happiness(),-5);p.advance(day(s)*3);assert.equal(p.happiness(),-20);p.advance(day(s));assert.equal(p.happiness(),-20);
+test('point 87: a change holds at once; the morning taxes use the day\'s average rate, so switching at dawn does not pay; the effect moves 5 points a day', () => {
+  const s=world(),castle=s.production.dailyIncome().gold??0,n=()=>s.policy.residents().length;let gold=s.inventory.count('gold');
+  s.gameTime.update(day(s)*.99);s.policy.set('tax','very_high');assert.equal(s.policy.tax,1.5,'at once');s.gameTime.update(day(s)*.02);
+  const paid=s.inventory.count('gold')-gold-castle;assert.ok(paid<n()*.52&&paid>=n()*.5,`about the day's average 0.5, not 1.5 (${paid})`);gold=s.inventory.count('gold');
+  s.policy.set('tax','none');assert.equal(s.policy.tax,0);assert.ok(s.policy.happiness()>-1,'no jump: only a moment of the new effect');
+  s.gameTime.update(day(s)*.97);assert.equal(s.inventory.count('gold'),gold,'no second collection today');s.gameTime.update(day(s)*.02);assert.ok(s.inventory.count('gold')-gold-castle<n()*.05,'the next morning: almost no taxes');
+  const p=s.policy;p.effect=0;p.tax=1.5;p.advance(day(s));assert.equal(p.happiness(),-5);p.advance(day(s)*3);assert.equal(p.happiness(),-20);p.advance(day(s));assert.equal(p.happiness(),-20);
   p.tax=0;p.advance(day(s)/2);assert.equal(p.happiness(),-17.5);assert.equal(p.daysToTarget(),5.5);
-  assert.equal(p.set('tax','none'),true);assert.equal(p.pending,null,'choosing the policy in force cancels nothing new');
-  assert.equal(p.set('tax','low'),true);assert.equal(p.cancel(),true);assert.equal(p.pending,null);
+  assert.equal(p.set('tax','none'),true);assert.equal(p.cancel,undefined,'no Cancel any more');
 });
 
 test('Policy v2 P1: the balance adds Castle income, taxes and trade, minus wages; food shows production, use and days left', () => {
   const s=world();s.policy.set('tax','high');const b=s.policy.balance(),wages=s.workerSystem.liveWorkers().reduce((n,w)=>n+s.wageSystem.dailyWage(w),0);
-  assert.equal(b.taxes,s.policy.dailyTaxes());assert.equal(b.nextTaxes,s.policy.residents().length*1);assert.equal(b.wages,wages);assert.equal(b.trade,0);
-  assert.equal(b.total,b.castle+b.taxes-b.wages);assert.equal(b.nextTotal,b.castle+b.nextTaxes-b.wages);
+  assert.equal(b.taxes,s.policy.residents().length*1);assert.equal(b.wages,wages);assert.equal(b.trade,0);
+  assert.equal(b.total,b.castle+b.taxes-b.wages);
   s.resourceLedger={history:[{totals:{gold:{incomeBySource:{'Trade Sale':30},expensesBySource:{'Trade Purchase':6}}}},{totals:{}},{totals:{gold:{incomeBySource:{'Trade Sale':6}}}}]};
   assert.equal(s.policy.balance().trade,10,'average of the last three days');
   const f=s.policy.food();assert.deepEqual(Object.keys(f),['production','consumption','net','days']);assert.equal(f.net,f.production-f.consumption);
@@ -84,7 +82,7 @@ test('Policy v2 P1: the balance adds Castle income, taxes and trade, minus wages
 
 test('#68: the Food need comes from rations and variety: Small/Normal/Generous 30/60/80, +5 per kind, at most 100, 0 without food', () => {
   const s=world({residents:1}),w=s.workerSystem.liveWorkers()[0],p=s.policy,f=s.foodSystem,today=()=>s.gameTime.day;
-  const rations=r=>{p.set('rations',r);p.apply();},settle=()=>{for(let i=0;i<30;i++)s.needs.step(s.gameTime.dayDuration/10);},meals=kinds=>{f.syncResidents();const r=f.residents.get(w.id);r.hungry=false;r.meals=Object.fromEntries(kinds.map(k=>[k,today()]));};
+  const rations=r=>{p.set('rations',r);},settle=()=>{for(let i=0;i<30;i++)s.needs.step(s.gameTime.dayDuration/10);},meals=kinds=>{f.syncResidents();const r=f.residents.get(w.id);r.hungry=false;r.meals=Object.fromEntries(kinds.map(k=>[k,today()]));};
   const target=()=>s.needs.status(w).foodTarget;
   for(const [r,v] of [['small',30],['normal',60],['generous',80]]){rations(r);meals([]);assert.equal(target(),v,r);assert.equal(p.foodBase(),v);}
   rations('normal');for(const [kinds,v] of [[['apple'],65],[['apple','bread'],70],[['apple','bread','meat'],75],[['apple','bread','meat','fish'],80]]){meals(kinds);assert.equal(target(),v,`${kinds.length} kinds`);}
@@ -113,7 +111,7 @@ test('#68: the Food tooltip shows rations + variety = target (en + cs); a reside
 });
 
 test('Policy v2 P2 / #68: Small rations lower Happiness through the Food need; no ration bonus; situation penalties act at once with reasons', () => {
-  const s=world({residents:1}),w=s.workerSystem.liveWorkers()[0],p=s.policy,now=(tax,rations)=>{p.set('tax',tax);p.set('rations',rations);p.apply();p.effect=p.target();};
+  const s=world({residents:1}),w=s.workerSystem.liveWorkers()[0],p=s.policy,now=(tax,rations)=>{p.set('tax',tax);p.set('rations',rations);p.effect=p.target();};
   s.inventory.add('bread',100);now('normal','small');for(let i=0;i<20;i++)s.needs.step(s.gameTime.dayDuration/10);
   assert.equal(s.needs.status(w).food,30,'Small rations hold Food at 30');assert.equal(s.needs.status(w).foodBase,30);
   now('normal','normal');for(let i=0;i<20;i++)s.needs.step(s.gameTime.dayDuration/10);assert.equal(s.needs.status(w).food,60);
@@ -166,8 +164,16 @@ test('analog tax: rates snap to 0.05, Happiness and the "high taxes" rule follow
   for(const [rate,happiness,level] of [[0,10,'none'],[.1,8,'none'],[.25,5,'low'],[.4,2,'normal'],[.75,-5,'normal'],[.8,-6,'high'],[1.25,-15,'high'],[1.5,-20,'very_high']]){
     assert.ok(Math.abs(taxHappiness(rate)-happiness)<1e-9,`happiness at ${rate}`);assert.equal(taxLevel(rate),level,`level at ${rate}`);assert.equal(validTax(rate),true);}
   assert.equal(validTax(.33),false);assert.equal(validTax(1.55),false);
-  const s=world(),p=s.policy,n=p.residents().length;assert.equal(p.set('tax',.73),true);assert.equal(p.pending.tax,.75);
-  assert.equal(p.balance().nextTaxes,Math.round(n*.75*100)/100);p.apply();assert.equal(p.target(),-5);
+  const s=world(),p=s.policy,n=p.residents().length;assert.equal(p.set('tax',.73),true);assert.equal(p.tax,.75);
+  assert.equal(p.balance().taxes,Math.round(n*.75*100)/100);assert.equal(p.target(),-5);
   const w=s.workerSystem.liveWorkers()[0];assert.deepEqual(p.contextPenalties(w,{hungry:true}).filter(c=>c.id==='hungryTaxes'),[],'0.75 still reads as Normal');
-  p.set('tax',.8);p.apply();assert.deepEqual(p.contextPenalties(w,{hungry:true}).filter(c=>c.id==='hungryTaxes').map(c=>c.value),[5]);
+  p.set('tax',.8);assert.deepEqual(p.contextPenalties(w,{hungry:true}).filter(c=>c.id==='hungryTaxes').map(c=>c.value),[5]);
+});
+
+// Owner 20 Nov 2026 (87): rations are analog – 0.4–1.2 portions in steps of 0.05; the Food need runs between the levels.
+test('analog rations: portions snap to 0.05, the Food need base and the level name follow the anchors', () => {
+  assert.deepEqual([normalizeRations(.73),normalizeRations(0),normalizeRations(9),normalizeRations('generous'),normalizeRations('x')],[.75,.4,1.2,1.2,null]);
+  for(const [v,base,level] of [[.4,30,'small'],[.6,45,'small'],[.65,49,'normal'],[.8,60,'normal'],[1,70,'normal'],[1.05,73,'generous'],[1.2,80,'generous']]){assert.equal(rationFoodBase(v),base,`base at ${v}`);assert.equal(rationLevel(v),level,`level at ${v}`);assert.equal(validRations(v),true);}
+  assert.equal(validRations(.43),false);assert.equal(validRations(1.25),false);assert.equal(foodNeedTarget(1,2).target,80);
+  const s=world({residents:2}),p=s.policy;p.set('rations',1);assert.equal(p.portions(),1);assert.equal(p.foodBase(),70);assert.equal(s.foodSystem.portionsPerDay(s.workerSystem.liveWorkers()[0]),1);
 });

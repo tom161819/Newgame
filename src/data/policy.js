@@ -30,7 +30,7 @@ export function taxHappiness(rate){
 }
 // The named level nearest to a rate (ties go to the lower one): the slider's name and icon, and the "high taxes" rule.
 export function taxLevel(rate){let best=TAX_ANCHORS[0];for(const a of TAX_ANCHORS)if(Math.abs(a.perResident-rate)<Math.abs(best.perResident-rate)-1e-9)best=a;return best.level;}
-export const DEFAULT_POLICY=Object.freeze({tax:TAX_RATES.normal.perResident,rations:'normal'});
+export const DEFAULT_POLICY=Object.freeze({tax:TAX_RATES.normal.perResident,rations:RATIONS.normal.portions});
 // Policy v2 P1: a new policy takes effect the next morning, and its Happiness effect moves towards the new value by
 // `effectPerDay` points per game day (smoothly during the day), in both directions.
 export const POLICY_RULES=Object.freeze({effectPerDay:5,tradeAverageDays:3,
@@ -40,8 +40,23 @@ export const POLICY_RULES=Object.freeze({effectPerDay:5,tradeAverageDays:3,
 // Policy v2 P3 / #68: meal variety = the kinds of food (EDIBLE_RESOURCES) a resident ate in the last `days` game days;
 // each kind adds `perKind` % to the Food need target, at most `max`. A resident who got no food has a target of 0.
 export const MEAL_VARIETY=Object.freeze({days:3,perKind:5,max:100});
+// Owner 20 Nov 2026 (87): rations are analog too – portions per resident a day, 0.4–1.2 in steps of 0.05. RATIONS stay
+// as named anchors: the Food need base runs linearly between them and the nearest one names the slider and its icon.
+export const RATION_RANGE=Object.freeze({min:.4,max:1.2,step:.05});
+const RATION_ANCHORS=Object.entries(RATIONS).map(([level,r])=>({level,...r})).sort((a,b)=>a.portions-b.portions);
+export function normalizeRations(value){
+  const v=typeof value==='string'&&Object.hasOwn(RATIONS,value)?RATIONS[value].portions:value;if(typeof v!=='number'||!Number.isFinite(v))return null;
+  return Math.round(Math.round(Math.min(RATION_RANGE.max,Math.max(RATION_RANGE.min,v))/RATION_RANGE.step)*RATION_RANGE.step*100)/100;
+}
+export const validRations=value=>typeof value==='number'&&Number.isFinite(value)&&value>=RATION_RANGE.min-1e-9&&value<=RATION_RANGE.max+1e-9&&Math.abs(value/RATION_RANGE.step-Math.round(value/RATION_RANGE.step))<1e-6;
+export function rationLevel(portions){const v=normalizeRations(portions)??RATIONS.normal.portions;return RATION_ANCHORS.reduce((best,a)=>Math.abs(a.portions-v)<Math.abs(best.portions-v)?a:best).level;}
+export function rationFoodBase(portions){
+  const v=normalizeRations(portions)??RATIONS.normal.portions,a=RATION_ANCHORS;if(v<=a[0].portions)return a[0].food;
+  for(let i=1;i<a.length;i++)if(v<=a[i].portions){const f=(v-a[i-1].portions)/(a[i].portions-a[i-1].portions);return Math.round(a[i-1].food+f*(a[i].food-a[i-1].food));}
+  return a.at(-1).food;
+}
 export function foodNeedTarget(rations,kinds,hungry=false){
-  const base=RATIONS[rations]?.food??RATIONS.normal.food,variety=kinds*MEAL_VARIETY.perKind;
+  const base=typeof rations==='number'||Object.hasOwn(RATIONS,rations??'')?rationFoodBase(rations):RATIONS.normal.food,variety=kinds*MEAL_VARIETY.perKind;
   return {base,kinds,variety,target:hungry?0:Math.min(MEAL_VARIETY.max,base+variety),hungry:!!hungry};
 }
 export const FEAST=Object.freeze({foodPerResident:1,goldPerResident:1,happiness:15,days:2,cooldownDays:5});

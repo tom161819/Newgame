@@ -1,46 +1,42 @@
 import { devFactor } from '../data/devBalance.js';
-import { RATIONS,DEFAULT_POLICY,POLICY_RULES,FEAST,normalizeTax,taxHappiness,taxLevel } from '../data/policy.js';
+import { DEFAULT_POLICY,POLICY_RULES,FEAST,normalizeTax,normalizeRations,rationFoodBase,rationLevel,taxHappiness,taxLevel } from '../data/policy.js';
 import { t } from '../i18n/index.js';
 
 // #103: tax rate and food rations. Taxes are collected at the start of each day from the permanent residents (Gold,
 // ledger source "Taxes"); rations scale how often residents (not the King) eat; both add to every resident's Happiness.
-// Policy v2 P1: a choice in the Castle panel is pending until the next morning (applied before the taxes are
-// collected), so switching around dawn cannot dodge taxes; the Happiness effect then moves 5 points a day to its target.
+// Policy v2 P1: the Happiness effect moves 5 points a day to its target. (The wait for the morning was removed on
+// 20 Nov 2026, point 87: changes hold at once and the morning taxes use the day's average rate.)
 export class PolicySystem {
   constructor(scene){
-    this.scene=scene;this.tax=DEFAULT_POLICY.tax;this.rations=DEFAULT_POLICY.rations;this.pending=null;this.effect=this.target();this.feastUntil=null;this.lastFeastAt=null;this.lastTaxDay=scene.gameTime?.day??1;this.listeners=new Set();
+    this.scene=scene;this.tax=DEFAULT_POLICY.tax;this.rations=DEFAULT_POLICY.rations;this.taxDay={sum:0,ms:0};this.effect=this.target();this.feastUntil=null;this.lastFeastAt=null;this.lastTaxDay=scene.gameTime?.day??1;this.listeners=new Set();
     this.unsubscribe=scene.gameTime?.onNewDay?.(day=>this.collect(day));
     this.unsubscribeAdvance=scene.gameTime?.onAdvance?.(delta=>this.advance(delta));
   }
   onChange(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   changed(){for(const listener of this.listeners)listener();}
-  // A choice waits for the next morning; choosing the policy in force again cancels the wait.
+  // Owner 20 Nov 2026 (87): a choice holds at once (no waiting for the morning, no Cancel). So that switching to high
+  // taxes just before dawn does not pay, the morning taxes use the day's average rate (`taxDay`, time-weighted).
   set(kind,value){
-    // The tax takes a number (Gold per resident) or a named level (its anchor rate), snapped to the slider step.
-    if(kind==='tax'){value=normalizeTax(value);if(value===null)return false;}else if(!(kind==='rations'&&Object.hasOwn(RATIONS,value)))return false;
-    const next={tax:this.pending?.tax??this.tax,rations:this.pending?.rations??this.rations,[kind]:value};
-    this.pending=next.tax===this.tax&&next.rations===this.rations?null:next;this.changed();return true;
+    const v=kind==='tax'?normalizeTax(value):kind==='rations'?normalizeRations(value):null;if(v===null)return false;
+    if(this[kind]===v)return true;this[kind]=v;this.scene.needs?.refresh?.();this.changed();return true;
   }
-  cancel(){if(!this.pending)return false;this.pending=null;this.changed();return true;}
-  // The morning: the pending policy takes effect (its Happiness effect then moves towards the new target).
-  apply(){if(!this.pending)return false;this.tax=this.pending.tax;this.rations=this.pending.rations;this.pending=null;this.scene.needs?.refresh?.();this.changed();return true;}
   advance(delta){
-    const day=this.scene.gameTime?.dayDuration;if(!(delta>0)||!day)return;const target=this.target();if(this.effect===target)return;
+    const day=this.scene.gameTime?.dayDuration;if(!(delta>0)||!day)return;this.taxDay.sum+=this.tax*delta;this.taxDay.ms+=delta;const target=this.target();if(this.effect===target)return;
     const step=POLICY_RULES.effectPerDay*delta/day;this.effect=this.effect<target?Math.min(target,this.effect+step):Math.max(target,this.effect-step);
   }
   target(policy=this){return taxHappiness(policy.tax);}
   // Days until the Happiness effect reaches its target (for the panel).
   daysToTarget(){return Math.abs(this.target()-this.effect)/POLICY_RULES.effectPerDay;}
   residents(){return (this.scene.workerSystem?.liveWorkers?.()??[]).filter(w=>w.isAlive&&w.isSubject!==false);}
-  portions(){return RATIONS[this.rations].portions;}
+  portions(){return this.rations;}
   // #68: the base of the Food need under the rations in force (variety adds to it, see foodNeedTarget).
-  foodBase(){return RATIONS[this.rations].food;}
+  foodBase(){return rationFoodBase(this.rations);}
   // Policy v2 P2: situation penalties of one resident, each with its reason (shown in the Happiness tooltip).
   contextPenalties(worker,{hungry=false}={}){
     const s=this.scene,c=POLICY_RULES.context,out=[];
     if(this.tax>0&&(s.wageSystem?.unpaid?.(worker)??0)>0)out.push({id:'taxedUnpaid',value:c.taxedUnpaid});
     // Generous rations promised, but no meal for this resident.
-    if(this.rations==='generous'&&s.foodSystem?.residents?.get(worker.id)?.hungry)out.push({id:'promisedFood',value:c.promisedFood});
+    if(rationLevel(this.rations)==='generous'&&s.foodSystem?.residents?.get(worker.id)?.hungry)out.push({id:'promisedFood',value:c.promisedFood});
     if(hungry&&c.hungryTaxRates.includes(taxLevel(this.tax)))out.push({id:'hungryTaxes',value:c.hungryTaxes});
     return out;
   }
@@ -48,8 +44,8 @@ export class PolicySystem {
   happiness(){return this.effect;}
   dailyTaxes(tax=this.tax){return Math.round(this.residents().length*tax*(this.scene.kingSkills?.taxMultiplier?.()??1)*devFactor('taxes')*100)/100;}
   collect(day){
-    if(day<=this.lastTaxDay)return 0;this.lastTaxDay=day;this.apply();
-    const castle=this.scene.buildings?.some(b=>b.type==='castle'&&(!b.construction||b.construction.state==='complete'));const amount=castle?this.dailyTaxes():0;
+    if(day<=this.lastTaxDay)return 0;this.lastTaxDay=day;const rate=this.taxDay.ms>0?normalizeTax(this.taxDay.sum/this.taxDay.ms)??this.tax:this.tax;this.taxDay={sum:0,ms:0};
+    const castle=this.scene.buildings?.some(b=>b.type==='castle'&&(!b.construction||b.construction.state==='complete'));const amount=castle?this.dailyTaxes(rate):0;
     if(amount>0)this.scene.inventory.add('gold',amount,{source:'Taxes',id:`taxes:${day}`,type:'production'});
     return amount;
   }
@@ -78,12 +74,12 @@ export class PolicySystem {
   balance(){
     const s=this.scene,castle=s.production?.dailyIncome?.().gold??0,wages=(s.workerSystem?.liveWorkers?.()??[]).reduce((n,w)=>n+(s.wageSystem?.dailyWage?.(w)??0),0);
     const days=(s.resourceLedger?.history??[]).slice(-POLICY_RULES.tradeAverageDays),trade=days.length?days.reduce((n,d)=>{const g=d.totals?.gold;return n+(g?.incomeBySource?.['Trade Sale']??0)-(g?.expensesBySource?.['Trade Purchase']??0);},0)/days.length:0;
-    const taxes=this.dailyTaxes(),next=this.pending?this.dailyTaxes(this.pending.tax):null;
-    return {castle,taxes,nextTaxes:next,trade,wages,total:castle+taxes+trade-wages,nextTotal:next===null?null:castle+next+trade-wages};
+    const taxes=this.dailyTaxes();
+    return {castle,taxes,trade,wages,total:castle+taxes+trade-wages};
   }
   // Food per day (production − consumption from the food history) and how many days the stock lasts at these rations.
   food(){const o=this.scene.foodSystem?.overview?.();if(!o)return null;return {production:o.production,consumption:o.daily,net:o.production-o.daily,days:o.days};}
-  exportState(){return {tax:this.tax,rations:this.rations,lastTaxDay:this.lastTaxDay,pending:this.pending?{...this.pending}:null,effect:this.effect,feastUntil:this.feastUntil,lastFeastAt:this.lastFeastAt};}
-  importState(state){if(!state)return;this.tax=state.tax;this.rations=state.rations;this.lastTaxDay=state.lastTaxDay;this.pending=state.pending?{...state.pending}:null;this.effect=state.effect;this.feastUntil=state.feastUntil;this.lastFeastAt=state.lastFeastAt;this.changed();}
+  exportState(){return {tax:this.tax,rations:this.rations,lastTaxDay:this.lastTaxDay,taxDay:{...this.taxDay},effect:this.effect,feastUntil:this.feastUntil,lastFeastAt:this.lastFeastAt};}
+  importState(state){if(!state)return;this.tax=state.tax;this.rations=state.rations;this.lastTaxDay=state.lastTaxDay;this.taxDay={sum:state.taxDay?.sum??0,ms:state.taxDay?.ms??0};this.effect=state.effect;this.feastUntil=state.feastUntil;this.lastFeastAt=state.lastFeastAt;this.changed();}
   destroy(){this.unsubscribe?.();this.unsubscribeAdvance?.();this.listeners.clear();}
 }

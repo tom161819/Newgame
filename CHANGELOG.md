@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.0] - 2026-11-20
+<!-- version: {"title":"Kingdom Policy, clearer","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Changed
+- Kingdom Policy: food rations have a smooth slider like taxes; a change of taxes or rations holds at once (the morning taxes use the day's average rate); under each slider only what it brings a day and its Happiness, with the meaning in a tooltip on the value.
+- The Kingdom overview shows Gold, Food and Happiness as foldable blocks: the total first, the parts below.
+- The Kingdom Policy card closes with a right click into the game; a click on the Castle opens only its window.
+
 ## [0.148.17] - 2026-11-20
 <!-- version: {"title":"Defence mode","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Added

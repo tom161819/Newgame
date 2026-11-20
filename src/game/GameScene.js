@@ -427,7 +427,9 @@ export class GameScene extends Phaser.Scene {
     // Request 28: a right click inside any window closes that window (PanelDismiss.js, one delegated listener).
     // m-pravy-klik-zavre-panel (owner, 12 Nov): the right mouse button on the map also closes the Buildings menu and the
     // Army panel (the Army panel only when no soldier is chosen in it – then the right click sends them, as on the map).
-    const sidePanels=()=>[this.settingsPanel,this.populationSidebar,this.buildingBar?.dismissable,this.armyPanel?.dismissable];
+    // Owner 20 Nov 2026 (87): a right click into the game closes the Kingdom Policy and Employments cards too.
+    const cards={get open(){const c=this.scene?.sideCards;return !!c&&(c.isOpen('policy')||c.isOpen('employment'));},setOpen:()=>{const c=this.sideCards;if(c?.isOpen('policy'))c.close('policy');if(c?.isOpen('employment'))c.close('employment');},scene:this};
+    const sidePanels=()=>[this.settingsPanel,this.populationSidebar,this.buildingBar?.dismissable,this.armyPanel?.dismissable,cards];
     installPanelDismiss(document,{panels:sidePanels,scene:this,signal:this.controls.signal});
     this.input.on('pointerdown',pointer=>{if(pointer.rightButtonDown()&&closeOpenPanels(document,{panels:sidePanels()}))return;if(this.sandboxPanel?.down(pointer))return;if(this.rockMiningTool.down(pointer))return;if(!this.unitSelection.down(pointer))this.handleClick(pointer);});
     this.input.on('pointerup',pointer=>{if(this.rockMiningTool.up(pointer))return;if(this.unitSelection.up(pointer))return;if(this.pavementTool?.anchor&&this.pavementTool.active()&&pointer.leftButtonReleased()){this.pavementTool.confirm(this.pointerTile(pointer));return;}if(this.dragAnchor&&pointer.leftButtonReleased())this.confirmWallLine(pointer);});
@@ -594,8 +596,8 @@ export class GameScene extends Phaser.Scene {
     if(selected?.kind==='child'){this.villagePanel.open('child',selected.object);return;}
     if(selected?.kind==='building'&&selected.object.type==='village_green'){this.villagePanel.open('green',selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).housing){this.villagePanel.open('house',selected.object);return;}
-    // m-hrad-urovne: a click on the Castle opens its detail (with the level and the Upgrade button) and its Employment card.
-    if(selected?.kind==='building'&&selected.object.type==='castle')this.employmentPanel.open();
+    // m-hrad-urovne: a click on the Castle opens its detail (with the level and the Upgrade button). Owner 20 Nov 2026
+    // (87): only that window – the Employments card is no longer opened beside it.
     if(selected?.kind==='building'&&buildingDefinition(selected.object).trade){this.marketplacePanel.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).builderWorkshop){this.builderWorkshopPanel.open(selected.object);return;}
     // farmhouse-store: a workplace with its own store (the Farmhouse) opens the workplace panel, which links to the store.

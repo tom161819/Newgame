@@ -1439,3 +1439,14 @@ body.sandbox-tool canvas { cursor:crosshair !important; }
 .sandbox-wave input { box-sizing:border-box; width:100%; min-width:0; padding:2px 2px; border:1px solid #79704b; border-radius:4px; background:#0006; color:inherit; font:inherit; }
 .sandbox-wave-remove { padding:0; min-height:0; height:20px; }
 .sandbox-wave-hint { margin:4px 0; font-size:.72rem; opacity:.8; }
+
+/* Owner 20 Nov 2026 (87): the Kingdom overview – three folding blocks, the total first, the parts below. */
+.policy-block { margin:6px 0; border:1px solid #79704b66; border-radius:7px; padding:4px 8px; background:#0002; }
+.policy-block summary { display:flex; justify-content:space-between; align-items:baseline; gap:8px; cursor:pointer; font-weight:600; }
+.policy-block summary strong { font-size:1.1rem; }
+.policy-block summary [data-tone=positive] { color:#9ed36a; } .policy-block summary [data-tone=negative] { color:#ee8a6f; }
+.policy-block summary::-webkit-details-marker { display:none; } .policy-block summary { list-style:none; }
+.policy-block summary > span::before { content:'▾'; display:inline-block; width:1em; color:#e3c57a; } .policy-block:not([open]) summary > span::before { content:'▸'; }
+.policy-rows { list-style:none; margin:4px 0 2px; padding:0; font-size:.85rem; }
+.policy-rows li { display:flex; justify-content:space-between; gap:8px; padding:1px 0; border-top:1px dotted #79704b44; }
+.policy-rows li[data-tone=positive] .policy-row-value { color:#9ed36a; } .policy-rows li[data-tone=negative] .policy-row-value { color:#ee8a6f; }
