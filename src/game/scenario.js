@@ -9,8 +9,11 @@ import { markEnemyBuilding } from '../systems/SiegeSystem.js';
 export const SCENARIO_SCHEMA='mk-scenario';
 export const SCENARIO_VERSION=1;
 export const SCENARIO_KEY='newgame.scenarios';
-export const SCENARIO_GOALS=Object.freeze(['king','castle','army','hold']);
-export const SCENARIO_LIMITS=Object.freeze({name:60,description:400,buildings:2000,units:1500,holdDays:[1,30]});
+export const SCENARIO_GOALS=Object.freeze(['king','castle','army','defend']);
+export const SCENARIO_LIMITS=Object.freeze({name:60,description:400,buildings:2000,units:1500,spawns:8,waves:20,waveUnits:200,waveMinutes:120});
+// Owner 20 Nov 2026 (86c): Defence – attack points (by the map edge) the waves come from, a random one per wave, and the
+// waves themselves: after how many game minutes (from the one before) and how many of each enemy soldier.
+export const WAVE_UNITS=Object.freeze(['enemy_soldier','enemy_archer','enemy_swordsman','enemy_knight']);
 const BUILDING_FIELDS=Object.freeze(['gateAxis','facing','level','look']);
 // Only what was put down on the Test map: the world's own animals (and wolves) come again with the same world.
 const ourUnit=w=>w.isAlive&&!w.away&&w.profession==='soldier'&&w.sandbox;
@@ -18,22 +21,26 @@ const foe=a=>a.isAlive&&(a.type==='wolf'||!!a.definition?.gameplay?.hostile);
 
 // The template of what stands on the Test map now. Buildings the map started with (the Castle, the first store) are
 // left out: the same world makes them again.
-export function captureScenario(scene,{name,description='',goal='king',holdDays=3}={}){
+export function captureScenario(scene,{name,description='',goal='king',waves=[]}={}){
   const s=scene,start=s.sandboxStartIds??new Set(),units=[];
   const buildings=s.buildings.filter(b=>!start.has(b.id)&&!b.construction).map(b=>{const out={type:b.type,x:b.x,y:b.y,side:b.enemy?'enemy':'ours'};for(const k of BUILDING_FIELDS)if(b[k]!=null)out[k]=b[k];return out;});
   for(const w of s.workerSystem.liveWorkers().filter(ourUnit)){const type=s.military.unit(w)?.type;if(type)units.push({side:'ours',unit:type,x:w.tile.x,y:w.tile.y});}
   for(const a of s.animalSystem.animals.values()){if(!a.isAlive||!a.sandbox)continue;const u={side:foe(a)?'enemy':'wild',id:a.type,x:a.tile.x,y:a.tile.y};if(a.onWall)u.wall=true;units.push(u);}
   const ours=units.filter(u=>u.side==='ours'),startAt=ours.length?{x:Math.round(ours.reduce((n,u)=>n+u.x,0)/ours.length),y:Math.round(ours.reduce((n,u)=>n+u.y,0)/ours.length)}:null;
   return normalizeScenario({schema:SCENARIO_SCHEMA,version:SCENARIO_VERSION,id:`scenario-${Date.now().toString(36)}`,name:name||'Scenario',description,
-    world:{code:s.gameSettings.worldCode,land:s.sandboxLandId??'home',mapSize:s.map.length},goal:{type:goal,...(goal==='hold'?{days:holdDays}:{})},start:startAt,buildings,units,createdAt:new Date().toISOString()});
+    world:{code:s.gameSettings.worldCode,land:s.sandboxLandId??'home',mapSize:s.map.length},goal:{type:goal},start:startAt,buildings,units,spawns:[...(s.scenarioMarks?.spawns??[])],king:s.scenarioMarks?.king??null,waves,createdAt:new Date().toISOString()});
 }
 // Checks a template (from a file or the browser) and returns a clean copy; throws on anything it cannot use.
 export function normalizeScenario(data){
   const fail=why=>{throw new TypeError(`Invalid scenario: ${why}`);},int=(v,what)=>Number.isSafeInteger(v)&&v>=0&&v<1000?v:fail(what),str=(v,max,what)=>typeof v==='string'&&v.length<=max?v:fail(what);
   if(!data||typeof data!=='object')fail('not an object');if(data.schema!==SCENARIO_SCHEMA)fail('schema');if(data.version!==SCENARIO_VERSION)fail('version');
   const w=data.world??{};const world={code:str(w.code,64,'world code'),land:str(w.land??'home',20,'land'),mapSize:int(w.mapSize,'map size')};
-  const goalType=SCENARIO_GOALS.includes(data.goal?.type)?data.goal.type:fail('goal'),goal={type:goalType};
-  if(goalType==='hold'){const d=data.goal.days;goal.days=Number.isSafeInteger(d)&&d>=SCENARIO_LIMITS.holdDays[0]&&d<=SCENARIO_LIMITS.holdDays[1]?d:fail('hold days');}
+  const asked=data.goal?.type==='hold'?'defend':data.goal?.type,goalType=SCENARIO_GOALS.includes(asked)?asked:fail('goal'),goal={type:goalType};
+  const spawns=(Array.isArray(data.spawns)?data.spawns:[]).slice(0,SCENARIO_LIMITS.spawns).map((p,i)=>({x:int(p?.x,`attack point ${i} x`),y:int(p?.y,`attack point ${i} y`)}));
+  const king=data.king==null?null:{x:int(data.king.x,'king x'),y:int(data.king.y,'king y')};
+  const count=(v,what)=>Number.isSafeInteger(v)&&v>=0&&v<=SCENARIO_LIMITS.waveUnits?v:fail(what);
+  const waves=(Array.isArray(data.waves)?data.waves:[]).slice(0,SCENARIO_LIMITS.waves).map((w,i)=>{const after=Number(w?.after);if(!(after>=0&&after<=SCENARIO_LIMITS.waveMinutes))fail(`wave ${i} time`);
+    const units={};for(const id of WAVE_UNITS){const n=count(w.units?.[id]??0,`wave ${i} ${id}`);if(n)units[id]=n;}return {after:Math.round(after*10)/10,units};});
   if(!Array.isArray(data.buildings)||data.buildings.length>SCENARIO_LIMITS.buildings)fail('buildings');if(!Array.isArray(data.units)||data.units.length>SCENARIO_LIMITS.units)fail('units');
   const buildings=data.buildings.map((b,i)=>{const out={type:str(b?.type,40,`building ${i}`),x:int(b.x,`building ${i} x`),y:int(b.y,`building ${i} y`),side:b.side==='enemy'?'enemy':'ours'};
     if(b.gateAxis!=null)out.gateAxis=b.gateAxis==='x'?'x':'y';if(b.facing!=null)out.facing=Number.isSafeInteger(b.facing)?b.facing:fail(`building ${i} facing`);if(b.level!=null)out.level=int(b.level,`building ${i} level`);if(b.look!=null)out.look=str(b.look,60,`building ${i} look`);return out;});
@@ -41,7 +48,7 @@ export function normalizeScenario(data){
     if(side==='ours')out.unit=str(u.unit,40,`unit ${i} type`);else out.id=str(u.id,40,`unit ${i} type`);if(u.wall)out.wall=true;return out;});
   const start=data.start==null?null:{x:int(data.start.x,'start x'),y:int(data.start.y,'start y')};
   return {schema:SCENARIO_SCHEMA,version:SCENARIO_VERSION,id:str(data.id||`scenario-${Date.now().toString(36)}`,80,'id'),name:str(String(data.name??'').slice(0,SCENARIO_LIMITS.name)||'Scenario',SCENARIO_LIMITS.name,'name'),
-    description:str(String(data.description??'').slice(0,SCENARIO_LIMITS.description),SCENARIO_LIMITS.description,'description'),world,goal,start,buildings,units,...(typeof data.createdAt==='string'?{createdAt:data.createdAt.slice(0,40)}:{})};
+    description:str(String(data.description??'').slice(0,SCENARIO_LIMITS.description),SCENARIO_LIMITS.description,'description'),world,goal,start,buildings,units,spawns,king,waves,...(typeof data.createdAt==='string'?{createdAt:data.createdAt.slice(0,40)}:{})};
 }
 // Puts a template on a fresh Test map of the same world. What cannot be placed (a changed world, an unknown type) is
 // skipped and counted.

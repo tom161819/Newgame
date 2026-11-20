@@ -906,6 +906,8 @@ export class GameScene extends Phaser.Scene {
   }
   finishGame(){
     if(this.gameOver)return;
+    // (86c) in a Defence the fallen King ends the Defence with its own window.
+    if(this.conquest&&!this.conquest.over){this.character.state=PLAYER_STATE.DEAD;this.character.walking=false;this.character.path=[];this.conquest.finish('lost');return;}
     this.gameOver=true;this.gameTime.setPaused(true);this.huntingSystem.cancel();this.mountSystem.cancel();this.treasureSystem.cancelRequest();this.cancelBuilding(t('status.kingFell'));
     this.character.stopForBuilding();this.character.nextTile=null;this.character.walking=false;this.character.state=PLAYER_STATE.DEAD;
     for(const attacker of [...this.combat.attacks.keys()])this.combat.stopAttack(attacker);

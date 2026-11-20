@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.17] - 2026-11-20
+<!-- version: {"title":"Defence mode","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- Defence: on the Test map mark attack points by the map edge and your King's place, set the waves in a simple table, and save the template with the Defence goal. In the main menu (Conquest / Defence) each wave comes from a random attack point; beat them all and keep your King alive.
+
 ## [0.148.16] - 2026-11-20
 <!-- version: {"title":"Conquest mode","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Added

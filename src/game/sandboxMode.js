@@ -6,7 +6,8 @@ import { replaceWalls } from './wallReplacement.js';
 import { zoneWorldCode,populateFeature } from './zoneMode.js';
 import { markEnemyBuilding,siegeable,canSiege } from '../systems/SiegeSystem.js';
 import { Conquest,showConquestEnd } from './conquest.js';
-import { captureScenario,applyScenario,storedScenarios,storeScenario,forgetScenario,normalizeScenario,scenarioFileName,SCENARIO_GOALS } from './scenario.js';
+import { captureScenario,applyScenario,storedScenarios,storeScenario,forgetScenario,normalizeScenario,scenarioFileName,SCENARIO_GOALS,WAVE_UNITS,SCENARIO_LIMITS } from './scenario.js';
+import { ScenarioMarks } from './scenarioMarks.js';
 
 // Owner 16 Nov 2026: the Test map (main menu, under the World Editor) – a sandbox to try battles and buildings.
 // A fresh world with the Castle and nobody else; every building is free and stands finished at once; no fog, no night
@@ -44,12 +45,14 @@ export function setupSandbox(scene){
   const app=s.registry?.get?.('application'),pending=app?.pendingScenario;
   // (86b) the attacker of a Conquest has no Castle: the world is the template's (made with the Castle, so the same
   // trees and rocks come), and the Castle and the first store are taken away before the template is put down.
-  if(app?.pendingConquest)removeStartBuildings(s);
+  // (86c) a Defence keeps them: the defender's Castle stands.
+  if(app?.pendingConquest&&app.pendingConquest.template?.goal?.type!=='defend')removeStartBuildings(s);
   if(pending){app.pendingScenario=null;try{const r=applyScenario(s,pending);s.scenarioLoaded=r;}catch(e){console.error(e);}}
   // (86b) Conquest: the template's map without the Test panel, our supply wagons, the goal checked until the end.
   const conquest=app?.pendingConquest;if(conquest){app.pendingConquest=null;document.body.classList.add('in-conquest');s.conquest=new Conquest(s,conquest);s.conquest.start();
     s.onConquestOver=over=>showConquestEnd(document,over,{again:()=>app.startConquest(conquest.template,conquest.supplies),menu:()=>app.returnToMain()});
     s.events.once('shutdown',()=>{document.body.classList.remove('in-sandbox','in-conquest');document.querySelector('#conquest-end')?.close?.();});s.setStatus?.(t(`conquest.goalText.${s.conquest.goal}`));return;}
+  s.scenarioMarks=new ScenarioMarks(s,{spawns:s.scenario?.spawns??[],king:s.scenario?.king??null});
   s.sandboxPanel=new SandboxPanel(s);
   s.events.once('shutdown',()=>{s.sandboxPanel?.destroy();s.sandboxPanel=null;document.body.classList.remove('in-sandbox');});
   s.setStatus?.(t('sandbox.started'));
@@ -155,9 +158,12 @@ class SandboxPanel {
     const box=el('div','sandbox-template');box.append(el('h3','',t('scenario.title')));
     const name=this.templateName=el('input','sandbox-template-name');name.type='text';name.maxLength=60;name.placeholder=t('scenario.namePlaceholder');name.value=this.scene.scenario?.name??'';
     const goal=this.templateGoal=el('select','sandbox-template-goal');for(const id of SCENARIO_GOALS){const o=el('option','',t(`scenario.goal.${id}`));o.value=id;goal.append(o);}goal.value=this.scene.scenario?.goal.type??'king';
-    const days=this.templateDays=el('input','sandbox-template-days');days.type='number';days.min='1';days.max='30';days.value=String(this.scene.scenario?.goal.days??3);days.title=t('scenario.days');
-    const showDays=()=>{days.hidden=goal.value!=='hold';};goal.addEventListener('change',showDays);showDays();
-    const row1=el('div','sandbox-row');row1.append(name);const row2=el('div','sandbox-row');row2.append(el('span','',t('scenario.goal')),goal,days);
+    const row1=el('div','sandbox-row');row1.append(name);const row2=el('div','sandbox-row');row2.append(el('span','',t('scenario.goal')),goal);
+    // (86c) marks: attack points by the map edge and our King's place; a click with the tool puts one, Remove takes it.
+    const marks=el('div','sandbox-row sandbox-marks');for(const [id,label] of [['spawn','scenario.markSpawn'],['king','scenario.markKing']]){const b=el('button',`sandbox-mark-${id}`,t(label));b.type='button';b.dataset.sandboxUnit=`mark-${id}`;b.addEventListener('click',()=>this.pick(`mark-${id}`));this.buttons.set(`mark-${id}`,b);marks.append(b);}
+    // (86c) the waves of a Defence: after how many minutes and how many of each enemy soldier.
+    const waves=this.waveBox=el('div','sandbox-waves');this.waves=structuredClone(this.scene.scenario?.waves??[]);
+    const showWaves=()=>{waves.hidden=goal.value!=='defend';};goal.addEventListener('change',showWaves);showWaves();this.drawWaves();
     const save=el('button','sandbox-template-save',t('scenario.save'));save.type='button';save.addEventListener('click',()=>this.saveTemplate());
     const exp=el('button','sandbox-template-export',t('scenario.export'));exp.type='button';exp.addEventListener('click',()=>this.exportTemplate());
     const imp=el('button','sandbox-template-import',t('scenario.import'));imp.type='button';const file=el('input');file.type='file';file.accept='.json,application/json';file.hidden=true;
@@ -165,19 +171,30 @@ class SandboxPanel {
     const row3=el('div','sandbox-row');row3.append(save,exp,imp,file);
     const list=this.templateList=el('select','sandbox-template-list');const load=el('button','sandbox-template-load',t('scenario.load'));load.type='button';load.addEventListener('click',()=>this.loadTemplate());
     const del=el('button','sandbox-template-delete',t('scenario.delete'));del.type='button';del.addEventListener('click',()=>{if(!list.value)return;forgetScenario(list.value);this.fillTemplates();this.say(t('scenario.deleted'));});
-    const row4=el('div','sandbox-row');row4.append(list,load,del);box.append(row1,row2,row3,row4);this.fillTemplates();
+    const row4=el('div','sandbox-row');row4.append(list,load,del);box.append(row1,row2,marks,waves,row3,row4);this.fillTemplates();
     if(this.scene.scenarioLoaded){const r=this.scene.scenarioLoaded;setTimeout(()=>this.say(t('scenario.loaded',{name:this.scene.scenario?.name??'',built:r.built,units:r.units,skipped:r.skipped})),0);}
     return box;
   }
+  drawWaves(){
+    const box=this.waveBox,doc=document,el=(tag,cls,text)=>{const e=doc.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;};box.replaceChildren(el('h4','',t('scenario.waves')));
+    const head=el('div','sandbox-wave sandbox-wave-head');head.append(el('span','','#'),el('span','',t('scenario.waveAfter')));for(const id of WAVE_UNITS)head.append(el('span','',this.scene.objectRegistry.get(id)?.name?.replace(/^Enemy /,'')??id));head.append(el('span',''));box.append(head);
+    this.waves.forEach((w,i)=>{const row=el('div','sandbox-wave');row.dataset.wave=String(i);row.append(el('span','',String(i+1)));
+      const num=(value,max,set)=>{const n=el('input');n.type='number';n.min='0';n.max=String(max);n.value=String(value);n.addEventListener('input',()=>set(Math.max(0,Math.min(max,Number(n.value)||0))));return n;};
+      row.append(num(w.after,SCENARIO_LIMITS.waveMinutes,v=>{w.after=v;}));for(const id of WAVE_UNITS)row.append(num(w.units[id]??0,SCENARIO_LIMITS.waveUnits,v=>{if(v)w.units[id]=v;else delete w.units[id];}));
+      const x=el('button','sandbox-wave-remove','×');x.type='button';x.title=t('scenario.waveRemove');x.addEventListener('click',()=>{this.waves.splice(i,1);this.drawWaves();});row.append(x);box.append(row);});
+    const add=el('button','sandbox-wave-add',t('scenario.waveAdd'));add.type='button';add.disabled=this.waves.length>=SCENARIO_LIMITS.waves;
+    add.addEventListener('click',()=>{const last=this.waves.at(-1);this.waves.push(last?{after:last.after||5,units:Object.fromEntries(Object.entries(last.units).map(([k,v])=>[k,Math.ceil(v*1.5)]))}:{after:3,units:{enemy_soldier:5}});this.drawWaves();});
+    box.append(add,el('p','sandbox-wave-hint',t('scenario.waveHint')));
+  }
   fillTemplates(){const list=this.templateList;list.replaceChildren();const all=storedScenarios();if(!all.length){const o=document.createElement('option');o.value='';o.textContent=t('scenario.none');list.append(o);}
     for(const d of all){const o=document.createElement('option');o.value=d.id;o.textContent=d.name;list.append(o);}}
-  current(){return captureScenario(this.scene,{name:this.templateName.value.trim()||t('scenario.untitled'),goal:this.templateGoal.value,holdDays:Math.max(1,Math.min(30,Math.round(Number(this.templateDays.value)||3)))});}
+  current(){return captureScenario(this.scene,{name:this.templateName.value.trim()||t('scenario.untitled'),goal:this.templateGoal.value,waves:this.templateGoal.value==='defend'?this.waves.filter(w=>Object.keys(w.units).length):[]});}
   saveTemplate(){try{const keep=this.scene.scenario,data=this.current();if(keep&&keep.name===data.name)data.id=keep.id;const saved=storeScenario(data);this.scene.scenario=saved;this.fillTemplates();this.templateList.value=saved.id;this.say(t('scenario.saved',{name:saved.name,buildings:saved.buildings.length,units:saved.units.length}));}catch(e){this.say(t('scenario.error',{message:e.message}));}}
   exportTemplate(){try{const data=this.current(),blob=new Blob([JSON.stringify(data,null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=scenarioFileName(data);document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);this.say(t('scenario.exported',{file:a.download}));}catch(e){this.say(t('scenario.error',{message:e.message}));}}
   async importTemplate(input){const f=input.files?.[0];input.value='';if(!f)return;try{const saved=storeScenario(normalizeScenario(JSON.parse(await f.text())));this.fillTemplates();this.templateList.value=saved.id;this.say(t('scenario.imported',{name:saved.name}));}catch(e){this.say(t('scenario.error',{message:e.message}));}}
   loadTemplate(){const d=storedScenarios().find(x=>x.id===this.templateList.value);if(!d)return;const app=this.scene.registry?.get?.('application');if(!app?.startScenarioMap)return;app.startScenarioMap(d);}
   unitName(u){return u.unit?t(`unit.type.${u.unit}`):this.scene.objectRegistry.get(u.id)?.name??u.id;}
-  pick(id){this.tool=this.tool===id?null:id;this.render();this.say(this.tool?t(this.tool==='remove'?'sandbox.removeHint':'sandbox.placeHint',{count:this.count}):t('sandbox.hint'));}
+  pick(id){this.tool=this.tool===id?null:id;this.render();this.say(this.tool?t(this.tool==='remove'?'sandbox.removeHint':this.tool==='mark-spawn'?'scenario.spawnHint':this.tool==='mark-king'?'scenario.kingHint':'sandbox.placeHint',{count:this.count}):t('sandbox.hint'));}
   say(text){this.hint.textContent=text;}
   render(){for(const [id,b] of this.buttons)b.classList.toggle('on',this.tool===id);for(const b of this.root.querySelectorAll('[data-sandbox-count]'))b.classList.toggle('on',Number(b.dataset.sandboxCount)===this.count);for(const b of this.root.querySelectorAll('[data-sandbox-side]'))b.classList.toggle('on',(this.scene.sandboxSide??'ours')===b.dataset.sandboxSide);document.body.classList.toggle('sandbox-enemy-side',this.scene.sandboxSide==='enemy');document.body.classList.toggle('sandbox-tool',!!this.tool);}
   // A left click on the map with a tool chosen puts units there (or removes one). Right click or Esc drops the tool.
@@ -186,6 +203,9 @@ class SandboxPanel {
     if(pointer.rightButtonDown()){this.tool=null;this.render();this.say(t('sandbox.hint'));return true;}
     if(!pointer.leftButtonDown()||s.buildMode)return false;
     pointer.updateWorldPoint(s.cameras.main);const tile=s.pointerTile(pointer);if(!tile)return true;
+    if(this.tool==='mark-spawn'){this.say(s.scenarioMarks?.addSpawn(tile)?t('scenario.spawnPlaced',{count:s.scenarioMarks.spawns.length}):t('scenario.spawnFull'));return true;}
+    if(this.tool==='mark-king'){s.scenarioMarks?.setKing(tile);this.say(t('scenario.kingPlaced'));return true;}
+    if(this.tool==='remove'&&s.scenarioMarks?.removeAt(tile)){this.say(t('scenario.markRemoved'));return true;}
     if(this.tool==='remove'){const a=s.animalSystem.atPoint(pointer.worldX,pointer.worldY),hit=a?null:s.pickInteraction(pointer.worldX,pointer.worldY,tile);const unit=a??(hit?.kind==='human'?hit.object:null);this.say(removeSandboxUnit(s,unit)?t('sandbox.removed'):t('sandbox.nothing'));return true;}
     const n=spawnSandboxUnits(s,this.tool,tile,this.count);this.say(t('sandbox.placed',{count:n}));return true;
   }
@@ -199,5 +219,5 @@ class SandboxPanel {
     const mid={x:ours.reduce((n,w)=>n+w.position.x,0)/ours.length,y:ours.reduce((n,w)=>n+w.position.y,0)/ours.length},near=foes.sort((a,b)=>Math.hypot(a.position.x-mid.x,a.position.y-mid.y)-Math.hypot(b.position.x-mid.x,b.position.y-mid.y))[0];
     for(const w of ours){s.workerSystem.commands.resume(w);s.military?.wallPatrol?.set(w,false);}s.military.orderAttack(ours,near);this.say(t('sandbox.charging',{count:ours.length}));
   }
-  destroy(){this.root.remove();document.body.classList.remove('sandbox-tool','sandbox-enemy-side');}
+  destroy(){this.scene.scenarioMarks?.destroy();this.root.remove();document.body.classList.remove('sandbox-tool','sandbox-enemy-side');}
 }

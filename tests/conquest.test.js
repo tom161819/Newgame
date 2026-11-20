@@ -28,3 +28,22 @@ test('the enemy counter-attacks when our army comes close and then in waves, nev
   w.scene.gameTime.totalElapsed=CONQUEST.waveEvery*1000+1;c.update(1000);assert.equal(w.marched.length,3);
   w.animals.get(0).isAlive=false;c.update(1000);assert.equal(over?.state,'won');
 });
+
+// Owner 20 Nov 2026 (86c): Defence – waves from the template's attack points; lost when our King falls.
+test('Defence sends the waves in order from a random attack point and is won when the last wave is beaten',async()=>{
+  const { sideOf,edgePoint }=await import('../src/game/conquest.js');
+  const w=world({foes:[]});const created=[];w.scene.objectRegistry={get:id=>({id,gameplay:{hostile:true}})};w.scene.random=()=>.99;
+  w.scene.animalSystem.create=(d,tile)=>{const a={isAlive:true,type:d.id,definition:d,tile,position:{x:tile.x+.5,y:tile.y+.5}};w.animals.set(100+created.length,a);created.push(a);return a;};
+  w.scene.character={tile:{x:50,y:50},currentHP:100,state:'ground'};let over=null;w.scene.onConquestOver=o=>{over=o;};
+  const template={...tpl('defend',[]),spawns:[{x:3,y:50},{x:96,y:50}],king:{x:50,y:50},waves:[{after:2,units:{enemy_soldier:3}},{after:1,units:{enemy_archer:2,enemy_knight:1}}]};
+  const c=new Conquest(w.scene,{template,supplies:{}});assert.equal(c.goal,'defend');
+  w.scene.gameTime.totalElapsed=119000;c.update(1000);assert.equal(created.length,0);
+  w.scene.gameTime.totalElapsed=120000;c.update(1000);assert.equal(created.length,3);assert.ok(created.every(a=>Math.abs(a.tile.x-96)<=3),'from the last attack point (random .99)');assert.deepEqual(w.marched.length,3);
+  for(const a of created)a.isAlive=false;c.update(1000);assert.equal(over,null,'a wave is still to come');
+  w.scene.gameTime.totalElapsed=180000;c.update(1000);assert.equal(created.length,6);
+  for(const a of created)a.isAlive=false;c.update(1000);assert.equal(over?.state,'won');
+  const lost=world({foes:[]});lost.scene.character={tile:{x:5,y:5},currentHP:0,state:'dead'};let end=null;lost.scene.onConquestOver=o=>{end=o;};
+  new Conquest(lost.scene,{template,supplies:{}}).update(1000);assert.equal(end?.state,'lost');
+  assert.equal(sideOf({map:{length:100}},{x:2,y:2}),'n');assert.equal(sideOf({map:{length:100}},{x:98,y:2}),'e');assert.equal(sideOf({map:{length:100}},{x:50,y:50}),'center');
+  const e=edgePoint({map:{length:100}},.3);assert.ok(e.x<=4||e.y<=4||e.x>=96||e.y>=96);
+});

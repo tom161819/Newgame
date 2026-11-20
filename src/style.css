@@ -1431,3 +1431,11 @@ body.sandbox-tool canvas { cursor:crosshair !important; }
 .conquest-supplies label { display:flex; justify-content:space-between; align-items:center; gap:10px; }
 .conquest-supplies input { width:60px; padding:3px 5px; border:1px solid #79704b; border-radius:5px; background:#0006; color:inherit; font:inherit; }
 .conquest-actions, .conquest-end-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
+
+/* Owner 20 Nov 2026 (86c): the wave table of a Defence template. */
+.sandbox-waves h4 { margin:6px 0 4px; font-size:.78rem; color:#e3c57a; }
+.sandbox-wave { display:grid; grid-template-columns:12px minmax(0,1.1fr) repeat(4, minmax(0,1fr)) 20px; gap:3px; align-items:center; margin-bottom:3px; font-size:.72rem; }
+.sandbox-wave-head span { opacity:.8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sandbox-wave input { box-sizing:border-box; width:100%; min-width:0; padding:2px 2px; border:1px solid #79704b; border-radius:4px; background:#0006; color:inherit; font:inherit; }
+.sandbox-wave-remove { padding:0; min-height:0; height:20px; }
+.sandbox-wave-hint { margin:4px 0; font-size:.72rem; opacity:.8; }
