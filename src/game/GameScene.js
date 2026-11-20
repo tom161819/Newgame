@@ -841,9 +841,9 @@ export class GameScene extends Phaser.Scene {
   }
   refreshWallConnections(){
     const layout=wallLayout(this.buildings);this.wallMap=layout.finished;
-    for(const {building,connections,shape} of layout.walls){
-      const key=JSON.stringify(connections)+JSON.stringify(shape);
-      if(key!==building.connectionKey){building.connections=connections;building.connectionKey=key;if(shape?.diagonal)building.diagonal=shape.diagonal;else delete building.diagonal;if(shape?.elbow)building.elbow=shape.elbow;else delete building.elbow;this.towerViews.get(building.id)?.paint(building,building.enemy?ENEMY_TINT:null);}
+    for(const {building,connections,shape,into} of layout.walls){
+      const key=JSON.stringify(connections)+JSON.stringify(shape)+into.join('');
+      if(key!==building.connectionKey){building.connections=connections;if(into.length)building.wallInto=into;else delete building.wallInto;building.connectionKey=key;if(shape?.diagonal)building.diagonal=shape.diagonal;else delete building.diagonal;if(shape?.elbow)building.elbow=shape.elbow;else delete building.elbow;this.towerViews.get(building.id)?.paint(building,building.enemy?ENEMY_TINT:null);}
     }
   }
   showMarker(tile) { this.marker.clear().lineStyle(2,0xe3c879,1).strokePoints(tilePolygon(tile),true).setVisible(true); }

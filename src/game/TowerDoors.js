@@ -10,8 +10,9 @@ export const TOWER_DOOR=Object.freeze({walkHeight:68,inset:.83,width:15,height:2
 // The doors to draw for one Tower: {side, column} for every finished wall touching its S or E face.
 export function upperDoors(tower,buildings){
   const {width,height}=buildingDefinition(tower),walls=new Set(buildings.filter(b=>isWall(b)&&buildingIsComplete(b)).map(b=>`${b.x},${b.y}`)),out=[];
-  for(let i=0;i<width;i++)if(walls.has(`${tower.x+i},${tower.y+height}`))out.push({side:'S',column:i});
-  for(let i=0;i<height;i++)if(walls.has(`${tower.x+width},${tower.y+i}`))out.push({side:'E',column:i});
+  // Owner 20 Nov 2026 ("dveře stačí jedny"): one door per face; with walls on both columns it sits in the middle.
+  const face=(side,n,at)=>{const cols=[...Array(n).keys()].filter(i=>walls.has(at(i)));if(cols.length)out.push({side,column:cols.length>1?(n-1)/2:cols[0]});};
+  face('S',width,i=>`${tower.x+i},${tower.y+height}`);face('E',height,i=>`${tower.x+width},${tower.y+i}`);
   return out;
 }
 // The four corners of a door on a face (bottom left, bottom right, top right, top left) and the arch top, in world space.

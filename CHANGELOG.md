@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.11] - 2026-11-20
+<!-- version: {"title":"Walls join Gate and Tower","type":"fix","reconstructed":false,"saveVersion":67} -->
+### Fixed
+- Walls join the Gate and the Stone Tower without a gap, and a wall standing in front of a Gate or Tower face is drawn in front of it.
+- A Tower face shows one wall-walk door, even where a wall runs along the whole face.
+
 ## [0.149.10] - 2026-11-20
 <!-- version: {"title":"Tripo Halberdier","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Changed

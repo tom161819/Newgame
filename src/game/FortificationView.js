@@ -57,9 +57,11 @@ function parapet(g,a,b,height,color){
 }
 
 // Stejné rozhraní jako TowerView, rozměry a výška pocházejí z definice.
+// How far (in tiles) a wall's stub reaches into a Tower or Gate: the Tripo bodies stand about this far inside their tiles.
+export const WALL_STUB=.22;
 export class FortificationView {
   constructor(scene,building,preview=false){
-    this.scene=scene;this.preview=preview;this.back=scene.add.graphics();this.front=scene.add.graphics();this.footprint=scene.add.graphics();this.art={};this.shadows={};this.artShown={};
+    this.scene=scene;this.preview=preview;this.back=scene.add.graphics();this.front=scene.add.graphics();this.footprint=scene.add.graphics();this.art={};this.shadows={};this.artShown={};this.stubArt={};
     if(isWall(building)){liveWalls.add(this);ensureWallArt(scene);}
     this.paint(building);if(preview)this.setAlpha(1);
   }
@@ -115,6 +117,16 @@ export class FortificationView {
       shadow.setOrigin(art.origin.x,art.origin.y).setPosition(at.x,at.y).setDepth(this.preview?10000:WALL_SHADOW_DEPTH).setVisible(this.back.visible).setAlpha(this.back.alpha);
       if(tint==null)image.clearTint();else image.setTint(tint);
     }
+    // Owner 20 Nov 2026 ("mezera u věže"): where the wall runs into a Tower or Gate (building.wallInto, walls.js), the
+    // block and its side merlons are drawn once more WALL_STUB of a tile further in, up to the Tripo body's face.
+    const stubs=use&&!building.diagonal&&!building.elbow?building.wallInto??[]:[],cross={N:['E','W'],S:['E','W'],E:['N','S'],W:['N','S']},step={N:[0,-1],S:[0,1],E:[1,0],W:[-1,0]};
+    const wanted=new Set();
+    for(const side of stubs){const [dx,dy]=step[side],off={x:(dx-dy)*32*WALL_STUB,y:(dx+dy)*16*WALL_STUB};
+      for(const piece of ['block',...cross[side].filter(p=>this.artShown[p])]){const id=`${side}:${piece}`,art=WALL_ART[piece],front=piece==='S'||piece==='E';wanted.add(id);
+        const image=this.stubArt[id]??=this.scene.add.image(0,0,bodyKey(piece)),key=damagedTexture(this.scene,bodyKey(piece),stage,building.id??0);if(image.texture?.key!==key)image.setTexture(key);
+        image.setOrigin(art.origin.x,art.origin.y).setPosition(this.base.x+off.x,this.base.y+off.y).setDepth(this.preview?(front?10002:10001):(front?depth+.3:depth)-.01).setVisible(this.back.visible).setAlpha(this.back.alpha);
+        if(tint==null)image.clearTint();else image.setTint(tint);}}
+    for(const [id,image] of Object.entries(this.stubArt))if(!wanted.has(id)){image.destroy();delete this.stubArt[id];}
     this.afterPaint?.();
     return use;
   }
@@ -124,10 +136,10 @@ export class FortificationView {
   }
   // Called when the building's hit points changed: repaints only when the stage changed.
   syncDamage(building){if(damageStage(building)!==(this.damage??0))this.paint(building,this.tint);}
-  get artImages(){return [...Object.values(this.art),...Object.values(this.shadows)];}
+  get artImages(){return [...Object.values(this.art),...Object.values(this.shadows),...Object.values(this.stubArt)];}
   contains(x,y){return Phaser.Geom.Polygon.Contains(this.hitArea,x-this.base.x,y-this.base.y);}
   setAlpha(value){const v=this.preview?value*.5:value;this.footprint.setAlpha(value);this.back.setAlpha(v);this.front.setAlpha(v);for(const image of this.artImages)image.setAlpha(v);return this;}
-  setVisible(value){this.back.setVisible(value);this.front.setVisible(value);this.footprint.setVisible(value);for(const layer of [this.art,this.shadows])for(const [piece,image]of Object.entries(layer))image.setVisible(value&&this.artShown[piece]===true);return this;}
+  setVisible(value){this.back.setVisible(value);this.front.setVisible(value);this.footprint.setVisible(value);for(const layer of [this.art,this.shadows])for(const [piece,image]of Object.entries(layer))image.setVisible(value&&this.artShown[piece]===true);for(const image of Object.values(this.stubArt))image.setVisible(value);return this;}
   inView(view){const width=(this.definition.width+this.definition.height)*32;return this.base.x+width>=view.x&&this.base.x-width<=view.right&&this.base.y+10>=view.y&&this.base.y-this.definition.visualHeight<=view.bottom;}
   destroy(){liveWalls.delete(this);this.back.destroy();this.front.destroy();this.footprint.destroy();for(const image of this.artImages)image.destroy();}
 }

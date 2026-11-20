@@ -44,7 +44,9 @@ export const buildings = [
     interactions:['enter','exit','walk_top'],description:'Spojitelná kamenná hradba. Tažením postavíš rovnou řadu a po vrcholu lze chodit mezi spojenými segmenty.',
     visibility:{multiplier:1.75},navigation:{walkableTop:true},construction:{mode:'line'},
     renderMode:'procedural',renderer:'fortification',origin:{x:.5,y:118/130},visualHeight:125,
-    platform:{x:0,y:-84},depth:{offset:0},visual:{wallHeight:68},
+    // Owner 20 Nov 2026 ("brána se zobrazuje nad zdí"): a wall in front of a Gate or Tower face shares its sort corner with
+    // the Tripo body; half a pixel more keeps it in front of that face.
+    platform:{x:0,y:-84},depth:{offset:.5},visual:{wallHeight:68},
     shadow:{baked:true,x:8,y:-8,width:65,height:24,color:0x30291c,alpha:.3},
   },
   // #97: a gate in the wall. People walk through it on the ground; the wall walk continues over it, and together with the

@@ -91,6 +91,9 @@ test('the way down from any wall piece is the nearest door; doors at the wall-wa
   assert.ok(down.route.every(t=>index.has(key(t))),'only over walls and the Tower');
   // The fort's Tower: walls touch it on its W and E sides at y = 20 – only the E one is on a face turned to the viewer.
   assert.deepEqual(upperDoors(tower,s.buildings),[{side:'E',column:1}]);
+  // Owner 20 Nov 2026: one door per face – a wall along both columns of a face gets one door in the middle.
+  const along=[{x:tower.x,y:tower.y+2},{x:tower.x+1,y:tower.y+2}].map(t=>({type:'wall',x:t.x,y:t.y,tiles:[t],construction:{state:'complete'}}));
+  assert.deepEqual(upperDoors(tower,[...s.buildings,...along]).filter(d=>d.side==='S'),[{side:'S',column:.5}]);
   const shape=doorShape(tower,{side:'E',column:1});assert.ok(shape.top.y<Math.min(shape.bl.y,shape.br.y)-20,'drawn up at the wall-walk height');
 });
 

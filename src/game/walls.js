@@ -130,6 +130,9 @@ export function wallLayout(buildings){
   // a wall at a Tower runs into it on every side, so no merlons stand in front of the tower doors.
   const gateSide=new Map();for(const b of buildings){const sides=b.type==='tower'?'NESW':b.type==='gate'?(b.gateAxis==='x'?'EW':'NS'):null;if(sides&&buildingIsComplete(b))for(const tile of b.tiles??buildingTiles(b,buildingDefinition(b)))gateSide.set(key(tile),sides);}
   const joined=building=>{const links=connectionsFor(finished,building);for(const d of WALL_DIRECTIONS)if(!links[d.name]&&gateSide.get(key({x:building.x+d.x,y:building.y+d.y}))?.includes(d.name))links[d.name]=true;return links;};
-  const walls=[...planned.values()].map(building=>({building,connections:joined(building),shape:building.type==='wall'?wallShape(finished.get(key(building))===building?finished:planned,building,solid):null}));
+  // Owner 20 Nov 2026 ("mezera u věže"): the Tripo Tower and Gate stand a little inside their tiles, so a wall that runs
+  // into one gets a short stub on that side (FortificationView) and no strip of grass shows at the joint.
+  const into=building=>WALL_DIRECTIONS.filter(d=>gateSide.get(key({x:building.x+d.x,y:building.y+d.y}))?.includes(d.name)).map(d=>d.name);
+  const walls=[...planned.values()].map(building=>({building,into:finished.get(key(building))===building?into(building):[],connections:joined(building),shape:building.type==='wall'?wallShape(finished.get(key(building))===building?finished:planned,building,solid):null}));
   return {finished,walls};
 }

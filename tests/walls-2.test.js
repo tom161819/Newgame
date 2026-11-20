@@ -123,3 +123,16 @@ test('a wall at a finished Tower runs into it on every side (no merlons in front
   tower.building.construction.state='complete';
   assert.equal(links({x:59,y:50}).E,true);assert.equal(links({x:60,y:52}).N,true);assert.equal(links({x:62,y:51}).W,true);
 });
+
+test('owner 20 Nov 2026: a wall running into a finished Tower or Gate gets a stub on that side; walls sort in front of a face they stand before',async()=>{
+  const { buildingDepth }=await import('../src/game/buildings.js');
+  const s=scene();walls(s,[{x:59,y:50},{x:60,y:52},{x:62,y:51},{x:62,y:52}],{planned:false});
+  const tower=place(s,'tower',{x:60,y:50});assert.ifError(tower.error);
+  const into=b=>wallLayout(s.buildings).walls.find(w=>w.building.x===b.x&&w.building.y===b.y).into;
+  assert.deepEqual(into({x:60,y:52}),[],'not while the Tower is built');
+  tower.building.construction.state='complete';
+  assert.deepEqual(into({x:59,y:50}),['E']);assert.deepEqual(into({x:60,y:52}),['N']);assert.deepEqual(into({x:62,y:51}),['W']);assert.deepEqual(into({x:62,y:52}),[],'only a corner touches');
+  // The wall at (60,52) stands before the Tower's S face and shares its sort corner: it must still be drawn in front.
+  const wall=s.buildings.find(b=>b.type==='wall'&&b.x===60&&b.y===52);assert.ok(buildingDepth(wall)>buildingDepth(tower.building));
+  const back=s.buildings.find(b=>b.type==='wall'&&b.x===59&&b.y===50);assert.ok(buildingDepth(back)<buildingDepth(tower.building));
+});
