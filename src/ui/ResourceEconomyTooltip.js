@@ -1,7 +1,7 @@
 import { ledgerLabel } from '../i18n/names.js';
 import { t } from '../i18n/index.js';
 import { element } from './objectLabels.js';
-import { economyAmount } from './resourceEconomy.js';
+import { economyAmount,operatingNet } from './resourceEconomy.js';
 
 export class ResourceEconomyTooltip {
   constructor(bar){
@@ -23,6 +23,8 @@ export class ResourceEconomyTooltip {
     if(!summary)nodes.push(element('p','',t('economy.noDay')));
     else{
       nodes.push(element('h4','',`${t('economy.lastDay',{day:summary.day})}${summary.partial?` · ${t('economy.partial')}`:''}`),element('p','resource-economy-summary',t('economy.summary',{income:`${summary.income?'+':''}${economyAmount(id,summary.income)}`,expenses:`${summary.expenses?'−':''}${economyAmount(id,summary.expenses)}`,net:economyAmount(id,summary.net,{signed:true})})));
+      // (85) the balance in the bar leaves out building and hand collection.
+      nodes.push(element('p','resource-economy-operating',t('economy.operating',{net:economyAmount(id,operatingNet(summary),{signed:true})})));
       for(const [title,entries,sign]of [[t('economy.income'),summary.incomeBySource,'+'],[t('economy.expenses'),summary.expensesBySource,'−']]){nodes.push(element('h4','',title));const list=element('ul');for(const [source,amount]of Object.entries(entries).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])))list.append(element('li','',`${sign}${economyAmount(id,amount)} ${ledgerLabel(source)}`));if(!list.childElementCount)list.append(element('li','', '0'));nodes.push(list);}
     }
     this.root.replaceChildren(...nodes);this.position();

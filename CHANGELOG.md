@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.14] - 2026-11-20
+<!-- version: {"title":"Resource balance without building","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Changed
+- The daily +/− by each resource now leaves out building costs and refunds and resources picked up by hand, so it shows whether production keeps up with use. The tooltip still lists everything.
+
 ## [0.148.13] - 2026-11-19
 <!-- version: {"title":"Loading screen","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Added
