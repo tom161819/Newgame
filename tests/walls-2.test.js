@@ -114,3 +114,12 @@ test('a wall meeting a finished Gate on its wall side runs into it; on the passa
   assert.equal(links({x:61,y:50}).E,true,'west wall joins the Gate');assert.equal(links({x:64,y:50}).W,true,'east wall joins the Gate');
   assert.equal(links({x:62,y:52}).N,false,'a wall at the gateway keeps its end');
 });
+
+test('a wall at a finished Tower runs into it on every side (no merlons in front of the tower doors)',()=>{
+  const s=scene();walls(s,[{x:59,y:50},{x:60,y:52},{x:62,y:51}],{planned:false});
+  const tower=place(s,'tower',{x:60,y:50});assert.ifError(tower.error);
+  const links=b=>wallLayout(s.buildings).walls.find(w=>w.building.x===b.x&&w.building.y===b.y).connections;
+  assert.equal(links({x:60,y:52}).N,false,'an unfinished Tower keeps the merlons');
+  tower.building.construction.state='complete';
+  assert.equal(links({x:59,y:50}).E,true);assert.equal(links({x:60,y:52}).N,true);assert.equal(links({x:62,y:51}).W,true);
+});

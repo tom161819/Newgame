@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.5] - 2026-11-20
+<!-- version: {"title":"No merlons at tower doors","type":"fix","reconstructed":false,"saveVersion":67} -->
+### Fixed
+- A wall that meets a finished Tower runs into it: no merlons stand in front of the tower doors any more.
+
 ## [0.149.4] - 2026-11-20
 <!-- version: {"title":"Gate turns with R","type":"fix","reconstructed":false,"saveVersion":67} -->
 ### Fixed

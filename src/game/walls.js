@@ -126,8 +126,9 @@ export function planRoofExit(map,buildings,start,order,options){
 export function wallLayout(buildings){
   const finished=wallIndex(buildings),planned=wallIndex(buildings,true),key=tileKey;
   const solid=new Set();for(const b of buildings)if(['tower','gate','castle'].includes(b.type)&&!finished.has(key(b)))for(const tile of b.tiles??[])solid.add(key(tile));
-  // Owner 20 Nov 2026: a wall that meets a Gate on one of its wall sides runs into it (no end merlons sticking out there).
-  const gateSide=new Map();for(const b of buildings)if(b.type==='gate'&&buildingIsComplete(b))for(const tile of b.tiles??[])gateSide.set(key(tile),b.gateAxis==='x'?'EW':'NS');
+  // Owner 20 Nov 2026: a wall that meets a Gate on one of its wall sides runs into it (no end merlons sticking out there);
+  // a wall at a Tower runs into it on every side, so no merlons stand in front of the tower doors.
+  const gateSide=new Map();for(const b of buildings){const sides=b.type==='tower'?'NESW':b.type==='gate'?(b.gateAxis==='x'?'EW':'NS'):null;if(sides&&buildingIsComplete(b))for(const tile of b.tiles??buildingTiles(b,buildingDefinition(b)))gateSide.set(key(tile),sides);}
   const joined=building=>{const links=connectionsFor(finished,building);for(const d of WALL_DIRECTIONS)if(!links[d.name]&&gateSide.get(key({x:building.x+d.x,y:building.y+d.y}))?.includes(d.name))links[d.name]=true;return links;};
   const walls=[...planned.values()].map(building=>({building,connections:joined(building),shape:building.type==='wall'?wallShape(finished.get(key(building))===building?finished:planned,building,solid):null}));
   return {finished,walls};
