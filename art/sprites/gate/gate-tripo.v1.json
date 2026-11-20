@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "assetId": "gate",
+  "variantId": "gate-tripo",
+  "name": "Tripo gatehouse (walls north–south)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "91b92f67",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 146,
+  "height": 155,
+  "anchor": {
+    "x": 66,
+    "y": 121
+  },
+  "origin": {
+    "x": 0.45205,
+    "y": 0.78065
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 66,
+    "y": 153
+  },
+  "baseOrigin": {
+    "x": 0.45205,
+    "y": 0.9871
+  },
+  "visualHeight": 153,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.405,
+  "lights": [],
+  "x2": {
+    "width": 291,
+    "height": 307,
+    "anchor": {
+      "x": 131,
+      "y": 241
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.3.0",
+    "samples": 64,
+    "supersampling": 4,
+    "seconds": null,
+    "renderHash": "a45bb9b6",
+    "script": "scripts/blender/render_glb.py",
+    "glb": "stone_tower_3d_model.glb"
+  }
+}

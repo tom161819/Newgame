@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "assetId": "gate",
+  "variantId": "gate-tripo-axis-x",
+  "name": "Tripo gatehouse (walls east–west)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "91b92f67",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 149,
+  "height": 157,
+  "anchor": {
+    "x": 65,
+    "y": 123
+  },
+  "origin": {
+    "x": 0.43624,
+    "y": 0.78344
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 155
+  },
+  "baseOrigin": {
+    "x": 0.43624,
+    "y": 0.98726
+  },
+  "visualHeight": 155,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.405,
+  "lights": [],
+  "x2": {
+    "width": 296,
+    "height": 311,
+    "anchor": {
+      "x": 129,
+      "y": 245
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.3.0",
+    "samples": 64,
+    "supersampling": 4,
+    "seconds": null,
+    "renderHash": "d22da16e",
+    "script": "scripts/blender/render_glb.py",
+    "glb": "stone_tower_3d_model.glb"
+  }
+}

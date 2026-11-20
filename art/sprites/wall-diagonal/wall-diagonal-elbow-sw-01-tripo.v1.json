@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "assetId": "wall-diagonal",
+  "variantId": "wall-diagonal-elbow-sw-01-tripo",
+  "name": "Elbow SW 01 (Tripo stone)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "56396dc8",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 147,
+  "anchor": {
+    "x": 97,
+    "y": 97
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.65986
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 145
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98639
+  },
+  "visualHeight": 145,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.075,
+  "lights": [],
+  "x2": {
+    "width": 445,
+    "height": 352,
+    "anchor": {
+      "x": 193,
+      "y": 254
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.3.0",
+    "samples": 48,
+    "supersampling": 4,
+    "seconds": 73.1,
+    "renderHash": "7004788c",
+    "script": "scripts/blender/render.py",
+    "stoneTexture": "art/textures/stone-tripo.v1.png"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "assetId": "wall-diagonal",
+  "variantId": "wall-diagonal-se-tripo",
+  "name": "Run down the screen (Tripo stone)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "7cf59171",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 146,
+  "anchor": {
+    "x": 97,
+    "y": 96
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.65753
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 144
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.9863
+  },
+  "visualHeight": 144,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.075,
+  "lights": [],
+  "x2": {
+    "width": 387,
+    "height": 289,
+    "anchor": {
+      "x": 193,
+      "y": 191
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.3.0",
+    "samples": 48,
+    "supersampling": 4,
+    "seconds": 151.3,
+    "renderHash": "3e32c898",
+    "script": "scripts/blender/render.py",
+    "stoneTexture": "art/textures/stone-tripo.v1.png"
+  }
+}

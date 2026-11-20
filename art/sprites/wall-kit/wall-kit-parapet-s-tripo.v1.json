@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "assetId": "wall-kit",
+  "variantId": "wall-kit-parapet-s-tripo",
+  "name": "Parapet south (front left) (Tripo stone)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "404f44b0",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 100,
+  "anchor": {
+    "x": 33,
+    "y": 82
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.82
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 98
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.98
+  },
+  "visualHeight": 98,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.075,
+  "lights": [],
+  "x2": {
+    "width": 189,
+    "height": 260,
+    "anchor": {
+      "x": 65,
+      "y": 226
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.3.0",
+    "samples": 48,
+    "supersampling": 4,
+    "seconds": 59.4,
+    "renderHash": "69a6a0f8",
+    "script": "scripts/blender/render.py",
+    "stoneTexture": "art/textures/stone-tripo.v1.png"
+  }
+}

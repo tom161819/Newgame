@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "assetId": "wall-kit",
+  "variantId": "wall-kit-parapet-e-tripo",
+  "name": "Parapet east (front right) (Tripo stone)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "3b44dd16",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 88,
+  "height": 101,
+  "anchor": {
+    "x": 33,
+    "y": 83
+  },
+  "origin": {
+    "x": 0.375,
+    "y": 0.82178
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 99
+  },
+  "baseOrigin": {
+    "x": 0.375,
+    "y": 0.9802
+  },
+  "visualHeight": 99,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.075,
+  "lights": [],
+  "x2": {
+    "width": 189,
+    "height": 260,
+    "anchor": {
+      "x": 65,
+      "y": 226
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.3.0",
+    "samples": 48,
+    "supersampling": 4,
+    "seconds": 60,
+    "renderHash": "ce5b757e",
+    "script": "scripts/blender/render.py",
+    "stoneTexture": "art/textures/stone-tripo.v1.png"
+  }
+}

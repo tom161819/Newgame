@@ -239,6 +239,344 @@
         "openX": false,
         "merlons": 3
       }
+    },
+    {
+      "id": "wall-diagonal-se-tripo",
+      "name": "Run down the screen (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "diagonal",
+        "run": "se",
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "3e32c898",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-ne-tripo",
+      "name": "Run across the screen (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "diagonal",
+        "run": "ne",
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "5e6265fa",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-ne-11-tripo",
+      "name": "Elbow NE 11 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "NE",
+        "openZ": true,
+        "openX": true,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "f1ec7c08",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-ne-10-tripo",
+      "name": "Elbow NE 10 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "NE",
+        "openZ": true,
+        "openX": false,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "086a9088",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-ne-01-tripo",
+      "name": "Elbow NE 01 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "NE",
+        "openZ": false,
+        "openX": true,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "ae58cb6e",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-ne-00-tripo",
+      "name": "Elbow NE 00 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "NE",
+        "openZ": false,
+        "openX": false,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "35a5e24c",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-se-11-tripo",
+      "name": "Elbow SE 11 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "SE",
+        "openZ": true,
+        "openX": true,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "eee014dc",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-se-10-tripo",
+      "name": "Elbow SE 10 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "SE",
+        "openZ": true,
+        "openX": false,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "14f715f8",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-se-01-tripo",
+      "name": "Elbow SE 01 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "SE",
+        "openZ": false,
+        "openX": true,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "ef1246bf",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-se-00-tripo",
+      "name": "Elbow SE 00 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "SE",
+        "openZ": false,
+        "openX": false,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "d3ade307",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-sw-11-tripo",
+      "name": "Elbow SW 11 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "SW",
+        "openZ": true,
+        "openX": true,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "f4d85ef4",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-sw-10-tripo",
+      "name": "Elbow SW 10 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "SW",
+        "openZ": true,
+        "openX": false,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "fafa7a8e",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-sw-01-tripo",
+      "name": "Elbow SW 01 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "SW",
+        "openZ": false,
+        "openX": true,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "7004788c",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-sw-00-tripo",
+      "name": "Elbow SW 00 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "SW",
+        "openZ": false,
+        "openX": false,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "0dbd4328",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-nw-11-tripo",
+      "name": "Elbow NW 11 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "NW",
+        "openZ": true,
+        "openX": true,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "e2294f4c",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-nw-10-tripo",
+      "name": "Elbow NW 10 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "NW",
+        "openZ": true,
+        "openX": false,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "62dd541a",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-nw-01-tripo",
+      "name": "Elbow NW 01 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "NW",
+        "openZ": false,
+        "openX": true,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "0de51c4f",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-nw-00-tripo",
+      "name": "Elbow NW 00 (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "NW",
+        "openZ": false,
+        "openX": false,
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "1cc712e8",
+        "samples": 48
+      }
     }
   ]
 }

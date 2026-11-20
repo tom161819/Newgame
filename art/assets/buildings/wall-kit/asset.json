@@ -59,6 +59,89 @@
         "side": "W",
         "merlons": 3
       }
+    },
+    {
+      "id": "wall-kit-block-tripo",
+      "name": "Block (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "block"
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "bb497069",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-kit-parapet-n-tripo",
+      "name": "Parapet north (back left) (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "parapet",
+        "side": "N",
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "154e4cc0",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-kit-parapet-e-tripo",
+      "name": "Parapet east (front right) (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "parapet",
+        "side": "E",
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "ce5b757e",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-kit-parapet-s-tripo",
+      "name": "Parapet south (front left) (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "parapet",
+        "side": "S",
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "69a6a0f8",
+        "samples": 48
+      }
+    },
+    {
+      "id": "wall-kit-parapet-w-tripo",
+      "name": "Parapet west (back right) (Tripo stone)",
+      "version": 1,
+      "notes": "Owner 20 Nov 2026: the same piece in the stone of the Tripo Tower and Gate (a masonry tile taken from the tower face), rendered by Blender.",
+      "spec": {
+        "piece": "parapet",
+        "side": "W",
+        "merlons": 3
+      },
+      "baked": {
+        "renderer": "blender",
+        "stoneTexture": "art/textures/stone-tripo.v1.png",
+        "renderHash": "e3532947",
+        "samples": 48
+      }
     }
   ]
 }

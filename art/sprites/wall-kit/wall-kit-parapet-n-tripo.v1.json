@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "assetId": "wall-kit",
+  "variantId": "wall-kit-parapet-n-tripo",
+  "name": "Parapet north (back left) (Tripo stone)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "6de05cf7",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 88,
+  "height": 114,
+  "anchor": {
+    "x": 33,
+    "y": 96
+  },
+  "origin": {
+    "x": 0.375,
+    "y": 0.84211
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 112
+  },
+  "baseOrigin": {
+    "x": 0.375,
+    "y": 0.98246
+  },
+  "visualHeight": 112,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.075,
+  "lights": [],
+  "x2": {
+    "width": 189,
+    "height": 288,
+    "anchor": {
+      "x": 65,
+      "y": 254
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.3.0",
+    "samples": 48,
+    "supersampling": 4,
+    "seconds": 67.7,
+    "renderHash": "154e4cc0",
+    "script": "scripts/blender/render.py",
+    "stoneTexture": "art/textures/stone-tripo.v1.png"
+  }
+}

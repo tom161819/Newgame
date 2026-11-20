@@ -14,7 +14,7 @@ import { buildCatalog } from '../studio/src/lib/specs.js';
 import { projectPoint } from '../studio/src/lib/projection.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const [assetId, only] = process.argv.slice(2).filter(a => !a.startsWith('--'));
+const [assetId, only] = process.argv.slice(2).filter((a, i, all) => !a.startsWith('--') && !(all[i - 1] ?? '').startsWith('--'));
 const samples = process.argv.includes('--samples') ? process.argv[process.argv.indexOf('--samples') + 1] : '96';
 const python = process.env.BLENDER_PYTHON || 'python3';
 if (!assetId) { console.error('Usage: npm run blender:bake -- <assetId> [<variantId>] [--samples 96]'); process.exit(2); }
@@ -32,13 +32,31 @@ if (!targets.length) throw new Error(`No Blender-baked variant in ${assetId}${on
 const renderer = await readFile(path.join(root, 'scripts/blender/render.py'));
 const work = await mkdtemp(path.join(os.tmpdir(), 'blender-bake-'));
 
+// Owner 20 Nov 2026 (Tripo models): `baked.stoneTexture` renders the recipe's stone with that masonry tile;
+// `baked.glb` renders a downloaded 3D model (not in the repo: --glb-dir <folder>) with scripts/blender/render_glb.py.
+// --from <folder> takes an earlier render (<folder>/<variant>.png, .x2.png, .render.json) instead of rendering again.
+const argOf = name => process.argv.includes(name) ? process.argv[process.argv.indexOf(name) + 1] : null;
+const glbDir = argOf('--glb-dir'), from = argOf('--from');
 for (const variant of targets) {
-  const modelFile = path.join(work, `${variant.id}.model.json`), prefix = path.join(work, variant.id);
+  const modelFile = path.join(work, `${variant.id}.model.json`);
+  let prefix = path.join(work, variant.id);
   execFileSync('node', [path.join(root, 'scripts/blender-model.mjs'), assetId, variant.id, modelFile], { stdio: 'inherit' });
-  variant.baked.renderHash = createHash('sha256').update(renderer).update(await readFile(modelFile)).update(`samples=${samples}`).digest('hex').slice(0, 8);
-  variant.baked.samples = Number(samples);
-  console.log(`Rendering ${variant.id} with Blender (${samples} samples)…`);
-  execFileSync(python, [path.join(root, 'scripts/blender/render.py'), modelFile, prefix, '--samples', samples], { stdio: ['ignore', 'ignore', 'inherit'] });
+  const b = variant.baked, glbRenderer = b.glb ? await readFile(path.join(root, 'scripts/blender/render_glb.py')) : '';
+  const extra = b.glb ? `glb=${b.glb};rot=${b.rotation ?? 0};sx=${b.stretchX ?? 1}` : b.stoneTexture ? await readFile(path.join(root, b.stoneTexture)) : '';
+  b.renderHash = createHash('sha256').update(renderer).update(glbRenderer).update(await readFile(modelFile)).update(extra).update(`samples=${samples}`).digest('hex').slice(0, 8);
+  b.samples = Number(samples);
+  const env = { ...process.env, ...(b.stoneTexture ? { MK_STONE_TEXTURE: path.join(root, b.stoneTexture) } : {}) };
+  if (from) {
+    prefix = path.join(from, variant.id);
+    console.log(`Taking the render of ${variant.id} from ${from}.`);
+  } else if (b.glb) {
+    if (!glbDir) throw new Error(`${variant.id} renders ${b.glb}: pass --glb-dir <folder with the GLB>.`);
+    console.log(`Rendering ${variant.id} from ${b.glb} with Blender (${samples} samples)…`);
+    execFileSync(python, [path.join(root, 'scripts/blender/render_glb.py'), '--', modelFile, path.join(glbDir, b.glb), prefix, '--rot', String(b.rotation ?? 0), '--sx', String(b.stretchX ?? 1), '--samples', samples], { stdio: ['ignore', 'ignore', 'inherit'], env });
+  } else {
+    console.log(`Rendering ${variant.id} with Blender (${samples} samples)…`);
+    execFileSync(python, [path.join(root, 'scripts/blender/render.py'), modelFile, prefix, '--samples', samples], { stdio: ['ignore', 'ignore', 'inherit'], env });
+  }
   const render = JSON.parse(await readFile(`${prefix}.render.json`, 'utf8'));
   await writeFile(assetFile, `${JSON.stringify(asset, null, 2)}\n`);
   // The spec hash is the Studio's, computed from the updated asset.json (it includes baked.renderHash).
@@ -57,7 +75,7 @@ for (const variant of targets) {
     base: { x: +base.x.toFixed(2), y: +base.y.toFixed(2) }, baseOrigin: { x: +(base.x / one.width).toFixed(5), y: +(base.y / one.height).toFixed(5) },
     visualHeight: +base.y.toFixed(2), platform: null, frontLayer: false, gameLights: [], modelHeight: +render.modelHeight.toFixed(3), lights: [],
     x2: { width: two.width, height: two.height, anchor: two.anchor },
-    render: { engine: render.engine, blender: render.blender, samples: render.samples, supersampling: render.supersampling, seconds: render.seconds, renderHash: variant.baked.renderHash, script: 'scripts/blender/render.py' },
+    render: { engine: render.engine ?? 'CYCLES', blender: render.blender ?? null, samples: render.samples ?? Number(samples), supersampling: render.supersampling ?? 4, seconds: render.seconds ?? null, renderHash: variant.baked.renderHash, script: variant.baked.glb ? 'scripts/blender/render_glb.py' : 'scripts/blender/render.py', ...(variant.baked.glb ? { glb: variant.baked.glb } : {}), ...(variant.baked.stoneTexture ? { stoneTexture: variant.baked.stoneTexture } : {}) },
   };
   await writeFile(sprite.replace(/\.png$/, '.json'), `${JSON.stringify(meta, null, 2)}\n`);
   console.log(`Baked ${entry.paths.sprite} (${one.width}×${one.height}, anchor ${one.anchor.x},${one.anchor.y}, hash ${entry.hash}) in ${render.seconds} s.`);

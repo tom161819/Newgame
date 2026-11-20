@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.6] - 2026-11-20
+<!-- version: {"title":"Studio: Tripo Tower, Gate and walls","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Asset Studio: the owner's Tripo watchtower and gatehouse, and the wall pieces in their stone, for review.
+
 ## [0.149.5] - 2026-11-20
 <!-- version: {"title":"No merlons at tower doors","type":"fix","reconstructed":false,"saveVersion":67} -->
 ### Fixed

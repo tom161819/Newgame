@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "assetId": "watchtower",
+  "variantId": "watchtower-tripo",
+  "name": "Tripo stone tower",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "91b92f67",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 176,
+  "height": 243,
+  "anchor": {
+    "x": 65,
+    "y": 209
+  },
+  "origin": {
+    "x": 0.36932,
+    "y": 0.86008
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 241
+  },
+  "baseOrigin": {
+    "x": 0.36932,
+    "y": 0.99177
+  },
+  "visualHeight": 241,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 4.66,
+  "lights": [],
+  "x2": {
+    "width": 349,
+    "height": 483,
+    "anchor": {
+      "x": 129,
+      "y": 417
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.3.0",
+    "samples": 64,
+    "supersampling": 4,
+    "seconds": null,
+    "renderHash": "697c3e4d",
+    "script": "scripts/blender/render_glb.py",
+    "glb": "watchtower_v1.glb"
+  }
+}

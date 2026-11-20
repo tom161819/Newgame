@@ -14,7 +14,7 @@ gives soft sky light, ambient occlusion in the joints and a soft ground shadow.
 """
 import hashlib
 import json
-import math
+import math, os
 import random
 import sys
 import time
@@ -127,6 +127,25 @@ def make_material(mid, spec, kind):
         links.new(lift.outputs['Color'], bsdf.inputs['Base Color'])
         bump = nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value = 0.4; bump.inputs['Distance'].default_value = 0.01
         links.new(brick.outputs['Fac'], bump.inputs['Height']); links.new(bump.outputs['Normal'], bsdf.inputs['Normal'])
+    stone_tex = os.environ.get('MK_STONE_TEXTURE')
+    if stone_tex and kind == 'stone':
+        # Owner 20 Nov 2026: walls in the stone of the approved Tripo Tower and Gate. A seamless tile of real masonry
+        # (one tile edge wide, so neighbouring wall tiles continue), tinted per material (plinth darker, caps lighter).
+        img = bpy.data.images.load(stone_tex, check_existing=True)
+        uv = nodes.new('ShaderNodeUVMap'); mapping = nodes.new('ShaderNodeMapping')
+        aspect = img.size[0] / img.size[1]
+        mapping.inputs['Scale'].default_value = (1.0, aspect, 1.0)
+        tex = nodes.new('ShaderNodeTexImage'); tex.image = img; tex.interpolation = 'Cubic'
+        links.new(uv.outputs['UV'], mapping.inputs['Vector']); links.new(mapping.outputs['Vector'], tex.inputs['Vector'])
+        tint = nodes.new('ShaderNodeMix'); tint.data_type = 'RGBA'; tint.blend_type = 'MULTIPLY'; tint.inputs['Factor'].default_value = 1.0
+        shade = {'stone_dark': 0.74, 'stone_light': 1.12}.get(mid, 1.0)
+        tint.inputs['B'].default_value = (shade, shade, shade, 1.0)
+        links.new(tex.outputs['Color'], tint.inputs['A'])
+        for link in list(bsdf.inputs['Base Color'].links): links.remove(link)
+        links.new(tint.outputs['Result'], bsdf.inputs['Base Color'])
+        for link in list(bsdf.inputs['Normal'].links): links.remove(link)
+        bump = nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value = 0.6; bump.inputs['Distance'].default_value = 0.015
+        links.new(tex.outputs['Color'], bump.inputs['Height']); links.new(bump.outputs['Normal'], bsdf.inputs['Normal'])
     if kind == 'dark':
         bsdf.inputs['Base Color'].default_value = base
         for link in list(bsdf.inputs['Base Color'].links): links.remove(link)
@@ -394,7 +413,11 @@ def build(model, rnd):
     if model.get('look'):
         rest = build_organic(model, rnd, mats, model['look'])
         model = {**model, 'primitives': rest}
-    for part in model['primitives']:
+    for i, part in enumerate(model['primitives']):
+        if os.environ.get('MK_STONE_TEXTURE'):
+            # Coplanar tops of overlapping parts (the mitred caps of wall elbows) rendered black in Cycles: lift each part
+            # a hair (0.6 mm per part) so no two surfaces coincide.
+            part = {**part, 'at': [part['at'][0], part['at'][1] + 0.0006 * i, part['at'][2]]}
         mat, kind, shape = mats[part['material']], material_kind(part['material']), part['shape']
         if shape == 'box':
             stone(part, rnd, mat, rough=kind == 'stone')

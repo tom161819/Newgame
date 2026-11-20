@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "assetId": "wall-kit",
+  "variantId": "wall-kit-block-tripo",
+  "name": "Block (Tripo stone)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "1e0903db",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 89,
+  "height": 103,
+  "anchor": {
+    "x": 36,
+    "y": 85
+  },
+  "origin": {
+    "x": 0.40449,
+    "y": 0.82524
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 36,
+    "y": 101
+  },
+  "baseOrigin": {
+    "x": 0.40449,
+    "y": 0.98058
+  },
+  "visualHeight": 101,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.735,
+  "lights": [],
+  "x2": {
+    "width": 177,
+    "height": 202,
+    "anchor": {
+      "x": 72,
+      "y": 168
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.3.0",
+    "samples": 48,
+    "supersampling": 4,
+    "seconds": 51.5,
+    "renderHash": "bb497069",
+    "script": "scripts/blender/render.py",
+    "stoneTexture": "art/textures/stone-tripo.v1.png"
+  }
+}
