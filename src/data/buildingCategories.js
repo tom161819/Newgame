@@ -12,7 +12,7 @@ export const buildingCategoryLabel=definition=>BUILDING_CATEGORIES[definition.bu
 // Owner 15 Nov 2026 (63): the order inside each category; buildings not listed follow by menuOrder, then registry order.
 export const BUILDING_MENU_ORDER=Object.freeze({
   food:Object.freeze(['granary','hunting_lodge','fisherman_hut','farmhouse','orchard','wheat_field','flax_field','mill','bakery']),
-  defense:Object.freeze(['castle','gate','wall','tower','barracks','armory','bowyer','swordsmith','armorer','tailor']),
+  defense:Object.freeze(['castle','gate','wall','tower','stakes','moat','barracks','armory','bowyer','swordsmith','armorer','tailor']),
   industry:Object.freeze(['lumberjack_hut','builder_workshop','quarry','iron_mine','smelter','pitch_kiln','wheelwright_workshop','weaver']),
   logistics:Object.freeze(['material_yard','warehouse','marketplace','stables']),
 });

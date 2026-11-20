@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.14] - 2026-11-21
+<!-- version: {"title":"Stakes and Moat","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Stakes: a row of sharpened stakes dragged like a wall. Riders and carts cannot get through, men on foot cross slowly.
+- Moat: a ditch with water. Everyone wades slowly across it; carts and siege engines practically cannot cross.
+
 ## [0.149.13] - 2026-11-20
 <!-- version: {"title":"Flank attacks and morale","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added

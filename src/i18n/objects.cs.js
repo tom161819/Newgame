@@ -56,6 +56,8 @@ export default {
   'object.pitch_kiln.name':"Smolárna",'object.pitch_kiln.description':"Smolař pálí ze 2 dřev 1 smůlu a z 1 dřeva a 1 smůly dělá 3 pochodně. Nejdřív udržuje 20 pochodní ve skladech.",
   'object.torch_post.name':"Sloup s pochodní",'object.torch_post.description':"Železný sloup s pochodní. V noci osvětlí 5 políček kolem; spálí 1 pochodeň za noc.",
   'object.campfire.name':"Táborák",'object.campfire.description':"Oheň z klestí nasbíraného na místě. Hoří jednu noc; vlci se jeho světlu vyhnou.",
+  'object.stakes.name':"Kůly",'object.stakes.description':"Řada naostřených kůlů. Jezdci jimi neprojedou, pěšáci se jimi brodí pomalu – pod šípy tvých lučištníků.",
+  'object.moat.name':"Příkop",'object.moat.description':"Vykopaný příkop s vodou. Každý se jím brodí pomalu; vozy, katapult a beranidlo jím neprojedou.",
   'object.bandit.name':"Loupežník",'object.bandit.description':"Loupežník, který hlídá kořist svého tábora. Napadne každého, kdo se přiblíží.",'object.cave_rat.name':"Obří krysa",'object.cave_rat.description':"Obří krysa z opuštěného dolu. Kousne každého, kdo se přiblíží.",
   'object.enemy_soldier.name':"Nepřátelský branec",'object.enemy_soldier.description':"Branec nepřátelské armády v ocelově modré. Napadne každého z království, kdo se přiblíží.",
   'object.enemy_archer.name':"Nepřátelský lučištník",'object.enemy_archer.description':"Lučištník nepřátelské armády v ocelově modré. Střílí na každého z království, kdo se přiblíží.",

@@ -51,6 +51,23 @@ export const buildings = [
     platform:{x:0,y:-84},depth:{offset:.5},visual:{wallHeight:68},
     shadow:{baked:true,x:8,y:-8,width:65,height:24,color:0x30291c,alpha:.3},
   },
+  // Owner 20 Nov 2026 ("zpracuj postupně všechny ty návrhy na obranu / útok", point 2). Provisional drawings in code
+  // (DefenseViews.js) until the owner's models: a row of sharpened stakes and a dug moat, both dragged like a wall.
+  // Both stay walkable; `defense.speed` slows everyone on them, `defense.mounted` riders, `defense.wheels` carts and engines.
+  {
+    id:'stakes',name:'Stakes',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/stakes/stakes.svg',
+    width:1,height:1,walkable:true,collectible:false,buildable:true,cost:{wood:2},repeatPlacement:true,constructionTime:4000,
+    interactions:[],description:'A row of sharpened stakes. Riders cannot get through, foot soldiers wade through slowly – under the arrows of your archers.',
+    construction:{mode:'line'},renderMode:'procedural',renderer:'stakes',origin:{x:.5,y:.8},visualHeight:30,depth:{offset:0},
+    defense:{speed:.45,mounted:.08,wheels:.08},
+  },
+  {
+    id:'moat',name:'Moat',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/moat/moat.svg',
+    width:1,height:1,walkable:true,collectible:false,buildable:true,cost:{},repeatPlacement:true,constructionTime:9000,
+    interactions:[],description:'A dug ditch with water. Everyone wades across it slowly; carts, the Catapult and the battering ram cannot cross it.',
+    construction:{mode:'line'},renderMode:'procedural',renderer:'moat',origin:{x:.5,y:.5},visualHeight:4,depth:{offset:0},
+    defense:{speed:.35,mounted:.3,wheels:.02},
+  },
   // #97: a gate in the wall. People walk through it on the ground; the wall walk continues over it, and together with the
   // Towers it is where the King climbs up to and down from the wall walk. Provisional art: the Studio concept "Gate, open".
   {

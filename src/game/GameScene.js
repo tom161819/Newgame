@@ -35,6 +35,7 @@ import { RiverLife } from './RiverLife.js';
 import { FishShadows } from './FishShadows.js';
 import { FuelIcons } from './FuelIcons.js';
 import { CampfireView } from './CampfireView.js';
+import { StakesView,MoatView } from './DefenseViews.js';
 import { FireViews } from './FireViews.js';
 import { NightThreatSystem } from '../systems/NightThreatSystem.js';
 import { KingdomOverview,HelpArrow } from '../ui/KingdomOverview.js';
@@ -87,6 +88,7 @@ import { AlarmSystem } from '../systems/AlarmSystem.js';
 import { EnemyGates } from '../systems/EnemyGates.js';
 import { EnemyArmy } from '../systems/EnemyArmy.js';
 import { MoraleSystem } from '../systems/MoraleSystem.js';
+import { defenseSpeed } from './defenseWorks.js';
 import { levelDefinition, placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors,entryTiles,sideTiles,DOOR_SIDES, buildingDefinition,buildingDepth,buildingIsComplete, definitionFor } from './buildings.js';
 import { edgeLight,fadeStep } from './sightFade.js';
 import { footprintShown,applyFootprint,selectedBuildingIds } from './footprintHighlight.js';
@@ -256,6 +258,8 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('crop',(_definition,context)=>new CropPlotView(this,context.building,context.preview));
     this.assets.registerRenderer('pavement',(_definition,context)=>new PavementView(this,context.building,context.preview));
     this.assets.registerRenderer('village_green',(_definition,context)=>new VillageGreenView(this,context.building,context.preview));
+    this.assets.registerRenderer('stakes',(_definition,context)=>new StakesView(this,context.building,context.preview));
+    this.assets.registerRenderer('moat',(_definition,context)=>new MoatView(this,context.building,context.preview));
     this.assets.registerRenderer('campfire',(_definition,context)=>new CampfireView(this,context.building,context.preview));
     this.assets.registerRenderer('decoration',(_definition,context)=>new DecorationView(this,context.building,context.preview));
     this.assets.registerRenderer('material_yard',(_definition,context)=>new MaterialYardView(this,context.building,context.preview));
@@ -294,7 +298,7 @@ export class GameScene extends Phaser.Scene {
     this.unsubscribeSeason=this.seasons.onChange(()=>{const changed=this.terrain.season!==this.seasons.season;this.terrain.setSeason(this.seasons.season);if(changed&&this.worldCamera){this.terrain.invalidateArea(this.mapMemory.observeTerrain(this.terrainGrid,this.pathWear,this.seasons.season,this.map));this.terrain.update(this.cameras.main,this.fog,this.mapMemory);}this.updateTimeDisplay();this.settingsPanel?.syncSeasons();});
     this.activities=new GameActivityBus();this.experienceSystem=new ExperienceSystem(this.activities);
     this.skillSystem=new SkillSystem(this);
-    this.pathWear=new PathWearSystem({map:this.map,terrain:this.terrainGrid,time:this.gameTime,groundSpeed:tile=>isFordGround(this.groundGrid[tile.y]?.[tile.x])?FORD_SPEED:1,isGrass:tile=>this.terrainGrid[tile.y]?.[tile.x]===0&&isFertileGround(this.groundGrid[tile.y]?.[tile.x])});this.terrain.setPathWear(this.pathWear);
+    this.pathWear=new PathWearSystem({map:this.map,terrain:this.terrainGrid,time:this.gameTime,groundSpeed:tile=>isFordGround(this.groundGrid[tile.y]?.[tile.x])?FORD_SPEED:1,isGrass:tile=>this.terrainGrid[tile.y]?.[tile.x]===0&&isFertileGround(this.groundGrid[tile.y]?.[tile.x])});this.terrain.setPathWear(this.pathWear);this.pathWear.defenseSpeed=(actor,tile)=>defenseSpeed(this,actor,tile);
     this.pauseManager=new PauseManager(this);
     this.noticeRemaining=0;document.querySelector('#day-notice').hidden=true;
     this.resources=new Map();this.stones=this.resources; // Kompatibilní označení původního seznamu kamenů.
@@ -844,6 +848,8 @@ export class GameScene extends Phaser.Scene {
     else this.cancelBuilding(message);
   }
   refreshWallConnections(){
+    // Owner 20 Nov 2026: a Moat tile's water joins its neighbours (DefenseViews.js); repaint when the line grows or shrinks.
+    for(const b of this.buildings)if(b.type==='moat'){const v=this.towerViews.get(b.id),inner=v?.view??v;if(inner?.joined&&inner.joinedKey!==inner.joined()){inner.joinedKey=inner.joined();v.paint?.(b);}}
     const layout=wallLayout(this.buildings);this.wallMap=layout.finished;
     for(const {building,connections,shape,into} of layout.walls){
       const key=JSON.stringify(connections)+JSON.stringify(shape)+into.join('');

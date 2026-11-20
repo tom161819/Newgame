@@ -56,6 +56,8 @@ export default {
   'object.pitch_kiln.name':"Pitch Kiln",'object.pitch_kiln.description':"A Pitch Maker burns 2 Wood into 1 Pitch, and dips 1 Wood in 1 Pitch for 3 Torches. He keeps 20 Torches in the stores first.",
   'object.torch_post.name':"Torch Post",'object.torch_post.description':"An iron post with a torch. Lights 5 tiles around it at night; burns 1 Torch a night.",
   'object.campfire.name':"Campfire",'object.campfire.description':"A fire of brushwood gathered on the spot. Burns one night; wolves keep away from its light.",
+  'object.stakes.name':"Stakes",'object.stakes.description':"A row of sharpened stakes. Riders cannot get through, foot soldiers wade through slowly – under the arrows of your archers.",
+  'object.moat.name':"Moat",'object.moat.description':"A dug ditch with water. Everyone wades across it slowly; carts, the Catapult and the battering ram cannot cross it.",
   'object.bandit.name':"Bandit",'object.bandit.description':"A bandit guarding the loot of his camp. Attacks anyone who comes close.",'object.cave_rat.name':"Giant Rat",'object.cave_rat.description':"A giant rat of an abandoned mine. Bites anyone who comes close.",
   'object.enemy_soldier.name':"Enemy Recruit",'object.enemy_soldier.description':"A recruit of an enemy army in steel blue. Attacks anyone of the kingdom who comes close.",
   'object.enemy_archer.name':"Enemy Archer",'object.enemy_archer.description':"An archer of an enemy army in steel blue. Shoots at anyone of the kingdom who comes close.",

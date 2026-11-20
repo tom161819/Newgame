@@ -21,7 +21,7 @@ export class PathWearSystem {
   isPaved(tile){return Number.isInteger(tile.x)&&Number.isInteger(tile.y)&&tile.x>=0&&tile.y>=0&&tile.x<this.width&&tile.y<this.height&&this.paved[this.index(tile)]===1;}
   setPaved(tile,value){const i=this.index(tile),next=value?1:0;if(this.paved[i]===next)return false;this.paved[i]=next;this.pavedCount+=next?1:-1;this.revision++;this.levelRevision++;for(const listener of this.listeners)listener(tile);return true;}
   // World v2: ground can slow walking (a ford ×0.6); it applies to everyone, paths and paving never stand on it.
-  speedMultiplier(actor,tile){const ground=this.groundSpeed?.(tile)??1;if(ground!==1)return ground;if(this.isPaved(tile)&&(actor.state==null||actor.state==='ground'||actor.mountedHorse))return PAVEMENT.speedMultiplier;return this.affects(actor)?PATH_WEAR.speedMultipliers[this.level(tile)]:1;}
+  speedMultiplier(actor,tile){const defense=this.defenseSpeed?.(actor,tile)??1;if(defense!==1)return defense;const ground=this.groundSpeed?.(tile)??1;if(ground!==1)return ground;if(this.isPaved(tile)&&(actor.state==null||actor.state==='ground'||actor.mountedHorse))return PAVEMENT.speedMultiplier;return this.affects(actor)?PATH_WEAR.speedMultipliers[this.level(tile)]:1;}
   routingOptions(actor){const ground=actor.state&&actor.state!=='ground'?{definition:actor.definition,state:'ground'}:actor;return {speedMultiplier:tile=>this.speedMultiplier(ground,tile),maxSpeed:Math.max(PATH_WEAR.speedMultipliers[this.highestLevel],this.pavedCount?PAVEMENT.speedMultiplier:1)};}
   enter(actor,tile){
     // Owner 9 Nov 2026 ("proč tam jsou zase kolečka"): residents shuffling between waiting spots around the Castle or
