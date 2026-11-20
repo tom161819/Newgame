@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-19T18:30:00.000Z",
+  "updatedAt": "2026-11-20T20:56:00.000Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -1589,6 +1589,51 @@
           "note": "",
           "updatedAt": "2026-11-04T21:55:38.204Z",
           "approvedAt": "2026-11-04T21:55:38.204Z"
+        },
+        "wall-kit-block-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1e0903db",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-kit-parapet-n-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6de05cf7",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-kit-parapet-e-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3b44dd16",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-kit-parapet-s-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "404f44b0",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-kit-parapet-w-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3ee9f324",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
         }
       }
     },
@@ -1638,7 +1683,7 @@
       }
     },
     "watchtower": {
-      "preferred": "watchtower-square",
+      "preferred": "watchtower-tripo",
       "variants": {
         "watchtower-square": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -1648,6 +1693,15 @@
           "updatedAt": "2026-11-07T10:18:41.561Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:18:41.561Z"
+        },
+        "watchtower-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "91b92f67",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
         }
       }
     },
@@ -7912,6 +7966,191 @@
           "updatedAt": "2026-11-15T05:55:25.411Z",
           "version": 5,
           "history": []
+        },
+        "wall-diagonal-se-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7cf59171",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-ne-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cd41612c",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-ne-11-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ccca3a90",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-ne-10-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "854da35f",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-ne-01-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4e28d3a9",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-ne-00-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a0906080",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-se-11-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8dc3f495",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-se-10-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e1663030",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-se-01-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9757d4c6",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-se-00-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c2bd58c9",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-sw-11-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e561bd27",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-sw-10-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f660164a",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-sw-01-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "56396dc8",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-sw-00-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a721b653",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-nw-11-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0a13ea1e",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-nw-10-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a3abe045",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-nw-01-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "693f8adf",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-nw-00-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "01dacb16",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        }
+      }
+    },
+    "gate": {
+      "preferred": "gate-tripo",
+      "variants": {
+        "gate-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "91b92f67",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "gate-tripo-axis-x": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "91b92f67",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
         }
       }
     }

@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.8] - 2026-11-20
+<!-- version: {"title":"Tripo Tower, Gate and walls","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Changed
+- The Stone Tower, the Gate and all walls use the owner's new Tripo models and their stone (approved in the Asset Studio).
+- The Gate has its own picture for each direction instead of a mirrored one, and every diagonal wall corner now has its picture.
+
 ## [0.149.7] - 2026-11-20
 <!-- version: {"title":"Tripo Knight","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Changed

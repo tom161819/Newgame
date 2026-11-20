@@ -4,20 +4,20 @@ import { WORKPLACES } from '../workplaces.js';
 import { MINING_WORK } from '../minerals.js';
 export const buildings = [
   {
-    // Approved Asset Studio sprite (art/sprites/watchtower/watchtower-square.v1.json); TowerView stays the fallback.
-    id: 'tower', name: 'Stone Tower', category: 'building', buildingCategory:'defense', sprite: '/assets/buildings/tower/watchtower-square.v1.png',
-    frontSprite: '/assets/buildings/tower/watchtower-square.v1.front.png', artSource: 'art/sprites/watchtower/watchtower-square.v1.json',
+    // Approved Asset Studio sprite (art/sprites/watchtower/watchtower-tripo.v1.json); TowerView stays the fallback.
+    id: 'tower', name: 'Stone Tower', category: 'building', buildingCategory:'defense', sprite: '/assets/buildings/tower/watchtower-tripo.v1.png',
+    frontSprite: '/assets/buildings/tower/watchtower-tripo.v1.front.png', artSource: 'art/sprites/watchtower/watchtower-tripo.v1.json',
     visibility: { multiplier: 2 },
     // Owner 17 Nov 2026: the door shows the side a Tower is climbed from (facing 1: on the right face; 2 and 3: hidden).
     // Provisional sprites cut from the approved one by the mechanics chat until the Studio has the turned views.
-    artSprites: { 'door-e': { sprite: '/assets/buildings/tower/watchtower-square.v1.door-e.png', origin: { x: 0.39634, y: 0.99107 } }, 'no-door': { sprite: '/assets/buildings/tower/watchtower-square.v1.no-door.png', origin: { x: 0.39634, y: 0.99107 } } },
+    artSprites: { 'door-e': { sprite: '/assets/buildings/tower/watchtower-tripo.v1.door-e.png', origin: { x: 0.36932, y: 0.99177 } }, 'no-door': { sprite: '/assets/buildings/tower/watchtower-tripo.v1.no-door.png', origin: { x: 0.36932, y: 0.99177 } } },
     // m-staveni-zdi-studna (59): the tool stays selected after placing; a Tower may replace Stone Wall segments.
     width: 2, height: 2, walkable: false, collectible: false, buildable: true, repeatPlacement: true, replacesWall: true,
     cost: { stone: 20 }, interactions: ['enter', 'exit'], description: 'Kamenná strážní věž s horní plošinou a cimbuřím.',
     constructionTime:20000,
-    renderMode: 'sprite', renderer: 'tower', origin: { x: 0.39634, y: 0.99107 }, frontOrigin: { x: 0.39634, y: 0.99107 }, visualHeight: 222,
-    platform: { x: 0, y: -183.28 }, depth: { offset: 0 },
-    lights: [{ type: 'torch', x: -15.88, y: -72.15, color: '#ffb25a', radius: 102.4, intensity: 0.95, flicker: { amplitude: 0.12, speed: 7 }, flameSize: 1 }],
+    renderMode: 'sprite', renderer: 'tower', origin: { x: 0.36932, y: 0.99177 }, frontOrigin: { x: 0.36932, y: 0.99177 }, visualHeight: 241,
+    platform: { x: 0, y: -195.3 }, depth: { offset: 0 },
+    lights: [{ type: 'torch', x: -12, y: -84, color: '#ffb25a', radius: 102.4, intensity: 0.95, flicker: { amplitude: 0.12, speed: 7 }, flameSize: 1 }],
     // Day and night N2: two torch holders (2 Torches a night); their sight counts only with someone on the tower.
     fuel: TORCHES.places.tower,
     shadow: { baked: true, x: 8, y: -20, width: 114, height: 43, color: 0x30291c, alpha: 0.3 },
@@ -60,13 +60,13 @@ export const buildings = [
   // m-brana-2x2 (owner, 12 Nov): the Gate is 2 × 2 and joins the walls at its sides; people pass through it on the ground
   // and climb to the wall walk from the walls beside it (as at a Tower). The 1 × 1 Gate stays for older saves only.
   {
-    id:'gate',name:'Gate',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/wall_gate/wall-gate-open.v1.png',
+    id:'gate',name:'Gate',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/gate/gate-tripo.v1.png',artSource:'art/sprites/gate/gate-tripo.v1.json',
+    // Owner 20 Nov 2026: the gatehouse from the owner's Tripo model, one picture per axis (walls north–south: main; east–west: axis-x).
+    artSprites:{'axis-x':{sprite:'/assets/buildings/gate/gate-tripo.v1.axis-x.png',origin:{x:.44,y:.98726}}},
     width:2,height:2,walkable:true,collectible:false,buildable:true,cost:{stone:12},constructionTime:20000,repeatPlacement:true,replacesWall:true,
     interactions:[],description:'A 2 × 2 gate in the wall: people pass through it, and from the walls beside it you climb up to the wall walk.',
     visibility:{multiplier:1.75},
-    // Owner 20 Nov 2026 ("brána se vykresluje jinde, než je"): the 1 × 1 art (86 × 115, its ground diamond 64 px wide) is drawn
-    // exactly twice as big, so its ground covers the 2 × 2 tiles (it was 150 × 200: 1.74 tiles, short of the back row).
-    renderMode:'sprite',origin:{x:.38372,y:.84348},visual:{displayWidth:172,displayHeight:230},visualHeight:207,depth:{offset:0},
+    renderMode:'sprite',origin:{x:.44,y:.98726},visualHeight:155,depth:{offset:0},
   },
   // #118: Builders who have a place in a finished workshop (4 per workshop) work at full speed, others at half speed;
   // idle Builders wait at their workshop. Approved art: builders-workshop material yard (APPROVED_BUILDING_ART).

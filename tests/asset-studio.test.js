@@ -214,7 +214,7 @@ test('game definitions map to studio categories and filters combine source, cate
   assert.equal(studioCategoryForGameObject({ id: 'oak_tree', category: 'resource' }), 'trees');
   assert.equal(studioCategoryForGameObject({ id: 'rock_outcrop', category: 'decoration' }), 'nature');
   assert.ok(catalog.game.every(item => CATEGORY_IDS.includes(item.category) && item.id.startsWith('game:')));
-  assert.ok(catalog.game.some(item => item.gameObjectId === 'tower' && item.spritePath === 'public/assets/buildings/tower/watchtower-square.v1.png'));
+  assert.ok(catalog.game.some(item => item.gameObjectId === 'tower' && item.spritePath === 'public/assets/buildings/tower/watchtower-tripo.v1.png'));
   const studioBuildings = filterCatalog(catalog.all, { category: 'buildings', source: 'studio' });
   assert.ok(studioBuildings.every(i => i.category === 'buildings' && i.source === 'studio'));
   for (const id of ['house', 'quarry', 'stone-wall', 'watchtower', 'scaffold']) assert.ok(studioBuildings.some(i => i.id === id), id);
@@ -259,7 +259,7 @@ test('the game uses the approved Asset Studio exports byte for byte with their a
     }
     if (meta.platform) assert.deepEqual(definition.platform, meta.platform);
   }
-  const front = pngSize('public/assets/buildings/tower/watchtower-square.v1.front.png'), main = pngSize('public/assets/buildings/tower/watchtower-square.v1.png');
+  const front = pngSize('public/assets/buildings/tower/watchtower-tripo.v1.front.png'), main = pngSize('public/assets/buildings/tower/watchtower-tripo.v1.png');
   assert.deepEqual(front, main, 'front layer has the same frame as the tower sprite');
   assert.equal(definitions.get('brazier').buildingCategory, 'infrastructure');
   assert.ok(definitions.get('brazier').buildable && definitions.get('brazier').constructionTime > 0);
@@ -391,7 +391,8 @@ test('the connected wall uses the approved wall kit: a block and one parapet per
   assert.deepEqual(Object.keys(APPROVED_WALL_ART).sort(), ['E', 'N', 'S', 'W', 'block']);
   for (const [piece, art] of Object.entries(APPROVED_WALL_ART)) {
     const meta = json(art.artSource);
-    assert.equal(meta.variantId, piece === 'block' ? 'wall-kit-block' : `wall-kit-parapet-${piece.toLowerCase()}`);
+    // Owner 20 Nov 2026: the kit in the stone of the Tripo Tower and Gate.
+    assert.equal(meta.variantId, piece === 'block' ? 'wall-kit-block-tripo' : `wall-kit-parapet-${piece.toLowerCase()}-tripo`);
     assert.equal(approvals.assets['wall-kit'].variants[meta.variantId]?.status, 'approved', piece);
     assert.ok(readFileSync(path.join(root, `public${art.sprite}`)).equals(readFileSync(path.join(root, `art/sprites/wall-kit/${meta.variantId}.v1.png`))), piece);
     assert.deepEqual(art.origin, meta.baseOrigin, `${piece}: anchored at the tile's front corner like the procedural wall`);

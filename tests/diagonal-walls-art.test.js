@@ -17,7 +17,7 @@ test('diagonal walls: every piece in the game is approved in that version, expor
     assert.ok(existsSync(new URL(`../public${art.sprite}`, import.meta.url)), `${key}: sprite deployed`);
   }
 });
-test('diagonal walls: rejected elbows are left out (those tiles stay a plain block)', () => {
-  for (const key of ['elbow-NW-00', 'elbow-NW-01', 'elbow-NW-10', 'elbow-SE-00']) assert.equal(key in DIAGONAL_WALL_ART, false, key);
-  assert.equal(Object.keys(DIAGONAL_WALL_ART).length, 14);
+test('diagonal walls: all sixteen elbows and both runs, in the Tripo stone (owner 20 Nov 2026)', () => {
+  for (const key of ['elbow-NW-00', 'elbow-NW-01', 'elbow-NW-10', 'elbow-SE-00']) assert.ok(key in DIAGONAL_WALL_ART, key);
+  assert.equal(Object.keys(DIAGONAL_WALL_ART).length, 18);
 });
