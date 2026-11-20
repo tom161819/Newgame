@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.2] - 2026-11-20
+<!-- version: {"title":"Gate over its tiles","type":"fix","reconstructed":false,"saveVersion":67} -->
+### Fixed
+- The Gate's picture now covers its 2 × 2 tiles exactly (it was drawn a little smaller and off its ground plan).
+
 ## [0.149.1] - 2026-11-20
 <!-- version: {"title":"Diagonal wall joint","type":"fix","reconstructed":false,"saveVersion":67} -->
 ### Fixed

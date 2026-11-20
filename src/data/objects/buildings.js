@@ -64,7 +64,9 @@ export const buildings = [
     width:2,height:2,walkable:true,collectible:false,buildable:true,cost:{stone:12},constructionTime:20000,repeatPlacement:true,replacesWall:true,
     interactions:[],description:'A 2 × 2 gate in the wall: people pass through it, and from the walls beside it you climb up to the wall walk.',
     visibility:{multiplier:1.75},
-    renderMode:'sprite',origin:{x:.38372,y:.84348},visual:{displayWidth:150,displayHeight:200},visualHeight:180,depth:{offset:0},
+    // Owner 20 Nov 2026 ("brána se vykresluje jinde, než je"): the 1 × 1 art (86 × 115, its ground diamond 64 px wide) is drawn
+    // exactly twice as big, so its ground covers the 2 × 2 tiles (it was 150 × 200: 1.74 tiles, short of the back row).
+    renderMode:'sprite',origin:{x:.38372,y:.84348},visual:{displayWidth:172,displayHeight:230},visualHeight:207,depth:{offset:0},
   },
   // #118: Builders who have a place in a finished workshop (4 per workshop) work at full speed, others at half speed;
   // idle Builders wait at their workshop. Approved art: builders-workshop material yard (APPROVED_BUILDING_ART).
