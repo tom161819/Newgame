@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.3] - 2026-11-20
+<!-- version: {"title":"Flat view: people on the ground","type":"fix","reconstructed":false,"saveVersion":67} -->
+### Fixed
+- With Space (flattened buildings), soldiers on Towers, Gates and walls stand on the ground plan instead of in the air, and the tower doors and warning icons are not left floating.
+- On sloping ground the door from a wall into a Tower sits at the height of the wall walk.
+
 ## [0.149.2] - 2026-11-20
 <!-- version: {"title":"Gate over its tiles","type":"fix","reconstructed":false,"saveVersion":67} -->
 ### Fixed

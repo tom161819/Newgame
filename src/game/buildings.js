@@ -106,7 +106,11 @@ export function groundDepthAbove(buildings,tile,depth){
   return result;
 }
 export function buildingDepth(building) { return towerBase(building).y+(buildingDefinition(building).depth?.offset??0); }
+// Owner 20 Nov 2026: while Space flattens the buildings, people on Towers, Gates, walls and the Castle stand on the
+// ground plan (no lift: the unit is drawn on its own tile) instead of in the air.
+export const FLAT_VIEW={on:false};
 export function towerTop(building) {
+  if(FLAT_VIEW.on)return gridToWorld(building.x+.5,building.y+.5);// = tileCenter: no lift over the ground
   const base=towerBase(building),platform=buildingDefinition(building).platform??{x:0,y:0};
   return {x:base.x+platform.x,y:base.y+platform.y};
 }

@@ -1,5 +1,6 @@
 import { tilePolygon } from './isometric.js';
 import { buildingIsComplete } from './buildingState.js';
+import { FLAT_VIEW } from './buildings.js';
 import { buildingReachable } from './fogReach.js';
 
 // Owner 19 Nov 2026 (84): Space flattens the buildings – their pictures hide and only their ground plans (footprints)
@@ -15,7 +16,7 @@ export function flatLook(building){return building.enemy?FLAT_LOOK.enemy:buildin
 export class FlatBuildings {
   constructor(scene){this.scene=scene;this.on=false;this.graphics=null;this.signature=null;}
   toggle(on=!this.on){
-    this.on=!!on;this.signature=null;
+    this.on=!!on;FLAT_VIEW.on=this.on;this.signature=null;this.scene.towerDoors?.refresh?.();if(this.scene.issueIcons)this.scene.issueIcons.revision=-1;
     if(this.on&&!this.graphics)this.graphics=this.scene.add.graphics().setDepth(FLAT_LOOK.depth);
     this.graphics?.setVisible(this.on);if(!this.on)this.graphics?.clear();
     this.scene.setStatus?.(this.scene.flatStatus?.(this.on));return this.on;
@@ -28,5 +29,5 @@ export class FlatBuildings {
     for(const b of shown){const look=flatLook(b);g.fillStyle(look.fill,look.alpha);g.lineStyle(1.5,look.line,.9);
       for(const tile of b.tiles??[]){const poly=tilePolygon(tile);g.fillPoints(poly,true);g.strokePoints(poly,true);}}
   }
-  destroy(){this.graphics?.destroy();this.graphics=null;}
+  destroy(){FLAT_VIEW.on=false;this.graphics?.destroy();this.graphics=null;}
 }
