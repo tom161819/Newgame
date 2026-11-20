@@ -40,6 +40,8 @@ export function wallShape(index,building,solid=null){
   if(links.length===1){const d=links[0],open=(dx,dy)=>!has(dx,dy)?1:0;return {elbow:`${d.name}-${open(0,-d.y)}${open(-d.x,0)}`};}
   return null;
 }
+// Owner 20 Nov 2026: the two sides of a block beside the corner its diagonal band leaves through ('NW-10' → N, W).
+export const bandSides=elbow=>elbow?String(elbow).split('-')[0].split('').filter(c=>'NESW'.includes(c)):[];
 export const diagonalRun=(index,building,solid=null)=>wallShape(index,building,solid)?.diagonal??null;
 
 export function connectionsFor(index,building){

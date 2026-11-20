@@ -26,3 +26,11 @@ test('the remembered map keeps the diagonal piece and the elbow of a wall',()=>{
   assert.equal(ok({}),true);assert.equal(ok({diagonal:'se'}),true);assert.equal(ok({elbow:'NW-01'}),true);
   assert.equal(ok({diagonal:'up'}),false);assert.equal(ok({elbow:'x'}),false);
 });
+
+// Owner 20 Nov 2026: a joint without its own elbow art hides the merlons of the two sides the band runs into.
+test('an elbow names the two sides beside its band corner', async () => {
+  const { bandSides,wallShape,wallIndex }=await import('../src/game/walls.js');
+  assert.deepEqual(bandSides('NW-10'),['N','W']);assert.deepEqual(bandSides('SE-00'),['S','E']);assert.deepEqual(bandSides(null),[]);
+  const walls=[{x:10,y:10},{x:11,y:10},{x:9,y:9},{x:8,y:8}].map((p,i)=>({id:i+1,type:'wall',...p,tiles:[p]}));
+  assert.equal(wallShape(wallIndex(walls),walls[0]).elbow,'NW-10','the joint of the owner screenshot');
+});

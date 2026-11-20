@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { gridToWorld,tilePolygon } from './isometric.js';
 import { towerBase,buildingDepth,buildingDefinition } from './buildings.js';
-import { isWall,wallIndex,connectionsFor } from './walls.js';
+import { isWall,wallIndex,connectionsFor,bandSides } from './walls.js';
 import { APPROVED_WALL_ART,DIAGONAL_WALL_ART } from '../data/objects/approvedArt.js';
 import { tileCenter } from './isometric.js';
 // Every wall picture: the kit (block and parapets, on the tile's front corner) and the diagonal pieces (tile centre).
@@ -102,7 +102,10 @@ export class FortificationView {
       // m-hradby-diagonala: a tile of a diagonal run shows its one diagonal piece and nothing else.
       // From stage 2 the top of the block is broken off, so the parapets on it are gone.
       const run=building.diagonal,elbow=building.elbow&&`elbow-${building.elbow}` in DIAGONAL_WALL_ART?building.elbow:null/* an elbow without approved art stays a plain block */,diagonal=piece in DIAGONAL_WALL_ART;
-      const show=use&&(run?piece===run:elbow?piece===`elbow-${elbow}`:!diagonal&&(piece==='block'||!links[piece]&&stage<2)),at=diagonal?tileCenter(building):this.base;
+      // Owner 20 Nov 2026: an elbow without approved art (NW-00/01/10, SE-00) stays a plain block, but without the parapets
+      // of the two sides beside the linked corner – the diagonal band runs in there, and those merlons stuck out of the joint.
+      const toBand=!elbow&&!run?bandSides(building.elbow):[];
+      const show=use&&(run?piece===run:elbow?piece===`elbow-${elbow}`:!diagonal&&(piece==='block'||!links[piece]&&stage<2&&!toBand.includes(piece))),at=diagonal?tileCenter(building):this.base;
       // Remember which pieces belong to the wall: culling hides and shows the whole view later.
       this.artShown[piece]=show;
       if(!show){this.art[piece]?.setVisible(false);this.shadows[piece]?.setVisible(false);continue;}

@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.1] - 2026-11-20
+<!-- version: {"title":"Diagonal wall joint","type":"fix","reconstructed":false,"saveVersion":67} -->
+### Fixed
+- Where a straight wall meets a diagonal wall through its back corner, no merlons stick out of the joint any more.
+
 ## [0.149.0] - 2026-11-20
 <!-- version: {"title":"Kingdom Policy, clearer","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Changed
