@@ -60,6 +60,7 @@ export default {
   'object.enemy_soldier.name':"Nepřátelský branec",'object.enemy_soldier.description':"Branec nepřátelské armády v ocelově modré. Napadne každého z království, kdo se přiblíží.",
   'object.enemy_archer.name':"Nepřátelský lučištník",'object.enemy_archer.description':"Lučištník nepřátelské armády v ocelově modré. Střílí na každého z království, kdo se přiblíží.",
   'object.enemy_swordsman.name':"Nepřátelský šermíř",'object.enemy_swordsman.description':"Šermíř nepřátelské armády v ocelově modré. Napadne každého z království, kdo se přiblíží.",
+  'object.enemy_king.name':"Nepřátelský král",'object.enemy_king.description':"Král nepřátelského hradu se zlatou korunou. Drží se u svého hradu; zabij ho a Dobývání vyhraješ.",
   'object.enemy_knight.name':"Nepřátelský rytíř",'object.enemy_knight.description':"Rytíř nepřátelské armády v ocelově modré. Napadne každého z království, kdo se přiblíží.",
   'object.raider.name':"Nepřátelský voják",'object.raider.description':"Voják nepřátelské armády. Napadne každého z království, kdo se přiblíží.",
   'object.wolf.name':"Vlk",'object.wolf.description':"Šedý vlk, který v noci loví ve smečce. Ohni se vyhne. Zanechá 2 maso.",

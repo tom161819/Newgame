@@ -60,6 +60,7 @@ export default {
   'object.enemy_soldier.name':"Enemy Recruit",'object.enemy_soldier.description':"A recruit of an enemy army in steel blue. Attacks anyone of the kingdom who comes close.",
   'object.enemy_archer.name':"Enemy Archer",'object.enemy_archer.description':"An archer of an enemy army in steel blue. Shoots at anyone of the kingdom who comes close.",
   'object.enemy_swordsman.name':"Enemy Swordsman",'object.enemy_swordsman.description':"A swordsman of an enemy army in steel blue. Attacks anyone of the kingdom who comes close.",
+  'object.enemy_king.name':"Enemy King",'object.enemy_king.description':"The king of an enemy castle with a gold crown. He stays by his castle; kill him to win the Conquest.",
   'object.enemy_knight.name':"Enemy Knight",'object.enemy_knight.description':"A knight of an enemy army in steel blue. Attacks anyone of the kingdom who comes close.",
   'object.raider.name':"Raider",'object.raider.description':"A soldier of an enemy army. Attacks anyone of the kingdom who comes close.",
   'object.wolf.name':"Wolf",'object.wolf.description':"A grey wolf that hunts in packs at night. Keeps away from fire. Leaves 2 meat.",

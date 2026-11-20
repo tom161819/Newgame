@@ -969,7 +969,7 @@ export class GameScene extends Phaser.Scene {
     if(this.gameOver)return null;
     this.constructionSystem.update(delta);this.demolition.update(delta);this.repairs.update(delta);
     this.farmingSystem.update(delta);
-    this.foodProduction.update(delta);this.military.update(delta);this.vehicles.update();this.stables.update(delta);this.caravans.update(delta);this.trade.update();this.scouting.update();if(this.zone)updateZone(this);this.caravanViews.update();this.vehicleViews.update();this.employment.update();this.diagnostics.update();
+    this.foodProduction.update(delta);this.military.update(delta);this.vehicles.update();this.stables.update(delta);this.caravans.update(delta);this.trade.update();this.scouting.update();if(this.zone)updateZone(this);this.conquest?.update(delta);this.caravanViews.update();this.vehicleViews.update();this.employment.update();this.diagnostics.update();
     this.regeneration.update(delta,[this.character,...this.animalSystem.animals.values(),...this.workerSystem.liveWorkers()],covered);
     this.combatFeedback.update(activeDelta);this.foodSystem.update(activeDelta);
     this.experienceFeedback.update(activeDelta);

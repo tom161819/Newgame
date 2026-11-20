@@ -5,6 +5,7 @@ import { placeBuilding,buildingDefinition } from './buildings.js';
 import { replaceWalls } from './wallReplacement.js';
 import { zoneWorldCode,populateFeature } from './zoneMode.js';
 import { markEnemyBuilding,siegeable,canSiege } from '../systems/SiegeSystem.js';
+import { Conquest,showConquestEnd } from './conquest.js';
 import { captureScenario,applyScenario,storedScenarios,storeScenario,forgetScenario,normalizeScenario,scenarioFileName,SCENARIO_GOALS } from './scenario.js';
 
 // Owner 16 Nov 2026: the Test map (main menu, under the World Editor) – a sandbox to try battles and buildings.
@@ -22,7 +23,7 @@ export function sandboxSettings(landId='home',{worldCode=null}={}){
 }
 export const SANDBOX_UNITS=Object.freeze([
   {group:'ours',id:'soldier',unit:'soldier'},{group:'ours',id:'archer',unit:'archer'},{group:'ours',id:'swordsman',unit:'swordsman'},{group:'ours',id:'knight',unit:'knight'},{group:'ours',id:'halberdier',unit:'halberdier'},{group:'ours',id:'royal_archer',unit:'royal_archer'},{group:'ours',id:'crossbowman',unit:'crossbowman'},{group:'ours',id:'light_cavalry',unit:'light_cavalry'},{group:'ours',id:'catapult',unit:'catapult'},{group:'ours',id:'military_wagon',unit:'military_wagon'},
-  {group:'foes',id:'enemy_soldier'},{group:'foes',id:'enemy_archer'},{group:'foes',id:'enemy_swordsman'},{group:'foes',id:'enemy_knight'},{group:'foes',id:'raider'},{group:'foes',id:'bandit'},{group:'foes',id:'cave_rat'},{group:'foes',id:'wolf'},
+  {group:'foes',id:'enemy_soldier'},{group:'foes',id:'enemy_archer'},{group:'foes',id:'enemy_swordsman'},{group:'foes',id:'enemy_knight'},{group:'foes',id:'enemy_king'},{group:'foes',id:'raider'},{group:'foes',id:'bandit'},{group:'foes',id:'cave_rat'},{group:'foes',id:'wolf'},
   {group:'animals',id:'deer'},{group:'animals',id:'wild_boar'},{group:'animals',id:'rabbit'},{group:'animals',id:'horse'},
 ].map(u=>Object.freeze(u)));
 export const SANDBOX_COUNTS=Object.freeze([1,5,10,25,50]);
@@ -40,10 +41,25 @@ export function setupSandbox(scene){
   document.body.classList.add('in-sandbox');
   // (86a) what the map started with stays out of a template; a template waiting to be loaded is put down now.
   s.sandboxLandId=s.sandboxLand?(s.sandboxLand.dungeon?'dungeon':s.sandboxLand.type):'home';s.sandboxStartIds=new Set(s.buildings.map(b=>b.id));
-  const app=s.registry?.get?.('application'),pending=app?.pendingScenario;if(pending){app.pendingScenario=null;try{const r=applyScenario(s,pending);s.scenarioLoaded=r;}catch(e){console.error(e);}}
+  const app=s.registry?.get?.('application'),pending=app?.pendingScenario;
+  // (86b) the attacker of a Conquest has no Castle: the world is the template's (made with the Castle, so the same
+  // trees and rocks come), and the Castle and the first store are taken away before the template is put down.
+  if(app?.pendingConquest)removeStartBuildings(s);
+  if(pending){app.pendingScenario=null;try{const r=applyScenario(s,pending);s.scenarioLoaded=r;}catch(e){console.error(e);}}
+  // (86b) Conquest: the template's map without the Test panel, our supply wagons, the goal checked until the end.
+  const conquest=app?.pendingConquest;if(conquest){app.pendingConquest=null;document.body.classList.add('in-conquest');s.conquest=new Conquest(s,conquest);s.conquest.start();
+    s.onConquestOver=over=>showConquestEnd(document,over,{again:()=>app.startConquest(conquest.template,conquest.supplies),menu:()=>app.returnToMain()});
+    s.events.once('shutdown',()=>{document.body.classList.remove('in-sandbox','in-conquest');document.querySelector('#conquest-end')?.close?.();});s.setStatus?.(t(`conquest.goalText.${s.conquest.goal}`));return;}
   s.sandboxPanel=new SandboxPanel(s);
   s.events.once('shutdown',()=>{s.sandboxPanel?.destroy();s.sandboxPanel=null;document.body.classList.remove('in-sandbox');});
   s.setStatus?.(t('sandbox.started'));
+}
+export function removeStartBuildings(scene){
+  const s=scene;let n=0;for(const b of [...s.buildings]){if(!s.sandboxStartIds?.has(b.id))continue;
+    for(const [id,l] of [...(s.foodStorage?.locations??new Map())])if(l.buildingId===b.id)s.foodStorage.locations.delete(id);
+    s.buildings.splice(s.buildings.indexOf(b),1);for(const tile of b.tiles??[])s.map[tile.y][tile.x]=s.terrainGrid?.[tile.y]?.[tile.x]??0;
+    s.towerViews?.get(b.id)?.destroy();s.towerViews?.delete(b.id);s.terrain?.invalidateArea?.(b.tiles??[]);n++;}
+  s.sandboxStartIds=new Set();s.events?.emit?.('buildings:changed');return n;
 }
 // Placing a building on the Test map: free, finished at once. Returns true when it handled the click.
 export function placeSandboxBuilding(scene,goal,fields,pointer){

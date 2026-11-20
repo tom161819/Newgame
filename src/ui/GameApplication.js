@@ -1,3 +1,6 @@
+import { storedScenarios } from '../game/scenario.js';
+import { BUILTIN_SCENARIOS } from '../data/scenarios.js';
+import { CONQUEST,clampSupplies,conquestGoal } from '../game/conquest.js';
 import { LoadingScreen } from './LoadingScreen.js';
 import { sandboxSettings,SANDBOX_LANDS } from '../game/sandboxMode.js';
 import { zoneStart,homeAfterZone,buryFallen,nextMap } from '../game/zoneMode.js';
@@ -55,6 +58,7 @@ export class GameApplication {
     document.querySelector('#main-world-editor')?.addEventListener('click',()=>{this.editorFrom='main';this.main.hidden=true;this.worldEditor.open();});
     // Owner 16 Nov 2026: the Test map – a sandbox to try battles and buildings (sandboxMode.js).
     document.querySelector('#main-test-map')?.addEventListener('click',()=>this.chooseTestLand());
+    document.querySelector('#main-conquest')?.addEventListener('click',()=>this.chooseConquest());
     document.querySelector('#setup-open-editor')?.addEventListener('click',()=>{this.editorFrom='setup';this.setup.root.hidden=true;this.worldEditor.open(this.setup.world);});
     document.querySelector('#main-load-game').addEventListener('click',()=>this.openSaves('load'));
     // E2 (report 0.48.0): Continue loads the newest compatible save straight away.
@@ -80,7 +84,7 @@ export class GameApplication {
   }
   async latestSave(){try{return (await this.saves.list()).find(r=>saveRecordStatus(r).compatible&&r.state)??null;}catch{return null;}}
   async refreshContinue(){const button=document.querySelector('#continue-game');if(!button)return;const record=await this.latestSave();button.hidden=!record;if(record)button.title=t('menu.continueTitle',{name:record.name||t('saves.unnamed')});}
-  showMainMenu(){this.refreshContinue();this.scene=null;this.main.hidden=false;document.body.classList.remove('in-game');document.querySelector('main').inert=true;document.querySelector('#new-game').disabled=false;document.querySelector('#main-load-game').disabled=false;const editorButton=document.querySelector('#main-world-editor');if(editorButton)editorButton.disabled=false;const testButton=document.querySelector('#main-test-map');if(testButton)testButton.disabled=false;this.worldEditor?.close();document.querySelector('#new-game').focus();
+  showMainMenu(){this.refreshContinue();this.scene=null;this.main.hidden=false;document.body.classList.remove('in-game');document.querySelector('main').inert=true;document.querySelector('#new-game').disabled=false;document.querySelector('#main-load-game').disabled=false;const editorButton=document.querySelector('#main-world-editor');if(editorButton)editorButton.disabled=false;const testButton=document.querySelector('#main-test-map');if(testButton)testButton.disabled=false;const conquestButton=document.querySelector('#main-conquest');if(conquestButton)conquestButton.disabled=false;this.worldEditor?.close();document.querySelector('#new-game').focus();
     if(this.pendingSetup){this.pendingSetup=false;this.main.hidden=true;this.setup.open();}}
   // Opens Game Setup from anywhere. A running game is stopped first; nothing is saved or deleted.
   openNewGameSetup(){
@@ -102,6 +106,22 @@ export class GameApplication {
   }
   // (86a) a template: the Test map of its world, then setupSandbox puts its buildings and units down.
   startScenarioMap(template){const land=template.world.land;this.pendingGettingStarted=false;this.pendingScenario=template;this.start(null,{...sandboxSettings(land,{worldCode:template.world.code}),...(land==='home'?{}:{mapSize:template.world.mapSize})},null,land==='home'?true:land);}
+  // Owner 20 Nov 2026 (86b): Conquest – a template's world without our Castle, its buildings and armies, our supplies.
+  startConquest(template,supplies){const land=template.world.land;this.pendingGettingStarted=false;this.pendingScenario=template;this.pendingConquest={template,supplies:clampSupplies(supplies)};
+    this.start(null,{...sandboxSettings(land,{worldCode:template.world.code}),...(land==='home'?{}:{mapSize:template.world.mapSize})},null,land==='home'?true:land);}
+  chooseConquest(){
+    let dialog=document.querySelector('#conquest-setup');if(!dialog){dialog=document.createElement('dialog');dialog.id='conquest-setup';dialog.className='conquest-setup';document.body.append(dialog);}
+    const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;};
+    const all=[...BUILTIN_SCENARIOS,...storedScenarios()];const title=el('h2','',t('conquest.title'));
+    if(!all.length){const close=el('button','',t('sandbox.cancel'));close.type='button';close.addEventListener('click',()=>dialog.close());dialog.replaceChildren(title,el('p','',t('conquest.noTemplates')),close);dialog.showModal?.();return dialog;}
+    const list=el('select','conquest-template');list.id='conquest-template';for(const d of all){const o=el('option','',d.name);o.value=d.id;list.append(o);}
+    const info=el('p','conquest-info');const show=()=>{const d=all.find(x=>x.id===list.value);if(!d)return;const ours=d.units.filter(u=>u.side==='ours').length,foes=d.units.filter(u=>u.side==='enemy').length;info.textContent=`${d.description?d.description+' · ':''}${t(`conquest.goalText.${conquestGoal(d)}`)} · ${t('conquest.armies',{ours,foes})}`;};list.addEventListener('change',show);
+    const supplies={};const rows=el('div','conquest-supplies');rows.append(el('h3','',t('conquest.supplies')));
+    for(const kind of ['food','stone','torch']){const label=el('label','',t(`conquest.wagon.${kind}`));const input=el('input');input.type='number';input.min='0';input.max=String(CONQUEST.maxWagons);input.value=kind==='food'?'1':'0';input.dataset.supply=kind;supplies[kind]=input;label.append(input);rows.append(label);}
+    const start=el('button','conquest-start',t('conquest.start'));start.type='button';start.addEventListener('click',()=>{const d=all.find(x=>x.id===list.value);if(!d)return;dialog.close();this.startConquest(d,Object.fromEntries(Object.entries(supplies).map(([k,i])=>[k,i.value])));});
+    const cancel=el('button','',t('sandbox.cancel'));cancel.type='button';cancel.addEventListener('click',()=>dialog.close());const actions=el('div','conquest-actions');actions.append(start,cancel);
+    dialog.replaceChildren(title,list,info,rows,actions);show();dialog.showModal?.();return dialog;
+  }
   startTestMap(land='home'){this.pendingGettingStarted=false;this.start(null,sandboxSettings(land),null,land==='home'?true:land);}
   // Owner 17 Nov 2026: the Test map asks which land – the home map with the Castle or a land the scouts find.
   chooseTestLand(){

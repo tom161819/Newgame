@@ -23,6 +23,8 @@ export class HumanView extends Phaser.GameObjects.Container {
     this.leftLeg=scene.add.rectangle(-3,-5,4,11,0x454334);this.rightLeg=scene.add.rectangle(3,-5,4,11,0x454334);
     this.body=scene.add.graphics();this.arms=[scene.add.rectangle(-7,-21,4,14,COLORS.armSkin),scene.add.rectangle(7,-21,4,14,COLORS.armSkin)];
     this.weapon=scene.add.graphics().setVisible(false);this.tool=scene.add.graphics().setVisible(false);this.art=scene.add.image(0,0,'__DEFAULT').setVisible(false);this.add([this.shadow,this.leftLeg,this.rightLeg,this.body,...this.arms,this.weapon,this.tool,this.art]);this.cargoBundle=new CargoBundleView(scene,this);this.paint();
+    // (86b) the enemy King wears a gold crown over his head (provisional, until his own art).
+    if(definition?.crown){this.crown=scene.add.graphics();this.crown.fillStyle(0xf0c53a,1).lineStyle(1,0x6b4a10,1);const pts=[{x:-8,y:-56},{x:-8,y:-64},{x:-4,y:-60},{x:0,y:-67},{x:4,y:-60},{x:8,y:-64},{x:8,y:-56}];this.crown.fillPoints(pts,true);this.crown.strokePoints(pts,true);this.add(this.crown);}
     if(definition?.look)this.updateLook();// an enemy soldier wears his look from the start (also if he never moves)
   }
   // Profession and name decide the approved look; the procedural figure stays until it loads.

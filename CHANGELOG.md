@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.16] - 2026-11-20
+<!-- version: {"title":"Conquest mode","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- Conquest: a new mode in the main menu. Pick a template made on the Test map and your supply wagons (food, stones for Catapults, torches), then take the enemy Castle with your army – kill the enemy King unless the template sets another goal. The enemy counter-attacks when you come close.
+- The enemy King (with a crown) on the Test map.
+
 ## [0.148.15] - 2026-11-20
 <!-- version: {"title":"Test map templates","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Added

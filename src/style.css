@@ -1420,3 +1420,14 @@ body.sandbox-tool canvas { cursor:crosshair !important; }
 /* Owner 20 Nov 2026 (86a): the template part of the Test panel. */
 .sandbox-template input[type=text], .sandbox-template select { flex:1 1 120px; min-width:0; padding:3px 5px; border:1px solid #79704b; border-radius:5px; background:#0006; color:inherit; font:inherit; }
 .sandbox-template input[type=number] { width:52px; padding:3px 5px; border:1px solid #79704b; border-radius:5px; background:#0006; color:inherit; font:inherit; }
+
+/* Owner 20 Nov 2026 (86b): Conquest – the setup and the end windows. */
+.conquest-setup, .conquest-end { min-width:min(420px, 92vw); padding:18px 20px; border:1px solid var(--line, #79704b); border-radius:10px; background:var(--glass, rgb(30 35 25 / .97)); color:var(--ink, #ede5c9); font:14px/1.4 var(--font-ui, system-ui); }
+.conquest-setup::backdrop, .conquest-end::backdrop { background:#0008; }
+.conquest-setup h2, .conquest-end h2 { margin:0 0 10px; color:var(--gold, #e3c57a); }
+.conquest-setup select { width:100%; padding:5px; border:1px solid #79704b; border-radius:6px; background:#0006; color:inherit; font:inherit; }
+.conquest-supplies { display:grid; gap:6px; margin:10px 0; }
+.conquest-supplies h3 { margin:4px 0; font-size:.85rem; color:var(--gold, #e3c57a); }
+.conquest-supplies label { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+.conquest-supplies input { width:60px; padding:3px 5px; border:1px solid #79704b; border-radius:5px; background:#0006; color:inherit; font:inherit; }
+.conquest-actions, .conquest-end-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }

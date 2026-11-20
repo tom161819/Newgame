@@ -80,14 +80,16 @@ animals.push({
 const ENEMY_RANKS={soldier:{name:'Enemy Recruit',look:'enemy-recruit',speed:2.6,stats:{maxHP:70,attackDPS:7,armor:5,attackRange:1}},
   archer:{name:'Enemy Archer',look:'enemy-archer',speed:2.6,stats:{maxHP:60,attackDPS:7,armor:0,attackRange:9}},
   swordsman:{name:'Enemy Swordsman',look:'enemy-swordsman',speed:2.5,stats:{maxHP:100,attackDPS:10,armor:20,attackRange:1}},
-  knight:{name:'Enemy Knight',look:'enemy-knight',speed:2.8,stats:{maxHP:140,attackDPS:13,armor:30,attackRange:1}}};
+  knight:{name:'Enemy Knight',look:'enemy-knight',speed:2.8,stats:{maxHP:140,attackDPS:13,armor:30,attackRange:1}},
+  // Owner 20 Nov 2026 (86b): the enemy King – the goal of Conquest. Provisional look: the enemy Knight with a crown.
+  king:{name:'Enemy King',look:'enemy-knight',speed:2.4,crown:true,guard:6,stats:{maxHP:420,attackDPS:16,armor:35,attackRange:1}}};
 for(const [rank,r] of Object.entries(ENEMY_RANKS))animals.push({
-  id:`enemy_${rank}`,name:r.name,category:'animal',sprite:'/assets/characters/peasant/peasant.svg',look:r.look,
+  id:`enemy_${rank}`,name:r.name,category:'animal',sprite:'/assets/characters/peasant/peasant.svg',look:r.look,...(r.crown?{crown:true}:{}),
   width:1,height:1,walkable:false,collectible:false,buildable:false,cost:{},interactions:['hunt'],
   description:'A soldier of an enemy army in steel blue. Attacks anyone of the kingdom who comes close.',
   renderMode:'procedural',renderer:'enemy-soldier',origin:{x:.5,y:.92},visualHeight:48,
   visual:{hitArea:{x:-13,y:-44,width:26,height:39},healthBarOffset:48},depth:{offset:.1},
-  gameplay:{movementSpeed:r.speed,initialCount:0,behavior:'wander',huntable:true,meatDrop:0,wanderRadius:2,guardRadius:9,zoneOnly:true,hostile:true},
+  gameplay:{movementSpeed:r.speed,initialCount:0,behavior:'wander',huntable:true,meatDrop:0,wanderRadius:r.crown?1:2,guardRadius:r.guard??9,zoneOnly:true,hostile:true},
   stats:{...r.stats},
   animations:{mode:'procedural',states:['idle','walk'],directions:['N','NE','E','SE','S','SW','W','NW']},
 });
