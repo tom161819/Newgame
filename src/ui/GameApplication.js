@@ -100,6 +100,8 @@ export class GameApplication {
     (this.loadingScreen??=new LoadingScreen(document)).show();/* owner 19 Nov 2026 (74) */
     this.game.scene.stop('MainMenu');this.game.scene.stop('Game');this.scene=null;this.game.scene.start('Game',{state,settings,zone,sandbox});
   }
+  // (86a) a template: the Test map of its world, then setupSandbox puts its buildings and units down.
+  startScenarioMap(template){const land=template.world.land;this.pendingGettingStarted=false;this.pendingScenario=template;this.start(null,{...sandboxSettings(land,{worldCode:template.world.code}),...(land==='home'?{}:{mapSize:template.world.mapSize})},null,land==='home'?true:land);}
   startTestMap(land='home'){this.pendingGettingStarted=false;this.start(null,sandboxSettings(land),null,land==='home'?true:land);}
   // Owner 17 Nov 2026: the Test map asks which land – the home map with the Castle or a land the scouts find.
   chooseTestLand(){

@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.148.15] - 2026-11-20
+<!-- version: {"title":"Test map templates","type":"feature","reconstructed":false,"saveVersion":66} -->
+### Added
+- Test map templates: save the buildings and units of both sides with a goal as a template, load it again on the same world, and export or import it as a file. They are the start of the coming Conquest and Defence modes.
+
 ## [0.148.14] - 2026-11-20
 <!-- version: {"title":"Resource balance without building","type":"feature","reconstructed":false,"saveVersion":66} -->
 ### Changed

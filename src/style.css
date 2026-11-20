@@ -1416,3 +1416,7 @@ body.sandbox-tool canvas { cursor:crosshair !important; }
 .loading-screen p { margin:0; opacity:.85; }
 .loading-bar { width:min(360px, 70vw); height:8px; border:1px solid var(--line, #79704b); border-radius:5px; overflow:hidden; background:#0008; }
 .loading-bar span { display:block; height:100%; width:5%; background:linear-gradient(90deg, #a8843f, #f0d78b); transition:width .25s; }
+
+/* Owner 20 Nov 2026 (86a): the template part of the Test panel. */
+.sandbox-template input[type=text], .sandbox-template select { flex:1 1 120px; min-width:0; padding:3px 5px; border:1px solid #79704b; border-radius:5px; background:#0006; color:inherit; font:inherit; }
+.sandbox-template input[type=number] { width:52px; padding:3px 5px; border:1px solid #79704b; border-radius:5px; background:#0006; color:inherit; font:inherit; }

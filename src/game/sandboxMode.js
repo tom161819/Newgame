@@ -5,6 +5,7 @@ import { placeBuilding,buildingDefinition } from './buildings.js';
 import { replaceWalls } from './wallReplacement.js';
 import { zoneWorldCode,populateFeature } from './zoneMode.js';
 import { markEnemyBuilding,siegeable,canSiege } from '../systems/SiegeSystem.js';
+import { captureScenario,applyScenario,storedScenarios,storeScenario,forgetScenario,normalizeScenario,scenarioFileName,SCENARIO_GOALS } from './scenario.js';
 
 // Owner 16 Nov 2026: the Test map (main menu, under the World Editor) – a sandbox to try battles and buildings.
 // A fresh world with the Castle and nobody else; every building is free and stands finished at once; no fog, no night
@@ -14,9 +15,10 @@ import { markEnemyBuilding,siegeable,canSiege } from '../systems/SiegeSystem.js'
 // (a dense forest, iron or stone hills, a bandit camp, ruins, an abandoned mine, the inside of a mine).
 export const SANDBOX_LANDS=Object.freeze(['home','forest','iron','stone','bandits','ruins','mine','dungeon']);
 export function sandboxLand(id){if(!SANDBOX_LANDS.includes(id)||id==='home')return null;return id==='dungeon'?{id:'sandbox',type:'mine',dungeon:true}:{id:'sandbox',type:id,dungeon:false};}
-export function sandboxSettings(landId='home'){
+// (86a) a template brings its own world code back, so the same world comes again.
+export function sandboxSettings(landId='home',{worldCode=null}={}){
   const land=sandboxLand(landId),seed=randomWorldCode();
-  return gameSettings({...DEFAULT_GAME_SETTINGS,worldCode:land?zoneWorldCode(seed,`sandbox-${Date.now()}`,land.type,{dungeon:land.dungeon}):seed,...(land?{mapSize:100}:{}),fogOfWar:false,nightWolves:false,nightThieves:false,nightFires:false,startingGarrison:false,startingCastle:!land});
+  return gameSettings({...DEFAULT_GAME_SETTINGS,worldCode:worldCode??(land?zoneWorldCode(seed,`sandbox-${Date.now()}`,land.type,{dungeon:land.dungeon}):seed),...(land?{mapSize:100}:{}),fogOfWar:false,nightWolves:false,nightThieves:false,nightFires:false,startingGarrison:false,startingCastle:!land});
 }
 export const SANDBOX_UNITS=Object.freeze([
   {group:'ours',id:'soldier',unit:'soldier'},{group:'ours',id:'archer',unit:'archer'},{group:'ours',id:'swordsman',unit:'swordsman'},{group:'ours',id:'knight',unit:'knight'},{group:'ours',id:'halberdier',unit:'halberdier'},{group:'ours',id:'royal_archer',unit:'royal_archer'},{group:'ours',id:'crossbowman',unit:'crossbowman'},{group:'ours',id:'light_cavalry',unit:'light_cavalry'},{group:'ours',id:'catapult',unit:'catapult'},{group:'ours',id:'military_wagon',unit:'military_wagon'},
@@ -36,6 +38,9 @@ export function setupSandbox(scene){
   // Units put down by the Test panel are not news: no "has joined" lines, no royal tasks.
   const feed=s.eventFeed;if(feed?.push){const push=feed.push.bind(feed);feed.push=(key,...rest)=>/^(arrived|royal|skill|death|died)/.test(String(key))?null:push(key,...rest);}
   document.body.classList.add('in-sandbox');
+  // (86a) what the map started with stays out of a template; a template waiting to be loaded is put down now.
+  s.sandboxLandId=s.sandboxLand?(s.sandboxLand.dungeon?'dungeon':s.sandboxLand.type):'home';s.sandboxStartIds=new Set(s.buildings.map(b=>b.id));
+  const app=s.registry?.get?.('application'),pending=app?.pendingScenario;if(pending){app.pendingScenario=null;try{const r=applyScenario(s,pending);s.scenarioLoaded=r;}catch(e){console.error(e);}}
   s.sandboxPanel=new SandboxPanel(s);
   s.events.once('shutdown',()=>{s.sandboxPanel?.destroy();s.sandboxPanel=null;document.body.classList.remove('in-sandbox');});
   s.setStatus?.(t('sandbox.started'));
@@ -124,10 +129,37 @@ class SandboxPanel {
     // Battle test, point 2: the enemy army marches on the Castle.
     const attack=el('button','sandbox-enemy-attack',t('sandbox.enemyAttack'));attack.type='button';attack.addEventListener('click',()=>{const n=this.scene.enemyArmy?.march()??0;this.say(n?t('army.attacking',{count:n}):t('sandbox.noArmy'));});
     tools.append(remove,clearFoes,clearOurs,clearAll,charge,attack,torch);this.body.append(tools);
+    this.body.append(this.templateSection(el));
     this.hint=el('p','sandbox-hint',t('sandbox.hint'));this.body.append(this.hint);
     for(const e of ['pointerdown','mousedown','wheel'])root.addEventListener(e,ev=>ev.stopPropagation());
     document.body.append(root);this.render();
   }
+  // Owner 20 Nov 2026 (86a): save what stands on the map as a template, load one, export and import files.
+  templateSection(el){
+    const box=el('div','sandbox-template');box.append(el('h3','',t('scenario.title')));
+    const name=this.templateName=el('input','sandbox-template-name');name.type='text';name.maxLength=60;name.placeholder=t('scenario.namePlaceholder');name.value=this.scene.scenario?.name??'';
+    const goal=this.templateGoal=el('select','sandbox-template-goal');for(const id of SCENARIO_GOALS){const o=el('option','',t(`scenario.goal.${id}`));o.value=id;goal.append(o);}goal.value=this.scene.scenario?.goal.type??'king';
+    const days=this.templateDays=el('input','sandbox-template-days');days.type='number';days.min='1';days.max='30';days.value=String(this.scene.scenario?.goal.days??3);days.title=t('scenario.days');
+    const showDays=()=>{days.hidden=goal.value!=='hold';};goal.addEventListener('change',showDays);showDays();
+    const row1=el('div','sandbox-row');row1.append(name);const row2=el('div','sandbox-row');row2.append(el('span','',t('scenario.goal')),goal,days);
+    const save=el('button','sandbox-template-save',t('scenario.save'));save.type='button';save.addEventListener('click',()=>this.saveTemplate());
+    const exp=el('button','sandbox-template-export',t('scenario.export'));exp.type='button';exp.addEventListener('click',()=>this.exportTemplate());
+    const imp=el('button','sandbox-template-import',t('scenario.import'));imp.type='button';const file=el('input');file.type='file';file.accept='.json,application/json';file.hidden=true;
+    imp.addEventListener('click',()=>file.click());file.addEventListener('change',()=>this.importTemplate(file));
+    const row3=el('div','sandbox-row');row3.append(save,exp,imp,file);
+    const list=this.templateList=el('select','sandbox-template-list');const load=el('button','sandbox-template-load',t('scenario.load'));load.type='button';load.addEventListener('click',()=>this.loadTemplate());
+    const del=el('button','sandbox-template-delete',t('scenario.delete'));del.type='button';del.addEventListener('click',()=>{if(!list.value)return;forgetScenario(list.value);this.fillTemplates();this.say(t('scenario.deleted'));});
+    const row4=el('div','sandbox-row');row4.append(list,load,del);box.append(row1,row2,row3,row4);this.fillTemplates();
+    if(this.scene.scenarioLoaded){const r=this.scene.scenarioLoaded;setTimeout(()=>this.say(t('scenario.loaded',{name:this.scene.scenario?.name??'',built:r.built,units:r.units,skipped:r.skipped})),0);}
+    return box;
+  }
+  fillTemplates(){const list=this.templateList;list.replaceChildren();const all=storedScenarios();if(!all.length){const o=document.createElement('option');o.value='';o.textContent=t('scenario.none');list.append(o);}
+    for(const d of all){const o=document.createElement('option');o.value=d.id;o.textContent=d.name;list.append(o);}}
+  current(){return captureScenario(this.scene,{name:this.templateName.value.trim()||t('scenario.untitled'),goal:this.templateGoal.value,holdDays:Math.max(1,Math.min(30,Math.round(Number(this.templateDays.value)||3)))});}
+  saveTemplate(){try{const keep=this.scene.scenario,data=this.current();if(keep&&keep.name===data.name)data.id=keep.id;const saved=storeScenario(data);this.scene.scenario=saved;this.fillTemplates();this.templateList.value=saved.id;this.say(t('scenario.saved',{name:saved.name,buildings:saved.buildings.length,units:saved.units.length}));}catch(e){this.say(t('scenario.error',{message:e.message}));}}
+  exportTemplate(){try{const data=this.current(),blob=new Blob([JSON.stringify(data,null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=scenarioFileName(data);document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);this.say(t('scenario.exported',{file:a.download}));}catch(e){this.say(t('scenario.error',{message:e.message}));}}
+  async importTemplate(input){const f=input.files?.[0];input.value='';if(!f)return;try{const saved=storeScenario(normalizeScenario(JSON.parse(await f.text())));this.fillTemplates();this.templateList.value=saved.id;this.say(t('scenario.imported',{name:saved.name}));}catch(e){this.say(t('scenario.error',{message:e.message}));}}
+  loadTemplate(){const d=storedScenarios().find(x=>x.id===this.templateList.value);if(!d)return;const app=this.scene.registry?.get?.('application');if(!app?.startScenarioMap)return;app.startScenarioMap(d);}
   unitName(u){return u.unit?t(`unit.type.${u.unit}`):this.scene.objectRegistry.get(u.id)?.name??u.id;}
   pick(id){this.tool=this.tool===id?null:id;this.render();this.say(this.tool?t(this.tool==='remove'?'sandbox.removeHint':'sandbox.placeHint',{count:this.count}):t('sandbox.hint'));}
   say(text){this.hint.textContent=text;}
