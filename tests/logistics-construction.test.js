@@ -95,6 +95,8 @@ test('N02: Build with King fetches the missing materials, survives Save/Load on 
 test('N02: the Builder carries only while no Hauler is free; two Haulers never share one site booking',()=>{
   const s=scene(),warehouse=building(s,'material_yard',49,45);s.foodStorage.deposit(`yard-${warehouse.id}`,'stone',40);const sites=[building(s,'tower',60,45,{blueprint:true}),building(s,'tower',64,49,{blueprint:true})];
   const a=worker(s,warehouse,{x:53,y:45}),c=worker(s,warehouse,{x:53,y:47}),builder=s.workerSystem.create({x:58,y:47});s.workerSystem.jobs.assign(builder,'builder');
-  let builderCarried=false,haulerWasFree=false,hadCargo=false;until(s,()=>{if(builder.cargo&&!hadCargo&&haulerWasFree)builderCarried=true;hadCargo=!!builder.cargo;haulerWasFree=s.logisticsTasks.freeHauler();const ids=[a,c].map(w=>w.workTask?.stockReservation).filter(Boolean);assert.equal(new Set(ids).size,ids.length);return sites.every(site=>buildingIsComplete(site));},120000);
-  assert.equal(builderCarried,false,'the Builder never took a load while a Hauler stood free');assert.equal(quantity(s,'stone'),20);snapshot(s);
+  // The rule holds when the Builder books a load; it may pick the load up later, after a Hauler became free (m-test-n02-nahodny).
+  const L=s.logisticsTasks,book=L.updateWorker.bind(L);let builderCarried=false,builderBooked=false;L.updateWorker=(w,o)=>{const free=L.freeHauler(),ok=book(w,o);if(w===builder&&ok){builderBooked=true;if(free)builderCarried=true;}return ok;};
+  until(s,()=>{const ids=[a,c].map(w=>w.workTask?.stockReservation).filter(Boolean);assert.equal(new Set(ids).size,ids.length);return sites.every(site=>buildingIsComplete(site));},120000);
+  assert.equal(builderCarried,false,'the Builder never took a load while a Hauler stood free');assert.equal(builderBooked,true,'the Builder helped while both Haulers were busy');assert.equal(quantity(s,'stone'),20);snapshot(s);
 });
