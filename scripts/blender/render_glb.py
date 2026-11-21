@@ -24,9 +24,24 @@ fw, fh = model['footprint']['width'], model['footprint']['height']
 k = min((fw - 2 * margin) / (mx.x - mn.x), (fh - 2 * margin) / (mx.y - mn.y))
 if want_h: k = want_h / (mx.z - mn.z)
 sx = opt('--sx', 1.0); root.scale = (k * sx, k, k); bpy.context.view_layer.update()
+# Owner 21 Nov 2026 ("věž a bránu klidně vyrenderuj znovu"): --fill stretches the model across so its foot (the lowest
+# 12 % of its height) covers the footprint exactly – the walls beside it then meet its faces with no gap.
+if '--fill' in argv:
+    vs = [o.matrix_world @ v.co for o in meshes for v in o.data.vertices]; zs = [v.z for v in vs]; z0 = min(zs); top = max(zs)
+    foot = [v for v in vs if v.z <= z0 + 0.12 * (top - z0)]
+    bx = max(v.x for v in foot) - min(v.x for v in foot); by = max(v.y for v in foot) - min(v.y for v in foot)
+    kx, ky = fw / bx, fh / by; root.scale = (root.scale.x * kx, root.scale.y * ky, root.scale.z); bpy.context.view_layer.update()
+    print('fill', kx, ky)
 pts = [o.matrix_world @ Vector(c) for o in meshes for c in o.bound_box]
 mn = Vector([min(p[i] for p in pts) for i in range(3)]); mx = Vector([max(p[i] for p in pts) for i in range(3)])
 root.location = (-(mn.x + mx.x) / 2, -(mn.y + mx.y) / 2, -mn.z); bpy.context.view_layer.update()
+if '--fill' in argv:
+    # Centre the foot (not the whole model with its overhangs and torch) on the footprint.
+    vs = [o.matrix_world @ v.co for o in meshes for v in o.data.vertices]; z0 = min(v.z for v in vs); top = max(v.z for v in vs)
+    foot = [v for v in vs if v.z <= z0 + 0.12 * (top - z0)]
+    root.location.x -= (max(v.x for v in foot) + min(v.x for v in foot)) / 2; root.location.y -= (max(v.y for v in foot) + min(v.y for v in foot)) / 2; bpy.context.view_layer.update()
+    pts = [o.matrix_world @ Vector(c) for o in meshes for c in o.bound_box]
+    mn = Vector([min(p[i] for p in pts) for i in range(3)]); mx = Vector([max(p[i] for p in pts) for i in range(3)])
 h = mx.z - mn.z; print('size', (mx.x - mn.x), (mx.y - mn.y), h)
 for o in meshes:
     for slot in o.material_slots:

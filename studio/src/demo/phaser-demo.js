@@ -12,7 +12,7 @@ import approvals from '../../../art/approvals.json';
 import { TIMES, timePreset, lightStrength, hexToRgb } from '../lib/lighting.js';
 import { TILE_WIDTH, TILE_HEIGHT } from '../lib/projection.js';
 
-const pngs = import.meta.glob(['../../../art/sprites/**/*.png', '!../../../art/sprites/{oak-tree,pine-tree}/*-season-*.x2.png'], { eager: true, query: '?url', import: 'default' });
+const pngs = import.meta.glob(['../../../art/sprites/**/*.png', '!../../../art/sprites/{oak-tree,pine-tree}/*-season-*.x2.png', /* 21 Nov 2026: the superseded v1 Tripo tower and gate stay in the repo, not in the Studio (512-file limit) */ '!../../../art/sprites/{watchtower,gate}/*-tripo*.v1*.png', '!../../../art/sprites/wall-kit-preview/wall-kit-preview-diagonal{,-across}.v[1-4].png'], { eager: true, query: '?url', import: 'default' });
 const metas = import.meta.glob('../../../art/sprites/**/*.json', { eager: true, import: 'default' });
 const params = new URLSearchParams(location.search);
 const rendererChoice = params.get('renderer') === 'webgl' ? 'webgl' : 'canvas';

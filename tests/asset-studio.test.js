@@ -246,15 +246,17 @@ test('the game uses the approved Asset Studio exports byte for byte with their a
     assert.equal(repo.variants[meta.variantId].status, 'approved');
     assert.equal(repo.variants[meta.variantId].specHash, meta.specHash, `${assetId}: approval matches the export`);
     const variant = catalog.studio.find(a => a.id === assetId).variants.find(v => v.id === meta.variantId);
-    assert.equal(variant.hash, meta.specHash, `${assetId}: export matches the current spec`);
-    assert.ok(readFileSync(path.join(root, `public${definition.sprite}`)).equals(readFileSync(path.join(root, variant.paths.sprite))), `${gameId} sprite equals the approved export`);
+    // 21 Nov 2026: while a newer version of the variant waits for the owner's review, the game keeps the approved one.
+    const current = variant.version === meta.version;
+    if (current) assert.equal(variant.hash, meta.specHash, `${assetId}: export matches the current spec`);
+    assert.ok(readFileSync(path.join(root, `public${definition.sprite}`)).equals(readFileSync(path.join(root, current ? variant.paths.sprite : definition.artSource.replace(/\.json$/, '.png')))), `${gameId} sprite equals the approved export`);
     assert.equal(definition.renderMode, 'sprite');
     assert.deepEqual(definition.origin, meta.baseOrigin);
     assert.equal(definition.visualHeight, meta.visualHeight);
     assert.deepEqual(definition.lights, meta.gameLights);
     assert.deepEqual([definition.width, definition.height], [meta.footprint.width, meta.footprint.height]);
     if (meta.frontLayer) {
-      assert.ok(readFileSync(path.join(root, `public${definition.frontSprite}`)).equals(readFileSync(path.join(root, variant.paths.spriteFront))), `${gameId} front layer equals the export`);
+      assert.ok(readFileSync(path.join(root, `public${definition.frontSprite}`)).equals(readFileSync(path.join(root, current ? variant.paths.spriteFront : definition.artSource.replace(/\.json$/, '.front.png')))), `${gameId} front layer equals the export`);
       assert.deepEqual(definition.frontOrigin, meta.baseOrigin);
     }
     if (meta.platform) assert.deepEqual(definition.platform, meta.platform);

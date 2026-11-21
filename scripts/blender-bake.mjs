@@ -42,7 +42,7 @@ for (const variant of targets) {
   let prefix = path.join(work, variant.id);
   execFileSync('node', [path.join(root, 'scripts/blender-model.mjs'), assetId, variant.id, modelFile], { stdio: 'inherit' });
   const b = variant.baked, glbRenderer = b.glb ? await readFile(path.join(root, 'scripts/blender/render_glb.py')) : '';
-  const extra = b.glb ? `glb=${b.glb};rot=${b.rotation ?? 0};sx=${b.stretchX ?? 1}` : b.stoneTexture ? await readFile(path.join(root, b.stoneTexture)) : '';
+  const extra = b.glb ? `glb=${b.glb};rot=${b.rotation ?? 0};sx=${b.stretchX ?? 1}${b.fill ? ';fill' : ''}` : b.stoneTexture ? await readFile(path.join(root, b.stoneTexture)) : '';
   b.renderHash = createHash('sha256').update(renderer).update(glbRenderer).update(await readFile(modelFile)).update(extra).update(`samples=${samples}`).digest('hex').slice(0, 8);
   b.samples = Number(samples);
   const env = { ...process.env, ...(b.stoneTexture ? { MK_STONE_TEXTURE: path.join(root, b.stoneTexture) } : {}) };
@@ -52,7 +52,7 @@ for (const variant of targets) {
   } else if (b.glb) {
     if (!glbDir) throw new Error(`${variant.id} renders ${b.glb}: pass --glb-dir <folder with the GLB>.`);
     console.log(`Rendering ${variant.id} from ${b.glb} with Blender (${samples} samples)…`);
-    execFileSync(python, [path.join(root, 'scripts/blender/render_glb.py'), '--', modelFile, path.join(glbDir, b.glb), prefix, '--rot', String(b.rotation ?? 0), '--sx', String(b.stretchX ?? 1), '--samples', samples], { stdio: ['ignore', 'ignore', 'inherit'], env });
+    execFileSync(python, [path.join(root, 'scripts/blender/render_glb.py'), '--', modelFile, path.join(glbDir, b.glb), prefix, '--rot', String(b.rotation ?? 0), '--sx', String(b.stretchX ?? 1), ...(b.fill ? ['--fill'] : []), '--samples', samples], { stdio: ['ignore', 'ignore', 'inherit'], env });
   } else {
     console.log(`Rendering ${variant.id} with Blender (${samples} samples)…`);
     execFileSync(python, [path.join(root, 'scripts/blender/render.py'), modelFile, prefix, '--samples', samples], { stdio: ['ignore', 'ignore', 'inherit'], env });

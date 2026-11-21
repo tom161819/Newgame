@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.20] - 2026-11-21
+<!-- version: {"title":"Studio: Tripo Tower and Gate v2","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Asset Studio: new renders of the Tripo Stone Tower and Gate (v2) whose foot fills its 2 × 2 tiles, for review.
+
 ## [0.149.19] - 2026-11-21
 <!-- version: {"title":"Hit reactions, parry and dodge","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added
