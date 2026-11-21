@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.35] - 2026-11-21
+<!-- version: {"title":"Conditions for Small town and Town","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Conditions for the next kingdom ranks. Small town: 2 Farmhouses, 8 fields or orchards, food for 10 days, 20 buildings, a Village Green and a Marketplace. Town: closed walls around at least half of your buildings and 40 soldiers.
+
 ## [0.149.34] - 2026-11-21
 <!-- version: {"title":"Saves with retired task points load","type":"fix","reconstructed":false,"saveVersion":67} -->
 ### Fixed

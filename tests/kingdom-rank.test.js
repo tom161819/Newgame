@@ -28,9 +28,19 @@ test('the rank shows the conditions for the next one: Granary, Material Yard, Ha
   const many=[...few,building('material_yard'),...Array.from({length:5},()=>building('house'))];
   rank=kingdomRank(many,{happiness:70,foodDays:10,population:19});assert.equal(rank.met,5);assert.equal(rank.ready,false,'needs 20 residents');
   rank=kingdomRank(many,{happiness:70,foodDays:10,population:20});assert.equal(rank.met,6);assert.equal(rank.ready,true);
-  // Level 2 → 3: no conditions yet.
-  rank=kingdomRank([building('castle',{level:2})],{population:50});assert.equal(rank.rank,'village');assert.equal(rank.total,1);assert.equal(rank.ready,true);
-  assert.equal(kingdomRank([building('castle',{level:3})],{population:79}).ready,false);
+  // Owner 21 Nov 2026 – level 2 → 3: 2 Farmhouses, 8 fields (wheat, flax and orchards together), food for 10 days,
+  // 20 buildings, Village Green, Marketplace (and 50 residents). Soldiers only for level 4: the Barracks unlock at 3.
+  const town=[building('castle',{level:2}),building('farmhouse'),building('village_green'),building('marketplace'),...Array.from({length:4},()=>building('wheat_field')),building('flax_field'),building('flax_field'),building('orchard'),building('orchard'),...Array.from({length:8},()=>building('house'))];
+  const stats={population:50,foodDays:10,soldiers:0};
+  rank=kingdomRank(town,stats);assert.equal(rank.rank,'village');assert.equal(rank.total,7);assert.equal(rank.ready,false);
+  assert.deepEqual(rank.items.filter(i=>!i.ok).map(i=>[i.id,i.current,i.target]),[['farmhouses',1,2],['buildings',19,20]]);
+  rank=kingdomRank([...town,building('farmhouse')],stats);assert.equal(rank.ready,true);
+  assert.equal(kingdomRank([...town.filter(b=>b.type!=='orchard'),building('farmhouse'),building('house'),building('house')],stats).ready,false,'6 fields are not enough');
+  // Level 3 → 4: closed walls around at least half of the buildings, 40 soldiers (and 80 residents).
+  const castle3=[building('castle',{level:3})];
+  assert.equal(kingdomRank(castle3,{population:80,soldiers:40,walled:49}).ready,false);
+  assert.deepEqual(kingdomRank(castle3,{population:80,soldiers:40,walled:50}).items.map(i=>i.id),['walled','soldiers','population']);
+  assert.equal(kingdomRank(castle3,{population:80,soldiers:40,walled:50}).ready,true);
   setLanguage('cs');assert.equal(kingdomRankLabel(kingdomRank(few,{happiness:80,foodDays:4})),'Úroveň království: Osada · 2/6');
   assert.match(kingdomRankTip(kingdomRank(few,{happiness:80,foodDays:4})),/✗ Jídlo na 4 \/ 10 dní/);setLanguage('en');
 });
@@ -52,4 +62,16 @@ test('the Castle level caps the population: 20 at level 1, 50 at level 2, 100 at
   const cap=(level,houses)=>WorkerSystem.prototype.capacity.call({scene:{kingdomRanks:true,objectRegistry,buildings:[building('castle',{level}),...Array.from({length:houses},()=>building('house'))]},housingCapacity(){return 200;}});
   assert.equal(cap(1,0),20);assert.equal(cap(2,0),50);assert.equal(cap(3,0),100);assert.equal(cap(4,0),200);
   assert.equal(WorkerSystem.prototype.capacity.call({scene:{buildings:[]},housingCapacity(){return 200;}}),200,'no ranks (tests, sandbox scenes): no cap');
+});
+test('rank numbers: soldiers in the army and the share of buildings inside closed walls (Towers and Gates close the ring)', async () => {
+  const { kingdomRankStats }=await import('../src/game/kingdomRankState.js');
+  const map=Array.from({length:30},()=>Array(30).fill(0)),buildings=[];let id=1;
+  const put=(type,x,y)=>{const b={id:id++,type,x,y,tiles:[{x,y}],definition:{id:type,width:1,height:1,navigation:type==='wall'?{walkableTop:true}:undefined}};buildings.push(b);return b;};
+  for(let x=10;x<=18;x++){put('wall',x,10);put(x===14?'gate':'wall',x,18);}for(let y=11;y<=17;y++){put(y===14?'tower':'wall',10,y);put('wall',18,y);}
+  put('house',12,12);put('house',15,15);put('house',3,3);put('house',25,25);put('house',4,25);
+  const residents=[{profession:'soldier'},{profession:'soldier'},{profession:'farmer'}];
+  const scene={map,buildings,workerSystem:{liveSubjects:()=>residents}};
+  let stats=kingdomRankStats(scene);assert.equal(stats.soldiers,2);assert.equal(stats.walled,40,'2 of 5 houses inside; wall pieces are not counted');
+  put('house',13,16);stats=kingdomRankStats({...scene,buildings:[...buildings]});assert.equal(stats.walled,50);
+  stats=kingdomRankStats({...scene,buildings:buildings.filter(b=>!(b.type==='gate'))});assert.equal(stats.walled,0,'a gap opens the ring');
 });

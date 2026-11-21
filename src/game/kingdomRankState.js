@@ -1,13 +1,17 @@
 import { t } from '../i18n/index.js';
 import { foodDays } from '../data/foodOutlook.js';
-import { kingdomRank,KINGDOM_RANKS } from '../data/kingdomRank.js';
+import { kingdomRank,KINGDOM_RANKS,RANK_UNCOUNTED } from '../data/kingdomRank.js';
+import { enclosure } from './enclosure.js';
+import { buildingIsComplete } from './buildingState.js';
 
 // m-uroven-kralovstvi: the live numbers the rank conditions read – the residents' average Happiness (as in the
 // Kingdom overview) and how many days the food lasts.
 export function kingdomRankStats(scene){
   const residents=scene.workerSystem?.liveSubjects?.()??[],homes=scene.needs?.homes?.()??new Map();
   const values=residents.map(w=>scene.needs?.status?.(w,homes)?.happiness).filter(v=>Number.isFinite(v));
-  return {population:residents.length,happiness:values.length?Math.round(values.reduce((n,v)=>n+v,0)/values.length):null,foodDays:scene.foodSystem?foodDays(scene.foodSystem):0};
+  const counted=(scene.buildings??[]).filter(b=>buildingIsComplete(b)&&!RANK_UNCOUNTED.has(b.type??b.definition?.id)&&b.type!=='tower'&&b.type!=='gate');
+  const ring=scene.map?enclosure(scene):null,walled=ring?.any&&counted.length?Math.floor(100*counted.filter(b=>ring.holds(b)).length/counted.length):0;
+  return {soldiers:residents.filter(w=>w.profession==='soldier').length,walled,population:residents.length,happiness:values.length?Math.round(values.reduce((n,v)=>n+v,0)/values.length):null,foodDays:scene.foodSystem?foodDays(scene.foodSystem):0};
 }
 export const sceneKingdomRank=scene=>kingdomRank(scene.buildings,kingdomRankStats(scene));
 export const rankName=rank=>t(`kingdom.rank.${rank}`);

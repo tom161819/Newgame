@@ -20,8 +20,12 @@ export const BUILDING_UNLOCK_LEVEL=Object.freeze({
 });
 export const buildingUnlockLevel=id=>BUILDING_UNLOCK_LEVEL[id]??1;
 
-// Conditions for reaching a level (the Castle upgrade to it). Levels 3 and 4: to be added by the owner later.
+// Conditions for reaching a level (the Castle upgrade to it).
 // `buildings`: complete buildings, without the Castle, paving, walls, field defences, lights and ruins.
+// Owner 21 Nov 2026 (levels 3 and 4): `count` – at least `min` complete buildings of that type; `fields` – wheat fields,
+// flax fields and orchards together; `soldiers` – members of the army (recruits included); `walled` – share (%) of the
+// counted buildings inside closed walls (Towers and Gates close the ring too, game/enclosure.js).
+// The owner's 20 soldiers for level 3 are left out by his decision: the Barracks unlock at level 3.
 export const RANK_REQUIREMENTS=Object.freeze({
   2:Object.freeze([
     Object.freeze({id:'granary',kind:'building',building:'granary'}),
@@ -31,8 +35,20 @@ export const RANK_REQUIREMENTS=Object.freeze({
     Object.freeze({id:'buildings',kind:'buildings',min:8}),
     Object.freeze({id:'population',kind:'population',min:20}),
   ]),
-  3:Object.freeze([Object.freeze({id:'population',kind:'population',min:50})]),
-  4:Object.freeze([Object.freeze({id:'population',kind:'population',min:80})]),
+  3:Object.freeze([
+    Object.freeze({id:'farmhouses',kind:'count',building:'farmhouse',min:2}),
+    Object.freeze({id:'fields',kind:'fields',buildings:Object.freeze(['wheat_field','flax_field','orchard']),min:8}),
+    Object.freeze({id:'foodDays',kind:'foodDays',min:10}),
+    Object.freeze({id:'buildings',kind:'buildings',min:20}),
+    Object.freeze({id:'village_green',kind:'building',building:'village_green'}),
+    Object.freeze({id:'marketplace',kind:'building',building:'marketplace'}),
+    Object.freeze({id:'population',kind:'population',min:50}),
+  ]),
+  4:Object.freeze([
+    Object.freeze({id:'walled',kind:'walled',min:50}),
+    Object.freeze({id:'soldiers',kind:'soldiers',min:40}),
+    Object.freeze({id:'population',kind:'population',min:80}),
+  ]),
 });
 // Owner 21 Nov 2026: the most residents the kingdom can have at each Castle level (null = no limit). The owner's
 // cap is the one after the upgrade (2: 50, 3: 100, 4: none); level 1 holds the 20 the upgrade to 2 needs.
@@ -48,7 +64,8 @@ export function kingdomLevel(buildings){
 }
 export const countedBuildings=buildings=>(buildings??[]).filter(b=>buildingIsComplete(b)&&!RANK_UNCOUNTED.has(typeOf(b))).length;
 
-// What the kingdom has now for each condition of `level`. `stats`: {happiness (0–100 or null), foodDays}.
+// What the kingdom has now for each condition of `level`. `stats`: {happiness (0–100 or null), foodDays, population,
+// soldiers, walled (% of the counted buildings inside closed walls)}.
 export function rankRequirements(level,buildings,stats={}){
   const list=RANK_REQUIREMENTS[level];if(!list)return [];
   const complete=new Set((buildings??[]).filter(buildingIsComplete).map(typeOf));
@@ -58,6 +75,10 @@ export function rankRequirements(level,buildings,stats={}){
     if(r.kind==='foodDays'){const v=stats.foodDays??0;return {...r,ok:v>=r.min,current:Number.isFinite(v)?Math.floor(v):v,target:r.min};}
     if(r.kind==='population'){const v=stats.population??0;return {...r,ok:v>=r.min,current:v,target:r.min};}
     if(r.kind==='buildings'){const v=countedBuildings(buildings);return {...r,ok:v>=r.min,current:v,target:r.min};}
+    if(r.kind==='count'){const v=(buildings??[]).filter(b=>typeOf(b)===r.building&&buildingIsComplete(b)).length;return {...r,ok:v>=r.min,current:v,target:r.min};}
+    if(r.kind==='fields'){const v=(buildings??[]).filter(b=>r.buildings.includes(typeOf(b))&&buildingIsComplete(b)).length;return {...r,ok:v>=r.min,current:v,target:r.min};}
+    if(r.kind==='soldiers'){const v=stats.soldiers??0;return {...r,ok:v>=r.min,current:v,target:r.min};}
+    if(r.kind==='walled'){const v=stats.walled??0;return {...r,ok:v>=r.min,current:v,target:r.min};}
     return {...r,ok:false};
   });
 }
