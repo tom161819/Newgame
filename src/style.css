@@ -1480,3 +1480,23 @@ body.sandbox-tool canvas { cursor:crosshair !important; }
 .court-orders .court-button:disabled { opacity:.45; cursor:default; }
 .court-orders .court-late strong, .court-orders .court-alert { color:#ff9a8a; }
 .in-zone #court-orders, body.in-sandbox #court-orders, body.in-sandbox #court-trust { display:none !important; }
+
+/* m-pribeh-vlci-ujezd F2–F5: the story card and the letter */
+.story-card-body { display:flex; flex-direction:column; gap:4px; margin-top:6px; }
+.story-card-body p { margin:0; font-size:12px; }
+.story-card .court-button { align-self:flex-start; padding:2px 10px; font-size:12px; border-radius:6px; border:1px solid var(--line,rgba(240,209,116,.45)); background:rgba(240,209,116,.14); color:inherit; cursor:pointer; }
+.story-card .court-button:disabled { opacity:.45; cursor:default; }
+.story-letter { position:absolute; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; background:rgba(10,8,5,.55); pointer-events:auto; }
+.story-letter[hidden] { display:none; }
+.story-paper { width:min(620px,calc(100% - 32px)); max-height:calc(100% - 48px); overflow:auto; padding:22px 26px; border-radius:10px; background:#efe3c4; color:#2c2416; border:1px solid #8a6f3a; box-shadow:0 12px 40px rgba(0,0,0,.6); font-family:Georgia,'Times New Roman',serif; }
+.story-paper h2 { margin:0 0 4px; font-size:22px; color:#5a2d1a; }
+.story-paper .story-from { margin:0 0 12px; font-style:italic; color:#6b5a3a; font-size:13px; }
+.story-paper p { margin:0 0 10px; line-height:1.5; font-size:15px; }
+.story-buttons, .story-list { display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+.story-choice { text-align:left; padding:8px 12px; border-radius:6px; border:1px solid #8a6f3a; background:#e2d2a6; color:#2c2416; font:inherit; font-size:14px; cursor:pointer; }
+.story-choice:hover:not(:disabled) { background:#d8c48e; }
+.story-choice:disabled { opacity:.5; cursor:default; }
+.in-zone #story-card, body.in-sandbox #story-card { display:none !important; }
+#story-letter .story-paper h2 { color:#5a2d1a !important; -webkit-text-fill-color:#5a2d1a; background:none; text-shadow:none; font-family:Georgia,'Times New Roman',serif; letter-spacing:0; text-transform:none; }
+#story-letter .story-choice { background:#e2d2a6 !important; color:#2c2416 !important; border:1px solid #8a6f3a !important; box-shadow:none; text-shadow:none; }
+#story-letter .story-choice:hover:not(:disabled) { background:#d8c48e !important; }

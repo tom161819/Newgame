@@ -16,7 +16,12 @@ export class CourtSystem {
     this.scene=scene;this.spawn=spawn;this.trust=COURT.startTrust;this.orders=[];this.seq=0;this.nextOrderDay=COURT.firstOrderDay;this.fine=0;
     this.countdownDay=null;this.collected=false;this.expedition=null;this.expeditions=0;this.cooldownUntil=0;this.lastGiftDay=0;this.wait=0;this.revision=0;this.listeners=new Set();
   }
-  get active(){return !!this.scene.kingdomRanks&&!this.scene.sandbox;}
+  // `enabled`: a story game. `active`: somebody sends orders (not for the player's own lordship, nor after the epilogue).
+  get enabled(){return !!this.scene.kingdomRanks&&!this.scene.sandbox;}
+  get active(){const story=this.scene.story;return this.enabled&&story?.faction!=='own'&&!(story?.chapter>=8);}
+  // Who sends the orders: the King (also for the Crown's side), the Prague union or Tábor.
+  get patron(){const f=this.scene.story?.faction;return f==='prague'||f==='tabor'?f:'king';}
+  plunder(share){const inv=this.scene.inventory;for(const id of ['gold','wood','stone',...FOOD_RESOURCE_IDS]){const n=Math.floor((inv?.count?.(id)??0)*share);if(n>0)inv.spend(id,n,{source:'Court',id:`court:plunder:${this.day}:${id}`});}this.scene.updateInventory?.();}
   get day(){return this.scene.gameTime?.day??1;}
   get level(){return kingdomLevel(this.scene.buildings);}
   get band(){return courtBand(this.trust);}
@@ -25,7 +30,7 @@ export class CourtSystem {
   say(key,text,target=null){this.scene.eventFeed?.push?.(`court:${key}:${this.day}`,text,{important:true,target});this.scene.setStatus?.(text);}
   changeTrust(delta,reason){
     if(!delta)return this.trust;const before=this.band;this.trust=clamp(this.trust+delta);const after=this.band;
-    if(after!==before){this.say(`band:${after}`,t(`court.band.${after}.news`));this.bandChanged(before,after);}
+    if(after!==before){this.say(`band:${after}`,t(`court.band.${after}.news`,this.who()));this.bandChanged(before,after);}
     this.emit('trust',{delta,reason});return this.trust;
   }
   bandChanged(before,after){
@@ -37,8 +42,9 @@ export class CourtSystem {
   collect(){
     if(this.collected)return;this.collected=true;const inv=this.scene.inventory,taken=[];
     for(const id of ['gold',...FOOD_RESOURCE_IDS]){const n=Math.floor((inv?.count?.(id)??0)*COURT.collectShare);if(n>0&&inv.spend(id,n,{source:'Court',id:`court:collect:${this.day}:${id}`}))taken.push(`${n} ${t(`court.res.${id}`)}`);}
-    if(taken.length)this.say('collect',t('court.collected',{list:taken.join(', ')}));this.scene.updateInventory?.();
+    if(taken.length)this.say('collect',t('court.collected',{list:taken.join(', '),...this.who()}));this.scene.updateInventory?.();
   }
+  who(){return {lord:t(`court.lord.${this.patron}`),from:t(`court.from.${this.patron}`)};}
   population(){return this.scene.workerSystem?.liveSubjects?.()?.length??0;}
   deliveryResource(){
     const list=COURT.delivery[this.level]??COURT.delivery[1],built=new Set((this.scene.buildings??[]).filter(buildingIsComplete).map(typeOf));
@@ -53,7 +59,7 @@ export class CourtSystem {
     else{order.resource=this.deliveryResource();order.amount=Math.max(6,Math.round((pop*.7+4*level)*(kind==='request'?.6:1)));}
     const days=Math.max(2,Math.round(COURT.deadlineDays[kind]*(COURT.deadlineFactor[band]??1)));order.due=this.day+days;order.grace=order.due+Math.max(1,Math.round(days*COURT.graceShare));
     if(kind==='request')order.reward=COURT.requestGold*level;
-    this.orders.push(order);this.say(`order:${order.id}`,t('court.order.new',{text:this.orderText(order),days}));this.emit('order',order);return order;
+    this.orders.push(order);this.say(`order:${order.id}`,t('court.order.new',{text:this.orderText(order),days,...this.who()}));this.emit('order',order);return order;
   }
   orderText(order){return t(`court.order.${order.kind}`,{amount:order.amount,resource:t(`court.res.${order.resource}`)});}
   orderState(order){return this.day>order.due?'late':'open';}
@@ -79,7 +85,7 @@ export class CourtSystem {
   canAtone(){return this.countdownDay!=null&&!this.expedition&&(this.scene.inventory?.count?.('gold')??0)>=this.atonementCost();}
   atone(){
     if(!this.canAtone()||!this.scene.inventory.spend('gold',this.atonementCost(),{source:'Court',id:`court:atone:${this.day}`}))return false;
-    this.countdownDay=null;this.collected=false;this.trust=Math.max(this.trust,COURT.atonementTrust);this.scene.updateInventory?.();this.say('atone',t('court.atoned'));this.emit('trust',{reason:'atone'});return true;
+    this.countdownDay=null;this.collected=false;this.trust=Math.max(this.trust,COURT.atonementTrust);this.scene.updateInventory?.();this.say('atone',t('court.atoned',this.who()));this.emit('trust',{reason:'atone'});return true;
   }
   expeditionUnits(){
     const base=COURT.expedition.units[this.level]??COURT.expedition.units[1],factor=COURT.expedition.growth**this.expeditions,units={};
@@ -90,7 +96,7 @@ export class CourtSystem {
   foes(){return [...(this.scene.animalSystem?.animals?.values?.()??[])].filter(a=>a.isAlive&&a.active!==false&&a.definition?.gameplay?.hostile&&String(a.type??a.definition?.id).startsWith('enemy_'));}
   startExpedition(){
     const units=this.expeditionUnits(),count=this.spawn?this.spawn(units):0;this.countdownDay=null;this.collected=false;
-    this.expedition={day:this.day,count};this.expeditions++;this.say('expedition',t('court.expedition.start',{count}));this.emit('expedition',{count});return count;
+    this.expedition={day:this.day,count};this.expeditions++;this.say('expedition',t('court.expedition.start',{count,...this.who()}));this.emit('expedition',{count});return count;
   }
   castle(){return (this.scene.buildings??[]).find(b=>typeOf(b)==='castle'&&buildingIsComplete(b)&&!b.enemy)??null;}
   castleFallen(){const c=this.castle();if(!c)return true;const hp=buildingHP(c);return !!hp&&hp.hp<=hp.max*(ENEMY_ARMY.castleFloor+.01);}
@@ -98,20 +104,20 @@ export class CourtSystem {
     const foes=this.foes(),e=COURT.expedition;
     if(foes.length&&this.castleFallen()){
       // The Castle is beaten: the army plunders the stores and leaves.
-      const inv=this.scene.inventory;for(const id of ['gold','wood','stone',...FOOD_RESOURCE_IDS]){const n=Math.floor((inv?.count?.(id)??0)*e.plunderShare);if(n>0)inv.spend(id,n,{source:'Court',id:`court:plunder:${this.day}:${id}`});}
-      for(const a of foes)this.scene.animalSystem?.remove?.(a);this.scene.updateInventory?.();this.endExpedition('court.expedition.lost');return;
+      this.plunder(e.plunderShare);for(const a of foes)this.scene.animalSystem?.remove?.(a);this.endExpedition('court.expedition.lost');return;
     }
     if(!foes.length){this.endExpedition('court.expedition.won');return;}
     const idle=foes.filter(a=>!a.marching&&!a.onWall);if(idle.length)this.scene.enemyArmy?.march?.(idle);
   }
-  endExpedition(key){this.expedition=null;this.cooldownUntil=this.day+COURT.expedition.cooldownDays;this.trust=Math.max(this.trust,COURT.expedition.trustAfter);this.say('expedition-end',t(key));this.emit('expeditionEnd',{key});}
+  endExpedition(key){this.expedition=null;this.cooldownUntil=this.day+COURT.expedition.cooldownDays;this.trust=Math.max(this.trust,COURT.expedition.trustAfter);this.say('expedition-end',t(key,this.who()));this.emit('expeditionEnd',{key});}
   update(delta=0){
     if(!this.active)return;this.wait-=delta;if(this.wait>0)return;this.wait=500;const day=this.day;
     if(this.expedition){this.updateExpedition();return;}
+    if(this.scene.story?.raid)return;
     for(const order of [...this.orders])if(day>order.grace)this.fail(order);
     if(day>=this.nextOrderDay&&this.orders.length<COURT.maxActive&&this.castle()){this.issue();this.nextOrderDay=day+COURT.orderEveryDays;}
     const band=this.band;
-    if(band==='favour'&&day-this.lastGiftDay>=COURT.giftEveryDays){this.lastGiftDay=day;const gold=COURT.giftGold*this.level;this.scene.inventory?.add?.('gold',gold,{source:'Court',id:`court:gift:${day}`});this.scene.updateInventory?.();this.say('gift',t('court.gift',{gold}));}
+    if(band==='favour'&&day-this.lastGiftDay>=COURT.giftEveryDays){this.lastGiftDay=day;const gold=COURT.giftGold*this.level;this.scene.inventory?.add?.('gold',gold,{source:'Court',id:`court:gift:${day}`});this.scene.updateInventory?.();this.say('gift',t('court.gift',{gold,...this.who()}));}
     if(day>=this.cooldownUntil){
       if(band==='displeasure'&&this.countdownDay==null){this.countdownDay=day+COURT.countdownDays;this.collect();}
       if(band==='wrath'||(this.countdownDay!=null&&day>=this.countdownDay))this.startExpedition();

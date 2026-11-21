@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.151.0] - 2026-11-21
+<!-- version: {"title":"Story: Vlčí újezd","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Story "Vlčí újezd" (Bohemia 1419–1437), parts 2–5. Letters open over the game: the prologue, news of real events (Sudoměř, Vítkov, Vyšehrad, the Diet of Čáslav, Žižka's death, Ústí, Domažlice, Lipany, Jihlava) and letters from your people. Read ones stay in the new chapter card.
+- Chapters follow your Castle level (each at least 10 days); the year is shown next to the day.
+- Your brother Smil works against you: slander at court, saboteurs, hired raiders and mercenaries. Caught men and beaten raids give proofs; with three you can accuse him before the King.
+- At Castle level 4 you choose a side for good: the Crown, the Prague union, Tábor, or your own lordship. Each changes who sends orders, who attacks you and what you earn. Three more chapters lead to one of twelve endings; then you can play on.
+
 ## [0.150.0] - 2026-11-21
 <!-- version: {"title":"Story: the royal court","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added

@@ -9,7 +9,7 @@ import { playChime } from './sound.js';
 export function courtTrustLabel(court){return t('court.trust.label',{trust:court.trust,band:t(`court.band.${court.band}`)});}
 export function courtTrustTip(court){
   const b=COURT.bands,rows=[['favour',`${b.favour}–100`],['calm',`${b.calm}–${b.favour-1}`],['suspicion',`${b.suspicion}–${b.calm-1}`],['displeasure',`${b.displeasure}–${b.suspicion-1}`],['wrath',`0–${b.displeasure-1}`]];
-  const lines=[t('court.trust.tip')];for(const [id,range] of rows)lines.push(tipRow(`${id===court.band?'▶ ':''}${t(`court.band.${id}`)} (${range})`,t(`court.band.${id}.effect`)));
+  const lines=[t('court.trust.tip',court.who())];for(const [id,range] of rows)lines.push(tipRow(`${id===court.band?'▶ ':''}${t(`court.band.${id}`)} (${range})`,t(`court.band.${id}.effect`)));
   if(court.countdownDay!=null)lines.push(t('court.countdown',{days:Math.max(0,court.countdownDay-court.day)}));
   return lines.join('\n');
 }
@@ -37,10 +37,10 @@ export class CourtPanel {
     const c=this.court,shown=c.active&&!this.scene.tutorial?.active;
     if(this.hud){this.hud.hidden=!c.active;if(c.active){const label=courtTrustLabel(c),tip=courtTrustTip(c);if(this.hud.textContent!==label)this.hud.textContent=label;
       if(this.hud.dataset.tip!==tip){this.hud.dataset.tip=tip;this.hud.setAttribute('aria-label',label);this.tip?.refresh();}this.hud.dataset.band=c.band;}}
-    const signature=JSON.stringify([shown,c.revision,c.day,c.trust,c.orders.map(o=>[o.id,c.canFulfil(o)]),c.canAtone(),!!c.expedition]);
+    const signature=JSON.stringify([shown,c.patron,c.revision,c.day,c.trust,c.orders.map(o=>[o.id,c.canFulfil(o)]),c.canAtone(),!!c.expedition]);
     if(!force&&signature===this.signature)return;this.signature=signature;
     this.root.hidden=!shown||(!c.orders.length&&c.countdownDay==null&&!c.expedition&&c.seq===0);
-    this.summary.textContent=`${t('court.title')} · ${c.orders.length}`;
+    this.summary.textContent=`${t('court.title',c.who())} · ${c.orders.length}`;
     const items=[],el=(tag,cls,text)=>{const e=this.doc.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;};
     if(c.expedition)items.push(el('li','royal-goal court-alert',t('court.expedition.on')));
     else if(c.countdownDay!=null){const li=el('li','royal-goal court-alert');li.append(el('strong','',t('court.countdown',{days:Math.max(0,c.countdownDay-c.day)})));

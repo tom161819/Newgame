@@ -10,6 +10,7 @@ import { validHeatingState } from './HeatingSystem.js';
 import { validClothingState } from './ClothingSystem.js';
 import { validRoyalGoalState } from './RoyalGoals.js';
 import { validCourtState } from './CourtSystem.js';
+import { validStoryState } from './StorySystem.js';
 import { validKingSkillState } from './KingSkills.js';
 import { validNightSpeedTipState } from '../data/dayNight.js';
 import { exportDevBalance,validDevBalanceState,devRange } from '../data/devBalance.js';
@@ -127,7 +128,8 @@ export function serializeGameState(scene){
     ...(scene.clothing?{clothing:scene.clothing.exportState()}:{}),
     ...(scene.battleMarks&&(scene.battleMarks.corpses.length||scene.battleMarks.stains.length)?{battleMarks:scene.battleMarks.exportState()}:{}),
     ...(scene.royalGoals?{royalGoals:scene.royalGoals.exportState()}:{}),
-    ...(scene.court?.active?{court:scene.court.exportState()}:{}),
+    ...(scene.court?.enabled?{court:scene.court.exportState()}:{}),
+    ...(scene.story?.active?{story:scene.story.exportState()}:{}),
     ...(scene.kingSkills?{kingSkills:scene.kingSkills.exportState()}:{}),
     // m-noc-zrychleni (82): the night speed-up tip was shown in this game (optional; only `true`, absent = not yet).
     ...(scene.nightSpeedUp?.exportState?.()?{nightSpeedTip:true}:{}),
@@ -629,6 +631,7 @@ function validateAtSize(input,registry){
   // E4: finished Royal tasks and counted production (optional, older saves start with none done).
   part='royalGoals';if(s.royalGoals!==undefined)check(validRoyalGoalState(s.royalGoals));
   part='court';if(s.court!==undefined)check(validCourtState(s.court));
+  part='story';if(s.story!==undefined)check(validStoryState(s.story));
   // m-kral-odmeny-xp: the King's unspent skill points and royal skill levels (optional; points come from finished tasks).
   part='kingSkills';if(s.kingSkills!==undefined)check(validKingSkillState(s.kingSkills,s.royalGoals?.done??[]));
   // m-noc-zrychleni (82): the night speed-up tip shown (optional, only `true`).
