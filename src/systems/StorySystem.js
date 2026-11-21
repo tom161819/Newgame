@@ -1,5 +1,4 @@
-import { STORY,STORY_EVENTS,FACTIONS,storyEnding,STORY_EXTRA_LETTERS } from '../data/story.js';
-import { COURT } from '../data/court.js';
+import { STORY,STORY_EVENTS,FACTIONS,storyEnding,STORY_EXTRA_LETTERS,raidUnits } from '../data/story.js';
 import { kingdomLevel } from '../data/kingdomRank.js';
 import { FOOD_RESOURCE_IDS } from '../data/foodProduction.js';
 import { t } from '../i18n/index.js';
@@ -17,7 +16,7 @@ export class StorySystem {
     // A thief caught by the guards talks (the first piece of evidence), from chapter 2 on.
     const threats=scene.nightThreats;if(threats?.caught&&!threats.storyHooked){const caught=threats.caught.bind(threats);threats.storyHooked=true;threats.caught=(...a)=>{const r=caught(...a);scene.story?.thiefCaught();return r;};}
   }
-  get active(){return !!this.scene.kingdomRanks&&!this.scene.sandbox;}
+  get active(){return !!this.scene.kingdomRanks&&!this.scene.sandbox&&(!!this.scene.gameSettings?.story||!!this.forced||!!this.court?.forced);}
   get day(){return this.scene.gameTime?.day??1;}
   get level(){return kingdomLevel(this.scene.buildings);}
   get smilFallen(){return !!this.flags.smilFallen;}
@@ -54,10 +53,9 @@ export class StorySystem {
   canAccuse(){return this.evidence>=STORY.evidenceMax&&!this.smilFallen&&(this.faction===null||this.faction==='crown')&&!!this.court?.active;}
   accuse(){if(!this.canAccuse())return false;this.flags.smilFallen=true;this.court.changeTrust(STORY.accuseTrust,'accuse');this.post('accused');this.emit('accused');return true;}
   soldiers(){return (this.scene.workerSystem?.liveSubjects?.()??[]).filter(w=>w.profession==='soldier').length;}
-  // An attack on the Castle: the units of a punitive expedition for this Castle level, scaled by the kind.
+  // An attack on the Castle; its size follows the player's army (data/story.js raidUnits).
   startRaid(kind){
-    if(this.raid||this.court?.expedition||this.court?.foes?.().length)return false;const factor=STORY.raid[kind]??1,base=COURT.expedition.units[this.level]??COURT.expedition.units[1],units={};
-    for(const [id,n] of Object.entries(base))units[id]=Math.max(1,Math.round(n*factor));
+    if(this.raid||this.court?.expedition||this.court?.foes?.().length)return false;const units=raidUnits(kind,this.soldiers(),this.level);
     const count=this.court?.spawn?.(units)??0;if(!count)return false;this.raid={kind,day:this.day};this.feed(`raid:${kind}`,t(`story.raid.${kind}`,{count}));this.emit('raid',kind);return true;
   }
   updateRaid(){
@@ -74,7 +72,7 @@ export class StorySystem {
   smilActs(){
     const S=STORY.smil,step=this.smilStep++,s=this.scene;
     const raid=this.chapter>=4?'mercs':this.chapter===3?'smil':null;
-    if(raid&&step%2===0&&this.startRaid(raid))return;
+    if(raid&&step%2===0&&this.day-this.chapterDay>=STORY.raidQuietDays&&this.startRaid(raid))return;
     if(this.chapter>=2&&step%2===1&&!this.faction){
       if(this.soldiers()>=S.guards){this.feed('saboteur',t('story.smil.caught'));if(this.evidence===0)this.addEvidence();return;}
       const lost=[];for(const id of ['wood',...FOOD_RESOURCE_IDS]){const n=Math.floor((s.inventory?.count?.(id)??0)*S.sabotageShare);if(n>0&&s.inventory.spend(id,n,{source:'Story',id:`story:sabotage:${this.day}:${id}`}))lost.push(`${n} ${t(`court.res.${id}`)}`);}
@@ -121,13 +119,13 @@ export class StorySystem {
     if(!d){
       // A save from before the story: no prologue in the middle of a game; the chapter follows the Castle at once.
       this.chapter=Math.min(4,this.level);this.chapterDay=this.day;this.fired=STORY_EVENTS.filter(ev=>ev.ch<this.chapter||ev.id==='prologue').map(ev=>ev.id);this.smilNext=this.day+STORY.smil.everyDays;this.incomeDay=this.day;this.emit('loaded');return;}
-    Object.assign(this,{chapter:d.chapter,chapterDay:d.chapterDay,fired:[...d.fired],inbox:[...d.inbox],read:[...d.read],evidence:d.evidence,faction:d.faction,flags:{...d.flags},smilNext:d.smilNext,smilStep:d.smilStep,
+    this.forced=true;Object.assign(this,{chapter:d.chapter,chapterDay:d.chapterDay,fired:[...d.fired],inbox:[...d.inbox],read:[...d.read],evidence:d.evidence,faction:d.faction,flags:{...d.flags},smilNext:d.smilNext,smilStep:d.smilStep,
       raid:d.raid?{...d.raid}:null,nextRaidDay:d.nextRaidDay,incomeDay:d.incomeDay,ending:d.ending,pending:d.pending});this.wait=0;this.emit('loaded');
   }
   destroy(){this.listeners.clear();}
 }
 const int=v=>Number.isSafeInteger(v)&&v>=0;
-const LETTERS=new Set([...STORY_EVENTS.map(ev=>ev.id),...STORY_EXTRA_LETTERS]),RAIDS=new Set(Object.keys(STORY.raid).filter(k=>k!=='plunderShare'));
+const LETTERS=new Set([...STORY_EVENTS.map(ev=>ev.id),...STORY_EXTRA_LETTERS]),RAIDS=new Set(Object.keys(STORY.raidExtra));
 export function validStoryState(d){
   if(!d||typeof d!=='object'||Array.isArray(d))return false;
   if(Object.keys(d).sort().join()!=='chapter,chapterDay,ending,evidence,faction,fired,flags,inbox,incomeDay,nextRaidDay,pending,raid,read,smilNext,smilStep')return false;

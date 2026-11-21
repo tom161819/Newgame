@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.151.1] - 2026-11-22
+<!-- version: {"title":"Story switch, fair raids","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- New Game has a "Story: Vlčí újezd" switch (Advanced Settings, on by default). Off: a free game without the court, letters and raids. Saves from before the story stay without it.
+### Changed
+- Raids of the story (Smil's men, Hussite companies, royal hosts, tribute) are sized by your own army, so a young town is not run over; no raid comes in the first 5 days of a chapter. The punitive expedition stays large.
+
 ## [0.151.0] - 2026-11-21
 <!-- version: {"title":"Story: Vlčí újezd","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added

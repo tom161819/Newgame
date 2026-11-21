@@ -10,6 +10,9 @@ export const DEFAULT_GAME_SETTINGS=Object.freeze({difficulty:'normal',wildlifePo
   winterHeating:true,
   // m-start-v2: 2 Soldiers and 2 Archers at the start (New Game proposes it; scenarios and older settings start without).
   startingGarrison:false,
+  // m-pribeh-vlci-ujezd: the story (court, letters, Smil, the choice of side). New Game proposes it; older saves and
+  // automated scenarios play without.
+  story:false,
   // m-velikost-mapy (34): side of the square map in tiles (MAP_SIZES); older settings and saves are 100.
   mapSize:DEFAULT_MAP_SIZE});
 // Owner request 7 Nov 2026: the New Game Setup proposes a built Castle (can be switched off), Gold at its limit (500)
@@ -19,7 +22,7 @@ export const DEFAULT_GAME_SETTINGS=Object.freeze({difficulty:'normal',wildlifePo
 // Hut 6 + House 10 + Material Yard 20 + Builder's Workshop 20 = 76) with a reserve; Stone and Bread make room in
 // the 300-unit Starter Stockpile. m-drevo-start (playtest 0.76.0 #2): 110 Wood (reserve 34 until the Lumberjack runs)
 // and 160 Bread (food balance m-jidlo-balanc makes it last): 30 + 110 + 160 = 300.
-export const NEW_GAME_DEFAULTS=Object.freeze({...DEFAULT_GAME_SETTINGS,startingCastle:true,startingGold:500,startingStone:30,startingWood:110,startingIronOre:0,startingBread:160,startingGarrison:true});
+export const NEW_GAME_DEFAULTS=Object.freeze({...DEFAULT_GAME_SETTINGS,startingCastle:true,startingGold:500,startingStone:30,startingWood:110,startingIronOre:0,startingBread:160,startingGarrison:true,story:true});
 // m-tutorial-v2: a start with the Castle brings 2 more residents (5 instead of POPULATION.initial 3), so a Miner is still
 // free after the Builder, Hauler and Hunter. With the starting garrison (4, not free workers) that is 9 of the 10 places.
 export const CASTLE_START_EXTRA_RESIDENTS=2;
@@ -44,7 +47,7 @@ export function gameSettings(input=DEFAULT_GAME_SETTINGS){
   if(!Object.hasOwn(DIFFICULTIES,s.difficulty)||!Object.hasOwn(WILDLIFE_COUNTS,s.wildlifePopulation)
     ||!Number.isInteger(s.treasureCount)||s.treasureCount<0||s.treasureCount>10
     ||!Number.isInteger(s.initialStoneCount)||s.initialStoneCount<0||s.initialStoneCount>100||s.initialStoneCount%5!==0
-    ||typeof s.fogOfWar!=='boolean'||['nightWolves','nightThieves','nightFires','winterHeating'].some(k=>typeof s[k]!=='boolean')||typeof s.explorationMode!=='boolean'||typeof s.seasonsEnabled!=='boolean'||typeof s.autoEmployment!=='boolean'||typeof s.startingGarrison!=='boolean'||typeof s.startingCastle!=='boolean'||![60,120,240].includes(s.dayLengthSeconds)
+    ||typeof s.fogOfWar!=='boolean'||['nightWolves','nightThieves','nightFires','winterHeating'].some(k=>typeof s[k]!=='boolean')||typeof s.explorationMode!=='boolean'||typeof s.seasonsEnabled!=='boolean'||typeof s.autoEmployment!=='boolean'||typeof s.startingGarrison!=='boolean'||typeof s.story!=='boolean'||typeof s.startingCastle!=='boolean'||![60,120,240].includes(s.dayLengthSeconds)
     ||!Object.hasOwn(WILDLIFE_INTERVALS,s.wildlifeRespawn)||!Number.isInteger(s.startingGold)||s.startingGold<0||s.startingGold>500||s.startingGold%25!==0
     ||!validWorldCode(s.worldCode)||!validMapSize(s.mapSize)
     ||Object.keys(STARTING_RESOURCES).some(k=>!Number.isInteger(s[k])||s[k]<0||s[k]>STARTING_RESOURCE_CAPACITY||s[k]%STARTING_RESOURCE_STEP!==0)||startingResourceTotal(s)>STARTING_RESOURCE_CAPACITY)throw new Error('Neplatné nastavení nové hry.');

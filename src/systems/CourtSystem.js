@@ -17,7 +17,8 @@ export class CourtSystem {
     this.countdownDay=null;this.collected=false;this.expedition=null;this.expeditions=0;this.cooldownUntil=0;this.lastGiftDay=0;this.wait=0;this.revision=0;this.listeners=new Set();
   }
   // `enabled`: a story game. `active`: somebody sends orders (not for the player's own lordship, nor after the epilogue).
-  get enabled(){return !!this.scene.kingdomRanks&&!this.scene.sandbox;}
+  // On when the game was started with the story (settings), or a save carries the court's state.
+  get enabled(){return !!this.scene.kingdomRanks&&!this.scene.sandbox&&(!!this.scene.gameSettings?.story||!!this.forced);}
   get active(){const story=this.scene.story;return this.enabled&&story?.faction!=='own'&&!(story?.chapter>=8);}
   // Who sends the orders: the King (also for the Crown's side), the Prague union or Tábor.
   get patron(){const f=this.scene.story?.faction;return f==='prague'||f==='tabor'?f:'king';}
@@ -126,8 +127,8 @@ export class CourtSystem {
   exportState(){return {trust:this.trust,orders:this.orders.map(o=>({...o})),seq:this.seq,nextOrderDay:this.nextOrderDay,fine:Math.round(this.fine*100)/100,countdownDay:this.countdownDay,collected:this.collected,
     expedition:this.expedition?{...this.expedition}:null,expeditions:this.expeditions,cooldownUntil:this.cooldownUntil,lastGiftDay:this.lastGiftDay};}
   importState(data){
-    if(!data){this.nextOrderDay=Math.max(COURT.firstOrderDay,this.day+1);this.emit('loaded');return;}
-    Object.assign(this,{trust:data.trust,orders:data.orders.map(o=>({...o})),seq:data.seq,nextOrderDay:data.nextOrderDay,fine:data.fine,countdownDay:data.countdownDay,collected:data.collected,
+    if(!data){this.forced=false;this.nextOrderDay=Math.max(COURT.firstOrderDay,this.day+1);this.emit('loaded');return;}
+    this.forced=true;Object.assign(this,{trust:data.trust,orders:data.orders.map(o=>({...o})),seq:data.seq,nextOrderDay:data.nextOrderDay,fine:data.fine,countdownDay:data.countdownDay,collected:data.collected,
       expedition:data.expedition?{...data.expedition}:null,expeditions:data.expeditions,cooldownUntil:data.cooldownUntil,lastGiftDay:data.lastGiftDay});this.wait=0;this.emit('loaded');
   }
   destroy(){this.listeners.clear();}

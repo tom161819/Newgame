@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CourtSystem } from '../src/systems/CourtSystem.js';
 import { StorySystem,validStoryState } from '../src/systems/StorySystem.js';
-import { STORY,STORY_EVENTS,STORY_ENDINGS,STORY_EXTRA_LETTERS,storyEnding } from '../src/data/story.js';
+import { STORY,STORY_EVENTS,STORY_ENDINGS,STORY_EXTRA_LETTERS,storyEnding,raidUnits } from '../src/data/story.js';
 import { COURT } from '../src/data/court.js';
 import { Inventory } from '../src/game/inventory.js';
 import { setLanguage,t } from '../src/i18n/index.js';
@@ -11,7 +11,7 @@ const building=(type,extra={})=>({type,construction:{state:'complete'},...extra}
 function world({gold=500,level=1,soldiers=0}={}){
   const inventory=new Inventory();inventory.add('gold',gold);inventory.add('wood',200);const feed=[],castle=building('castle',{level});
   const residents=[...Array.from({length:10},()=>({profession:'farmer'})),...Array.from({length:soldiers},()=>({profession:'soldier'}))];
-  const scene={kingdomRanks:true,inventory,gameTime:{day:1},buildings:[castle,building('lumberjack_hut')],workerSystem:{liveSubjects:()=>residents},eventFeed:{push:(k,text)=>feed.push(text)},
+  const scene={kingdomRanks:true,gameSettings:{story:true},inventory,gameTime:{day:1},buildings:[castle,building('lumberjack_hut')],workerSystem:{liveSubjects:()=>residents},eventFeed:{push:(k,text)=>feed.push(text)},
     animalSystem:{animals:new Map(),remove(a){this.animals.delete(a.id);}}};
   const court=new CourtSystem(scene,{spawn:units=>{let n=0;for(const [id,c] of Object.entries(units))for(let i=0;i<c;i++){const a={id:`${id}${i}-${scene.gameTime.day}`,type:id,isAlive:true,definition:{gameplay:{hostile:true}}};scene.animalSystem.animals.set(a.id,a);n++;}return n;}});
   scene.court=court;let joined=0;const story=new StorySystem(scene,court,{reinforce:n=>{joined+=n;}});scene.story=story;
@@ -24,7 +24,7 @@ test('story: every letter and choice has a text in both languages', () => {
   for(const lang of ['en','cs']){setLanguage(lang);
     for(const id of ids)for(const part of ['title','from','body']){const key=`story.${id}.${part}`;assert.notEqual(t(key),key,`${lang} ${key}`);}
     for(const ev of STORY_EVENTS)for(const c of ev.choices??[]){const key=`story.${ev.id}.${c.id}`;assert.notEqual(t(key),key,`${lang} ${key}`);}
-    for(const k of ['story.tribute.pay','story.tribute.refuse',...Object.keys(STORY.raid).filter(k=>k!=='plunderShare').map(k=>`story.raid.${k}`),...[1,2,3,4,5,6,7,8].map(n=>`story.chapter.${n}`)])assert.notEqual(t(k),k,`${lang} ${k}`);}
+    for(const k of ['story.tribute.pay','story.tribute.refuse',...Object.keys(STORY.raidExtra).map(k=>`story.raid.${k}`),...[1,2,3,4,5,6,7,8].map(n=>`story.chapter.${n}`)])assert.notEqual(t(k),k,`${lang} ${k}`);}
   setLanguage('en');assert.equal(new Set(ids).size,ids.length);
 });
 test('story: the prologue opens the game; chapters follow the Castle level and a minimum time; the year follows', () => {
@@ -38,10 +38,10 @@ test('story: Smil slanders, a saboteur is caught by guards (proof 1), beaten rai
   const {story,court,tick,readAll,castle,kill}=world({soldiers:2});court.nextOrderDay=1e6;tick(1);readAll();
   tick(6);assert.equal(court.trust,COURT.startTrust+STORY.smil.slander,'slander in chapter 1');
   castle.level=2;tick(11);readAll();assert.equal(story.chapter,2);tick(13);assert.equal(story.evidence,1,'the guards caught the saboteur');readAll();
-  castle.level=3;tick(21);readAll();assert.equal(story.chapter,3);tick(27);assert.ok(story.raid,'hired raiders');assert.equal(story.raid.kind,'smil');
-  kill();tick(28);assert.equal(story.raid,null);assert.equal(story.evidence,2);readAll();
-  castle.level=4;tick(31);assert.equal(story.chapter,4);readAll({choice:'crown'});assert.equal(story.faction,null,'the choice comes two days into the chapter');
-  tick(33);assert.deepEqual(story.choicesOf('choice').map(c=>c.id),['crown','prague','tabor','own']);readAll({choice:'crown'});assert.equal(story.faction,'crown');tick(34);assert.equal(story.chapter,5);
+  castle.level=3;tick(21);readAll();assert.equal(story.chapter,3);tick(28);assert.equal(story.raid,null);tick(35);assert.ok(story.raid,'hired raiders, not in the first days of the chapter');assert.equal(story.raid.kind,'smil');
+  kill();tick(36);assert.equal(story.raid,null);assert.equal(story.evidence,2);readAll();
+  castle.level=4;tick(37);assert.equal(story.chapter,4);readAll({choice:'crown'});assert.equal(story.faction,null,'the choice comes two days into the chapter');
+  tick(39);assert.deepEqual(story.choicesOf('choice').map(c=>c.id),['crown','prague','tabor','own']);readAll({choice:'crown'});assert.equal(story.faction,'crown');tick(40);assert.equal(story.chapter,5);
   let guard=0;while(story.evidence<3&&guard++<40){tick(story.day+1);if(story.raid){kill();}readAll();}
   assert.equal(story.evidence,3);assert.equal(story.canAccuse(),true);const trust=court.trust;assert.equal(story.accuse(),true);assert.equal(court.trust,Math.min(100,trust+STORY.accuseTrust));assert.equal(story.smilFallen,true);
   assert.equal(story.canAccuse(),false);
@@ -73,4 +73,10 @@ test('story: chapters 5–7 run by time to the epilogue and an ending; the state
   assert.deepEqual([['crown',{},3,50],['crown',{},0,10],['crown',{},0,50],['prague',{traitor:true},3,50],['prague',{},0,50],['tabor',{lastStand:true},0,0],['tabor',{turncoat:true},0,0],['own',{landfryd:true},3,0],['own',{landfryd:true},0,0],['own',{},3,0]]
     .map(([faction,flags,evidence,trust])=>storyEnding({faction,flags,evidence,trust})),['crownBrod','crownFall','crownSecond','pragueTraitor','pragueLord','taborLast','taborTurncoat','ownBrod','ownFree','ownIsland']);
   assert.equal(STORY_ENDINGS.length,12);
+});
+test('story: a raid is sized by the player\'s army, with archers, swordsmen and knights by Castle level', () => {
+  assert.deepEqual(raidUnits('smil',0,3),{enemy_soldier:3},'at least three men');
+  assert.deepEqual(raidUnits('smil',4,3),{enemy_archer:1,enemy_soldier:3});
+  assert.deepEqual(raidUnits('royal',20,4),{enemy_archer:7,enemy_swordsman:5,enemy_knight:2,enemy_soldier:12});
+  const total=u=>Object.values(u).reduce((n,v)=>n+v,0);assert.equal(total(raidUnits('lastStand',10,4)),22);assert.ok(total(raidUnits('mercs',10,4))<total(raidUnits('royal',10,4)));
 });

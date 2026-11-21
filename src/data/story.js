@@ -9,7 +9,12 @@ export const STORY=Object.freeze({
   years:Object.freeze({1:[1420,1420],2:[1420,1420],3:[1420,1421],4:[1421,1421],5:[1421,1424],6:[1426,1431],7:[1434,1436],8:[1437,1437]}),
   smil:Object.freeze({firstDay:6,everyDays:7,slander:-4,sabotageShare:.1,guards:2}),
   accuseTrust:30,
-  raid:Object.freeze({smil:.5,mercs:.8,hussite:.7,royal:1,tribute:.6,lastStand:2,plunderShare:.3}),
+  // A raid's size follows the player's army (so a young town is not run over): ours × factor + extra men.
+  raid:Object.freeze({smil:.6,mercs:.9,hussite:.8,royal:1.1,tribute:.7,lastStand:1.6,plunderShare:.3}),
+  raidExtra:Object.freeze({smil:2,mercs:3,hussite:3,royal:4,tribute:2,lastStand:6}),
+  // Who comes, as shares of the men, by Castle level (the rest are soldiers).
+  raidMix:Object.freeze({1:Object.freeze({enemy_archer:.3}),2:Object.freeze({enemy_archer:.3}),3:Object.freeze({enemy_archer:.3,enemy_swordsman:.2}),4:Object.freeze({enemy_archer:.3,enemy_swordsman:.2,enemy_knight:.1})}),
+  raidQuietDays:5,               // no raid in the first days of a chapter
   raidEveryDays:16,              // after the choice: Hussite raids (crown), royal armies (Prague, Tábor), tribute (own)
   income:Object.freeze({crown:4,prague:6,tabor:0,own:8}),   // gold a day × Castle level after the choice
   tributeGold:35,                // × Castle level
@@ -43,6 +48,12 @@ export const STORY_EVENTS=Object.freeze([
   e('jihlava',7,10),
   e('epilogue',8,0),
 ]);
+// The men of a raid of `kind` against an army of `ours` soldiers at a Castle level.
+export function raidUnits(kind,ours,level){
+  const total=Math.max(3,Math.round(ours*(STORY.raid[kind]??1))+(STORY.raidExtra[kind]??2)),mix=STORY.raidMix[level]??STORY.raidMix[1],units={};let rest=total;
+  for(const [id,share] of Object.entries(mix)){const n=Math.floor(total*share);if(n>0){units[id]=n;rest-=n;}}
+  units.enemy_soldier=rest;return units;
+}
 // The ending by side, flags, evidence and trust.
 export function storyEnding({faction,flags={},evidence=0,trust=0,smilFallen=false}){
   const proof=smilFallen||evidence>=STORY.evidenceMax;

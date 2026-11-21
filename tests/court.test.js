@@ -9,7 +9,7 @@ import { setLanguage } from '../src/i18n/index.js';
 const building=(type,extra={})=>({type,construction:{state:'complete'},...extra});
 function world({gold=0,wood=0,level=1}={}){
   const inventory=new Inventory();inventory.add('gold',gold);inventory.add('wood',wood);const feed=[];
-  const scene={kingdomRanks:true,inventory,gameTime:{day:1},buildings:[building('castle',{level}),building('lumberjack_hut')],workerSystem:{liveSubjects:()=>Array.from({length:10},()=>({profession:'farmer'}))},
+  const scene={kingdomRanks:true,gameSettings:{story:true},inventory,gameTime:{day:1},buildings:[building('castle',{level}),building('lumberjack_hut')],workerSystem:{liveSubjects:()=>Array.from({length:10},()=>({profession:'farmer'}))},
     eventFeed:{push:(k,text)=>feed.push(text)},animalSystem:{animals:new Map(),remove(a){this.animals.delete(a.id);}}};
   let spawned=null;const court=new CourtSystem(scene,{spawn:units=>{spawned=units;let n=0;for(const [id,c] of Object.entries(units))for(let i=0;i<c;i++){const a={id:`${id}${i}`,type:id,isAlive:true,definition:{gameplay:{hostile:true}}};scene.animalSystem.animals.set(a.id,a);n++;}return n;}});
   const tick=day=>{scene.gameTime.day=day;court.wait=0;court.update(0);};
