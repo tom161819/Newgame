@@ -56,6 +56,7 @@ export default {
   'object.pitch_kiln.name':"Smolárna",'object.pitch_kiln.description':"Smolař pálí ze 2 dřev 1 smůlu a z 1 dřeva a 1 smůly dělá 3 pochodně. Nejdřív udržuje 20 pochodní ve skladech.",
   'object.torch_post.name':"Sloup s pochodní",'object.torch_post.description':"Železný sloup s pochodní. V noci osvětlí 5 políček kolem; spálí 1 pochodeň za noc.",
   'object.campfire.name':"Táborák",'object.campfire.description':"Oheň z klestí nasbíraného na místě. Hoří jednu noc; vlci se jeho světlu vyhnou.",
+  'object.enemy_siege_tower.name':"Nepřátelská obléhací věž",'object.enemy_siege_tower.description':"Nepřátelská obléhací věž. Přistavená k hradbě pustí vojáky u ní hned přes hradbu. Příkopem neprojede.",
   'object.ram_site.name':"Beranidlo (stavba)",'object.ram_site.description':"Stavitelé u své dílny smontují beranidlo. Až bude hotové, vyjede pro obsluhu z kasáren.",
   'object.ram.name':"Beranidlo",'object.ram.description':"Zastřešený kmen na kolech, který rozbíjí brány a hradby. Šípy jeho obsluze skoro neublíží; příkopem neprojede.",
   'object.enemy_ram.name':"Nepřátelské beranidlo",'object.enemy_ram.description':"Nepřátelské beranidlo. Rozbíjí brány a hradby; šípy jeho obsluze skoro neublíží a příkopem neprojede.",

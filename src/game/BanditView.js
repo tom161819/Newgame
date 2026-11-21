@@ -36,3 +36,16 @@ export class RamView extends HumanView {
   applyArt(){}
   setAttackPose(){}
 }
+
+// Point 6: the enemy siege tower (provisional): a tall plank tower on wheels with a drawbridge at the top.
+export class SiegeTowerView extends RamView {
+  paint(){
+    for(const p of [this.leftLeg,this.rightLeg,...(this.arms??[])])p?.setVisible(false);this.shadow?.setVisible(false);if(this.art)this.art.setVisible(false);
+    const g=this.body.clear();g.fillStyle(0x2e241a,.3);g.fillEllipse(0,0,46,12);
+    g.fillStyle(0x7a5233);g.fillRect(-16,-86,32,80);g.lineStyle(1.5,0x3b2616);g.strokeRect(-16,-86,32,80);
+    g.lineStyle(1,0x4a3220,.8);for(let y=-78;y<-8;y+=8)g.lineBetween(-16,y,16,y);
+    g.fillStyle(0x6a4528);g.fillRect(-19,-92,38,7);g.fillStyle(0x8a5e36);g.fillRect(-12,-84,24,16);g.lineStyle(1,0x3b2616);g.strokeRect(-12,-84,24,16);
+    g.fillStyle(0x3f6fb0);g.fillTriangle(0,-104,10,-100,0,-96);g.lineStyle(1.5,0x3b2616);g.lineBetween(0,-92,0,-104);
+    for(const x of [-12,12]){g.fillStyle(0x5a4a3a);g.fillCircle(x,-3,6);g.lineStyle(1.5,0x2e241a);g.strokeCircle(x,-3,6);}
+  }
+}

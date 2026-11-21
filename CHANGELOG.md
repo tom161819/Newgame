@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.18] - 2026-11-21
+<!-- version: {"title":"Portcullis, siege tower and pavise","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Portcullis: fit one in a Gate's window (10 Iron, 6 Wood). Rams and soldiers then do only half damage to that Gate.
+- Pavise: a Crossbowman standing still is behind his pavise and takes half damage from arrows and bolts.
+- Enemy siege tower: it rolls to your wall and docks, and enemy soldiers beside it cross the wall at once.
+
 ## [0.149.17] - 2026-11-21
 <!-- version: {"title":"Shield wall, Hedgehog and terrain","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added

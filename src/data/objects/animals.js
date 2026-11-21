@@ -106,3 +106,15 @@ animals.push({
   stats:{maxHP:420,attackDPS:0,armor:40,attackRange:1},
   animations:{mode:'procedural',states:['idle','walk'],directions:['N','NE','E','SE','S','SW','W','NW']},
 });
+// Owner 20 Nov 2026 (defence list, point 6): the enemy's siege tower – rolls to our wall and docks; his soldiers beside it
+// cross that wall at once (EnemyArmy). Provisional drawing in code (SiegeTowerView).
+animals.push({
+  id:'enemy_siege_tower',name:'Enemy Siege Tower',category:'animal',sprite:'/assets/resources/horse_wagon/horse_wagon.svg',
+  width:1,height:1,walkable:false,collectible:false,buildable:false,cost:{},interactions:['hunt'],
+  description:'An enemy siege tower. Docked at a wall, it lets the enemy soldiers beside it over the wall at once. It cannot cross a Moat.',
+  renderMode:'procedural',renderer:'enemy-siege-tower',origin:{x:.5,y:.92},visualHeight:90,
+  visual:{hitArea:{x:-22,y:-92,width:44,height:94},healthBarOffset:98},depth:{offset:.1},
+  gameplay:{movementSpeed:1.1,initialCount:0,behavior:'wander',huntable:true,meatDrop:0,wanderRadius:1,zoneOnly:true,hostile:true,ram:true,wheels:true,siegeTower:true},
+  stats:{maxHP:500,attackDPS:0,armor:30,attackRange:1},
+  animations:{mode:'procedural',states:['idle','walk'],directions:['N','NE','E','SE','S','SW','W','NW']},
+});

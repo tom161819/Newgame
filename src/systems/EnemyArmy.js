@@ -5,7 +5,7 @@ import { gridToWorld,tileCenter } from '../game/isometric.js';
 import { isWalkable } from '../game/map.js';
 import { inAttackRange } from './CombatSystem.js';
 import { siegeTiles,touchesBuilding } from './SiegeSystem.js';
-import { RAM,LADDER } from '../data/military.js';
+import { RAM,LADDER,PORTCULLIS,SIEGE_TOWER } from '../data/military.js';
 
 // Battle test 18 Nov 2026, point 2 ("the enemies are passive"): an enemy army with an order. On the Test map the
 // button "Enemy attacks" sends every enemy soldier on the ground against the kingdom (`animal.marching`): they march on
@@ -68,10 +68,13 @@ export class EnemyArmy{
   }
   hit(animal,b,delta){
     const s=this.scene,{width,height}=buildingDefinition(b),dx=b.x+width/2-animal.position.x,dy=b.y+height/2-animal.position.y,n=Math.hypot(dx,dy);if(n)animal.direction={x:dx/n,y:dy/n};
+    // Point 6: the enemy siege tower docks at our wall and stays there (his men cross beside it).
+    if(animal.definition?.gameplay?.siegeTower){if(b.type==='wall'){animal.docked=b.id;animal.path=[];if(!b.towerTold){b.towerTold=true;s.eventFeed?.push?.(`army-tower:${b.id}`,t('army.siegeTower'),{important:true,target:{x:b.x,y:b.y}});}}return;}
     // Owner 20 Nov 2026: a ram strikes Gates and walls hard (RAM); a soldier with a ladder goes over a wall instead.
     if(animal.definition?.gameplay?.ladder&&b.type==='wall'&&this.ladder(animal,b,delta))return;
     let amount=animal.definition?.gameplay?.ram?RAM.damage*1000/RAM.reload*(RAM.fortTypes.includes(b.type)?1:RAM.otherShare)*(b.type==='castle'?ENEMY_ARMY.castleShare:1)*Math.max(0,delta)/1000
       :Math.max(0,animal.attackDPS)*(b.type==='castle'?ENEMY_ARMY.castleShare:ENEMY_ARMY.buildingShare)*Math.max(0,delta)/1000;
+    if(b.portcullis)amount*=PORTCULLIS.damage;
     if(b.type==='castle'){const hp=buildingHP(b),floor=hp.max*ENEMY_ARMY.castleFloor;amount=Math.min(amount,Math.max(0,hp.hp-floor));if(amount<=0){animal.armyBuilding=null;return;}}
     const result=damageBuilding(b,amount);s.repairs?.cancel?.(b.id);s.military?.siege?.drawBar?.(b);
     if(!b.underAttackTold){b.underAttackTold=true;s.eventFeed?.push?.(`army-hit:${b.id}`,t('army.buildingAttacked',{name:buildingDefinition(b).name}),{important:true,target:{x:b.x+1,y:b.y+1}});}
@@ -85,6 +88,9 @@ export class EnemyArmy{
     const s=this.scene,e=animal.tile,dx=wall.x-e.x,dy=wall.y-e.y;if(Math.abs(dx)+Math.abs(dy)!==1)return false;
     const over={x:wall.x+dx,y:wall.y+dy};if(!isWalkable(s.map,over.x,over.y))return false;
     const l=animal.ladderState??={wall:wall.id,time:0,pushed:0};if(l.wall!==wall.id){l.wall=wall.id;l.time=0;l.pushed=0;}
+    // Point 6: beside a docked enemy siege tower the wall is crossed at once and nobody throws anything down.
+    const docked=this.animals().some(a=>a.definition?.gameplay?.siegeTower&&a.docked===wall.id||a.definition?.gameplay?.siegeTower&&a.docked!=null&&Math.hypot(a.position.x-animal.position.x,a.position.y-animal.position.y)<=SIEGE_TOWER.reach);
+    if(docked){l.time+=delta;if(l.time<SIEGE_TOWER.climb)return true;delete animal.ladderState;this.dropLadder(animal);animal.position={x:over.x+.5,y:over.y+.5};animal.tile={...over};animal.nextTile=null;animal.path=[];animal.armyBuilding=null;animal.armyRepath=0;return true;}
     l.time+=delta;this.drawLadder(animal,wall,Math.max(0,Math.min(1,l.time/LADDER.raise)));
     const guard=(s.workerSystem?.liveWorkers?.()??[]).some(w=>w.onWall&&w.isAlive&&Math.hypot(w.position.x-wall.x-.5,w.position.y-wall.y-.5)<=LADDER.guard);
     l.pushed=guard?l.pushed+delta:0;

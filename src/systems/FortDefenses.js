@@ -1,5 +1,5 @@
 import { t } from '../i18n/index.js';
-import { BOILING_PITCH,BALLISTA } from '../data/military.js';
+import { BOILING_PITCH,BALLISTA,PORTCULLIS } from '../data/military.js';
 import { buildingDefinition,buildingIsComplete,towerTop } from '../game/buildings.js';
 import { gridToWorld,tileCenter } from '../game/isometric.js';
 import { clampArmor } from './UnitStats.js';
@@ -48,5 +48,10 @@ export class FortDefenses{
   mount(tower){
     const s=this.scene;if(tower?.type!=='tower'||tower.enemy||!buildingIsComplete(tower))return {error:t('defense.noTower')};if(tower.ballista)return {error:t('defense.ballistaThere')};
     if(!s.sandbox&&!s.inventory.pay(BALLISTA.cost,{source:'Ballista'}))return {error:t('status.noFunds')};tower.ballista=true;return {ok:true};
+  }
+  // Point 6: the Gate's window – a portcullis.
+  portcullis(gate){
+    const s=this.scene;if(!['gate','wall_gate'].includes(gate?.type)||gate.enemy||!buildingIsComplete(gate))return {error:t('defense.noGate')};if(gate.portcullis)return {error:t('defense.portcullisThere')};
+    if(!s.sandbox&&!s.inventory.pay(PORTCULLIS.cost,{source:'Portcullis'}))return {error:t('status.noFunds')};gate.portcullis=true;return {ok:true};
   }
 }

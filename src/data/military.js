@@ -110,3 +110,10 @@ export const MORALE=Object.freeze({max:100,death:14,deathRadius:6,wounded:4,outn
 // a bolt every `reload` ms at the nearest enemy within `range` (rams and riders first), `damage`, half the armour ignored.
 export const BOILING_PITCH=Object.freeze({damage:45,reload:12000,pitch:1,fortTypes:Object.freeze(['gate','tower','wall_gate'])});
 export const BALLISTA=Object.freeze({range:14,reload:6000,damage:60,pierce:.5,cost:Object.freeze({wood:20,iron:4})});
+// Owner 20 Nov 2026 (defence list, point 6). Portcullis: bought in the Gate's window; a Gate with it takes `damage` of the
+// blows of rams and soldiers. Pavise: a Crossbowman standing still sets up his pavise – shots do `ranged` to him.
+// Siege tower: the enemy's tower rolls to our wall and docks; his men within `reach` tiles of it cross that wall in
+// `climb` ms and cannot be thrown down.
+export const PORTCULLIS=Object.freeze({damage:.5,cost:Object.freeze({iron:10,wood:6})});
+export const PAVISE=Object.freeze({ranged:.5});
+export const SIEGE_TOWER=Object.freeze({reach:4,climb:1000});

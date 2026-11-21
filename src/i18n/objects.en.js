@@ -56,6 +56,7 @@ export default {
   'object.pitch_kiln.name':"Pitch Kiln",'object.pitch_kiln.description':"A Pitch Maker burns 2 Wood into 1 Pitch, and dips 1 Wood in 1 Pitch for 3 Torches. He keeps 20 Torches in the stores first.",
   'object.torch_post.name':"Torch Post",'object.torch_post.description':"An iron post with a torch. Lights 5 tiles around it at night; burns 1 Torch a night.",
   'object.campfire.name':"Campfire",'object.campfire.description':"A fire of brushwood gathered on the spot. Burns one night; wolves keep away from its light.",
+  'object.enemy_siege_tower.name':"Enemy Siege Tower",'object.enemy_siege_tower.description':"An enemy siege tower. Docked at a wall, it lets the enemy soldiers beside it over the wall at once. It cannot cross a Moat.",
   'object.ram_site.name':"Battering Ram (building)",'object.ram_site.description':"Builders put together a Battering Ram beside their Workshop. When it is finished it rolls out for a crew from the Barracks.",
   'object.ram.name':"Battering Ram",'object.ram.description':"A roofed log on wheels that breaks Gates and walls. Arrows hardly hurt its crew; it cannot cross a Moat.",
   'object.enemy_ram.name':"Enemy Battering Ram",'object.enemy_ram.description':"An enemy battering ram. It breaks Gates and walls; arrows hardly hurt its crew and it cannot cross a Moat.",

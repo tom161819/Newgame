@@ -9,7 +9,7 @@ import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
 import { findPathToAny } from '../game/pathfinding.js';
 import { inAttackRange,isRanged,WALL_ARCHER_RANGE,LOB,canLob } from './CombatSystem.js';
 import { blockersBetween } from '../game/lineOfSight.js';
-import { MILITARY_RULES,PATROL,STANCES,BATTLE_ORDERS,holdsGround,TERRAIN_COMBAT } from '../data/military.js';
+import { MILITARY_RULES,PATROL,STANCES,BATTLE_ORDERS,holdsGround,TERRAIN_COMBAT,PAVISE } from '../data/military.js';
 import { freeAround,awayFrom } from '../game/combatSpacing.js';
 import { SiegeSystem,siegeable,canSiege } from './SiegeSystem.js';
 import { buildingDefinition } from '../game/buildings.js';
@@ -31,7 +31,9 @@ export class MilitarySystem {
   orderFactor(attacker,target){
     const ranged=isRanged(attacker),wall=BATTLE_ORDERS.shieldwall,hog=BATTLE_ORDERS.hedgehog;let f=1;
     if(target?.stance==='shieldwall')f*=ranged?wall.ranged:wall.melee;if(attacker?.stance==='shieldwall')f*=wall.own;
-    if(target?.stance==='hedgehog'&&this.mounted(attacker))f*=hog.vsRider;if(attacker?.stance==='hedgehog'&&this.mounted(target))f*=hog.riderBonus;
+    if(target?.stance==='hedgehog'&&this.mounted(attacker))f*=hog.vsRider;
+    // Point 6: a Crossbowman standing still is behind his pavise.
+    if(ranged&&this.spec(target)?.equipment?.weapon==='crossbow'&&!target.nextTile&&!target.path?.length)f*=PAVISE.ranged;if(attacker?.stance==='hedgehog'&&this.mounted(target))f*=hog.riderBonus;
     return f;
   }
   // …and the ground: an archer above his target shoots harder; trees around the target soak up arrows.

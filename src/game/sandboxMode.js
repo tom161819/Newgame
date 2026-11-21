@@ -24,7 +24,7 @@ export function sandboxSettings(landId='home',{worldCode=null}={}){
 }
 export const SANDBOX_UNITS=Object.freeze([
   {group:'ours',id:'soldier',unit:'soldier'},{group:'ours',id:'archer',unit:'archer'},{group:'ours',id:'swordsman',unit:'swordsman'},{group:'ours',id:'knight',unit:'knight'},{group:'ours',id:'halberdier',unit:'halberdier'},{group:'ours',id:'royal_archer',unit:'royal_archer'},{group:'ours',id:'crossbowman',unit:'crossbowman'},{group:'ours',id:'light_cavalry',unit:'light_cavalry'},{group:'ours',id:'catapult',unit:'catapult'},{group:'ours',id:'ram',unit:'ram'},{group:'ours',id:'military_wagon',unit:'military_wagon'},
-  {group:'foes',id:'enemy_soldier'},{group:'foes',id:'enemy_archer'},{group:'foes',id:'enemy_swordsman'},{group:'foes',id:'enemy_knight'},{group:'foes',id:'enemy_ram'},{group:'foes',id:'enemy_king'},{group:'foes',id:'raider'},{group:'foes',id:'bandit'},{group:'foes',id:'cave_rat'},{group:'foes',id:'wolf'},
+  {group:'foes',id:'enemy_soldier'},{group:'foes',id:'enemy_archer'},{group:'foes',id:'enemy_swordsman'},{group:'foes',id:'enemy_knight'},{group:'foes',id:'enemy_ram'},{group:'foes',id:'enemy_siege_tower'},{group:'foes',id:'enemy_king'},{group:'foes',id:'raider'},{group:'foes',id:'bandit'},{group:'foes',id:'cave_rat'},{group:'foes',id:'wolf'},
   {group:'animals',id:'deer'},{group:'animals',id:'wild_boar'},{group:'animals',id:'rabbit'},{group:'animals',id:'horse'},
 ].map(u=>Object.freeze(u)));
 export const SANDBOX_COUNTS=Object.freeze([1,5,10,25,50]);
