@@ -1,5 +1,5 @@
 import { KING_SKILLS,KING_SKILL_IDS,KING_POINT_COST } from '../data/kingSkills.js';
-import { ROYAL_GOALS } from '../data/royalGoals.js';
+import { ROYAL_GOALS,RETIRED_ROYAL_GOAL_POINTS } from '../data/royalGoals.js';
 import { SKILL_IDS } from '../data/jobs.js';
 import { getXPRequired,totalXPForLevel } from '../data/experience.js';
 import { visibilityProfile } from './VisibilityModifiers.js';
@@ -68,6 +68,6 @@ export function validKingSkillState(data,doneGoals=[],goals=ROYAL_GOALS){
   if(Object.keys(data).sort().join()!==['points',...KING_SKILL_IDS].sort().join())return false;
   if(!Number.isSafeInteger(data.points)||data.points<0)return false;
   for(const id of KING_SKILL_IDS)if(!Number.isSafeInteger(data[id])||data[id]<0||data[id]>KING_SKILLS[id].maxLevel)return false;
-  const done=new Set(doneGoals),earned=goals.filter(g=>done.has(g.id)).reduce((sum,g)=>sum+(g.skillPoints??0),0);
+  const done=new Set(doneGoals),earned=goals.filter(g=>done.has(g.id)).reduce((sum,g)=>sum+(g.skillPoints??0),0)+RETIRED_ROYAL_GOAL_POINTS;
   return data.points+KING_SKILL_IDS.reduce((sum,id)=>sum+data[id]*KING_POINT_COST,0)<=earned;
 }

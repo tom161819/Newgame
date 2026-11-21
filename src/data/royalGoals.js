@@ -13,6 +13,10 @@ export const ROYAL_GOALS=Object.freeze([
 // m-uroven-kralovstvi (owner 21 Nov 2026): the Wall and Barracks tasks are dropped (they need Castle level 3). A save that
 // finished them still loads; the ids are skipped on import.
 export const RETIRED_ROYAL_GOALS=Object.freeze(['wall','barracks']);
+// Owner 21 Nov 2026 ("proč mi nejde načíst hra? [kingSkills]"): the retired tasks gave 2 + 3 King skill points. A save
+// keeps those points but no longer lists the tasks as done (they are skipped on import, so the next save drops them), so
+// the King skill check allows these points on top of what the listed tasks earned.
+export const RETIRED_ROYAL_GOAL_POINTS=5;
 export const ROYAL_GOALS_ACTIVE=3;
 // How often the goals are checked (game milliseconds); a finished goal never needs to be faster than this.
 export const ROYAL_GOALS_CHECK_MS=500;

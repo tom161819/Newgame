@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.34] - 2026-11-21
+<!-- version: {"title":"Saves with retired task points load","type":"fix","reconstructed":false,"saveVersion":67} -->
+### Fixed
+- A save whose King had skill points from the retired Wall and Barracks tasks loads again (it failed with [kingSkills]).
+
 ## [0.149.33] - 2026-11-21
 <!-- version: {"title":"New Archer and Crossbowman","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Changed

@@ -92,7 +92,9 @@ test('Save/Load keeps unspent points, royal levels and bought King skill levels;
   const r=workerScene(saved.terrain,{starter:false,gameSettings:gameSettings()});r.policy=new PolicySystem(r);r.royalGoals=new RoyalGoals(r);r.kingSkills=new KingSkills(r,r.royalGoals);
   loadGameState(r,saved);assert.deepEqual(r.kingSkills.exportState(),saved.kingSkills);assert.equal(r.character.skills.combat.level,combat);
   for(const corrupt of [k=>k.points=-1,k=>k.points=1.5,k=>k.leadership=6,k=>k.stewardship='2',k=>k.extra=1,k=>delete k.points,k=>k.points=100]){const bad=structuredClone(saved);corrupt(bad.kingSkills);assert.throws(()=>validateGameState(bad),JSON.stringify(bad.kingSkills));}
-  const none=structuredClone(saved);none.royalGoals.done=[];assert.throws(()=>validateGameState(none),'points without finished tasks');
+  const none=structuredClone(saved);none.royalGoals.done=[];Object.assign(none.kingSkills,{points:6,leadership:0,stewardship:0});assert.throws(()=>validateGameState(none),'points without finished tasks');
+  // Owner 21 Nov 2026: the retired Wall and Barracks tasks gave 5 points that a later save keeps without listing the tasks.
+  const retired=structuredClone(saved);retired.royalGoals.done=[];Object.assign(retired.kingSkills,{points:3,leadership:1,stewardship:1});assert.ok(validateGameState(retired),'points of the retired tasks load');
   const old=structuredClone(saved);delete old.kingSkills;assert.ok(validateGameState(old),'the field is optional');
   const o=workerScene(old.terrain,{starter:false,gameSettings:gameSettings()});o.royalGoals=new RoyalGoals(o);o.kingSkills=new KingSkills(o,o.royalGoals);loadGameState(o,old);assert.deepEqual(o.kingSkills.exportState(),{points:0,leadership:0,stewardship:0});
   assert.equal(validKingSkillState({points:0,leadership:0,stewardship:0}),true);assert.equal(validKingSkillState(null),false);assert.equal(validKingSkillState([]),false);
