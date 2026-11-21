@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.31] - 2026-11-21
+<!-- version: {"title":"Selection tips stay on screen","type":"fix","reconstructed":false,"saveVersion":67} -->
+### Fixed
+- The hover texts of the unit boxes in the selection bar no longer run off the screen.
+
 ## [0.149.30] - 2026-11-21
 <!-- version: {"title":"Taller Population panel","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Changed

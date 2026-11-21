@@ -10,6 +10,7 @@ import { knownMap } from '../game/knownMap.js';
 import { blockingDialog } from './dockedPanels.js';
 import { setSquad,squadMembers } from './armySquads.js';
 import { JOBS } from '../data/jobs.js';
+import { GameTip } from './KingdomOverview.js';
 import { GEAR_ICONS,gearOf } from './gearIcons.js';
 import { KIND_ICONS,lookPicture } from './unitPictures.js';
 import { confirmAsk } from './confirmAsk.js';
@@ -27,6 +28,8 @@ export class UnitSelection {
     this.scene=scene;this.ids=new Set();this.graphics=scene.add.graphics().setDepth(1000000);this.overlay=scene.add.graphics().setDepth(1000001);
     this.panel=document.createElement('div');this.panel.id='unit-command-bar';this.panel.className='unit-command-bar';this.panel.hidden=true;this.panel.setAttribute('role','group');
     this.label=document.createElement('span');this.panel.append(this.label);this.buttons={};
+    // Owner 21 Nov 2026: the hover texts are the game's tip panel, which never leaves the window (the CSS bubble did).
+    this.tipAbort=new AbortController();this.tip=new GameTip(document,[this.panel],{signal:this.tipAbort.signal});
     // Owner 16 Nov 2026: what is chosen, by kind – an icon and a count for each kind (a click keeps only that kind).
     this.kinds=document.createElement('span');this.kinds.className='unit-kinds';this.panel.append(this.kinds);
     for(const action of ['hold','resume','inspect','clear']){const button=document.createElement('button');button.type='button';button.dataset.unitCommand=action;button.addEventListener('click',()=>this.act(action));this.panel.append(button);this.buttons[action]=button;}
@@ -234,5 +237,5 @@ export class UnitSelection {
     // pointer at every zoom (a scroll-free overlay is still zoomed around the screen middle).
     if(this.anchor&&this.dragging&&this.current){const cam=s.cameras.main,a=cam.getWorldPoint(this.anchor.x,this.anchor.y),b=cam.getWorldPoint(this.current.x,this.current.y);this.overlay.lineStyle(1/(cam.zoom||1),0xffd768,1).fillStyle(0xffd768,.12).fillRect(a.x,a.y,b.x-a.x,b.y-a.y).strokeRect(a.x,a.y,b.x-a.x,b.y-a.y);}
   }
-  destroy(){this.keys?.abort();this.graphics.destroy();this.overlay.destroy();this.blueprint?.destroy();this.panel.remove();}
+  destroy(){this.tipAbort?.abort();this.tip?.destroy();this.keys?.abort();this.graphics.destroy();this.overlay.destroy();this.blueprint?.destroy();this.panel.remove();}
 }

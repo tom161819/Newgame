@@ -1469,3 +1469,4 @@ body.sandbox-tool canvas { cursor:crosshair !important; }
 /* Owner 21 Nov 2026: Population from under the top bar to the bottom; the list takes the free height. */
 .population-panel { top:90px; bottom:12px; max-height:none; overflow-y:auto; }
 .population-panel .population-viewport { flex:1 1 auto; height:auto; min-height:180px; }
+.unit-icon-command::after { display:none !important; } /* owner 21 Nov 2026: the game tip panel shows these */

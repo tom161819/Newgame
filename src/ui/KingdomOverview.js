@@ -68,7 +68,7 @@ export const tipParts=text=>{const lines=String(text??'').split('\n').filter(Boo
 export class GameTip {
   constructor(doc,roots,options){
     this.doc=doc;if(!doc?.createElement||!doc.body)return;this.box=doc.createElement('div');this.box.className='game-tip';this.box.hidden=true;this.box.setAttribute('role','tooltip');doc.body.append(this.box);
-    const find=event=>event.target?.closest?.('[data-tip]');
+    const find=event=>event.target?.closest?.('[data-tip],[data-tip-title]');
     for(const root of roots.filter(Boolean)){
       root.addEventListener('pointerover',event=>{const el=find(event);if(el)this.show(el);},options);
       root.addEventListener('pointerout',event=>{if(this.target&&!this.target.contains(event.relatedTarget))this.hide();},options);
@@ -78,8 +78,10 @@ export class GameTip {
   show(el){this.target=el;this.text=null;this.refresh();}
   hide(){this.target=null;if(this.box)this.box.hidden=true;}
   refresh(){
-    const el=this.target,box=this.box;if(!el||!box)return;if(!el.isConnected||!el.dataset.tip){this.hide();return;}
-    if(el.dataset.tip!==this.text){this.text=el.dataset.tip;const parts=tipParts(this.text),kids=[element('strong','game-tip-title',parts.title)];
+    const el=this.target,box=this.box;if(!el||!box)return;if(!el.isConnected||!(el.dataset.tip||el.dataset.tipTitle)){this.hide();return;}
+    // A separate `data-tip-title` (the unit command bar) is the heading above the tip text.
+    const text=el.dataset.tipTitle?[el.dataset.tipTitle,el.dataset.tip].filter(Boolean).join('\n'):el.dataset.tip;
+    if(text!==this.text){this.text=text;const parts=tipParts(this.text),kids=[element('strong','game-tip-title',parts.title)];
       for(const l of parts.lines){if(l.row){const r=element('div','game-tip-row');r.dataset.tone=l.tone;r.append(element('span','',l.row[0]),element('b','',l.row[1]));kids.push(r);continue;}kids.push(element('p',l.tip?'game-tip-advice':l.number?'game-tip-factor':'',l.text));}box.replaceChildren(...kids);}
     box.hidden=false;const r=el.getBoundingClientRect(),w=box.offsetWidth,h=box.offsetHeight,view=this.doc.documentElement,vw=view.clientWidth,vh=view.clientHeight;
     const left=Math.max(8,Math.min(vw-w-8,r.left)),top=r.top-h-8>=8?r.top-h-8:Math.min(vh-h-8,r.bottom+8);box.style.left=`${Math.round(left)}px`;box.style.top=`${Math.round(Math.max(8,top))}px`;
