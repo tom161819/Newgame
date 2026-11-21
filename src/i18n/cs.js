@@ -490,4 +490,12 @@ export default {
   "build.side.E":"vpravo dole",
   "build.side.N":"vpravo nahoře (vzadu)",
   "build.side.W":"vlevo nahoře (vzadu)",
+  // m-uroven-kralovstvi
+  'kingdom.rank.settlement':'Osada','kingdom.rank.village':'Vesnice','kingdom.rank.smallTown':'Městečko','kingdom.rank.town':'Město',
+  'kingdom.label':'Úroveň království: {rank} · {met}/{total}','kingdom.labelNone':'Úroveň království: {rank}','kingdom.labelMax':'Úroveň království: {rank}',
+  'kingdom.tipTitle':'Úroveň království: {rank} (hrad úrovně {level})','kingdom.tipNext':'Další: {rank} (hrad úrovně {level}) – splněno {met} z {total} podmínek',
+  'kingdom.tipLater':'Podmínky pro úroveň {rank} (hrad úrovně {level}) přibudou později; hrad lze vylepšit už teď.','kingdom.tipMax':'Nejvyšší úroveň.',
+  'kingdom.tipReady':'Tip: Všechny podmínky jsou splněné – vylepši hrad a království postoupí.','kingdom.tipHow':'Tip: Až budou všechny podmínky splněné, vylepši hrad.',
+  'kingdom.req.building':'Postavena: {name}','kingdom.req.happiness':'Spokojenost {current} / {target} %','kingdom.req.foodDays':'Jídlo na {current} / {target} dní','kingdom.req.buildings':'Postavené budovy {current} / {target}',
+  'unlock.castleLevel':'Vyžaduje hrad úrovně {level} ({rank})','castle.rankBlocked':'Království ještě není připravené stát se úrovní {rank}: {missing}',
 };

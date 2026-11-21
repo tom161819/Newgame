@@ -1,6 +1,7 @@
 import { t } from '../i18n/index.js';
 import { buildingDefinition,buildingIsComplete,buildingTiles,levelDefinition } from './buildings.js';
 import { CASTLE_LEVELS,CASTLE_MAX_LEVEL,castleLevel } from '../data/castle.js';
+import { sceneKingdomRank,rankBlockedText } from './kingdomRankState.js';
 
 // m-hrad-urovne (owner 15 Nov 2026): the Castle's upgrade. A bigger footprint needs free ground around (the Castle may
 // grow to any side). Owner 15 Nov 2026 (61): the upgrade is paid when ordered and then built by Builders over the level's
@@ -10,6 +11,8 @@ export function castleUpgradePlan(scene,castle,{paid=false}={}){
   if(castle.upgrade&&!paid)return {next:castle.upgrade.level,rules:CASTLE_LEVELS[castle.upgrade.level],busy:true,error:t('castle.upgrading',{level:castle.upgrade.level,progress:Math.floor(castle.upgrade.progress??0)})};
   if(castle.repair&&!paid)return {error:t('castle.repairing')};
   const next=paid?castle.upgrade.level:castleLevel(castle)+1;if(next>CASTLE_MAX_LEVEL)return {error:t('castle.maxLevel'),max:true};
+  // m-uroven-kralovstvi: the next level needs the kingdom's conditions for the next rank (sandbox: free).
+  if(!paid&&scene.kingdomRanks&&!scene.sandbox){const rank=sceneKingdomRank(scene);if(rank.next===next&&!rank.ready)return {next,rules:CASTLE_LEVELS[next],rank,blocked:true,error:rankBlockedText(rank)};}
   const rules=CASTLE_LEVELS[next],d=levelDefinition(scene.objectRegistry.require('castle'),next),old=buildingDefinition(castle),grow=rules.size-old.width;
   const king=scene.character;if(king&&king.state!=='ground'&&king.currentTower===castle)return {next,rules,error:t('castle.kingInside')};
   const own=new Set(castle.tiles.map(p=>`${p.x},${p.y}`)),units=new Set();

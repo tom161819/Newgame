@@ -613,6 +613,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .need-mood[data-mood="happy"] { color:#b9e08a; } .need-mood[data-mood="unhappy"] { color:#e6b062; } .need-mood[data-mood="critical"] { color:#f08a6c; }
 .kingdom-happiness { justify-self:start; padding:0 6px; font:inherit; font-size:11px; color:#d5c78d; background:none; border:1px solid #6c6440; border-radius:3px; cursor:pointer; }
 .kingdom-happiness[data-mood="unhappy"] { color:#e6b062; } .kingdom-happiness[data-mood="critical"] { color:#f08a6c; border-color:#a5553c; }
+.kingdom-rank { margin-left:auto; padding:1px 8px; font-size:11px; color:#e3c57a; border:1px solid #6c6440; border-radius:3px; white-space:nowrap; cursor:help; } .kingdom-rank[data-ready="true"] { color:#9fc172; border-color:#6f8a4d; }
 .population-needs { margin:.2rem 0; font-size:12px; color:#d9cfa8; }
 .building-inspect-button{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .demolition-actions{margin-top:1rem;padding-top:1rem;border-top:1px solid #a9987255}

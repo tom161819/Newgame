@@ -64,10 +64,10 @@ export function gateAxis(index,building){
 export const gateAxisLocked=(index,building)=>{const a=gateAxis(index,{...building,gateAxis:'x'}),b=gateAxis(index,{...building,gateAxis:'y'});return a===b;};
 // R while placing: turns the pending axis unless the wall run under the cursor decides it (then it stays and locked is true).
 export function turnGate(index,anchor,axis){return anchor&&gateAxisLocked(index,anchor)?{axis:axis==='x'?'x':'y',locked:true}:{axis:axis==='x'?'y':'x',locked:false};}
-export function wallLinePlan({map,tiles,resources,reservedTiles=[],buildings,definition,inventory}){
+export function wallLinePlan({map,tiles,resources,reservedTiles=[],buildings,definition,inventory,unlocks=null}){
   const existing=wallIndex(buildings,true),fresh=tiles.filter(tile=>!existing.has(tileKey(tile)));
   if(!fresh.length)return {error:t('status.wallExists'),tiles:[],cost:{}};
-  for(const tile of fresh){const error=placementError(map,tile,resources,reservedTiles,definition,buildings);if(error)return {error,tiles:fresh,cost:{}};}
+  for(const tile of fresh){const error=placementError(map,tile,resources,reservedTiles,definition,buildings,unlocks);if(error)return {error,tiles:fresh,cost:{}};}
   const cost=Object.fromEntries(Object.entries(definition.cost).map(([id,amount])=>[id,amount*fresh.length]));
   if(!inventory.canAfford(cost))return {error:t('status.wallNoFunds'),tiles:fresh,cost};
   return {tiles:fresh,cost,error:null};

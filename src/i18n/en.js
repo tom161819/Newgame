@@ -489,4 +489,12 @@ export default {
   "build.side.E":"lower right",
   "build.side.N":"upper right (back)",
   "build.side.W":"upper left (back)",
+  // m-uroven-kralovstvi
+  'kingdom.rank.settlement':'Settlement','kingdom.rank.village':'Village','kingdom.rank.smallTown':'Small town','kingdom.rank.town':'Town',
+  'kingdom.label':'Kingdom: {rank} · {met}/{total}','kingdom.labelNone':'Kingdom: {rank}','kingdom.labelMax':'Kingdom: {rank}',
+  'kingdom.tipTitle':'Kingdom rank: {rank} (Castle level {level})','kingdom.tipNext':'Next: {rank} (Castle level {level}) – {met} of {total} conditions met',
+  'kingdom.tipLater':'Conditions for {rank} (Castle level {level}) come later; the Castle can be upgraded now.','kingdom.tipMax':'The highest rank.',
+  'kingdom.tipReady':'Tip: All conditions are met – upgrade the Castle to reach the next rank.','kingdom.tipHow':'Tip: When all conditions are met, upgrade the Castle.',
+  'kingdom.req.building':'{name} built','kingdom.req.happiness':'Happiness {current} / {target} %','kingdom.req.foodDays':'Food for {current} / {target} days','kingdom.req.buildings':'Buildings {current} / {target}',
+  'unlock.castleLevel':'Needs Castle level {level} ({rank})','castle.rankBlocked':'The kingdom is not ready to become a {rank}: {missing}',
 };

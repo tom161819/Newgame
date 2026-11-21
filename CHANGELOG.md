@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.23] - 2026-11-21
+<!-- version: {"title":"Kingdom rank","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Kingdom rank in the top bar: Settlement, Village, Small town or Town by the Castle level, with how many conditions for the next rank are met. Hover it to see them.
+- To upgrade the Castle to level 2 (Village) the kingdom needs a Granary, a Material Yard, Happiness of at least 70 %, food for 10 days and 8 buildings.
+### Changed
+- Buildings unlock by the Castle level: for example the Stone Tower, Farmhouse and Mill at level 2, walls, Gate and Barracks at level 3, the military workshops at level 4.
+
 ## [0.149.22] - 2026-11-21
 <!-- version: {"title":"Asset Studio in two parts","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Changed
