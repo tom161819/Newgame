@@ -40,7 +40,7 @@ export async function kingdomBarSmoke(context,url,instrument){
       for(const word of ['Happiness','Food','Rest','Housing','Safety','Average mood'])assert.ok((await page.locator('#kingdom-bar-body').textContent()).includes(word),word);
       if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/kingdom-bar-${width}.png`});
       // Folded by the top-bar chips, kept after a reload, opened by its own toggle.
-      await page.locator('#kingdom-overview').click();await page.waitForFunction(()=>document.querySelector('#kingdom-bar').classList.contains('collapsed'));
+      await page.locator('#kingdom-bar-toggle').click();await page.waitForFunction(()=>document.querySelector('#kingdom-bar').classList.contains('collapsed'));
       assert.equal(await page.locator('#kingdom-bar-body').isVisible(),false);assert.match(await page.locator('#kingdom-bar-summary').textContent(),/\d+ \/ \d+/);
       await check(`${width} folded`);
       await page.reload();await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingdomOverview);

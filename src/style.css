@@ -1454,3 +1454,15 @@ body.sandbox-tool canvas { cursor:crosshair !important; }
 .policy-rows { list-style:none; margin:4px 0 2px; padding:0; font-size:.85rem; }
 .policy-rows li { display:flex; justify-content:space-between; gap:8px; padding:1px 0; border-top:1px dotted #79704b44; }
 .policy-rows li[data-tone=positive] .policy-row-value { color:#9ed36a; } .policy-rows li[data-tone=negative] .policy-row-value { color:#ee8a6f; }
+
+/* Owner 21 Nov 2026: the Kingdom overview in the top bar (in place of the summary chips); its list drops down. */
+.kingdom-bar.kingdom-bar-hud { position:relative; left:auto; bottom:auto; z-index:30; width:auto; max-width:none; padding:1px 6px; background:none; border:0; border-radius:6px; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; font-size:12px; }
+.kingdom-bar.kingdom-bar-hud.collapsed { padding:1px 6px; }
+.kingdom-bar-hud .kingdom-bar-toggle { gap:10px; width:auto; }
+.kingdom-bar-hud .kingdom-bar-title { font-size:13px; }
+.kingdom-bar-hud:not(.collapsed) .kingdom-bar-summary { display:inline; }
+.kingdom-bar-hud .kingdom-bar-arrow { margin-left:0; }
+.kingdom-bar-hud:hover { background:rgb(255 240 200 / .07); }
+.kingdom-bar-hud .kingdom-bar-body { position:absolute; top:calc(100% + 8px); left:-6px; width:min(350px,calc(100vw - 24px)); margin:0; padding:8px 10px 9px; color:var(--ink,#ede5c9); background:var(--glass,rgb(30 35 25 / .94)); border:1px solid var(--line-soft,#5b5a40); border-radius:10px; box-shadow:var(--shadow,0 4px 14px #0008); font-size:13px; }
+.hud-row-bottom .hud-left-slot:has(> .kingdom-bar-hud) { width:auto !important; min-width:0; }
+.kingdom-bar-hud .kingdom-bar-title, .kingdom-bar-hud .kingdom-bar-summary { white-space:nowrap; }

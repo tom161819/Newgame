@@ -87,13 +87,15 @@ export class GameTip {
   destroy(){this.box?.remove();this.box=null;this.target=null;}
 }
 export const KINGDOM_BAR_AVOID='.inventory,.camera-controls,#notices-panel,#event-feed,#minimap,#unit-command-bar,#settings-button,#dev-tool-button,.population-tab,.buildings-panel';
-export function kingdomBarSummary(o){return [t('overview.population',{count:o.population,capacity:o.capacity}),o.happiness==null?t('overview.moodNone'):t('overview.mood',{value:o.happiness})].join(' · ');}
+export function kingdomBarSummary(o){return [t('overview.population',{count:o.population,capacity:o.capacity}),...(o.unemployed>0?[t('overview.unemployed',{count:o.unemployed})]:[]),o.happiness==null?t('overview.moodNone'):t('overview.mood',{value:o.happiness})].join(' · ');}
 export class KingdomOverview {
   constructor(scene,{document:doc=globalThis.document,storage=globalThis.localStorage}={}){
-    this.scene=scene;this.storage=storage;this.root=doc.querySelector('#kingdom-overview');this.bar=doc.querySelector('#kingdom-bar');this.next=0;this.nextPlace=0;
+    this.scene=scene;this.storage=storage;this.bar=doc.querySelector('#kingdom-bar');this.chips=doc.querySelector('#kingdom-overview');this.root=this.chips??this.bar;this.next=0;this.nextPlace=0;
     if(!this.root)return;this.abort=new AbortController();const options={signal:this.abort.signal};
-    this.root.addEventListener('click',()=>this.setCollapsed(!this.collapsed),options);
-    this.root.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();this.setCollapsed(!this.collapsed);}},options);
+    // Owner 21 Nov 2026: the Kingdom overview panel sits in the top bar in place of the summary chips (#kingdom-bar in
+    // .hud-left-slot); its list drops down under the bar. Old layouts with the chips still toggle it from them.
+    if(this.chips)this.chips.addEventListener('click',()=>this.setCollapsed(!this.collapsed),options);
+    if(this.chips)this.chips.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();this.setCollapsed(!this.collapsed);}},options);
     if(this.bar){
       this.body=doc.querySelector('#kingdom-bar-body');this.toggle=doc.querySelector('#kingdom-bar-toggle');this.summary=doc.querySelector('#kingdom-bar-summary');
       this.toggle?.addEventListener('click',()=>this.setCollapsed(!this.collapsed),options);
@@ -115,6 +117,8 @@ export class KingdomOverview {
   // Keeps the bar in the corner, clear of what else is there now (the building strip, a moved Notices bar, …).
   place(){
     const bar=this.bar,view=bar?.parentElement?.getBoundingClientRect?.();if(!bar||bar.hidden||!view?.width)return;
+    // In the top bar the list drops down just under the whole bar (on a narrow screen the bar has more rows below).
+    if(bar.classList?.contains('kingdom-bar-hud')){const hud=bar.closest?.('.inventory')?.getBoundingClientRect?.(),me=bar.getBoundingClientRect?.();if(this.body&&hud&&me){const top=`${Math.round(hud.bottom-me.top+6)}px`;if(this.body.style.top!==top)this.body.style.top=top;}return;}
     const doc=bar.ownerDocument,obstacles=[...doc.querySelectorAll(KINGDOM_BAR_AVOID)].filter(el=>!el.hidden&&!bar.contains(el)&&el.getClientRects().length).map(el=>fromDom(el.getBoundingClientRect())).filter(r=>r.right>view.left&&r.left<view.right&&r.bottom>view.top&&r.top<view.bottom);
     const box=placeBottomLeft({view:fromDom(view),size:{width:bar.offsetWidth,height:bar.offsetHeight},obstacles,margin:20});// 20: the map reaches the window edge (9 Nov 2026)
     const left=`${Math.round(box.left-view.left)}px`,bottom=`${Math.round(view.bottom-box.bottom)}px`;

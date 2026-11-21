@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.29] - 2026-11-21
+<!-- version: {"title":"Kingdom overview in the top bar","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Changed
+- The Kingdom overview panel moved into the top bar in place of the summary; its list opens under the bar.
+
 ## [0.149.28] - 2026-11-21
 <!-- version: {"title":"Overview bonuses in rows","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Improved

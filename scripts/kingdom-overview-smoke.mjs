@@ -17,7 +17,7 @@ export async function kingdomOverviewSmoke(context,url,instrument){
       const residents=await page.evaluate(()=>window.__game.registry.get('application').scene.workerSystem.liveSubjects().length);
       assert.ok(residents>=3);assert.match(chips[0],new RegExp(`${residents} \\/ \\d+`));assert.match(chips[1],/Unemployed \d/);assert.match(chips[2],/%|—/);
       // No overlap between the overview and the food status.
-      const boxes=await page.evaluate(()=>['#kingdom-overview','.food-status','.hud-status'].map(q=>{const r=document.querySelector(q).getBoundingClientRect();return {l:r.left,r:r.right,t:r.top,b:r.bottom};}));
+      const boxes=await page.evaluate(()=>['#kingdom-bar','.food-status','.hud-status'].map(q=>{const r=document.querySelector(q).getBoundingClientRect();return {l:r.left,r:r.right,t:r.top,b:r.bottom};}));
       const overlap=(a,b)=>a.l<b.r-1&&b.l<a.r-1&&a.t<b.b-1&&b.t<a.b-1;assert.ok(!overlap(boxes[0],boxes[1])&&!overlap(boxes[0],boxes[2]),`no overlap at ${width}px: ${JSON.stringify(boxes)}`);
       // m-prehled-kralovstvi-pozice: the needs and attractiveness live in the bottom-left overview bar (no hover popup).
       await page.locator('#kingdom-bar-body').waitFor({state:'visible'});
