@@ -31,11 +31,17 @@ test('m-prehled-procenta-tooltip: every percentage explains itself – how it is
   assert.equal(d.parts.food+d.parts.rest+d.parts.housing+d.parts.safety+d.other,o.happiness,'the listed parts add up to the shown Happiness');
   assert.equal(d.hungry,1);assert.equal(d.tired,1);assert.equal(d.housed+d.unhoused,4);assert.equal(d.residents,4);
   setLanguage('en',{persist:false});const lines=overviewExplain(o);
-  for(const k of ['residents','unemployed','happiness','food','rest','housing','safety'])assert.ok(lines[k].length>=1&&lines[k].every(l=>typeof l==='string'&&l.length>10&&!l.includes('{')&&!l.startsWith('explain.')),k);
-  assert.match(lines.happiness[0],new RegExp(`Happiness ${o.happiness} % = the average of all 4 residents`));assert.match(lines.happiness[1],/food \d+ \+ rest \d+ \+ housing \d+ \+ safety \d+, other [+-]?\d+/);
+  for(const k of ['residents','unemployed','happiness','food','rest','housing','safety'])assert.ok(lines[k].length>=1&&lines[k].every(l=>typeof l==='string'&&(l.length>10||l.includes('\t'))&&!l.includes('{')&&!l.startsWith('explain.')),k);
+  assert.match(lines.happiness[0],new RegExp(`Happiness ${o.happiness} % = the average of all 4 residents`));assert.match(lines.happiness[1],/^Food \(weight 35 %\)\t\+\d+$/);assert.match(lines.happiness[5],/^Other \(taxes, wages, feast, surroundings\)\t[+\u2212-]?\d+$/);
   assert.match(lines.food[1],/1 of 4 go hungry/);assert.ok(lines.food.some(l=>l.startsWith('Tip:')));assert.match(lines.housing[0],new RegExp(`Housing ${o.housing} % = ${d.housed} of 4 have a home`));assert.equal(lines.housing.some(l=>l.startsWith('Tip:')),d.unhoused>0);
   assert.equal(lines.happiness.filter(l=>l.startsWith('Tip:')).length,1,'at most one tip');
   setLanguage('cs',{persist:false});assert.match(overviewExplain(o).housing[0],/Bydlení \d+ % = \d z 4 má kde bydlet/);setLanguage('en',{persist:false});
+});
+
+test('owner 21 Nov 2026: a "label<TAB>value" line is a row with its value on the right, green or red by sign', async () => {
+  const {tipParts}=await import('../src/ui/KingdomOverview.js');
+  const p=tipParts('Title\nFood (weight 35 %)\t+24\nOther\t\u22123\nBase\t50\nTip: build');
+  assert.deepEqual(p.lines.slice(0,3).map(l=>[l.row,l.tone]),[[['Food (weight 35 %)','+24'],'good'],[['Other','\u22123'],'bad'],[['Base','50'],'']]);assert.equal(p.lines[3].tip,true);
 });
 
 test('m-prehled-info-panely: a hover text splits into a heading, factor lines and the tip', async () => {

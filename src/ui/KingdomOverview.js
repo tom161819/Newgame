@@ -43,17 +43,17 @@ export function overviewExplain(o){
   lines.residents=[t('explain.residents',{count:o.population,capacity:o.capacity}),t('explain.arrivals',{perDay:d.perDay,per:POPULATION.migrantsPerResidents,max:POPULATION.migrantsMaxPerDay,chance:o.attractiveness??100}),
     o.settleBlock?t(`overview.settleBlock.${o.settleBlock}`):null,t('explain.departures',{strike:DISCONTENT.strikeBelow,strikeDays:DISCONTENT.strikeDays,leave:DISCONTENT.emigrateBelow,leaveDays:DISCONTENT.emigrateDays}),
     d.striking||d.leaving||d.atRisk?t('explain.departuresNow',{striking:d.striking,leaving:d.leaving,atRisk:d.atRisk}):null,o.population>=o.capacity?t('explain.tip.capacity'):null];
-  if(o.attractiveness!=null)lines.attractiveness=[t('explain.attractiveness',{value:o.attractiveness}),t('explain.attractivenessBase',{base:d.base}),...o.factors.map(([id,v])=>`${t(`overview.factor.${id}`)}: ${sign(v)}`),
+  if(o.attractiveness!=null)lines.attractiveness=[t('explain.attractiveness',{value:o.attractiveness}),tipRow(t('explain.attractivenessBaseLabel'),`+${d.base}`),...o.factors.map(([id,v])=>tipRow(t(`overview.factor.${id}`),sign(v))),
     t('explain.attractivenessHappiness'),t('explain.attractivenessOther',{each:ENCLOSURE.ruins.each,max:ENCLOSURE.ruins.max}),o.settleBlock?t(`overview.settleBlock.${o.settleBlock}`):null];
   if(o.clothing!=null)lines.clothing=[t('explain.clothing',{value:o.clothing,effect:sign(o.clothingEffect)}),t('explain.clothingNeed',{perDay:(Math.round(o.clothingNeed*10)/10).toLocaleString(),days:CLOTHING.wearDays}),o.clothing<60?t('explain.tip.clothing'):null];
   lines.unemployed=[t('explain.unemployed',{count:o.unemployed,seats:d.seats}),o.unemployed>3?t('explain.tip.unemployed'):null];
   if(o.happiness!=null){
-    lines.happiness=[t('explain.happiness',{value:o.happiness,count:d.residents}),t('explain.happinessParts',{food:d.parts.food,rest:d.parts.rest,housing:d.parts.housing,safety:d.parts.safety,other:sign(d.other)}),t('explain.happinessWeights'),
+    lines.happiness=[t('explain.happiness',{value:o.happiness,count:d.residents}),...['food','rest','housing','safety'].map(k=>tipRow(t(`explain.part.${k}`,{weight:Math.round(NEEDS.weights[k]*100)}),`+${d.parts[k]}`)),tipRow(t('explain.part.other'),sign(d.other)),
       worst&&worst.loss>=5?t(`explain.tip.${worst.k}`,{count:worst.k==='housing'?d.unhoused:worst.k==='food'?d.hungry:worst.k==='rest'?d.tired:d.unsafe}):null];
     lines.food=[t('explain.food',{value:o.food}),t('explain.foodNow',{hungry:d.hungry,count:d.residents}),d.hungry||o.food<70?t('explain.tip.food',{count:d.hungry}):null];
     lines.rest=[t('explain.rest',{value:o.rest}),t('explain.restNow',{tired:d.tired,housed:d.housed,unhoused:d.unhoused}),o.rest<70?t('explain.tip.rest',{count:d.tired}):null];
     lines.housing=[t('explain.housing',{value:o.housing,housed:d.housed,count:d.residents}),d.unhoused?t('explain.tip.housing',{count:d.unhoused}):null];
-    lines.safety=[t('explain.safety',{value:o.safety}),t('explain.safetyRule',{base:NEEDS.safety.base,castle:NEEDS.safety.castle.bonus,tower:NEEDS.safety.tower.bonus,guard:NEEDS.safety.guard.bonus,attack:NEEDS.safety.attack.penalty}),o.safety<70?t('explain.tip.safety',{count:d.unsafe}):null];
+    lines.safety=[t('explain.safety',{value:o.safety}),tipRow(t('explain.safety.base'),String(NEEDS.safety.base)),tipRow(t('explain.safety.castle'),`+${NEEDS.safety.castle.bonus}`),tipRow(t('explain.safety.tower'),`+${NEEDS.safety.tower.bonus}`),tipRow(t('explain.safety.guard'),`+${NEEDS.safety.guard.bonus}`),tipRow(t('explain.safety.attack'),`\u2212${NEEDS.safety.attack.penalty}`),o.safety<70?t('explain.tip.safety',{count:d.unsafe}):null];
   }
   for(const k of Object.keys(lines))lines[k]=lines[k].filter(Boolean);
   return lines;
@@ -61,7 +61,10 @@ export function overviewExplain(o){
 // m-prehled-info-panely (owner 14 Nov 2026): the explanations are a panel in the game's style, not the browser's white
 // hover box. Any element with `data-tip` under the given roots shows it: the first line is the heading, a line starting
 // with "Tip:" is set apart. The panel follows the text while it changes and never leaves the window.
-export const tipParts=text=>{const lines=String(text??'').split('\n').filter(Boolean);return {title:lines[0]??'',lines:lines.slice(1).map(l=>({text:l,tip:/^Tip:/.test(l),number:/[+\u2212-]\d+$/.test(l)}))};};
+// Owner 21 Nov 2026: a line "label<TAB>value" is a row – the label on the left, the value on the right (as in the
+// Kingdom Policy window), green when it adds, red when it takes away.
+export const tipRow=(label,value)=>`${label}\t${value}`;
+export const tipParts=text=>{const lines=String(text??'').split('\n').filter(Boolean);return {title:lines[0]??'',lines:lines.slice(1).map(l=>{const tab=l.indexOf('\t');if(tab>=0){const value=l.slice(tab+1);return {row:[l.slice(0,tab),value],tone:/^[\u2212-]/.test(value)?'bad':/^\+/.test(value)?'good':''};}return {text:l,tip:/^Tip:/.test(l),number:/[+\u2212-]\d+$/.test(l)};})};};
 export class GameTip {
   constructor(doc,roots,options){
     this.doc=doc;if(!doc?.createElement||!doc.body)return;this.box=doc.createElement('div');this.box.className='game-tip';this.box.hidden=true;this.box.setAttribute('role','tooltip');doc.body.append(this.box);
@@ -77,7 +80,7 @@ export class GameTip {
   refresh(){
     const el=this.target,box=this.box;if(!el||!box)return;if(!el.isConnected||!el.dataset.tip){this.hide();return;}
     if(el.dataset.tip!==this.text){this.text=el.dataset.tip;const parts=tipParts(this.text),kids=[element('strong','game-tip-title',parts.title)];
-      for(const l of parts.lines)kids.push(element('p',l.tip?'game-tip-advice':l.number?'game-tip-factor':'',l.text));box.replaceChildren(...kids);}
+      for(const l of parts.lines){if(l.row){const r=element('div','game-tip-row');r.dataset.tone=l.tone;r.append(element('span','',l.row[0]),element('b','',l.row[1]));kids.push(r);continue;}kids.push(element('p',l.tip?'game-tip-advice':l.number?'game-tip-factor':'',l.text));}box.replaceChildren(...kids);}
     box.hidden=false;const r=el.getBoundingClientRect(),w=box.offsetWidth,h=box.offsetHeight,view=this.doc.documentElement,vw=view.clientWidth,vh=view.clientHeight;
     const left=Math.max(8,Math.min(vw-w-8,r.left)),top=r.top-h-8>=8?r.top-h-8:Math.min(vh-h-8,r.bottom+8);box.style.left=`${Math.round(left)}px`;box.style.top=`${Math.round(Math.max(8,top))}px`;
   }

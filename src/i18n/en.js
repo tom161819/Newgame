@@ -498,4 +498,6 @@ export default {
   'kingdom.req.building':'{name} built','kingdom.req.happiness':'Happiness {current} / {target} %','kingdom.req.foodDays':'Food for {current} / {target} days','kingdom.req.buildings':'Buildings {current} / {target}',
   'unlock.castleLevel':'Needs Castle level {level} ({rank})','castle.rankBlocked':'The kingdom is not ready to become a {rank}: {missing}',
   'kingdom.req.population':'Residents {current} / {target}','kingdom.popCap':'At most {cap} residents at this rank.',
+  'explain.part.food':'Food (weight {weight} %)','explain.part.rest':'Rest (weight {weight} %)','explain.part.housing':'Housing (weight {weight} %)','explain.part.safety':'Safety (weight {weight} %)','explain.part.other':'Other (taxes, wages, feast, surroundings)',
+  'explain.attractivenessBaseLabel':'Base','explain.safety.base':'Base','explain.safety.castle':'Near the Castle','explain.safety.tower':'Near a tower','explain.safety.guard':'Near a guard','explain.safety.attack':'For a day after an attack',
 };

@@ -499,4 +499,6 @@ export default {
   'kingdom.req.building':'Postavena: {name}','kingdom.req.happiness':'Spokojenost {current} / {target} %','kingdom.req.foodDays':'Jídlo na {current} / {target} dní','kingdom.req.buildings':'Postavené budovy {current} / {target}',
   'unlock.castleLevel':'Vyžaduje hrad úrovně {level} ({rank})','castle.rankBlocked':'Království ještě není připravené stát se úrovní {rank}: {missing}',
   'kingdom.req.population':'Obyvatelé {current} / {target}','kingdom.popCap':'Na této úrovni nejvýš {cap} obyvatel.',
+  'explain.part.food':'Jídlo (váha {weight} %)','explain.part.rest':'Odpočinek (váha {weight} %)','explain.part.housing':'Bydlení (váha {weight} %)','explain.part.safety':'Bezpečí (váha {weight} %)','explain.part.other':'Ostatní (daně, mzdy, hostina, okolí domu)',
+  'explain.attractivenessBaseLabel':'Základ','explain.safety.base':'Základ','explain.safety.castle':'U hradu','explain.safety.tower':'U věže','explain.safety.guard':'U stráže','explain.safety.attack':'Den po útoku',
 };

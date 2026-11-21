@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.28] - 2026-11-21
+<!-- version: {"title":"Overview bonuses in rows","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Improved
+- Kingdom overview hover panels list each bonus on its own row with its value on the right (Happiness, Safety, Attractiveness).
+
 ## [0.149.27] - 2026-11-21
 <!-- version: {"title":"Population cap after the upgrade","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Changed

@@ -1292,6 +1292,9 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 .game-tip p { margin:0; }
 .game-tip-factor { font-variant-numeric:tabular-nums; color:#f1e7c6; padding-left:10px; border-left:2px solid rgb(162 139 86 / .6); }
 .game-tip-advice { margin-top:3px !important; padding:5px 8px; border-radius:6px; background:rgb(227 197 122 / .1); color:#ecd9a0; }
+.game-tip-row { display:flex; justify-content:space-between; align-items:baseline; gap:18px; padding:2px 0; border-bottom:1px solid rgb(162 139 86 / .16); font-variant-numeric:tabular-nums; }
+.game-tip-row b { font-weight:650; color:#f1e7c6; white-space:nowrap; } .game-tip-row[data-tone="good"] b { color:#9fc172; } .game-tip-row[data-tone="bad"] b { color:#e0806b; }
+.game-tip-title + .game-tip-row, p + .game-tip-row { margin-top:3px; }
 
 /* Points 38, 40, 46 (owner 14 Nov 2026) */
 .population-haulers { margin:6px 0 8px; }
