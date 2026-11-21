@@ -11,7 +11,7 @@ const atlas=decodePng(readFileSync(new URL(`../public${NATURE_ATLAS.src}`,import
 
 test('g-nasadit-prirodu: every atlas frame is an approved export, pixel for pixel, with its metadata origin', () => {
   assert.equal(atlas.width,NATURE_ATLAS.width);assert.equal(atlas.height,NATURE_ATLAS.height);
-  assert.ok(Object.keys(NATURE_ATLAS.frames).length>=90);assert.match(NATURE_ATLAS.src,/^\/assets\/nature\/nature-atlas\.v2\.png$/);
+  assert.ok(Object.keys(NATURE_ATLAS.frames).length>=60);/* 21 Nov 2026: the old shrub fallbacks not chosen in the Studio are no longer packed */assert.match(NATURE_ATLAS.src,/^\/assets\/nature\/nature-atlas\.v2\.png$/);
   for(const [variant,f] of Object.entries(NATURE_ATLAS.frames)){
     const asset=f.artSource.split('/')[2],record=approvals[asset].variants[variant];
     assert.equal(record.status,'approved',variant);assert.equal(f.artSource,`art/sprites/${asset}/${variant}.v${record.version}.json`);

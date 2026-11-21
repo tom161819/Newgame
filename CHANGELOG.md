@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.25] - 2026-11-21
+<!-- version: {"title":"Blender bushes approved","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Changed
+- Decorative bushes use the new Blender renders.
+
 ## [0.149.24] - 2026-11-21
 <!-- version: {"title":"Kingdom rank: Castle not counted","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Changed

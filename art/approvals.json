@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-21T08:39:09.872Z",
+  "updatedAt": "2026-11-21T19:03:00.203Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -424,6 +424,33 @@
           "updatedAt": "2026-11-15T00:40:00.000Z",
           "version": 2
         },
+        "castle-l1-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5ccb40db",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:30.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:28:30.000Z"
+        },
+        "castle-l1-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5ccb40db",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:30.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:28:30.000Z"
+        },
+        "castle-l1-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5ccb40db",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:30.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:28:30.000Z"
+        },
         "castle-l2-0": {
           "approvedAt": "2026-11-15T01:05:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -432,6 +459,33 @@
           "status": "approved",
           "updatedAt": "2026-11-15T01:05:00.000Z",
           "version": 3
+        },
+        "castle-l2-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "60cd85be",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:30.000Z",
+          "version": 3,
+          "approvedAt": "2026-11-14T23:28:30.000Z"
+        },
+        "castle-l2-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "60cd85be",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:30.000Z",
+          "version": 3,
+          "approvedAt": "2026-11-14T23:28:30.000Z"
+        },
+        "castle-l2-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "60cd85be",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:30.000Z",
+          "version": 3,
+          "approvedAt": "2026-11-14T23:28:30.000Z"
         },
         "castle-l3-0": {
           "approvedAt": "2026-11-15T00:40:00.000Z",
@@ -442,6 +496,33 @@
           "updatedAt": "2026-11-15T00:40:00.000Z",
           "version": 2
         },
+        "castle-l3-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5ccb40db",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:30.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:28:30.000Z"
+        },
+        "castle-l3-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5ccb40db",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:30.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:28:30.000Z"
+        },
+        "castle-l3-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5ccb40db",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:30.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:28:30.000Z"
+        },
         "castle-l4-0": {
           "approvedAt": "2026-11-15T00:40:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -450,6 +531,33 @@
           "status": "approved",
           "updatedAt": "2026-11-15T00:40:00.000Z",
           "version": 2
+        },
+        "castle-l4-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5ccb40db",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:30.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:28:30.000Z"
+        },
+        "castle-l4-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5ccb40db",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:30.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:28:30.000Z"
+        },
+        "castle-l4-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5ccb40db",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:30.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:28:30.000Z"
         }
       }
     },
@@ -1521,7 +1629,7 @@
       }
     },
     "wall-diagonal": {
-      "preferred": null,
+      "preferred": "wall-diagonal-elbow-sw-01-tripo",
       "variants": {
         "wall-diagonal-se": {
           "approvedAt": "2026-11-19T18:17:13.492Z",
@@ -2047,6 +2155,33 @@
           "updatedAt": "2026-11-07T10:18:14.876Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:18:14.876Z"
+        },
+        "wall-kit-preview-diagonal": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c4e7da17",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:54:34.000Z",
+          "version": 5,
+          "approvedAt": "2026-11-15T05:54:34.000Z"
+        },
+        "wall-kit-preview-diagonal-across": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "dd00dad9",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:54:34.000Z",
+          "version": 5,
+          "approvedAt": "2026-11-15T05:54:34.000Z"
+        },
+        "wall-kit-preview-diagonal-ends": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "339b8b13",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:54:34.000Z",
+          "version": 5,
+          "approvedAt": "2026-11-15T05:54:34.000Z"
         }
       }
     },
@@ -2251,6 +2386,33 @@
           "status": "approved",
           "updatedAt": "2026-11-14T21:15:00.000Z",
           "version": 2
+        },
+        "fountain-render-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "937d202a",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:46.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:28:46.000Z"
+        },
+        "fountain-render-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "937d202a",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:46.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:28:46.000Z"
+        },
+        "fountain-render-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "937d202a",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:28:46.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:28:46.000Z"
         }
       }
     },
@@ -2836,6 +2998,33 @@
           "status": "approved",
           "updatedAt": "2026-11-14T21:15:00.000Z",
           "version": 2
+        },
+        "well-render-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "937d202a",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:29:34.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:29:34.000Z"
+        },
+        "well-render-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "937d202a",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:29:34.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:29:34.000Z"
+        },
+        "well-render-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "937d202a",
+          "status": "approved",
+          "updatedAt": "2026-11-14T23:29:34.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-14T23:29:34.000Z"
         }
       }
     },
@@ -2944,6 +3133,587 @@
           "note": "",
           "updatedAt": "2026-11-04T21:40:25.183Z",
           "approvedAt": "2026-11-04T21:40:25.183Z"
+        }
+      }
+    },
+    "bush-berry-views": {
+      "preferred": "bush-berry-views-spring-0",
+      "variants": {
+        "bush-berry-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-berry-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "bush-flowering-views": {
+      "preferred": "bush-flowering-views-autumn-0",
+      "variants": {
+        "bush-flowering-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6db21b52",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6db21b52",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6db21b52",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6db21b52",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6486a74a",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6486a74a",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6486a74a",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6486a74a",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5e982959",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5e982959",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5e982959",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5e982959",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ae04ab82",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ae04ab82",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ae04ab82",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-flowering-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ae04ab82",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "bush-meadow-views": {
+      "preferred": "bush-meadow-views-spring-0",
+      "variants": {
+        "bush-meadow-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-meadow-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "bush-scrub-views": {
+      "preferred": "bush-scrub-views-spring-0",
+      "variants": {
+        "bush-scrub-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ad8c1482",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "bush-scrub-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "bush-scrub-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "bush-scrub-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "bush-scrub-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "bush-scrub-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "bush-scrub-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "bush-scrub-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "bush-scrub-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "bush-scrub-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "bush-scrub-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "bush-scrub-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "bush-scrub-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "bush-scrub-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "bush-scrub-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "bush-scrub-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ad8c1482",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
         }
       }
     },
@@ -3364,137 +4134,2307 @@
         "shrubs-hazel-1": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "f28f3dfb",
+          "specHash": "f295f9c0",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
         "shrubs-hazel-2": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "ec3bf6e2",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ec3e3579",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-hazel-3": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "7a0256e8",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "79fa0823",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-rosehip-1": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "39d6d3b8",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "39ce84f3",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-rosehip-2": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "b42143f6",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "b423828d",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-rosehip-3": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "ef01cb94",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "eefb0fcf",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-juniper-1": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "11fca13b",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "12035d00",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-juniper-2": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "8d0ba389",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "8d07d1f2",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-juniper-3": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "443515df",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "443d64a4",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-bramble-1": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ca9ab400",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
+        },
+        "shrubs-bramble-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "bc35c11a",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
+        },
+        "shrubs-bramble-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "cfa36cd4",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
+        },
+        "shrubs-heather-1": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "2cdb3796",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
+        },
+        "shrubs-heather-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "88a9e760",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
+        },
+        "shrubs-heather-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "d9bbc0aa",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
+        }
+      }
+    },
+    "shrubs-bramble-1-views": {
+      "preferred": "shrubs-bramble-1-views-autumn-180",
+      "variants": {
+        "shrubs-bramble-1-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "43652723",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-1-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "43652723",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-1-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "43652723",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-1-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "43652723",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-1-views-summer-0": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
           "specHash": "ca93f83b",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
           "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
-        "shrubs-bramble-2": {
+        "shrubs-bramble-1-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ca93f83b",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-1-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ca93f83b",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-1-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ca93f83b",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-1-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bc352cee",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-1-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bc352cee",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-1-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bc352cee",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-1-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "bc352cee",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-bramble-1-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "37c59ccb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-bramble-1-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "37c59ccb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-bramble-1-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "37c59ccb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-bramble-1-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "37c59ccb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "shrubs-bramble-2-views": {
+      "preferred": "shrubs-bramble-2-views-spring-0",
+      "variants": {
+        "shrubs-bramble-2-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ca5115d9",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-2-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ca5115d9",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-2-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ca5115d9",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-2-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ca5115d9",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-2-views-summer-0": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
           "specHash": "bc37ffb1",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
           "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
-        "shrubs-bramble-3": {
+        "shrubs-bramble-2-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bc37ffb1",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-2-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bc37ffb1",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-2-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bc37ffb1",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-2-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "43b45d24",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-2-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "43b45d24",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-2-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "43b45d24",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-2-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "43b45d24",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-2-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5a089341",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-2-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5a089341",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-2-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5a089341",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-2-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5a089341",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "shrubs-bramble-3-views": {
+      "preferred": "shrubs-bramble-3-views-spring-0",
+      "variants": {
+        "shrubs-bramble-3-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "052f39d7",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-3-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "052f39d7",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-3-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "052f39d7",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-3-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "052f39d7",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-3-views-summer-0": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
           "specHash": "cf9b1e0f",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
           "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
-        "shrubs-heather-1": {
+        "shrubs-bramble-3-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cf9b1e0f",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-3-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cf9b1e0f",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-3-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cf9b1e0f",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-3-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ed7f1786",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-3-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ed7f1786",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-3-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ed7f1786",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-3-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ed7f1786",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-3-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a6ed875f",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-3-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a6ed875f",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-3-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a6ed875f",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-bramble-3-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a6ed875f",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "shrubs-hazel-1-views": {
+      "preferred": "shrubs-hazel-1-views-autumn-180",
+      "variants": {
+        "shrubs-hazel-1-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b25b24f3",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-1-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b25b24f3",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-1-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b25b24f3",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-1-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b25b24f3",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-1-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f28f3dfb",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-1-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f28f3dfb",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-1-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f28f3dfb",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-1-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f28f3dfb",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-1-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c22f1d50",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-1-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c22f1d50",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-1-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c22f1d50",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-1-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "c22f1d50",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-hazel-1-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ec6a458b",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-hazel-1-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ec6a458b",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-hazel-1-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ec6a458b",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-hazel-1-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ec6a458b",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "shrubs-hazel-2-views": {
+      "preferred": "shrubs-hazel-2-views-autumn-180",
+      "variants": {
+        "shrubs-hazel-2-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a6f09f9a",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-2-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a6f09f9a",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-2-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a6f09f9a",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-2-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a6f09f9a",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-2-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ec3bf6e2",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-2-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ec3bf6e2",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-2-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ec3bf6e2",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-2-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ec3bf6e2",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-2-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2550524f",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-2-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2550524f",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-2-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2550524f",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-2-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "2550524f",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-hazel-2-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "4b88d872",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-hazel-2-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "4b88d872",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-hazel-2-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "4b88d872",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-hazel-2-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "4b88d872",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "shrubs-hazel-3-views": {
+      "preferred": "shrubs-hazel-3-views-spring-0",
+      "variants": {
+        "shrubs-hazel-3-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "dfbb18c0",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "dfbb18c0",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "dfbb18c0",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "dfbb18c0",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7a0256e8",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7a0256e8",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7a0256e8",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7a0256e8",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cfce8539",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cfce8539",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cfce8539",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cfce8539",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e14e9878",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e14e9878",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e14e9878",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-hazel-3-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e14e9878",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "shrubs-heather-1-views": {
+      "preferred": "shrubs-heather-1-views-spring-0",
+      "variants": {
+        "shrubs-heather-1-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1b59ea55",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-1-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1b59ea55",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-1-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1b59ea55",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-1-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1b59ea55",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-1-views-summer-0": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
           "specHash": "2cdd762d",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
           "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
-        "shrubs-heather-2": {
+        "shrubs-heather-1-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2cdd762d",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-1-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2cdd762d",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-1-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2cdd762d",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-1-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e753d1a0",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-1-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e753d1a0",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-1-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e753d1a0",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-1-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e753d1a0",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-1-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8de4e45d",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-1-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8de4e45d",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-1-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8de4e45d",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-1-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8de4e45d",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "shrubs-heather-2-views": {
+      "preferred": "shrubs-heather-2-views-spring-0",
+      "variants": {
+        "shrubs-heather-2-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1c0f6603",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-2-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1c0f6603",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-2-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1c0f6603",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-2-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1c0f6603",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-2-views-summer-0": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
           "specHash": "88a32b9b",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
           "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
-        "shrubs-heather-3": {
+        "shrubs-heather-2-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "88a32b9b",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-2-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "88a32b9b",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-2-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "88a32b9b",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-2-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8a9d086e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-2-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8a9d086e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-2-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8a9d086e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-2-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8a9d086e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-2-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "af7f4c0b",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-2-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "af7f4c0b",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-2-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "af7f4c0b",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-2-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "af7f4c0b",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "shrubs-heather-3-views": {
+      "preferred": "shrubs-heather-3-views-spring-0",
+      "variants": {
+        "shrubs-heather-3-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "85ab20a9",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "85ab20a9",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "85ab20a9",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "85ab20a9",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-summer-0": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
           "specHash": "d9bdff41",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
           "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d9bdff41",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d9bdff41",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d9bdff41",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2d387d38",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2d387d38",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2d387d38",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2d387d38",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "06f56f71",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "06f56f71",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "06f56f71",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-heather-3-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "06f56f71",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "shrubs-juniper-1-views": {
+      "preferred": "shrubs-juniper-1-views-spring-0",
+      "variants": {
+        "shrubs-juniper-1-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7c57dbd3",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-1-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7c57dbd3",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-1-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7c57dbd3",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-1-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7c57dbd3",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-1-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "11fca13b",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-1-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "11fca13b",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-1-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "11fca13b",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-1-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "11fca13b",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-1-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "42822442",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-juniper-1-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "42822442",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-1-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "42822442",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-1-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "42822442",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-1-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "92506bcb",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-1-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "92506bcb",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-1-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "92506bcb",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-1-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "92506bcb",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "shrubs-juniper-2-views": {
+      "preferred": "shrubs-juniper-2-views-spring-0",
+      "variants": {
+        "shrubs-juniper-2-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9194afa1",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9194afa1",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9194afa1",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9194afa1",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8d0ba389",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8d0ba389",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8d0ba389",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8d0ba389",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "04840fb8",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "04840fb8",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "04840fb8",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "04840fb8",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ff995f19",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ff995f19",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ff995f19",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-2-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ff995f19",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "shrubs-juniper-3-views": {
+      "preferred": "shrubs-juniper-3-views-spring-0",
+      "variants": {
+        "shrubs-juniper-3-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a164ef97",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-3-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a164ef97",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-3-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a164ef97",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-3-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a164ef97",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-3-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "443515df",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-3-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "443515df",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-3-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "443515df",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-3-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "443515df",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-3-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4dc4ecea",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-juniper-3-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4dc4ecea",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-3-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4dc4ecea",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-3-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4dc4ecea",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-3-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9afc596f",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-3-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9afc596f",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-3-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9afc596f",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-juniper-3-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9afc596f",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "shrubs-rosehip-1-views": {
+      "preferred": "shrubs-rosehip-1-views-spring-0",
+      "variants": {
+        "shrubs-rosehip-1-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3eea2e70",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-rosehip-1-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "3eea2e70",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-1-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "3eea2e70",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-1-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "3eea2e70",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-1-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "39d6d3b8",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-1-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "39d6d3b8",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-1-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "39d6d3b8",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-1-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "39d6d3b8",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-1-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "c8ea6151",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-1-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "c8ea6151",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-1-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "c8ea6151",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-1-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "c8ea6151",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-1-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "c675f4c8",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-1-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "c675f4c8",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-1-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "c675f4c8",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-1-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "c675f4c8",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "shrubs-rosehip-2-views": {
+      "preferred": "shrubs-rosehip-2-views-spring-0",
+      "variants": {
+        "shrubs-rosehip-2-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a2852a4e",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-rosehip-2-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "a2852a4e",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-2-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "a2852a4e",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-2-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "a2852a4e",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-2-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "b42143f6",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-2-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "b42143f6",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-2-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "b42143f6",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-2-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "b42143f6",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-2-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "5a6835d7",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-2-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "5a6835d7",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-2-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "5a6835d7",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-2-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "5a6835d7",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-2-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "23a4d2c6",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-2-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "23a4d2c6",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-2-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "23a4d2c6",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-2-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "23a4d2c6",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "shrubs-rosehip-3-views": {
+      "preferred": "shrubs-rosehip-3-views-autumn-270",
+      "variants": {
+        "shrubs-rosehip-3-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "07ed87cc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-rosehip-3-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "07ed87cc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-rosehip-3-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "07ed87cc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-rosehip-3-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "07ed87cc",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-rosehip-3-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ef01cb94",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-rosehip-3-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ef01cb94",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-rosehip-3-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ef01cb94",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-rosehip-3-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ef01cb94",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-rosehip-3-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8f49e819",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-rosehip-3-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8f49e819",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-rosehip-3-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8f49e819",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-rosehip-3-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8f49e819",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "shrubs-rosehip-3-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0441b224",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-3-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0441b224",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-3-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0441b224",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "shrubs-rosehip-3-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0441b224",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
         }
       }
     },
@@ -3504,137 +6444,123 @@
         "shrubs-seasons-hazel-spring": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "198bb8ed",
+          "specHash": "1987e756",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
         "shrubs-seasons-hazel-autumn": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "65756eb2",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6577ad49",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-seasons-hazel-winter": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "1544cdd5",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "1540fc3e",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-seasons-rosehip-spring": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "bfbb0c87",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "bfc1c84c",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-seasons-rosehip-autumn": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "e894cd34",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "e88c7e6f",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-seasons-rosehip-winter": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "d56dc90f",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "d57617d4",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-seasons-juniper-spring": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "5fb598a8",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "5faedce3",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-seasons-juniper-autumn": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "f6eef5ff",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "f6f5b1c4",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-seasons-juniper-winter": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "fda4b950",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "fd9c6a8b",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-seasons-bramble-spring": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "64c497d4",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "64bc490f",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-seasons-bramble-autumn": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "5c15b52f",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "5c1c70f4",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-seasons-bramble-winter": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "e2ee69cc",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "e2e7ae07",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-seasons-heather-spring": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "c6f3297e",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "c6f56815",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-seasons-heather-autumn": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "5ea63461",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "5ea3f5ca",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         },
         "shrubs-seasons-heather-winter": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "7e993256",
-          "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "7e9d03ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2
         }
       }
     },
@@ -3846,38 +6772,440 @@
         "thicket-2x1-hazel": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "71358398",
+          "specHash": "712ec7d3",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
         "thicket-2x1-bramble": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "ea643efb",
+          "specHash": "ea6afac0",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
         "thicket-2x1-autumn": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "0b3eab68",
+          "specHash": "0b365ca3",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
         "thicket-2x1-winter": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "6c7258ed",
+          "specHash": "6c6e8756",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "thicket-2x1-bramble-views": {
+      "preferred": "thicket-2x1-bramble-views-spring-0",
+      "variants": {
+        "thicket-2x1-bramble-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7b363763",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
           "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "thicket-2x1-bramble-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "7b363763",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-bramble-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "7b363763",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-bramble-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "7b363763",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-bramble-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ea643efb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-bramble-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ea643efb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-bramble-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ea643efb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-bramble-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ea643efb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-bramble-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-bramble-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-bramble-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-bramble-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-bramble-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-bramble-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-bramble-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-bramble-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "thicket-2x1-hazel-views": {
+      "preferred": "thicket-2x1-hazel-views-spring-0",
+      "variants": {
+        "thicket-2x1-hazel-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "29be9cd0",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "thicket-2x1-hazel-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-hazel-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-hazel-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-hazel-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-hazel-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-hazel-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-hazel-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-hazel-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-hazel-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-hazel-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-hazel-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-hazel-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-hazel-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-hazel-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-hazel-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "thicket-2x1-mixed-views": {
+      "preferred": "thicket-2x1-mixed-views-spring-0",
+      "variants": {
+        "thicket-2x1-mixed-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "29be9cd0",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "thicket-2x1-mixed-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-mixed-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-mixed-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-mixed-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-mixed-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-mixed-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-mixed-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-mixed-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-mixed-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-mixed-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-mixed-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-mixed-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-mixed-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-mixed-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x1-mixed-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
         }
       }
     },
@@ -3887,38 +7215,440 @@
         "thicket-2x2-hazel": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "71358398",
+          "specHash": "712ec7d3",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
         "thicket-2x2-bramble": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "ea643efb",
+          "specHash": "ea6afac0",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
         "thicket-2x2-autumn": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "0b3eab68",
+          "specHash": "0b365ca3",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
         "thicket-2x2-winter": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "6c7258ed",
+          "specHash": "6c6e8756",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "thicket-2x2-bramble-views": {
+      "preferred": "thicket-2x2-bramble-views-spring-0",
+      "variants": {
+        "thicket-2x2-bramble-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7b363763",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
           "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "thicket-2x2-bramble-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "7b363763",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-bramble-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "7b363763",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-bramble-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "7b363763",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-bramble-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ea643efb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-bramble-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ea643efb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-bramble-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ea643efb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-bramble-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ea643efb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-bramble-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-bramble-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-bramble-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-bramble-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-bramble-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-bramble-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-bramble-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-bramble-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "thicket-2x2-hazel-views": {
+      "preferred": "thicket-2x2-hazel-views-spring-0",
+      "variants": {
+        "thicket-2x2-hazel-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "29be9cd0",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "thicket-2x2-hazel-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-hazel-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-hazel-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-hazel-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-hazel-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-hazel-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-hazel-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-hazel-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-hazel-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-hazel-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-hazel-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-hazel-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-hazel-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-hazel-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-hazel-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "thicket-2x2-mixed-views": {
+      "preferred": "thicket-2x2-mixed-views-spring-0",
+      "variants": {
+        "thicket-2x2-mixed-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "29be9cd0",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "thicket-2x2-mixed-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-mixed-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-mixed-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-mixed-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-mixed-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-mixed-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-mixed-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-mixed-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-mixed-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-mixed-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-mixed-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-mixed-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-mixed-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-mixed-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-2x2-mixed-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
         }
       }
     },
@@ -3928,38 +7658,440 @@
         "thicket-3x2-hazel": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "71358398",
+          "specHash": "712ec7d3",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
         "thicket-3x2-bramble": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "ea643efb",
+          "specHash": "ea6afac0",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
         "thicket-3x2-autumn": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "0b3eab68",
+          "specHash": "0b365ca3",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
         },
         "thicket-3x2-winter": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "6c7258ed",
+          "specHash": "6c6e8756",
           "status": "approved",
-          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        }
+      }
+    },
+    "thicket-3x2-bramble-views": {
+      "preferred": "thicket-3x2-bramble-views-spring-0",
+      "variants": {
+        "thicket-3x2-bramble-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7b363763",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
           "version": 1,
-          "approvedAt": "2026-11-08T22:08:00.000Z"
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "thicket-3x2-bramble-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "7b363763",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-bramble-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "7b363763",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-bramble-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "7b363763",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-bramble-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ea643efb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-bramble-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ea643efb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-bramble-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ea643efb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-bramble-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "ea643efb",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-bramble-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-bramble-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-bramble-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-bramble-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-bramble-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-bramble-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-bramble-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-bramble-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "thicket-3x2-hazel-views": {
+      "preferred": "thicket-3x2-hazel-views-spring-0",
+      "variants": {
+        "thicket-3x2-hazel-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "29be9cd0",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "thicket-3x2-hazel-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-hazel-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-hazel-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-hazel-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-hazel-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-hazel-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-hazel-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-hazel-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-hazel-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-hazel-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-hazel-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-hazel-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-hazel-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-hazel-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-hazel-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "thicket-3x2-mixed-views": {
+      "preferred": "thicket-3x2-mixed-views-spring-0",
+      "variants": {
+        "thicket-3x2-mixed-views-spring-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "29be9cd0",
+          "status": "approved",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-16T18:38:00.000Z"
+        },
+        "thicket-3x2-mixed-views-spring-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-mixed-views-spring-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-mixed-views-spring-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "29be9cd0",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-mixed-views-summer-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-mixed-views-summer-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-mixed-views-summer-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-mixed-views-summer-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "71358398",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-mixed-views-autumn-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-mixed-views-autumn-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-mixed-views-autumn-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-mixed-views-autumn-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "0b3eab68",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-mixed-views-winter-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-mixed-views-winter-90": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-mixed-views-winter-180": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
+        },
+        "thicket-3x2-mixed-views-winter-270": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6c7258ed",
+          "status": "rejected",
+          "updatedAt": "2026-11-16T18:38:00.000Z",
+          "version": 1
         }
       }
     },
@@ -4533,40 +8665,40 @@
       "preferred": "bush-meadow",
       "variants": {
         "bush-meadow": {
-          "approvedAt": "2026-11-07T06:11:40.955Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "c0bb75fc",
+          "specHash": "c0b4ba37",
           "status": "approved",
-          "updatedAt": "2026-11-07T06:11:40.955Z",
-          "version": 1
+          "updatedAt": "2026-11-20T11:41:52.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-20T11:41:52.000Z"
         },
         "bush-berry": {
-          "approvedAt": "2026-11-07T06:11:41.875Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "0fe03e7e",
+          "specHash": "0fe27d15",
           "status": "approved",
-          "updatedAt": "2026-11-07T06:11:41.875Z",
-          "version": 1
+          "updatedAt": "2026-11-20T11:41:52.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-20T11:41:52.000Z"
         },
         "bush-flowering": {
-          "approvedAt": "2026-11-07T06:11:42.986Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "6db21b52",
+          "specHash": "6db459e9",
           "status": "approved",
-          "updatedAt": "2026-11-07T06:11:42.986Z",
-          "version": 1
+          "updatedAt": "2026-11-20T11:41:52.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-20T11:41:52.000Z"
         },
         "bush-scrub": {
-          "approvedAt": "2026-11-07T06:11:44.074Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "ad8c1482",
+          "specHash": "ad8e5319",
           "status": "approved",
-          "updatedAt": "2026-11-07T06:11:44.074Z",
-          "version": 1
+          "updatedAt": "2026-11-20T11:41:52.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-20T11:41:52.000Z"
         }
       }
     },
