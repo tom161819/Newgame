@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.26] - 2026-11-21
+<!-- version: {"title":"Residents for Castle levels","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Castle upgrades need residents: 20 for level 2, 50 for level 3, 80 for level 4.
+- The Castle level caps the population: at most 50 residents at level 1 and 100 at level 2; no cap from level 3.
+
 ## [0.149.25] - 2026-11-21
 <!-- version: {"title":"Blender bushes approved","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Changed

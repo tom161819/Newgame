@@ -29,10 +29,14 @@ export const RANK_REQUIREMENTS=Object.freeze({
     Object.freeze({id:'happiness',kind:'happiness',min:70}),
     Object.freeze({id:'foodDays',kind:'foodDays',min:10}),
     Object.freeze({id:'buildings',kind:'buildings',min:8}),
+    Object.freeze({id:'population',kind:'population',min:20}),
   ]),
-  3:Object.freeze([]),
-  4:Object.freeze([]),
+  3:Object.freeze([Object.freeze({id:'population',kind:'population',min:50})]),
+  4:Object.freeze([Object.freeze({id:'population',kind:'population',min:80})]),
 });
+// Owner 21 Nov 2026: the most residents the kingdom can have at each Castle level (null = no limit).
+export const RANK_POPULATION_CAP=Object.freeze({1:50,2:100,3:null,4:null});
+export const rankPopulationCap=level=>RANK_POPULATION_CAP[level]??null;
 export const RANK_UNCOUNTED=new Set(['castle','stone_pavement','stone_pavement_joint','wall','stakes','moat','brazier','torch_post','campfire','burnt_ruins']);
 
 const typeOf=b=>b.type??b.definition?.id;
@@ -51,6 +55,7 @@ export function rankRequirements(level,buildings,stats={}){
     if(r.kind==='building')return {...r,ok:complete.has(r.building),current:complete.has(r.building)?1:0,target:1};
     if(r.kind==='happiness'){const v=stats.happiness;return {...r,ok:v!=null&&v>=r.min,current:v,target:r.min};}
     if(r.kind==='foodDays'){const v=stats.foodDays??0;return {...r,ok:v>=r.min,current:Number.isFinite(v)?Math.floor(v):v,target:r.min};}
+    if(r.kind==='population'){const v=stats.population??0;return {...r,ok:v>=r.min,current:v,target:r.min};}
     if(r.kind==='buildings'){const v=countedBuildings(buildings);return {...r,ok:v>=r.min,current:v,target:r.min};}
     return {...r,ok:false};
   });

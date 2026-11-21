@@ -1,4 +1,5 @@
 import { castleRules } from '../data/castle.js';
+import { kingdomLevel,rankPopulationCap } from '../data/kingdomRank.js';
 import { devFactor } from '../data/devBalance.js';
 import { t } from '../i18n/index.js';
 import { IdleGathering } from './IdleGathering.js';
@@ -106,7 +107,9 @@ export class WorkerSystem {
   sleepersIn(buildingId){return this.liveWorkers().filter(w=>w.sleepingIn===buildingId);}
   onDeath(worker){worker.manualRockId=null;this.scene.military?.release(worker,{dead:true});this.scene.vehicles?.release(worker);worker.commandState={state:'Working',goal:null};worker.diedAt??=this.scene.gameTime.totalElapsed;this.scene.workplaceSystem?.detach(worker);this.ai.cancel(worker);worker.active=false;worker.path=[];worker.nextTile=null;worker.walking=false;worker.workState='Dead';worker.workMessage='';worker.arriving=false;worker.view.destroy();this.scene.combatFeedback.remove(worker.id);this.updateUI();}
   // Resident capacity: the base settlement plus every completed House.
-  capacity(){return POPULATION.maximum+(this.scene.buildings??[]).reduce((n,b)=>n+(b.type==='castle'&&b.level&&buildingIsComplete(b)?castleRules(b).residents:0),0)+(this.scene.buildings??[]).reduce((n,b)=>n+(buildingIsComplete(b)?this.scene.objectRegistry?.get(b.type)?.housing?.capacity??0:0),0);}
+  // m-uroven-kralovstvi (owner 21 Nov 2026): with kingdom ranks the Castle level also caps the population.
+  capacity(){const room=this.housingCapacity(),cap=this.scene.kingdomRanks&&!this.scene.sandbox?rankPopulationCap(kingdomLevel(this.scene.buildings)):null;return cap==null?room:Math.min(room,cap);}
+  housingCapacity(){return POPULATION.maximum+(this.scene.buildings??[]).reduce((n,b)=>n+(b.type==='castle'&&b.level&&buildingIsComplete(b)?castleRules(b).residents:0),0)+(this.scene.buildings??[]).reduce((n,b)=>n+(buildingIsComplete(b)?this.scene.objectRegistry?.get(b.type)?.housing?.capacity??0:0),0);}
   updateUI(){const count=this.liveSubjects().length,maximum=this.capacity();this.onChange(count,maximum);for(const listener of this.listeners)listener(count,maximum);}
   // m-hlasky-udalosti (41): the last 50 deaths with their cause ('killed:<attacker type>' or 'wounds') and day.
   recordDeath(worker,cause){this.deceased??=[];this.deceased.push({name:worker.name,...(worker.identity?{identity:{...worker.identity}}:{}),profession:worker.displayProfession&&worker.displayProfession!=='idle'?worker.displayProfession:worker.profession,cause,day:this.scene.gameTime?.day??1});if(this.deceased.length>50)this.deceased.splice(0,this.deceased.length-50);}

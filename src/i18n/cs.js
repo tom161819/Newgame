@@ -498,4 +498,5 @@ export default {
   'kingdom.tipReady':'Tip: Všechny podmínky jsou splněné – vylepši hrad a království postoupí.','kingdom.tipHow':'Tip: Až budou všechny podmínky splněné, vylepši hrad.',
   'kingdom.req.building':'Postavena: {name}','kingdom.req.happiness':'Spokojenost {current} / {target} %','kingdom.req.foodDays':'Jídlo na {current} / {target} dní','kingdom.req.buildings':'Postavené budovy {current} / {target}',
   'unlock.castleLevel':'Vyžaduje hrad úrovně {level} ({rank})','castle.rankBlocked':'Království ještě není připravené stát se úrovní {rank}: {missing}',
+  'kingdom.req.population':'Obyvatelé {current} / {target}','kingdom.popCap':'Na této úrovni nejvýš {cap} obyvatel.',
 };

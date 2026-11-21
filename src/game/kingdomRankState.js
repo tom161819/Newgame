@@ -7,7 +7,7 @@ import { kingdomRank,KINGDOM_RANKS } from '../data/kingdomRank.js';
 export function kingdomRankStats(scene){
   const residents=scene.workerSystem?.liveSubjects?.()??[],homes=scene.needs?.homes?.()??new Map();
   const values=residents.map(w=>scene.needs?.status?.(w,homes)?.happiness).filter(v=>Number.isFinite(v));
-  return {happiness:values.length?Math.round(values.reduce((n,v)=>n+v,0)/values.length):null,foodDays:scene.foodSystem?foodDays(scene.foodSystem):0};
+  return {population:residents.length,happiness:values.length?Math.round(values.reduce((n,v)=>n+v,0)/values.length):null,foodDays:scene.foodSystem?foodDays(scene.foodSystem):0};
 }
 export const sceneKingdomRank=scene=>kingdomRank(scene.buildings,kingdomRankStats(scene));
 export const rankName=rank=>t(`kingdom.rank.${rank}`);

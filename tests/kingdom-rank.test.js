@@ -23,13 +23,15 @@ test('the kingdom level is the highest standing Castle level; a Castle being bui
 test('the rank shows the conditions for the next one: Granary, Material Yard, Happiness 70, food for 10 days, 8 buildings',()=>{
   const few=[building('castle',{level:1}),building('granary'),building('house'),building('stone_pavement')];
   let rank=kingdomRank(few,{happiness:80,foodDays:4});
-  assert.equal(rank.rank,'settlement');assert.equal(rank.nextRank,'village');assert.equal(rank.total,5);assert.equal(rank.met,2);assert.equal(rank.ready,false);
+  assert.equal(rank.rank,'settlement');assert.equal(rank.nextRank,'village');assert.equal(rank.total,6);assert.equal(rank.met,2);assert.equal(rank.ready,false);
   assert.equal(countedBuildings(few),2,'the Castle and paving are not counted');
   const many=[...few,building('material_yard'),...Array.from({length:5},()=>building('house'))];
-  rank=kingdomRank(many,{happiness:70,foodDays:10});assert.equal(rank.met,5);assert.equal(rank.ready,true);
+  rank=kingdomRank(many,{happiness:70,foodDays:10,population:19});assert.equal(rank.met,5);assert.equal(rank.ready,false,'needs 20 residents');
+  rank=kingdomRank(many,{happiness:70,foodDays:10,population:20});assert.equal(rank.met,6);assert.equal(rank.ready,true);
   // Level 2 → 3: no conditions yet.
-  rank=kingdomRank([building('castle',{level:2})],{});assert.equal(rank.rank,'village');assert.equal(rank.total,0);
-  setLanguage('cs');assert.equal(kingdomRankLabel(kingdomRank(few,{happiness:80,foodDays:4})),'Úroveň království: Osada · 2/5');
+  rank=kingdomRank([building('castle',{level:2})],{population:50});assert.equal(rank.rank,'village');assert.equal(rank.total,1);assert.equal(rank.ready,true);
+  assert.equal(kingdomRank([building('castle',{level:3})],{population:79}).ready,false);
+  setLanguage('cs');assert.equal(kingdomRankLabel(kingdomRank(few,{happiness:80,foodDays:4})),'Úroveň království: Osada · 2/6');
   assert.match(kingdomRankTip(kingdomRank(few,{happiness:80,foodDays:4})),/✗ Jídlo na 4 \/ 10 dní/);setLanguage('en');
 });
 test('buildings above the Castle level are locked in the game (kingdomRanks); pure placement checks are not',()=>{
@@ -44,4 +46,10 @@ test('the Castle upgrade to level 2 waits for the rank conditions',()=>{
   const castle=building('castle',{level:1,id:1,x:5,y:5,tiles:[]});
   const scene={kingdomRanks:true,buildings:[castle],objectRegistry,inventory:{canAfford:()=>true},foodSystem:{dailyConsumption:10,availablePortions:20}};
   const plan=castleUpgradePlan(scene,castle);assert.equal(plan.blocked,true);assert.equal(plan.next,2);assert.match(plan.error,/Village/);
+});
+test('the Castle level caps the population: 50 at level 1, 100 at level 2, no cap from level 3',async()=>{
+  const { WorkerSystem } = await import('../src/systems/WorkerSystem.js');
+  const cap=(level,houses)=>WorkerSystem.prototype.capacity.call({scene:{kingdomRanks:true,objectRegistry,buildings:[building('castle',{level}),...Array.from({length:houses},()=>building('house'))]},housingCapacity(){return 200;}});
+  assert.equal(cap(1,0),50);assert.equal(cap(2,0),100);assert.equal(cap(3,0),200);assert.equal(cap(4,0),200);
+  assert.equal(WorkerSystem.prototype.capacity.call({scene:{buildings:[]},housingCapacity(){return 200;}}),200,'no ranks (tests, sandbox scenes): no cap');
 });
