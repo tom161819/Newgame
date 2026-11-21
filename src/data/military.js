@@ -117,3 +117,7 @@ export const BALLISTA=Object.freeze({range:14,reload:6000,damage:60,pierce:.5,co
 export const PORTCULLIS=Object.freeze({damage:.5,cost:Object.freeze({iron:10,wood:6})});
 export const PAVISE=Object.freeze({ranged:.5});
 export const SIEGE_TOWER=Object.freeze({reach:4,climb:1000});
+// Owner 20 Nov 2026 (defence list, point 7). Shield fighters parry `parry.chance` of melee blows, light troops dodge
+// `dodge.chance` (as a damage share); the picture shows a spark or a sidestep about every `showEvery` ms of being hit.
+export const DEFENSE_MOVES=Object.freeze({parry:Object.freeze({types:Object.freeze(['knight','swordsman','enemy_knight','enemy_swordsman']),chance:.15}),
+  dodge:Object.freeze({types:Object.freeze(['archer','royal_archer','crossbowman','light_cavalry','enemy_archer']),chance:.12}),showEvery:1600,flinchEvery:600});

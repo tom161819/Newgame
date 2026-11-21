@@ -5,7 +5,7 @@ const { workerScene } = await import('./helpers/workerScene.js');
 const { spawnSandboxUnits } = await import('../src/game/sandboxMode.js');
 const { placeBuilding } = await import('../src/game/buildings.js');
 const { AlarmSystem,ALARM } = await import('../src/systems/AlarmSystem.js');
-const { MILITARY_RULES,CATAPULT,WAGON_SUPPLY } = await import('../src/data/military.js');
+const { MILITARY_RULES,CATAPULT,WAGON_SUPPLY,DEFENSE_MOVES } = await import('../src/data/military.js');
 const { markEnemyBuilding } = await import('../src/systems/SiegeSystem.js');
 const { findPathToAny } = await import('../src/game/pathfinding.js');
 
@@ -142,7 +142,7 @@ test('point 3: archers ordered at a wooden enemy building shoot fire arrows unti
 test('unit roles: the Crossbowman ignores half the armour, the Halberdier hits riders harder, the Light Cavalry opens with a charge after a ride',async()=>{
   const { UNIT_TYPES } = await import('../src/data/military.js');const s=scene();s.character.away=true;
   const [xbow]=units(s,'crossbowman',{x:40,y:50},1),[bow]=units(s,'royal_archer',{x:40,y:52},1),[halb]=units(s,'halberdier',{x:40,y:54},1),[rider]=units(s,'light_cavalry',{x:30,y:60},1),[knight]=units(s,'enemy_knight',{x:44,y:50},1);
-  assert.equal(s.combat.pierce(xbow),.5);assert.equal(s.combat.pierce(bow),0);assert.equal(s.combat.bonus(halb,rider),UNIT_TYPES.halberdier.bonusVs.mounted);assert.equal(s.combat.bonus(halb,knight),1);assert.equal(s.combat.bonus(xbow,rider),1);
+  assert.equal(s.combat.pierce(xbow),.5);assert.equal(s.combat.pierce(bow),0);/* point 7 (20 Nov): the rider dodges, the Knight parries a share of melee blows */assert.ok(Math.abs(s.combat.bonus(halb,rider)-UNIT_TYPES.halberdier.bonusVs.mounted*(1-DEFENSE_MOVES.dodge.chance))<1e-9);assert.ok(Math.abs(s.combat.bonus(halb,knight)-(1-DEFENSE_MOVES.parry.chance))<1e-9);assert.equal(s.combat.bonus(xbow,rider),1);
   assert.equal(knight.armor,30);assert.equal(halb.armor,30);
   const rate=u=>{const hp=knight.currentHP=knight.maxHP;s.combat.attacks.set(u,knight);s.combat.update(1000);s.combat.attacks.delete(u);return hp-knight.currentHP;};
   assert.ok(Math.abs(rate(xbow)-xbow.attackDPS*(xbow.damageFactor??1)*.85)<1e-6,'armour 30 counts as 15 against a bolt');assert.ok(Math.abs(rate(bow)-bow.attackDPS*(bow.damageFactor??1)*.7)<1e-6);

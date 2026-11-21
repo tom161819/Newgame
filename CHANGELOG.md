@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.19] - 2026-11-21
+<!-- version: {"title":"Hit reactions, parry and dodge","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Fighters flinch away from blows. Knights and Swordsmen parry 15 % of melee blows (a spark shows), light troops dodge 12 % (a quick sidestep).
+
 ## [0.149.18] - 2026-11-21
 <!-- version: {"title":"Portcullis, siege tower and pavise","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added

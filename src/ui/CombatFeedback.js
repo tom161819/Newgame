@@ -1,3 +1,4 @@
+import { DEFENSE_MOVES } from '../data/military.js';
 import { t } from '../i18n/index.js';
 import { inAttackRange,isRanged } from '../systems/CombatSystem.js';
 
@@ -6,7 +7,21 @@ const isEnemyUnit=u=>u?.type==='wolf'||!!u?.definition?.gameplay?.hostile;
 const BATTLE_QUIET=5000;
 export class CombatFeedback {
   constructor(scene){this.scene=scene;this.bars=new Map();this.damage=new Map();this.rings=scene.add?.graphics?.().setDepth?.(5)??null;this.battle=null;}
-  hit(unit){if(!(unit.hitCooldown>0)){unit.hitFlash=110;unit.hitCooldown=350;}}
+  hit(unit,attacker=null){if(!(unit.hitCooldown>0)){unit.hitFlash=110;unit.hitCooldown=350;}this.react(unit,attacker);}
+  // Owner 20 Nov 2026 (defence list, point 7): a hit fighter flinches away from the blow; a shield fighter now and then
+  // parries (a spark at his shield), a light one sidesteps. Drawn on the figure's picture only (its place is not moved).
+  react(unit,attacker){
+    const s=this.scene,view=unit===s.character?null:unit.view,art=view?.art;if(!art?.visible||!attacker?.position||!s.tweens?.add)return;
+    const now=s.gameTime?.totalElapsed??0;if(now<(unit.reactAt??0))return;
+    const dx=unit.position.x-attacker.position.x,dy=unit.position.y-attacker.position.y,n=Math.hypot(dx,dy)||1,sx=(dx-dy)/n,sy=(dx+dy)/n*.5;
+    const move=isRanged(attacker)?null:s.military?.defenseMove?.(unit),show=move&&now>=(unit.moveShownAt??0);
+    if(show){unit.moveShownAt=now+DEFENSE_MOVES.showEvery;unit.reactAt=now+DEFENSE_MOVES.flinchEvery;
+      if(move==='parry'){const g=s.add.graphics().setDepth(view.depth+2),x=view.x-sx*8,y=view.y-26;g.fillStyle(0xfff2a8,1);g.fillTriangle(x-6,y,x+6,y,x,y-4);g.fillTriangle(x-6,y,x+6,y,x,y+4);g.fillTriangle(x,y-7,x,y+7,x-3,y);g.fillTriangle(x,y-7,x,y+7,x+3,y);
+        s.tweens.add({targets:g,alpha:0,duration:350,onComplete:()=>g.destroy()});}
+      else{const x0=art.x;s.tweens.add({targets:art,x:x0+(sy>0?6:-6),duration:110,yoyo:true,onComplete:()=>{art.x=x0;}});}
+      return;}
+    unit.reactAt=now+DEFENSE_MOVES.flinchEvery;const x0=art.x,y0=art.y;s.tweens.add({targets:art,x:x0+sx*3,y:y0+sy*2,duration:90,yoyo:true,onComplete:()=>{art.x=x0;art.y=y0;}});
+  }
   // Combat 16 Nov 2026: damage numbers – what a unit lost, added up and shown about twice a second over its head.
   damaged(unit,amount){if(!(amount>0))return;const d=this.damage.get(unit)??{sum:0,wait:0};d.sum+=amount;this.damage.set(unit,d);}
   floatDamage(delta){

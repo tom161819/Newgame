@@ -9,7 +9,7 @@ import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
 import { findPathToAny } from '../game/pathfinding.js';
 import { inAttackRange,isRanged,WALL_ARCHER_RANGE,LOB,canLob } from './CombatSystem.js';
 import { blockersBetween } from '../game/lineOfSight.js';
-import { MILITARY_RULES,PATROL,STANCES,BATTLE_ORDERS,holdsGround,TERRAIN_COMBAT,PAVISE } from '../data/military.js';
+import { MILITARY_RULES,PATROL,STANCES,BATTLE_ORDERS,holdsGround,TERRAIN_COMBAT,PAVISE,DEFENSE_MOVES } from '../data/military.js';
 import { freeAround,awayFrom } from '../game/combatSpacing.js';
 import { SiegeSystem,siegeable,canSiege } from './SiegeSystem.js';
 import { buildingDefinition } from '../game/buildings.js';
@@ -32,10 +32,13 @@ export class MilitarySystem {
     const ranged=isRanged(attacker),wall=BATTLE_ORDERS.shieldwall,hog=BATTLE_ORDERS.hedgehog;let f=1;
     if(target?.stance==='shieldwall')f*=ranged?wall.ranged:wall.melee;if(attacker?.stance==='shieldwall')f*=wall.own;
     if(target?.stance==='hedgehog'&&this.mounted(attacker))f*=hog.vsRider;
+    // Point 7: shield fighters parry and light troops dodge part of the melee blows.
+    if(!ranged){const move=this.defenseMove(target);if(move)f*=1-DEFENSE_MOVES[move].chance;}
     // Point 6: a Crossbowman standing still is behind his pavise.
     if(ranged&&this.spec(target)?.equipment?.weapon==='crossbow'&&!target.nextTile&&!target.path?.length)f*=PAVISE.ranged;if(attacker?.stance==='hedgehog'&&this.mounted(target))f*=hog.riderBonus;
     return f;
   }
+  defenseMove(unit){const type=this.unit(unit)?.type??unit?.definition?.id;return DEFENSE_MOVES.parry.types.includes(type)?'parry':DEFENSE_MOVES.dodge.types.includes(type)?'dodge':null;}
   // …and the ground: an archer above his target shoots harder; trees around the target soak up arrows.
   terrainFactor(attacker,target){
     if(!isRanged(attacker)||!target?.position)return 1;const s=this.scene,r=s.relief,h=r?.tiles?(x,y)=>r.tiles[y*r.width+x]??0:null,a=attacker.position,t=target.position;let f=1;
