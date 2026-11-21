@@ -14,6 +14,9 @@ export const WIKI_TOPICS=Object.freeze([
   Object.freeze({id:'taxes',category:'policy',links:Object.freeze(['topic:needs','resource:gold'])}),
   Object.freeze({id:'trade',category:'trade',links:Object.freeze(['building:marketplace','building:warehouse','resource:gold'])}),
   Object.freeze({id:'winter',category:'seasons',links:Object.freeze(['building:fisherman_hut','building:granary','topic:needs'])}),
+  // m-pribeh-vlci-ujezd: the story game (New Game → Story).
+  Object.freeze({id:'court',category:'policy',links:Object.freeze(['topic:story','topic:taxes','resource:gold','building:castle'])}),
+  Object.freeze({id:'story',category:'events',links:Object.freeze(['topic:court','building:castle','building:barracks'])}),
   Object.freeze({id:'builders',category:'professions',links:Object.freeze(['building:builder_workshop','profession:builder','profession:hauler'])}),
 ]);
 // Generated pages that also link to a topic.

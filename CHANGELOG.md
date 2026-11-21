@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.151.2] - 2026-11-22
+<!-- version: {"title":"Wiki pages for the story","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Wiki: two new pages, "Orders and trust" and "The story: Vlčí újezd".
+
 ## [0.151.1] - 2026-11-22
 <!-- version: {"title":"Story switch, fair raids","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added
