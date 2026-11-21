@@ -21,6 +21,9 @@ only = int(args[args.index('--only') + 1]) if '--only' in args else None
 first = int(args[args.index('--from') + 1]) if '--from' in args else 0
 last = int(args[args.index('--to') + 1]) if '--to' in args else 99
 TILT = float(os.environ.get('XBOW_TILT', '25'))  # crossbow level at the shoulder
+# Owner 21 Nov 2026 (Tripo crossbowman): a crossbow that hangs from the hand in the rest pose is turned up by XBOW_AIM
+# degrees (about the figure's X axis) while he raises, aims and lowers it.
+AIM = float(os.environ.get('XBOW_AIM', '0')); YAW = float(os.environ.get('XBOW_YAW', '0'))  # and turned by YAW about Z to point ahead
 hue = float(args[args.index('--hue') + 1]) if '--hue' in args else None  # army colour: node "Army cloth" Hue (0.5 = the owner's wine red)  # render only columns from this one on
 SS = 3; PPM = 30; FW, FH = 128, 136; ANCHOR = (64, 100)  # final frame and the feet point inside it
 
@@ -127,7 +130,9 @@ def attack(i):
     if lean > 5: rot('thigh.L', -lean * 1.6); rot('shin.L', lean); rot('thigh.R', lean); lift(-.004 * lean)
   elif kind == 'crossbow':
     up, fore, lean = CROSS[i]
+    rot('hand.R', YAW * [.4, .9, 1, 1, .5, .15][i], Z)  # first: the hand's rotations are composed in its own frame
     for side in 'RL': rot(f'upper_arm.{side}', up); rot(f'forearm.{side}', fore); rot(f'hand.{side}', -(up + fore) - (TILT * min(1, -up / 60) if 1 <= i <= 3 else 0))
+    rot('hand.R', AIM * [.4, .9, 1, 1, .5, .15][i])
     rot('spine', lean); rot('head', -lean * .6 + (6 if 1 <= i <= 3 else 0)); rot('spine', -6, Z)
   elif kind == 'halberd':
     up, fore, tilt = HALBERD[i]; rot('upper_arm.R', up); rot('forearm.R', fore); rot('hand.R', tilt - up - fore)

@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.33] - 2026-11-21
+<!-- version: {"title":"New Archer and Crossbowman","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Changed
+- New figures for the Archer (ours and enemy) and the Crossbowman, from the owner's 3D models: the archer draws his longbow, the crossbowman raises his crossbow to shoot.
+
 ## [0.149.32] - 2026-11-21
 <!-- version: {"title":"Season change without hard edges","type":"fix","reconstructed":false,"saveVersion":67} -->
 ### Fixed
