@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.32] - 2026-11-21
+<!-- version: {"title":"Season change without hard edges","type":"fix","reconstructed":false,"saveVersion":67} -->
+### Fixed
+- The change of seasons again blends smoothly on a zoomed-out view: no more hard square edges between chunks that were several steps apart.
+
 ## [0.149.31] - 2026-11-21
 <!-- version: {"title":"Selection tips stay on screen","type":"fix","reconstructed":false,"saveVersion":67} -->
 ### Fixed

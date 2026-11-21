@@ -51,7 +51,7 @@ export const draftStale=(scale,zoom)=>!!scale&&zoom>(DRAFT_VIEW.find(d=>d.scale=
 const FIRST_PAINT_MS = 12;
 const BACKLOG_CHUNKS = 6, BACKLOG_SLICE_MS = 10, BACKLOG_EVERY_MS = 30;
 // owner 15 Nov: a season step is blended ahead SEASON_PREP.sliceMs a frame, at most maxMs before it is shown anyway.
-const SEASON_PREP = Object.freeze({ sliceMs: 8, maxMs: 3000, pool: 96 });
+const SEASON_PREP = Object.freeze({ sliceMs: 8, maxMs: 12000, pool: 96 });
 const GROUND_BAND = 36; // rows of ground a frame in a paint spread over frames (a multiple of GROUND_STEP)
 // m-teren-vyska (part 2): room above a chunk's picture for its highest ground (px).
 const LIFT_PAD = Math.ceil(HEIGHT_MAX * HEIGHT_UNIT_PX) + 2;
@@ -326,19 +326,26 @@ export class TerrainRenderer {
       if(!this.chunks.has(ck))continue;const [cx,cy]=ck.split(',').map(Number),look=job.look(cx,cy,this.season,CHUNK_SIZE),stamp=this.groundStampFor(cx,cy,look.key),cached=this.groundCache?.get(ck);
       if(cached?.stamp===stamp)continue;const have=prepared.get(ck);if(have?.stamp===stamp)continue;
       if(performance.now()-t0>SEASON_PREP.sliceMs){done=false;break;}
-      const result=this.prepareGround(ck,cx,cy,look,stamp);prepared.set(ck,{stamp,result});
+      // A layer painted in bands (a full-size paint of a shown chunk) takes further bands of the same chunk in this slice.
+      let result=this.prepareGround(ck,cx,cy,look,stamp);
+      while(!result&&look.blend&&this.groundJobActive(ck)&&performance.now()-t0<=SEASON_PREP.sliceMs)result=this.prepareGround(ck,cx,cy,look,stamp);
+      if(!result&&look.blend&&this.groundJobActive(ck)){done=false;break;}
+      prepared.set(ck,{stamp,result});
     }
     if(done||performance.now()-job.since>SEASON_PREP.maxMs){this.seasonPrep=null;job.commit();}
   }
-  // The ground picture of one chunk for a look, into a canvas of its own, only from season layers already painted
-  // (cheap). Null when a layer would need a full paint.
+  // The ground picture of one chunk for a look, into a canvas of its own. Missing season layers are painted (at the
+  // draft size when zoomed out, else in bands: null until the last band). Null also for a finished look without its layer.
   prepareGround(ck,cx,cy,look,stamp){
     const own=this.seasonLayers?.get(ck),rest=stamp.slice(stamp.indexOf('|')),ready=season=>{const layer=own?.[season];return!!layer&&layer.stamp===`${season}${rest}`&&!draftStale(layer.canvas?.draft,this.viewZoom??1);};
-    if(!(look.blend?ready(look.from)&&ready(look.to):ready(look.key)))return null;
-    if(!look.blend)return{canvas:own[look.key].canvas,stamp,sig:own[look.key].sig};
+    if(!look.blend)return ready(look.key)?{canvas:own[look.key].canvas,stamp,sig:own[look.key].sig}:null;
+    // Owner 21 Nov 2026 ("zase ostré přechody"): a chunk whose season layers are missing (it has just entered the change)
+    // gets them painted here, off screen, while the picture holds the previous step. Before, it was skipped and repainted
+    // after the commit one chunk at a time, so on a zoomed-out view (80 chunks) neighbours stood several steps apart.
+    // The shown picture (cached) may become the old season's layer; it is only read.
     const origin=gridToWorld(cx*CHUNK_SIZE,cy*CHUNK_SIZE),left=origin.x-CHUNK_SIZE*32,size={width:CHUNK_SIZE*64,height:CHUNK_SIZE*32};
-    const out=this.groundPool?.pop()??document.createElement('canvas');
-    return this.groundPictureStep(ck,cx,cy,left,origin.y,size,this.buildingTiles(),stamp,null,{look,out});
+    const out=this.groundPool?.pop()??document.createElement('canvas'),result=this.groundPictureStep(ck,cx,cy,left,origin.y,size,this.buildingTiles(),stamp,this.groundCache?.get(ck)??null,{look,out});
+    if(!result)this.recycleGround(ck,out);return result;
   }
   groundJobActive(ck){if(this.groundJobs?.size)for(const key of this.groundJobs.keys())if(key.startsWith(`${ck}|`))return true;return false;}
   groundPictureStep(ck,cx,cy,left,top,texture,occupied,stamp,cached,options={}){
@@ -350,7 +357,7 @@ export class TerrainRenderer {
     // (about 12 ms without GPU instead of 110 ms at once), the plants last. A chunk without a picture is painted at once.
     const fine=canvas=>!draftStale(canvas?.draft,this.viewZoom??1);
     const plain=(season,canvas,draft=1)=>{
-      if(!progressive&&draft>1){canvas.width=texture.width;canvas.height=texture.height;this.paintDraftChunk(canvas,cx,cy,left,top,season,occupied,draft);canvas.draft=draft;count();return canvas;}
+      if(draft>1){canvas.width=texture.width;canvas.height=texture.height;this.paintDraftChunk(canvas,cx,cy,left,top,season,occupied,draft);canvas.draft=draft;count();return canvas;}
       if(!progressive){canvas.width=texture.width;canvas.height=texture.height;canvas.draft=0;const c2=canvas.getContext('2d');c2.clearRect(0,0,canvas.width,canvas.height);this.paintContinuousChunk(c2,cx,cy,left,top,season,occupied);count();return canvas;}
       const jobs=this.groundJobs??=new Map(),jk=`${ck}|${season}`,want=`${season}${rest}`;let job=jobs.get(jk);
       if(!job||job.want!==want){const work=job?.canvas??fresh();work.width=texture.width;work.height=texture.height;job={want,canvas:work,y:0,painter:this.groundPainter(cx,cy,left,top,season,occupied)};jobs.set(jk,job);
@@ -376,7 +383,7 @@ export class TerrainRenderer {
         if(!rect||rect.w*rect.h<=texture.width*texture.height*PATH_PARTIAL_SHARE){
           if(rect){this.paintContinuousChunk(have.canvas.getContext('2d'),cx,cy,left,top,season,occupied,rect);this.paintStats.groundPartial=(this.paintStats.groundPartial??0)+1;}
           have.stamp=want;have.sig=sig;return have.canvas;}}
-      const painted=plain(season,have?.canvas??fresh());if(!painted)return null;own[season]={stamp:want,sig,canvas:painted};return painted;};
+      const painted=plain(season,have?.canvas??fresh(),draftScale(this.viewZoom??1));if(!painted)return null;own[season]={stamp:want,sig,canvas:painted};return painted;};
     const a=layer(look.from),b=a&&layer(look.to);layers.delete(ck);layers.set(ck,own);if(!a||!b)return null;
     // Memory: two layers (~0.8 MB each) per chunk; chunks in view always keep theirs, of the others only the most
     // recently blended ones up to SEASON_TRANSITION.layerChunks in all.
@@ -387,7 +394,7 @@ export class TerrainRenderer {
     const m=mask.getContext('2d'),image=m.createImageData(gw,gh);blendMask(image.data,gw,gh,(px,py)=>{const g=worldToGrid(px*step+left,py*step+top);return[g.x,g.y];},look.blend.weight);m.putImageData(image,0,0);
     const top_=this.blendCanvas??=document.createElement('canvas');top_.width=W;top_.height=H;const t2=top_.getContext('2d');t2.clearRect(0,0,W,H);t2.drawImage(b,0,0);
     t2.globalCompositeOperation='destination-in';t2.imageSmoothingEnabled=true;t2.drawImage(mask,0,0,gw,gh,0,0,gw*step,gh*step);t2.globalCompositeOperation='source-over';
-    canvas.width=W;canvas.height=H;c.clearRect(0,0,W,H);c.drawImage(a,0,0);c.drawImage(top_,0,0);canvas.draft=0;this.paintStats.groundBlends=(this.paintStats.groundBlends??0)+1;
+    canvas.width=W;canvas.height=H;c.clearRect(0,0,W,H);c.drawImage(a,0,0);c.drawImage(top_,0,0);canvas.draft=Math.max(a.draft||0,b.draft||0);this.paintStats.groundBlends=(this.paintStats.groundBlends??0)+1;
     return{canvas,stamp,sig};
   }
   paintContinuousChunk(context,cx,cy,left,top,season,occupied,rect=null){const painter=this.groundPainter(cx,cy,left,top,season,occupied);painter.ground(context,rect);painter.plants(context,rect);}
