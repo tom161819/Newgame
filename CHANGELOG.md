@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.150.0] - 2026-11-21
+<!-- version: {"title":"Story: the royal court","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Added
+- Story, part 1 – the royal court. You hold your land from King Sigismund, who does not trust you. Riders bring orders from court (levies in gold, deliveries of wood and food, requests) with a deadline; hand them over in the new "Orders from court" card.
+- The King's trust (0–100) in the top bar: favour brings gifts and longer deadlines; suspicion shortens deadlines and seizes stock; displeasure sends collectors and starts a countdown that atonement in gold can stop; after it a large punitive army attacks your Castle.
+- Your character is now Hynek of Kamenný Brod with a title by Castle level (Squire, Landholder, Lord, High Lord).
+
 ## [0.149.35] - 2026-11-21
 <!-- version: {"title":"Conditions for Small town and Town","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added

@@ -1470,3 +1470,13 @@ body.sandbox-tool canvas { cursor:crosshair !important; }
 .population-panel { top:90px; bottom:12px; max-height:none; overflow-y:auto; }
 .population-panel .population-viewport { flex:1 1 auto; height:auto; min-height:180px; }
 .unit-icon-command::after { display:none !important; } /* owner 21 Nov 2026: the game tip panel shows these */
+
+/* m-pribeh-vlci-ujezd F1: the King's trust and the orders from court */
+.court-trust[hidden] { display:none; }
+.court-trust[data-band="favour"] { color:#bfe3a0; }
+.court-trust[data-band="suspicion"] { color:#f0c674; }
+.court-trust[data-band="displeasure"], .court-trust[data-band="wrath"] { color:#ff9a8a; border-color:rgba(255,120,100,.6); }
+.court-orders .court-button { grid-column:1 / -1; justify-self:start; padding:2px 10px; font-size:12px; border-radius:6px; border:1px solid var(--line,rgba(240,209,116,.45)); background:rgba(240,209,116,.14); color:inherit; cursor:pointer; }
+.court-orders .court-button:disabled { opacity:.45; cursor:default; }
+.court-orders .court-late strong, .court-orders .court-alert { color:#ff9a8a; }
+.in-zone #court-orders, body.in-sandbox #court-orders, body.in-sandbox #court-trust { display:none !important; }
