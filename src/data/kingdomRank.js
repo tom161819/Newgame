@@ -34,8 +34,9 @@ export const RANK_REQUIREMENTS=Object.freeze({
   3:Object.freeze([Object.freeze({id:'population',kind:'population',min:50})]),
   4:Object.freeze([Object.freeze({id:'population',kind:'population',min:80})]),
 });
-// Owner 21 Nov 2026: the most residents the kingdom can have at each Castle level (null = no limit).
-export const RANK_POPULATION_CAP=Object.freeze({1:50,2:100,3:null,4:null});
+// Owner 21 Nov 2026: the most residents the kingdom can have at each Castle level (null = no limit). The owner's
+// cap is the one after the upgrade (2: 50, 3: 100, 4: none); level 1 holds the 20 the upgrade to 2 needs.
+export const RANK_POPULATION_CAP=Object.freeze({1:20,2:50,3:100,4:null});
 export const rankPopulationCap=level=>RANK_POPULATION_CAP[level]??null;
 export const RANK_UNCOUNTED=new Set(['castle','stone_pavement','stone_pavement_joint','wall','stakes','moat','brazier','torch_post','campfire','burnt_ruins']);
 

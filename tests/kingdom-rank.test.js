@@ -47,9 +47,9 @@ test('the Castle upgrade to level 2 waits for the rank conditions',()=>{
   const scene={kingdomRanks:true,buildings:[castle],objectRegistry,inventory:{canAfford:()=>true},foodSystem:{dailyConsumption:10,availablePortions:20}};
   const plan=castleUpgradePlan(scene,castle);assert.equal(plan.blocked,true);assert.equal(plan.next,2);assert.match(plan.error,/Village/);
 });
-test('the Castle level caps the population: 50 at level 1, 100 at level 2, no cap from level 3',async()=>{
+test('the Castle level caps the population: 20 at level 1, 50 at level 2, 100 at level 3, none at level 4',async()=>{
   const { WorkerSystem } = await import('../src/systems/WorkerSystem.js');
   const cap=(level,houses)=>WorkerSystem.prototype.capacity.call({scene:{kingdomRanks:true,objectRegistry,buildings:[building('castle',{level}),...Array.from({length:houses},()=>building('house'))]},housingCapacity(){return 200;}});
-  assert.equal(cap(1,0),50);assert.equal(cap(2,0),100);assert.equal(cap(3,0),200);assert.equal(cap(4,0),200);
+  assert.equal(cap(1,0),20);assert.equal(cap(2,0),50);assert.equal(cap(3,0),100);assert.equal(cap(4,0),200);
   assert.equal(WorkerSystem.prototype.capacity.call({scene:{buildings:[]},housingCapacity(){return 200;}}),200,'no ranks (tests, sandbox scenes): no cap');
 });

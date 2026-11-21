@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.27] - 2026-11-21
+<!-- version: {"title":"Population cap after the upgrade","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Changed
+- Population cap by Castle level: 20 residents at level 1, 50 at level 2, 100 at level 3, no cap at level 4.
+
 ## [0.149.26] - 2026-11-21
 <!-- version: {"title":"Residents for Castle levels","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added
