@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.30] - 2026-11-21
+<!-- version: {"title":"Taller Population panel","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Changed
+- The Population panel reaches from the top bar to the bottom of the window and shows more residents; the Soldiers list moved out (it is in the Army panel).
+
 ## [0.149.29] - 2026-11-21
 <!-- version: {"title":"Kingdom overview in the top bar","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Changed

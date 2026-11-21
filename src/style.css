@@ -1466,3 +1466,6 @@ body.sandbox-tool canvas { cursor:crosshair !important; }
 .kingdom-bar-hud .kingdom-bar-body { position:absolute; top:calc(100% + 8px); left:-6px; width:min(350px,calc(100vw - 24px)); margin:0; padding:8px 10px 9px; color:var(--ink,#ede5c9); background:var(--glass,rgb(30 35 25 / .94)); border:1px solid var(--line-soft,#5b5a40); border-radius:10px; box-shadow:var(--shadow,0 4px 14px #0008); font-size:13px; }
 .hud-row-bottom .hud-left-slot:has(> .kingdom-bar-hud) { width:auto !important; min-width:0; }
 .kingdom-bar-hud .kingdom-bar-title, .kingdom-bar-hud .kingdom-bar-summary { white-space:nowrap; }
+/* Owner 21 Nov 2026: Population from under the top bar to the bottom; the list takes the free height. */
+.population-panel { top:90px; bottom:12px; max-height:none; overflow-y:auto; }
+.population-panel .population-viewport { flex:1 1 auto; height:auto; min-height:180px; }

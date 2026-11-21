@@ -19,15 +19,10 @@ export class PopulationSidebar {
     try{this.storage=window.localStorage;}catch{}this.preferences=readPopulationPreferences(this.storage);
     this.search=document.querySelector('#population-search');this.sort=document.querySelector('#population-sort');this.order=document.querySelector('#population-order');this.profession=document.querySelector('#population-profession');
     this.renderOptions();
-    // m-vojaci-chyba (owner point 87): the Soldiers group – every Soldier (the starting garrison included) with his unit
-    // type and where he is; a click centres the camera on him (or on the House or Castle he sleeps in).
-    this.soldiers=element('details','population-soldiers');this.soldiers.id='population-soldiers';this.soldiers.open=true;this.soldiers.hidden=true;
-    this.soldiersTitle=element('summary');this.soldiersList=element('div','population-soldier-list');this.soldiers.append(this.soldiersTitle,this.soldiersList);
-    document.querySelector('#population-needs')?.after(this.soldiers);
-    // m-nosici-panel (point 40): the wanted number of Haulers lives here, above the soldiers (it was in the Castle's Employment card).
-    this.haulerBox=element('div','employment-haulers population-haulers');this.haulerBox.id='population-haulers';this.soldiers.before(this.haulerBox);
+    // m-nosici-panel (point 40): the wanted number of Haulers lives here (it was in the Castle's Employment card).
+    this.haulerBox=element('div','employment-haulers population-haulers');this.haulerBox.id='population-haulers';document.querySelector('#population-needs')?.after(this.haulerBox);
+    // Owner 21 Nov 2026: the Soldiers group is gone from this panel – the Army panel lists them.
     this.haulerBox.addEventListener('click',event=>{const step=event.target.closest('[data-haulers]')?.dataset.haulers;if(!step)return;const e=scene.employment;e.setHaulers(step==='auto'?null:Math.max(0,e.haulerTarget()+Number(step)));this.haulerKey=null;this.lastRefresh=-Infinity;this.refresh(true);},options);
-    this.soldiersList.addEventListener('click',event=>{const b=event.target.closest?.('[data-soldier-id]');if(b)this.locateResident(b.dataset.soldierId);},options);
     this.sort.value=this.preferences.sortBy;this.order.value=this.preferences.direction;this.profession.value=this.preferences.profession;this.search.value='';
     const change=()=>{clearTimeout(this.inspectTimer);this.hideDetails();this.preferences={sortBy:this.sort.value,direction:this.order.value,profession:this.profession.value};writePopulationPreferences(this.storage,this.preferences);this.viewport.scrollTop=0;this.refresh(true);};
     for(const control of [this.sort,this.order,this.profession])control.addEventListener('change',change,options);this.search.addEventListener('input',change,options);
@@ -44,7 +39,7 @@ export class PopulationSidebar {
     this.tooltip.addEventListener('keydown',event=>{if(event.code==='Escape'){event.preventDefault();this.hideDetails();}},options);
     this.tooltip.addEventListener('focusout',event=>{if(!this.tooltip.contains(event.relatedTarget))this.hideDetails();},options);
     window.addEventListener('resize',()=>{this.positionTooltip();this.positionJobMenu();},options);
-    this.button.addEventListener('click',()=>this.setOpen(!this.open),options);document.querySelector('#close-population').addEventListener('click',()=>this.setOpen(false),options);
+    this.button.addEventListener('click',()=>this.setOpen(!this.open),options);globalThis.addEventListener?.('resize',()=>{if(this.open)this.fitHeight();},options);document.querySelector('#close-population').addEventListener('click',()=>this.setOpen(false),options);
     for(const event of ['pointerdown','mousedown','mouseup','click','wheel','keydown','keyup'])this.root.addEventListener(event,e=>e.stopPropagation(),options);
     this.root.addEventListener('keydown',event=>{if(event.code==='Escape'){event.preventDefault();if(this.jobMenuWorkerId!=null)this.closeJobMenu();else this.setOpen(false);}},options);
     this.viewport.addEventListener('scroll',()=>{if(this.jobMenuWorkerId!=null)this.closeJobMenu({focus:false});if(this.open)this.renderVisible();},options);
@@ -60,8 +55,10 @@ export class PopulationSidebar {
     if(sort)this.sort.value=sort;if(profession)this.profession.value=profession;
   }
   updateCount(count){document.querySelector('#population-tab-count').textContent=count;this.lastRefresh=-Infinity;}
+  // Owner 21 Nov 2026: the open panel reaches from just under the top bar to the bottom of the window.
+  fitHeight(){const hud=document.querySelector('.inventory')?.getBoundingClientRect?.();if(hud&&hud.height){const top=`${Math.round(hud.bottom+8)}px`;if(this.root.style.top!==top)this.root.style.top=top;}}
   setOpen(value){
-    this.open=!!value;if(!this.open)this.closeJobMenu({focus:false});this.root.classList.toggle('open',this.open);this.root.inert=!this.open;this.root.setAttribute('aria-hidden',String(!this.open));this.button.setAttribute('aria-expanded',String(this.open));
+    this.open=!!value;if(this.open)this.fitHeight();if(!this.open)this.closeJobMenu({focus:false});this.root.classList.toggle('open',this.open);this.root.inert=!this.open;this.root.setAttribute('aria-hidden',String(!this.open));this.button.setAttribute('aria-expanded',String(this.open));
     if(this.open)this.refresh(true);else{clearTimeout(this.inspectTimer);this.hideDetails();for(const record of this.rows.values())record.controller.abort();this.list.replaceChildren();this.rows.clear();this.visibleOrder=null;}
   }
   portrait(worker){
@@ -81,19 +78,10 @@ export class PopulationSidebar {
     const text=t('population.summary',{total:summary.total,employed:summary.employed,unemployed:summary.unemployed});
     const output=document.querySelector('#population-summary');if(output.textContent!==text)output.textContent=text;
     document.querySelector('#population-empty').hidden=this.records.length>0||this.deaths.length>0;document.querySelector('#population-filter-count').textContent=`${t('population.shown',{count:this.records.length,total:summary.total})}${this.deaths.length?` · ${t('population.recentDeathsCount',{count:this.deaths.length})}`:''}`;
-    this.list.style.height=`${this.displayRecords.length*POPULATION_ROW_HEIGHT}px`;this.renderVisible();this.refreshDetails();this.renderDeceased();this.renderSoldiers(summary.residents);
+    this.list.style.height=`${this.displayRecords.length*POPULATION_ROW_HEIGHT}px`;this.renderVisible();this.refreshDetails();this.renderDeceased();
     // Point 46: the profession filter shows the numbers; rebuilt only when they change and the list is not in use. Point 40: the Haulers box.
     if(document.activeElement!==this.profession&&this.statsKey(jobStats(this.scene))!==this.professionKey)this.renderOptions();
     if(this.scene.employment){const key=haulerBoxKey(this.scene);if(key!==this.haulerKey){this.haulerKey=key;renderHaulerBox(this.scene,this.haulerBox);}}
-  }
-  renderSoldiers(residents){
-    if(!this.soldiers)return;const military=this.scene.military,soldiers=residents.filter(w=>w.profession==='soldier').sort((a,b)=>names.compare(a.name,b.name));
-    const items=soldiers.map(w=>{const type=militaryRank(this.scene,w),shelter=w.sleepingIn!=null?this.scene.buildings.find(b=>b.id===w.sleepingIn):null;
-      return {id:w.id,name:w.name,type,state:shelter?t('population.soldierAsleep',{building:this.scene.objectRegistry.get(shelter.type)?.name??shelter.type}):localized(`work.state.${w.workState}`,w.workState)};});
-    const sig=JSON.stringify([items,language()]);if(sig===this.soldiersSig)return;this.soldiersSig=sig;
-    this.soldiers.hidden=!items.length;this.soldiersTitle.textContent=t('population.soldiers',{count:items.length,recruits:soldiers.filter(w=>!military?.unit(w)).length});
-    this.soldiersList.replaceChildren(...items.map(item=>{const b=element('button','population-soldier');b.type='button';b.dataset.soldierId=item.id;b.title=t('population.locateName',{name:item.name});
-      b.append(element('strong','',item.name),element('small','',`${item.type} · ${item.state}`));return b;}));
   }
   // m-hlasky-udalosti (41): the folding Deceased section – everyone who died (last 50), with the cause and the day.
   renderDeceased(){
