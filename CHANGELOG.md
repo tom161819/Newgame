@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.24] - 2026-11-21
+<!-- version: {"title":"Kingdom rank: Castle not counted","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Changed
+- The Castle no longer counts among the 8 buildings needed for Village.
+### Removed
+- Royal tasks "Wall" and "Barracks" (they need Castle level 3).
+
 ## [0.149.23] - 2026-11-21
 <!-- version: {"title":"Kingdom rank","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added

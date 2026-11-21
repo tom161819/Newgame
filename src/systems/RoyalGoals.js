@@ -1,5 +1,5 @@
 import { buildingIsComplete } from '../game/buildingState.js';
-import { ROYAL_GOALS, ROYAL_GOALS_ACTIVE, ROYAL_GOALS_CHECK_MS } from '../data/royalGoals.js';
+import { ROYAL_GOALS, ROYAL_GOALS_ACTIVE, ROYAL_GOALS_CHECK_MS, RETIRED_ROYAL_GOALS } from '../data/royalGoals.js';
 
 const typeOf=building=>building.type??building.definition?.id;
 // The world figures a goal is measured against. Buildings, residents and gold come from the world itself; finished
@@ -48,7 +48,7 @@ export class RoyalGoals {
 }
 export function validRoyalGoalState(data,goals=ROYAL_GOALS){
   if(!data||typeof data!=='object'||Array.isArray(data))return false;
-  const ids=new Set(goals.map(g=>g.id));
+  const ids=new Set([...goals.map(g=>g.id),...RETIRED_ROYAL_GOALS]);
   if(!Array.isArray(data.done)||new Set(data.done).size!==data.done.length||!data.done.every(id=>ids.has(id)))return false;
   if(!data.produced||typeof data.produced!=='object'||Array.isArray(data.produced))return false;
   return Object.values(data.produced).every(n=>Number.isSafeInteger(n)&&n>=0);

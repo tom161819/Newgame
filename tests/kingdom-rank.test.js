@@ -24,8 +24,8 @@ test('the rank shows the conditions for the next one: Granary, Material Yard, Ha
   const few=[building('castle',{level:1}),building('granary'),building('house'),building('stone_pavement')];
   let rank=kingdomRank(few,{happiness:80,foodDays:4});
   assert.equal(rank.rank,'settlement');assert.equal(rank.nextRank,'village');assert.equal(rank.total,5);assert.equal(rank.met,2);assert.equal(rank.ready,false);
-  assert.equal(countedBuildings(few),3,'paving is not counted');
-  const many=[...few,building('material_yard'),...Array.from({length:4},()=>building('house'))];
+  assert.equal(countedBuildings(few),2,'the Castle and paving are not counted');
+  const many=[...few,building('material_yard'),...Array.from({length:5},()=>building('house'))];
   rank=kingdomRank(many,{happiness:70,foodDays:10});assert.equal(rank.met,5);assert.equal(rank.ready,true);
   // Level 2 → 3: no conditions yet.
   rank=kingdomRank([building('castle',{level:2})],{});assert.equal(rank.rank,'village');assert.equal(rank.total,0);
