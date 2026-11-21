@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.21] - 2026-11-21
+<!-- version: {"title":"Tripo Tower and Gate v2","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Changed
+- The Stone Tower and Gate use the owner's approved new renders: their foot fills the 2 × 2 tiles and the walls meet them without a gap.
+
 ## [0.149.20] - 2026-11-21
 <!-- version: {"title":"Studio: Tripo Tower and Gate v2","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Added

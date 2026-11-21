@@ -57,8 +57,9 @@ function parapet(g,a,b,height,color){
 }
 
 // Stejné rozhraní jako TowerView, rozměry a výška pocházejí z definice.
-// How far (in tiles) a wall's stub reaches into a Tower or Gate: the Tripo bodies stand about this far inside their tiles.
-export const WALL_STUB=.22;
+// How far (in tiles) a wall's stub reaches into a Tower or Gate: the Tripo bodies stand about this far inside their tiles
+// (the corners of their foot are bevelled).
+export const WALL_STUB=.06;// .22 before the v2 renders (21 Nov 2026) filled the tiles
 export class FortificationView {
   constructor(scene,building,preview=false){
     this.scene=scene;this.preview=preview;this.back=scene.add.graphics();this.front=scene.add.graphics();this.footprint=scene.add.graphics();this.art={};this.shadows={};this.artShown={};this.stubArt={};

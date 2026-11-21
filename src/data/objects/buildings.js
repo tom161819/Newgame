@@ -4,22 +4,23 @@ import { WORKPLACES } from '../workplaces.js';
 import { MINING_WORK } from '../minerals.js';
 export const buildings = [
   {
-    // Approved Asset Studio sprite (art/sprites/watchtower/watchtower-tripo.v1.json); TowerView stays the fallback.
-    id: 'tower', name: 'Stone Tower', category: 'building', buildingCategory:'defense', sprite: '/assets/buildings/tower/watchtower-tripo.v1.png',
-    frontSprite: '/assets/buildings/tower/watchtower-tripo.v1.front.png', artSource: 'art/sprites/watchtower/watchtower-tripo.v1.json',
+    // Approved Asset Studio sprite (art/sprites/watchtower/watchtower-tripo.v2.json – owner 21 Nov 2026: v2, the foot fills
+    // the 2 × 2 tiles); TowerView stays the fallback.
+    id: 'tower', name: 'Stone Tower', category: 'building', buildingCategory:'defense', sprite: '/assets/buildings/tower/watchtower-tripo.v2.png',
+    frontSprite: '/assets/buildings/tower/watchtower-tripo.v2.front.png', artSource: 'art/sprites/watchtower/watchtower-tripo.v2.json',
     visibility: { multiplier: 2 },
     // Owner 17 Nov 2026: the door shows the side a Tower is climbed from (facing 1: on the right face; 2 and 3: hidden).
     // Provisional sprites cut from the approved one by the mechanics chat until the Studio has the turned views.
-    artSprites: { 'door-e': { sprite: '/assets/buildings/tower/watchtower-tripo.v1.door-e.png', origin: { x: 0.36932, y: 0.99177 } }, 'no-door': { sprite: '/assets/buildings/tower/watchtower-tripo.v1.no-door.png', origin: { x: 0.36932, y: 0.99177 } } },
+    artSprites: { 'door-e': { sprite: '/assets/buildings/tower/watchtower-tripo.v2.door-e.png', origin: { x: 0.36813, y: 0.99187 } }, 'no-door': { sprite: '/assets/buildings/tower/watchtower-tripo.v2.no-door.png', origin: { x: 0.36813, y: 0.99187 } } },
     // m-staveni-zdi-studna (59): the tool stays selected after placing; a Tower may replace Stone Wall segments.
     width: 2, height: 2, walkable: false, collectible: false, buildable: true, repeatPlacement: true, replacesWall: true,
     cost: { stone: 20 }, interactions: ['enter', 'exit'], description: 'Kamenná strážní věž s horní plošinou a cimbuřím.',
     constructionTime:20000,
-    renderMode: 'sprite', renderer: 'tower', origin: { x: 0.36932, y: 0.99177 }, frontOrigin: { x: 0.36932, y: 0.99177 }, visualHeight: 241,
+    renderMode: 'sprite', renderer: 'tower', origin: { x: 0.36813, y: 0.99187 }, frontOrigin: { x: 0.36813, y: 0.99187 }, visualHeight: 244,
     // Owner 20 Nov 2026 ("jednotky na věži překrývají texturu věže"): the deck floor in the middle of the Tripo platform (the
     // render's -195.3 was the top of the front parapet, so men stood on its edge in front of the merlons).
     platform: { x: 0, y: -206 }, depth: { offset: 0 },
-    lights: [{ type: 'torch', x: -12, y: -84, color: '#ffb25a', radius: 102.4, intensity: 0.95, flicker: { amplitude: 0.12, speed: 7 }, flameSize: 1 }],
+    lights: [{ type: 'torch', x: -14, y: -80, color: '#ffb25a', radius: 102.4, intensity: 0.95, flicker: { amplitude: 0.12, speed: 7 }, flameSize: 1 }],
     // Day and night N2: two torch holders (2 Torches a night); their sight counts only with someone on the tower.
     fuel: TORCHES.places.tower,
     shadow: { baked: true, x: 8, y: -20, width: 114, height: 43, color: 0x30291c, alpha: 0.3 },
@@ -81,16 +82,16 @@ export const buildings = [
   // m-brana-2x2 (owner, 12 Nov): the Gate is 2 × 2 and joins the walls at its sides; people pass through it on the ground
   // and climb to the wall walk from the walls beside it (as at a Tower). The 1 × 1 Gate stays for older saves only.
   {
-    id:'gate',name:'Gate',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/gate/gate-tripo.v1.png',artSource:'art/sprites/gate/gate-tripo.v1.json',
+    id:'gate',name:'Gate',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/gate/gate-tripo.v2.png',artSource:'art/sprites/gate/gate-tripo.v2.json',
     // Owner 20 Nov 2026: the gatehouse from the owner's Tripo model, one picture per axis (walls north–south: main; east–west: axis-x).
     // Owner 20 Nov 2026 ("jednotky na věži překrývají texturu"): men posted on the Gate stand on its deck behind the front
     // merlons. The front layers are cut from the same Tripo render (render_glb.py --front, the approved camera and model).
-    frontSprite:'/assets/buildings/gate/gate-tripo.v1.front.png',frontOrigin:{x:.44,y:.98726},platform:{x:0,y:-118},
-    artSprites:{'axis-x':{sprite:'/assets/buildings/gate/gate-tripo.v1.axis-x.png',origin:{x:.44,y:.98726}},'axis-x-front':{sprite:'/assets/buildings/gate/gate-tripo.v1.axis-x.front.png',origin:{x:.44,y:.98726}}},
+    frontSprite:'/assets/buildings/gate/gate-tripo.v2.front.png',frontOrigin:{x:.44444,y:.96894},platform:{x:0,y:-118},
+    artSprites:{'axis-x':{sprite:'/assets/buildings/gate/gate-tripo.v2.axis-x.png',origin:{x:.4375,y:.98137}},'axis-x-front':{sprite:'/assets/buildings/gate/gate-tripo.v2.axis-x.front.png',origin:{x:.4375,y:.98137}}},
     width:2,height:2,walkable:true,collectible:false,buildable:true,cost:{stone:12},constructionTime:20000,repeatPlacement:true,replacesWall:true,
     interactions:[],description:'A 2 × 2 gate in the wall: people pass through it, and from the walls beside it you climb up to the wall walk.',
     visibility:{multiplier:1.75},
-    renderMode:'sprite',origin:{x:.44,y:.98726},visualHeight:155,depth:{offset:0},
+    renderMode:'sprite',origin:{x:.44444,y:.96894},visualHeight:158,depth:{offset:0},
   },
   // #118: Builders who have a place in a finished workshop (4 per workshop) work at full speed, others at half speed;
   // idle Builders wait at their workshop. Approved art: builders-workshop material yard (APPROVED_BUILDING_ART).

@@ -33,9 +33,26 @@
     "y": 0.99187
   },
   "visualHeight": 244,
-  "platform": null,
-  "frontLayer": false,
-  "gameLights": [],
+  "platform": {
+    "x": 0,
+    "y": -206
+  },
+  "frontLayer": true,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -14,
+      "y": -80,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
   "modelHeight": 4.66,
   "lights": [],
   "x2": {

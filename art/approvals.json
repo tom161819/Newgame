@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-20T20:56:00.000Z",
+  "updatedAt": "2026-11-21T08:39:09.872Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -627,6 +627,29 @@
         }
       }
     },
+    "gate": {
+      "preferred": "gate-tripo",
+      "variants": {
+        "gate-tripo": {
+          "approvedAt": "2026-11-21T08:37:07.314Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "91bfeb2c",
+          "status": "approved",
+          "updatedAt": "2026-11-21T08:37:07.314Z",
+          "version": 2
+        },
+        "gate-tripo-axis-x": {
+          "approvedAt": "2026-11-21T08:37:08.126Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "91bfeb2c",
+          "status": "approved",
+          "updatedAt": "2026-11-21T08:37:08.126Z",
+          "version": 2
+        }
+      }
+    },
     "granary-store": {
       "preferred": "granary-store-gpt-wood-0",
       "variants": {
@@ -975,6 +998,15 @@
           "updatedAt": "2026-11-15T01:00:00.000Z",
           "version": 1
         },
+        "hunting-lodge-render-90": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "29c42966",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
         "hunting-lodge-render-180": {
           "approvedAt": "2026-11-15T01:00:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -985,15 +1017,6 @@
           "version": 1
         },
         "hunting-lodge-render-270": {
-          "approvedAt": "2026-11-15T01:00:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
-          "specHash": "29c42966",
-          "status": "approved",
-          "updatedAt": "2026-11-15T01:00:00.000Z",
-          "version": 1
-        },
-        "hunting-lodge-render-90": {
           "approvedAt": "2026-11-15T01:00:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
@@ -1468,6 +1491,15 @@
           "updatedAt": "2026-11-15T01:00:00.000Z",
           "version": 1
         },
+        "village-green-render-90": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "1017e4b6",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
         "village-green-render-180": {
           "approvedAt": "2026-11-15T01:00:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -1485,15 +1517,365 @@
           "status": "approved",
           "updatedAt": "2026-11-15T01:00:00.000Z",
           "version": 1
-        },
-        "village-green-render-90": {
-          "approvedAt": "2026-11-15T01:00:00.000Z",
+        }
+      }
+    },
+    "wall-diagonal": {
+      "preferred": null,
+      "variants": {
+        "wall-diagonal-se": {
+          "approvedAt": "2026-11-19T18:17:13.492Z",
+          "comments": [
+            {
+              "at": "2026-11-15T05:55:10.655Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to cimbuří je nějaký divný, oprav to",
+              "version": 5
+            }
+          ],
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
-          "specHash": "1017e4b6",
+          "note": "",
+          "specHash": "7cfc4d36",
           "status": "approved",
-          "updatedAt": "2026-11-15T01:00:00.000Z",
-          "version": 1
+          "updatedAt": "2026-11-19T18:17:13.492Z",
+          "version": 6,
+          "history": []
+        },
+        "wall-diagonal-ne": {
+          "approvedAt": "2026-11-19T18:17:14.680Z",
+          "comments": [
+            {
+              "at": "2026-11-15T05:55:13.451Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to cimbuří je nějaký divný, oprav to",
+              "version": 5
+            }
+          ],
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cd439fc3",
+          "status": "approved",
+          "updatedAt": "2026-11-19T18:17:14.680Z",
+          "version": 6,
+          "history": []
+        },
+        "wall-diagonal-elbow-ne-11": {
+          "approvedAt": "2026-11-15T05:55:17.245Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ccc14034",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:17.245Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-ne-10": {
+          "approvedAt": "2026-11-15T05:55:35.335Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "855830bb",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:35.335Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-ne-01": {
+          "approvedAt": "2026-11-15T05:55:20.320Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4e31ce05",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:20.320Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-ne-00": {
+          "approvedAt": "2026-11-15T05:55:21.071Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a0876624",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:21.071Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-se-11": {
+          "approvedAt": "2026-11-15T05:55:21.767Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8db96739",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:21.767Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-se-10": {
+          "approvedAt": "2026-11-15T05:55:22.411Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e15d35d4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:22.411Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-se-01": {
+          "approvedAt": "2026-11-15T05:55:22.959Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "974d476a",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:22.959Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-se-00": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c2c7e625",
+          "status": "rejected",
+          "updatedAt": "2026-11-15T16:53:14.039Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-sw-11": {
+          "approvedAt": "2026-11-15T05:55:25.411Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e56c4a83",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:25.411Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-sw-10": {
+          "approvedAt": "2026-11-15T05:55:26.338Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f66910a6",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:26.338Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-sw-01": {
+          "approvedAt": "2026-11-15T05:55:27.278Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5630736c",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:27.278Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-sw-00": {
+          "approvedAt": "2026-11-15T05:55:28.371Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a71728f7",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:28.371Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-nw-11": {
+          "approvedAt": "2026-11-15T05:55:29.642Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0a0aefc2",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:55:29.642Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-nw-10": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a3a152e9",
+          "status": "rejected",
+          "updatedAt": "2026-11-15T16:53:14.982Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-nw-01": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "694a183b",
+          "status": "rejected",
+          "updatedAt": "2026-11-15T16:53:20.520Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-elbow-nw-00": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "01d03dba",
+          "status": "rejected",
+          "updatedAt": "2026-11-15T16:53:22.196Z",
+          "version": 5,
+          "history": []
+        },
+        "wall-diagonal-se-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7cf59171",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-ne-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cd41612c",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-ne-11-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ccca3a90",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-ne-10-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "854da35f",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-ne-01-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4e28d3a9",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-ne-00-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a0906080",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-se-11-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8dc3f495",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-se-10-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e1663030",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-se-01-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9757d4c6",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-se-00-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c2bd58c9",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-sw-11-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e561bd27",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-sw-10-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f660164a",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-sw-01-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "56396dc8",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-sw-00-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a721b653",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-nw-11-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0a13ea1e",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-nw-10-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a3abe045",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-nw-01-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "693f8adf",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
+        },
+        "wall-diagonal-elbow-nw-00-tripo": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "01dacb16",
+          "status": "approved",
+          "updatedAt": "2026-11-20T20:55:57.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-20T20:55:57.000Z"
         }
       }
     },
@@ -1695,13 +2077,13 @@
           "approvedAt": "2026-11-07T10:18:41.561Z"
         },
         "watchtower-tripo": {
+          "approvedAt": "2026-11-21T08:37:10.571Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "91b92f67",
+          "specHash": "91bfeb2c",
           "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
+          "updatedAt": "2026-11-21T08:37:10.571Z",
+          "version": 2
         }
       }
     },
@@ -1855,6 +2237,20 @@
           "status": "approved",
           "updatedAt": "2026-11-07T21:49:00.000Z",
           "version": 1
+        }
+      }
+    },
+    "fountain": {
+      "preferred": "fountain-render-0",
+      "variants": {
+        "fountain-render-0": {
+          "approvedAt": "2026-11-14T21:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 14 Nov 2026: add this render to the game; v2 after his note that the cut was poor.",
+          "specHash": "937d202a",
+          "status": "approved",
+          "updatedAt": "2026-11-14T21:15:00.000Z",
+          "version": 2
         }
       }
     },
@@ -4238,79 +4634,16 @@
           "updatedAt": "2026-11-04T19:05:31.540Z",
           "approvedAt": "2026-11-04T19:05:31.540Z"
         },
-        "oak-tree-render-broad-0": {
-          "approvedAt": "2026-11-15T01:00:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
-          "specHash": "63410ccd",
-          "status": "approved",
-          "updatedAt": "2026-11-15T01:00:00.000Z",
-          "version": 1
-        },
-        "oak-tree-render-broad-180": {
-          "approvedAt": "2026-11-15T01:00:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
-          "specHash": "63410ccd",
-          "status": "approved",
-          "updatedAt": "2026-11-15T01:00:00.000Z",
-          "version": 1
-        },
-        "oak-tree-render-broad-270": {
-          "approvedAt": "2026-11-15T01:00:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
-          "specHash": "63410ccd",
-          "status": "approved",
-          "updatedAt": "2026-11-15T01:00:00.000Z",
-          "version": 1
-        },
-        "oak-tree-render-broad-90": {
-          "approvedAt": "2026-11-15T01:00:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
-          "specHash": "63410ccd",
-          "status": "approved",
-          "updatedAt": "2026-11-15T01:00:00.000Z",
-          "version": 1
-        },
-        "oak-tree-render-mature-0": {
-          "approvedAt": "2026-11-15T01:00:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
-          "specHash": "b727122d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T01:00:00.000Z",
-          "version": 1
-        },
-        "oak-tree-render-mature-180": {
-          "approvedAt": "2026-11-15T01:00:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
-          "specHash": "b727122d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T01:00:00.000Z",
-          "version": 1
-        },
-        "oak-tree-render-mature-270": {
-          "approvedAt": "2026-11-15T01:00:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
-          "specHash": "b727122d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T01:00:00.000Z",
-          "version": 1
-        },
-        "oak-tree-render-mature-90": {
-          "approvedAt": "2026-11-15T01:00:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
-          "specHash": "b727122d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T01:00:00.000Z",
-          "version": 1
-        },
         "oak-tree-render-young-0": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-young-90": {
           "approvedAt": "2026-11-15T01:00:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
@@ -4337,155 +4670,110 @@
           "updatedAt": "2026-11-15T01:00:00.000Z",
           "version": 1
         },
-        "oak-tree-render-young-90": {
+        "oak-tree-render-broad-0": {
           "approvedAt": "2026-11-15T01:00:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
-          "specHash": "ad828bf4",
+          "specHash": "63410ccd",
           "status": "approved",
           "updatedAt": "2026-11-15T01:00:00.000Z",
           "version": 1
         },
-        "oak-tree-season-young-spring-0": {
+        "oak-tree-render-broad-90": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "63410ccd",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-broad-180": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "63410ccd",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-broad-270": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "63410ccd",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-mature-0": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "b727122d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-mature-90": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "b727122d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-mature-180": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "b727122d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-mature-270": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "b727122d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-broad-autumn-0": {
           "approvedAt": "2026-11-15T04:20:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
+          "specHash": "63410ccd",
           "status": "approved",
           "updatedAt": "2026-11-15T04:20:00.000Z",
           "version": 1
         },
-        "oak-tree-season-young-spring-90": {
+        "oak-tree-season-broad-autumn-90": {
           "approvedAt": "2026-11-15T04:20:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
+          "specHash": "63410ccd",
           "status": "approved",
           "updatedAt": "2026-11-15T04:20:00.000Z",
           "version": 1
         },
-        "oak-tree-season-young-spring-180": {
+        "oak-tree-season-broad-autumn-180": {
           "approvedAt": "2026-11-15T04:20:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
+          "specHash": "63410ccd",
           "status": "approved",
           "updatedAt": "2026-11-15T04:20:00.000Z",
           "version": 1
         },
-        "oak-tree-season-young-spring-270": {
+        "oak-tree-season-broad-autumn-270": {
           "approvedAt": "2026-11-15T04:20:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-young-summer-0": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-young-summer-90": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-young-summer-180": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-young-summer-270": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-young-autumn-0": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-young-autumn-90": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-young-autumn-180": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-young-autumn-270": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-young-winter-0": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-young-winter-90": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-young-winter-180": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-young-winter-270": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "ad828bf4",
+          "specHash": "63410ccd",
           "status": "approved",
           "updatedAt": "2026-11-15T04:20:00.000Z",
           "version": 1
@@ -4562,42 +4850,6 @@
           "updatedAt": "2026-11-15T04:20:00.000Z",
           "version": 1
         },
-        "oak-tree-season-broad-autumn-0": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "63410ccd",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-broad-autumn-90": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "63410ccd",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-broad-autumn-180": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "63410ccd",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-broad-autumn-270": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "63410ccd",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
         "oak-tree-season-broad-winter-0": {
           "approvedAt": "2026-11-15T04:20:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -4630,6 +4882,42 @@
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
           "specHash": "63410ccd",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-grand-autumn-0": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "b727122d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-grand-autumn-90": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "b727122d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-grand-autumn-180": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "b727122d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-grand-autumn-270": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "b727122d",
           "status": "approved",
           "updatedAt": "2026-11-15T04:20:00.000Z",
           "version": 1
@@ -4706,42 +4994,6 @@
           "updatedAt": "2026-11-15T04:20:00.000Z",
           "version": 1
         },
-        "oak-tree-season-grand-autumn-0": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "b727122d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-grand-autumn-90": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "b727122d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-grand-autumn-180": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "b727122d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
-        "oak-tree-season-grand-autumn-270": {
-          "approvedAt": "2026-11-15T04:20:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
-          "specHash": "b727122d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T04:20:00.000Z",
-          "version": 1
-        },
         "oak-tree-season-grand-winter-0": {
           "approvedAt": "2026-11-15T04:20:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -4774,6 +5026,150 @@
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
           "specHash": "b727122d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-autumn-0": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-autumn-90": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-autumn-180": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-autumn-270": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-spring-0": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-spring-90": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-spring-180": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-spring-270": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-summer-0": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-summer-90": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-summer-180": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-summer-270": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-winter-0": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-winter-90": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-winter-180": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T04:20:00.000Z",
+          "version": 1
+        },
+        "oak-tree-season-young-winter-270": {
+          "approvedAt": "2026-11-15T04:20:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 05:06: \"tady jsou ty duby podle ročních období\" – the season oaks he promised for the game (\"duby pro roční období dodám\"); scaled to the in-game sizes of the approved summer oaks.",
+          "specHash": "ad828bf4",
           "status": "approved",
           "updatedAt": "2026-11-15T04:20:00.000Z",
           "version": 1
@@ -4820,151 +5216,7 @@
           "updatedAt": "2026-11-04T19:05:46.618Z",
           "approvedAt": "2026-11-04T19:05:46.618Z"
         },
-        "pine-tree-season-young-spring-0": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-spring-90": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-spring-180": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-spring-270": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-summer-0": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-summer-90": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-summer-180": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-summer-270": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-autumn-0": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-autumn-90": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-autumn-180": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-autumn-270": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-winter-0": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-winter-90": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-winter-180": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-young-winter-270": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "59fc743d",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-medium-spring-0": {
+        "pine-tree-season-mature-autumn-0": {
           "approvedAt": "2026-11-15T05:15:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
@@ -4973,7 +5225,7 @@
           "updatedAt": "2026-11-15T05:15:00.000Z",
           "version": 1
         },
-        "pine-tree-season-medium-spring-90": {
+        "pine-tree-season-mature-autumn-90": {
           "approvedAt": "2026-11-15T05:15:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
@@ -4982,7 +5234,7 @@
           "updatedAt": "2026-11-15T05:15:00.000Z",
           "version": 1
         },
-        "pine-tree-season-medium-spring-180": {
+        "pine-tree-season-mature-autumn-180": {
           "approvedAt": "2026-11-15T05:15:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
@@ -4991,115 +5243,7 @@
           "updatedAt": "2026-11-15T05:15:00.000Z",
           "version": 1
         },
-        "pine-tree-season-medium-spring-270": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-medium-summer-0": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-medium-summer-90": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-medium-summer-180": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-medium-summer-270": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-medium-autumn-0": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-medium-autumn-90": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-medium-autumn-180": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-medium-autumn-270": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-medium-winter-0": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-medium-winter-90": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-medium-winter-180": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-medium-winter-270": {
+        "pine-tree-season-mature-autumn-270": {
           "approvedAt": "2026-11-15T05:15:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
@@ -5180,42 +5324,6 @@
           "updatedAt": "2026-11-15T05:15:00.000Z",
           "version": 1
         },
-        "pine-tree-season-mature-autumn-0": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-mature-autumn-90": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-mature-autumn-180": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
-        "pine-tree-season-mature-autumn-270": {
-          "approvedAt": "2026-11-15T05:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
-          "specHash": "fa63223e",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:15:00.000Z",
-          "version": 1
-        },
         "pine-tree-season-mature-winter-0": {
           "approvedAt": "2026-11-15T05:15:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -5248,6 +5356,294 @@
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
           "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-autumn-0": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-autumn-90": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-autumn-180": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-autumn-270": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-spring-0": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-spring-90": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-spring-180": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-spring-270": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-summer-0": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-summer-90": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-summer-180": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-summer-270": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-winter-0": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-winter-90": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-winter-180": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-medium-winter-270": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "fa63223e",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-autumn-0": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-autumn-90": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-autumn-180": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-autumn-270": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-spring-0": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-spring-90": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-spring-180": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-spring-270": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-summer-0": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-summer-90": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-summer-180": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-summer-270": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-winter-0": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-winter-90": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-winter-180": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T05:15:00.000Z",
+          "version": 1
+        },
+        "pine-tree-season-young-winter-270": {
+          "approvedAt": "2026-11-15T05:15:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026 06:09: \"tady je soubor se smrky, postupuj jako u dubů\" – his spruces for the game (Smrky_obdobi); scaled to the in-game sizes like the oaks.",
+          "specHash": "59fc743d",
           "status": "approved",
           "updatedAt": "2026-11-15T05:15:00.000Z",
           "version": 1
@@ -7755,402 +8151,6 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:07:23.159Z",
           "approvedAt": "2026-11-04T19:07:23.159Z"
-        }
-      }
-    },
-    "fountain": {
-      "preferred": "fountain-render-0",
-      "variants": {
-        "fountain-render-0": {
-          "approvedAt": "2026-11-14T21:15:00.000Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 14 Nov 2026: add this render to the game; v2 after his note that the cut was poor.",
-          "specHash": "937d202a",
-          "status": "approved",
-          "updatedAt": "2026-11-14T21:15:00.000Z",
-          "version": 2
-        }
-      }
-    },
-    "wall-diagonal": {
-      "preferred": null,
-      "variants": {
-        "wall-diagonal-se": {
-          "approvedAt": "2026-11-19T18:17:13.492Z",
-          "comments": [
-            {
-              "at": "2026-11-15T05:55:10.655Z",
-              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-              "text": "to cimbuří je nějaký divný, oprav to",
-              "version": 5
-            }
-          ],
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "7cfc4d36",
-          "status": "approved",
-          "updatedAt": "2026-11-19T18:17:13.492Z",
-          "version": 6,
-          "history": []
-        },
-        "wall-diagonal-ne": {
-          "approvedAt": "2026-11-19T18:17:14.680Z",
-          "comments": [
-            {
-              "at": "2026-11-15T05:55:13.451Z",
-              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-              "text": "to cimbuří je nějaký divný, oprav to",
-              "version": 5
-            }
-          ],
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "cd439fc3",
-          "status": "approved",
-          "updatedAt": "2026-11-19T18:17:14.680Z",
-          "version": 6,
-          "history": []
-        },
-        "wall-diagonal-elbow-ne-00": {
-          "approvedAt": "2026-11-15T05:55:21.071Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "a0876624",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:55:21.071Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-ne-01": {
-          "approvedAt": "2026-11-15T05:55:20.320Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "4e31ce05",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:55:20.320Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-ne-10": {
-          "approvedAt": "2026-11-15T05:55:35.335Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "855830bb",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:55:35.335Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-ne-11": {
-          "approvedAt": "2026-11-15T05:55:17.245Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "ccc14034",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:55:17.245Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-nw-00": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "01d03dba",
-          "status": "rejected",
-          "updatedAt": "2026-11-15T16:53:22.196Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-nw-01": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "694a183b",
-          "status": "rejected",
-          "updatedAt": "2026-11-15T16:53:20.520Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-nw-10": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "a3a152e9",
-          "status": "rejected",
-          "updatedAt": "2026-11-15T16:53:14.982Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-nw-11": {
-          "approvedAt": "2026-11-15T05:55:29.642Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "0a0aefc2",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:55:29.642Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-se-00": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "c2c7e625",
-          "status": "rejected",
-          "updatedAt": "2026-11-15T16:53:14.039Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-se-01": {
-          "approvedAt": "2026-11-15T05:55:22.959Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "974d476a",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:55:22.959Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-se-10": {
-          "approvedAt": "2026-11-15T05:55:22.411Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "e15d35d4",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:55:22.411Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-se-11": {
-          "approvedAt": "2026-11-15T05:55:21.767Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "8db96739",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:55:21.767Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-sw-00": {
-          "approvedAt": "2026-11-15T05:55:28.371Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "a71728f7",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:55:28.371Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-sw-01": {
-          "approvedAt": "2026-11-15T05:55:27.278Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "5630736c",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:55:27.278Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-sw-10": {
-          "approvedAt": "2026-11-15T05:55:26.338Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "f66910a6",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:55:26.338Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-elbow-sw-11": {
-          "approvedAt": "2026-11-15T05:55:25.411Z",
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "e56c4a83",
-          "status": "approved",
-          "updatedAt": "2026-11-15T05:55:25.411Z",
-          "version": 5,
-          "history": []
-        },
-        "wall-diagonal-se-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "7cf59171",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-ne-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "cd41612c",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-ne-11-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "ccca3a90",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-ne-10-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "854da35f",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-ne-01-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "4e28d3a9",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-ne-00-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "a0906080",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-se-11-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "8dc3f495",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-se-10-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "e1663030",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-se-01-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "9757d4c6",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-se-00-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "c2bd58c9",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-sw-11-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "e561bd27",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-sw-10-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "f660164a",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-sw-01-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "56396dc8",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-sw-00-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "a721b653",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-nw-11-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "0a13ea1e",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-nw-10-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "a3abe045",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-nw-01-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "693f8adf",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "wall-diagonal-elbow-nw-00-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "01dacb16",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        }
-      }
-    },
-    "gate": {
-      "preferred": "gate-tripo",
-      "variants": {
-        "gate-tripo": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "91b92f67",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
-        },
-        "gate-tripo-axis-x": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "91b92f67",
-          "status": "approved",
-          "updatedAt": "2026-11-20T20:55:57.000Z",
-          "version": 1,
-          "approvedAt": "2026-11-20T20:55:57.000Z"
         }
       }
     }

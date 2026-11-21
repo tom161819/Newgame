@@ -30,7 +30,7 @@ test('the approved wall block breaks off from the top stage by stage; the same w
 });
 
 test('a Tower or a Gate keeps its outline (cracks and fallen bricks only), darker with every stage',()=>{
-  const png=decodePng(readFileSync(new URL('../public/assets/buildings/tower/watchtower-tripo.v1.png',import.meta.url))),{width:w,height:h}=png,whole=solid(png.data,w,h),base=light(png.data,w,h);let before=base;
+  const png=decodePng(readFileSync(new URL('../public/assets/buildings/tower/watchtower-tripo.v2.png',import.meta.url))),{width:w,height:h}=png,whole=solid(png.data,w,h),base=light(png.data,w,h);let before=base;
   for(const stage of [1,2,3]){const d=damagePixels(new Uint8ClampedArray(png.data),w,h,stage,'tower:0',{chip:false});assert.equal(solid(d,w,h),whole,'no pixel removed');const l=light(d,w,h);assert.ok(l<before,`stage ${stage} is darker`);before=l;}
 });
 
