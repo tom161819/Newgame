@@ -1,6 +1,6 @@
 {
   "name": "newgame",
-  "version": "0.149.21",
+  "version": "0.149.22",
   "private": true,
   "type": "module",
   "engines": {
@@ -27,7 +27,7 @@
     "build:pages": "npm run build -- --base=/Newgame/ && npm run archive:stage",
     "archive:verify-site": "node scripts/verify-site-archives.mjs",
     "studio": "vite --config studio/vite.config.js",
-    "studio:build": "vite build --config studio/vite.config.js",
+    "studio:build": "node scripts/studio-parts.mjs && vite build --config studio/vite.config.js",
     "studio:smoke": "node scripts/studio-smoke.mjs",
     "studio:lighting": "node scripts/studio-lighting.mjs",
     "studio:export": "node scripts/studio-export.mjs",
@@ -38,7 +38,9 @@
     "prices:sync": "node scripts/prices-sync.mjs",
     "art:revise": "node scripts/art-revise.mjs",
     "art:integrate": "node scripts/art-integrate.mjs",
-    "guide:sync": "node scripts/guide-sync.mjs"
+    "guide:sync": "node scripts/guide-sync.mjs",
+    "studio:parts": "node scripts/studio-parts.mjs",
+    "studio:build:parts": "node scripts/studio-parts.mjs && STUDIO_PART=buildings vite build --config studio/vite.config.js && STUDIO_PART=world vite build --config studio/vite.config.js"
   },
   "dependencies": {
     "@fontsource-variable/cinzel": "5.3.0",

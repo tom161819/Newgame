@@ -1,3 +1,4 @@
+import { exportedPngModules, exportedMetaModules } from '@studio-part';
 // Isolated Phaser 4 demo. It loads exported sprites (art/sprites) and places them
 // exactly as the game would: grid → world with the game's 64 × 32 projection,
 // image origin from the exported anchor, depth from the anchor's screen y.
@@ -12,8 +13,8 @@ import approvals from '../../../art/approvals.json';
 import { TIMES, timePreset, lightStrength, hexToRgb } from '../lib/lighting.js';
 import { TILE_WIDTH, TILE_HEIGHT } from '../lib/projection.js';
 
-const pngs = import.meta.glob(['../../../art/sprites/**/*.png', '!../../../art/sprites/{oak-tree,pine-tree}/*-season-*.x2.png', /* 21 Nov 2026: the superseded v1 Tripo tower and gate stay in the repo, not in the Studio (512-file limit) */ '!../../../art/sprites/{watchtower,gate}/*-tripo*.v1*.png', '!../../../art/sprites/wall-kit-preview/wall-kit-preview-diagonal{,-across}.v[1-4].png'], { eager: true, query: '?url', import: 'default' });
-const metas = import.meta.glob('../../../art/sprites/**/*.json', { eager: true, import: 'default' });
+const pngs = exportedPngModules;
+const metas = exportedMetaModules;
 const params = new URLSearchParams(location.search);
 const rendererChoice = params.get('renderer') === 'webgl' ? 'webgl' : 'canvas';
 let time = TIMES.includes(params.get('time')) ? params.get('time') : 'night';

@@ -1,3 +1,4 @@
+import { exportedPngModules, exportedMetaModules } from '@studio-part';
 // Fire Lab (owner, 7 Nov 2026): put a building from the Studio's exported sprites on the ground, set it on fire and
 // tune flames, smoke, embers, glow and charring. Settings can be saved to the page database and one can be proposed
 // for the game; Claude takes the proposal over on „revize“ and builds the game's fire effect from it.
@@ -16,8 +17,8 @@ function h(tag, attrs = {}, ...children) {
   return n;
 }
 // Exported sprites: newest version of each building variant (and the decorations that are small houses).
-const metas = import.meta.glob('../../../art/sprites/*/*.json', { eager: true, import: 'default' });
-const pngs = import.meta.glob(['../../../art/sprites/*/*.png', '!../../../art/sprites/{oak-tree,pine-tree}/*-season-*.x2.png', /* 21 Nov 2026: the superseded v1 Tripo tower and gate stay in the repo, not in the Studio (512-file limit) */ '!../../../art/sprites/{watchtower,gate}/*-tripo*.v1*.png', '!../../../art/sprites/wall-kit-preview/wall-kit-preview-diagonal{,-across}.v[1-4].png'], { eager: true, query: '?url', import: 'default' });
+const metas = exportedMetaModules;
+const pngs = exportedPngModules;
 const latest = new Map();
 for (const [path, meta] of Object.entries(metas)) {
   if (meta?.category !== 'buildings' || !meta.variantId) continue;

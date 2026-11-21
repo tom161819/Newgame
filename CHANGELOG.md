@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.149.22] - 2026-11-21
+<!-- version: {"title":"Asset Studio in two parts","type":"feature","reconstructed":false,"saveVersion":67} -->
+### Changed
+- Asset Studio is split into two pages: Buildings and fortifications, and Characters, nature and labs. Each links to the other's labs.
+
 ## [0.149.21] - 2026-11-21
 <!-- version: {"title":"Tripo Tower and Gate v2","type":"feature","reconstructed":false,"saveVersion":67} -->
 ### Changed
